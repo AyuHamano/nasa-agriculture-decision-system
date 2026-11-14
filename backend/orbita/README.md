@@ -34,9 +34,23 @@ De dentro de `backend/`:
    (RAW = p × TAW), o freio da sede (Ks) e o que a planta bebeu (Ks × pedido). A chuva que passa de encher se perde.
    A simulação é contínua, de 2014-07-01 ao último dia com dado. Terra sem planta evapora só a camada de cima (cap. 7,
    eq. 74). A braquiária continua bebendo água depois do milho, até ser seca antes da soja.
+   **A palha** (cap. 10, "Effects of surface mulches": a evaporação da terra cai uns 5% a cada 10% de terra coberta)
+   entra nas DUAS rotações, nos dias sem planta viva e na fase inicial da soja: 60% de cobertura com a palha do
+   milho (hoje) e 90% com a do milho mais a do capim (alternativa); as duas coberturas são hipótese.
+   **A disputa do capim com o milho** é hipótese e sai em faixa: enquanto os dois crescem juntos, o conjunto pede
+   (1 + fator) × o pedido do milho, com o fator em 0 (sem disputa), 0,04 (meio) e 0,08 (alta: o teto do Kc no
+   FAO-56, 1,30). O pedido do milho não muda; a terra é que seca mais depressa. Os campos antigos da alternativa
+   na resposta são os da hipótese do meio (`rotacoes.alternativa.disputa_com_o_milho` traz os três cenários).
 4. Por rotação e por safra (de 1/set a 31/ago): a falta de água em mm (pedido menos bebido), os dias de sede (dias com
    soja ou milho e Ks < 1) e a falta em % do pedido. "Safra com sede" = falta do milho de 20% ou mais (mostra também
    com 10% e 30%). "Dias sem planta viva" saem do calendário.
+5. **"Sede forte"**: safra de quebra = rendimento do milho de 2ª safra no IBGE abaixo de 80% da mediana das 10
+   safras; o nível é a menor falta do milho entre as safras de quebra, na conta da rotação de hoje com a terra
+   média e a chuva padrão. Sai do arquivo do IBGE, não está escrito à mão. O motor conta, em cada rotação, as safras
+   no nível ou acima, diz quais são, quais são alarme falso (sem quebra no IBGE) e que quebra ficou abaixo do nível.
+6. **O veredito da água** sai das duas pontas da faixa, pela falta de água da soja e do milho no pior ano: "a
+   alternativa se saiu melhor", "pior", "empate" (menos de 5 mm nas duas pontas) ou "depende da hipótese" (muda
+   dentro da faixa). Nenhuma vencedora está escrita no código.
 
 ## As fontes (cada arquivo guardado leva o endereço e a hora da consulta)
 | o quê | fonte | onde está |
@@ -46,6 +60,7 @@ De dentro de `backend/`:
 | as chuvas de comparação | CHIRPS, ERA5 (Open-Meteo), a chuva de modelo da NASA POWER (`PRECTOTCORR`) e a estação do INMET | `data/orbita/validacao/chuva/` e `data/orbita/nasa-power/` |
 | o rendimento do milho de 2ª safra | IBGE, Produção Agrícola Municipal | `data/orbita/validacao/ibge/` |
 | o verde visto pelo satélite (NDVI) | MODIS MOD13Q1 v061, 6 pontos escolhidos no mapa | `data/orbita/ndvi/` |
+| a palha e a disputa do capim com o milho | FAO-56, cap. 10 (a regra da palha: publicado) e cap. 7 (o teto do Kc); Embrapa Agropecuária Oeste (o relatório de impacto do consórcio, 2019, e o ensaio de Dourados, MS): dão a massa de palha e citam a disputa, sem número de cobertura nem de água; por isso as coberturas e a faixa são hipótese | `parametros.py` (`palha` e `disputa_com_o_milho`) |
 | os parâmetros (Kc, fases, raízes, p, a água da terra, o calendário) | FAO-56 e ZARC, com o link e a etiqueta "publicado" ou "hipótese" | `data/orbita/parametros-com-fonte.json` e `parametros.py` |
 
 ## Por que a chuva do satélite e o pior ano pelo IBGE
@@ -60,34 +75,45 @@ o padrão é a chuva do IMERG e o pior ano é o da pior colheita no IBGE (2015-1
 continuam, para comparar.
 
 ## O que a conta deu em 2026-11-14 (terra média; rode os comandos para ver tudo)
-- Padrão (`--chuva imerg --regra rendimento`): ano normal 2019-20, pior ano 2015-16. **Água: a rotação de hoje se saiu
-  melhor.** No pior ano faltaram 232,9 mm de água na rotação de hoje e 243,5 mm na alternativa (77 e 78 dias de sede);
-  no ano normal, 158,2 mm nas duas (61 dias de sede). O milho passou sede (20% ou mais) em 10 das 10 safras nas duas
-  rotações (com 30%, em 8). Dias sem planta viva: 122 (hoje) contra 30 (alternativa). **Resposta: "depende do que pesa
-  mais": a alternativa ganha em solo e erosão e perde em água.**
-- A falta de água do milho é igual nas duas rotações em todas as safras; a diferença aparece na soja (soma das 10
-  safras: 512,2 mm hoje, 538,7 mm na alternativa), porque a braquiária deixa a terra mais seca no plantio (no pior
-  ano, 26,5 mm de água na zona das raízes da soja na rotação de hoje e 10,6 mm na alternativa).
-- A resposta muda com as opções, e isso é parte do resultado: com `--regra chuva` (no IMERG: normal 2015-16, pior
-  2017-18) e com a chuva `power` (nas duas regras), a água empata e a resposta é "vale testar a troca"; com
-  `--terra muita`, a diferença contra a alternativa no pior ano sobe para 21,5 mm; com `--terra pouca`, empata (3,7 mm).
-- Com 10 de 10 safras "com sede", o critério de 20% não separa os anos: a conta, com a raiz do ZARC (0,5 m no milho)
-  e sem enxurrada nem palha, pede conferência de um agrônomo antes de virar número de vitrine.
+- Padrão (`--chuva imerg --regra rendimento`): ano normal 2019-20, pior ano 2015-16. **Água: depende da hipótese.**
+  No pior ano faltaram 225,9 mm de água na rotação de hoje (73 dias de sede); na alternativa, de 229,8 mm (sem
+  disputa: 3,9 mm a mais, dentro do empate de 5 mm) a 241,2 mm (disputa alta: 15,3 mm a mais), com 76 a 77 dias de
+  sede. No ano normal, 152,8 mm hoje e de 149,9 a 163,2 mm na alternativa. Dias sem planta viva: 122 (hoje) contra
+  30 (alternativa). **Resposta: "depende": a alternativa ganha em solo e erosão, e na água o resultado muda com a
+  hipótese da disputa.**
+- A falta de água do milho no pior ano: 220,6 mm (49,6% do pedido) na rotação de hoje e de 220,6 a 232,0 mm (49,6% a
+  52,1%) na alternativa; no ano normal, 142,8 mm (34,7%) e de 142,8 a 156,1 mm (34,7% a 38,0%). Na soma das 10
+  safras: milho 1.696,6 mm hoje e de 1.696,6 a 1.811,6 mm na alternativa; soja 452,0 mm hoje e 427,1 mm na
+  alternativa (a palha a mais ajuda a soja na soma; no pior ano a terra ainda chega mais seca ao plantio: 31,5 mm
+  hoje e 18,2 mm na alternativa).
+- Sede forte: o nível saiu em 49,6% (as safras de quebra no IBGE são 2015-16 e 2021-22, abaixo de 5.380 kg/ha). Na
+  terra média, 2 de 10 safras nas duas rotações (2015-16 e 2021-22). Na terra que segura pouca água, 3 hoje e de 3 a 4
+  na alternativa, com 2020-21 como alarme falso (falta alta, colheita de 7.200 kg/ha); na que segura muita, 1 nas
+  duas, e a quebra de 2015-16 fica abaixo do nível. O critério antigo de 20% continua na resposta (10 de 10 safras).
+- A resposta muda com as opções, e isso é parte do resultado: com `--terra pouca`, depende da hipótese (de 0,9 mm a
+  menos a 8,7 mm a mais); com `--terra muita`, a alternativa se saiu pior nas duas pontas (de 8,8 a 21,4 mm a mais);
+  com `--regra chuva` (pior ano 2017-18), o sinal muda dentro da faixa (de 6,1 mm a menos a 6,2 mm a mais); com a
+  chuva `era5`, empate nas duas pontas.
 - NDVI (prova só da rotação de hoje): pelo calendário, 122 dias sem planta; o satélite viu 96 dias seguidos sem planta
   verde (mediana de 36 medidas, de 16 a 160 dias).
 
 ## Os limites
 - Um caso só, com calendário fixo. Não mede renda, preço, custo nem produtividade: falta de água não é quebra de safra.
-- Não mede a palha do capim (menos evaporação, mais chuva entrando na terra) nem a enxurrada: só entra o lado em que a
-  braquiária bebe água. Enquanto o milho está na terra, o capim debaixo dele não aumenta o pedido de água (hipótese).
+- A palha entra só pelo lado da evaporação, com uma cobertura fixa em cada rotação (não se desfaz com o tempo) e só
+  nos dias sem planta viva e na fase inicial da soja; não entra a chuva a mais que a palha deixa entrar na terra, nem
+  a enxurrada. As coberturas (60% e 90%) são hipótese: a Embrapa dá a massa de palha, não a terra coberta.
+- O quanto o capim disputa água com o milho não foi medido: a faixa (0, 4% e 8% a mais de pedido) é hipótese, e o
+  veredito da água pode mudar com ela.
+- O nível de sede forte sai de poucas safras (2 de quebra em 10) e de uma conta só: pode haver alarme falso e quebra
+  que a conta não vê. É régua de comparação, não previsão de quebra.
 - A ETo de Hargreaves ficou de 7% a 10% acima da ETo do FAO que o Open-Meteo entrega (o `validar` mostra).
 - O dia do IMERG é o UTC; a temperatura é do dia local. A safra 2025-26 fica à parte, "a conferir".
-- 18 parâmetros ainda são hipótese (o `--json` lista cada um): o dia de plantio e as fases da soja, o coeficiente da
+- 24 parâmetros ainda são hipótese (o `--json` lista cada um): o dia de plantio e as fases da soja, o coeficiente da
   terra sem planta com a camada de cima molhada, o Kc, o p, a raiz
-  e a data de secar a braquiária, a classe de terra usada para a camada de cima (TEW e REW), o critério de 20% e o
-  empate de 5 mm. **Valide com o agrônomo.**
+  e a data de secar a braquiária, a classe de terra usada para a camada de cima (TEW e REW), as duas coberturas de palha, os
+  três fatores da disputa, o limite de 80% da mediana para a quebra, o critério de 20% e o empate de 5 mm. **Valide com o agrônomo.**
 
 ## Os arquivos
 `clima.py` (a série e a ETo) · `parametros.py` · `rotacoes.py` (o calendário e o Kc) · `balanco.py` (a água dia a dia)
 · `motor.py` (a resposta) · `explicacao.py` (o texto) · `conferencia.py` (a conferência do texto) · `ndvi.py` ·
-`perguntar.py` e `validar.py` (os comandos) · `tests/` (148 testes).
+`perguntar.py` e `validar.py` (os comandos) · `tests/` (172 testes).

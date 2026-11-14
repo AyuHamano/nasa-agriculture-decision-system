@@ -17,6 +17,10 @@ FAO6 = "https://www.fao.org/4/X0490E/x0490e0b.htm"  # cap. 6: Tabelas 11 (fases)
 FAO7 = "https://www.fao.org/4/X0490E/x0490e0c.htm"  # cap. 7: Tabela 19 (a terra) e a evaporação do solo (eq. 73, 74)
 FAO8 = "https://www.fao.org/4/X0490E/x0490e0e.htm"  # cap. 8: Tabela 22 (raízes e p) e o balanço (eq. 82 a 88)
 FAO10 = "https://www.fao.org/4/X0490E/x0490e0g.htm"  # cap. 10: a palha (surface mulches) e o consórcio (intercropping)
+IMPACTO_EMBRAPA = "https://bs.sede.embrapa.br/2019/relatorios/agropecuariaoeste_consorcio.pdf"
+DOURADOS_EMBRAPA = "https://www.alice.cnptia.embrapa.br/alice/bitstream/doc/909678/1/211Produtividade.pdf"
+ZARC_CONSORCIO = ("https://www.gov.br/agricultura/pt-br/assuntos/riscos-seguro/programa-nacional-de-zoneamento-agricola"
+                  "-de-risco-climatico/portarias/2022-2023/goias-go/port-no-345-cons-milho-braquiaria-2a-safra-go-ret.pdf")
 PUBLICADO, HIPOTESE = "publicado", "hipótese"
 
 
@@ -96,13 +100,39 @@ PADRAO = {
                                     "covered by an organic mulch.' E: 'In the case of Kc ini, which represents mostly "
                                     "evaporation from soil, one would reduce Kc ini by about 25% in this situation' "
                                     "(com 50% da terra coberta). 0,5 = 5% a cada 10%.", PUBLICADO),
-        "cobertura_do_milho_solteiro": _p(0.6, "", "A PREENCHER"),
-        "cobertura_do_milho_com_braquiaria": _p(0.9, "", "A PREENCHER"),
+        "cobertura_do_milho_solteiro": _p(0.6, IMPACTO_EMBRAPA, "Hipótese, com a faixa de 0,4 a 0,8: a parte da terra "
+                                          "coberta pela palha do milho safrinha solteiro. Não achei a porcentagem "
+                                          "de cobertura medida em página aberta. A Embrapa diz só que é baixa: 'Uma "
+                                          "das fragilidades do sistema de sucessão soja/milho safrinha consiste nos "
+                                          "baixos índices de cobertura do solo, principalmente durante os meses de "
+                                          "agosto a outubro, entre a colheita do milho e a semeadura da soja' "
+                                          "(Embrapa Agropecuária Oeste, Relatório de avaliação dos impactos: "
+                                          "Consórcio milho safrinha com Brachiaria ruziziensis, 2019)."),
+        "cobertura_do_milho_com_braquiaria": _p(0.9, IMPACTO_EMBRAPA, "Hipótese, com a faixa de 0,8 a 1,0: a parte "
+                                                "da terra coberta pela palha do milho mais a do capim. As fontes dão "
+                                                "massa de palha, não a porcentagem de terra coberta: 'É possível "
+                                                "produzir até 12 toneladas de palha (milho safrinha + braquiária)' "
+                                                "(o mesmo relatório da Embrapa, 2019); em Dourados (MS), em 2010, 'o "
+                                                "rendimento de massa seca de braquiária (2.759 kg ha-1)' somou-se à "
+                                                "do milho (Fonseca, Ceccon e outros, Embrapa: " + DOURADOS_EMBRAPA
+                                                + "). Os dois números de cobertura são escolha desta versão."),
     },
     "disputa_com_o_milho": {
-        "sem_disputa": _p(0.0, "", "A PREENCHER"),
-        "meio": _p(0.04, "", "A PREENCHER"),
-        "alta": _p(0.08, "", "A PREENCHER"),
+        "sem_disputa": _p(0.0, ZARC_CONSORCIO, "A ponta de baixo da faixa (o que a conta fazia antes): o capim "
+                          "debaixo do milho não aumenta o pedido de água. ZARC do milho com braquiária em Goiás "
+                          "(Portaria 345, de 2022): 'a braquiária apresenta desenvolvimento lento até a colheita "
+                          "do milho'."),
+        "meio": _p(0.04, "", "Hipótese: o meio da faixa. Enquanto o milho e o capim crescem juntos, o conjunto pede 4% "
+                   "a mais de água que o milho sozinho. Metade da ponta de cima; não há medida."),
+        "alta": _p(0.08, FAO10, "Hipótese: a ponta de cima da faixa (8% a mais). Não achei medida do consumo de água "
+                   "do consórcio. A Embrapa cita a disputa sem número: 'competição com a braquiária por água e "
+                   "nutrientes, que provavelmente ocorre no sistema consorciado' (Dourados, MS: " + DOURADOS_EMBRAPA
+                   + ") e 'pode ocorrer influencia no rendimento final de grãos do milho pela competição entre as "
+                   "culturas, principalmente após o florescimento' (relatório de 2019: " + IMPACTO_EMBRAPA + "). O "
+                   "teto vem do FAO-56: no consórcio, 'the Kc may increase as the density of the combined vegetation "
+                   "increases, proportional to the increase in LAI', 'with maximum Kc constrained by either Kc max "
+                   "(Equation 72) or by Kcb full' (cap. 10), e 'Kc max ranges from about 1.05 to 1.30 when using the "
+                   "grass reference ETo' (cap. 7: " + FAO7 + "). 1,20 (o Kc do milho no meio do ciclo) x 1,08 = 1,30."),
     },
     "ajustar_p_pela_demanda": _p(True, FAO8, "FAO-56, cap. 8: 'p = pTable 22 + 0.04 (5 - ETc)', limitado entre 0.1 e "
                                  "0.8, com a ETc em mm/dia.", PUBLICADO),

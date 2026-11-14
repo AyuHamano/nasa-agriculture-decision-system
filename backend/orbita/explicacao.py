@@ -29,19 +29,21 @@ def _sede_forte(r):
     total = len(r["rotacoes"]["atual"]["safras"])
     faixa = alternativa["faixa"]
     quantas = (f"{faixa['menor']}" if faixa["menor"] == faixa["maior"]
-               else f"de {faixa['menor']} a {faixa['maior']}, conforme a disputa")
+               else f"de {faixa['menor']} a {faixa['maior']} (conforme a disputa)")
     linhas = [f"   Sede forte (falta do milho de {n(sede['nivel_pct'])}% ou mais do que ele pediu): {hoje['quantas']} "
               f"de {total} safras na rotação de hoje ({_lista(hoje['quais'])}) e {quantas} na alternativa "
               f"({_lista(alternativa['quais'])} na hipótese do meio).",
               f"   De onde sai o nível: é a menor falta do milho entre as safras de quebra, as de "
               f"{sede['safra_de_quebra']}: {_lista(sede['safras_de_quebra'])} (abaixo de {n(sede['limite_kg_ha'])} "
               f"kg/ha), na conta da rotação de hoje com a terra média e a chuva padrão."]
+    for nome, forte in (("rotação de hoje", hoje), ("alternativa (hipótese do meio)", alternativa)):
+        if forte["alarmes_falsos"] or forte["quebras_abaixo_do_nivel"]:
+            linhas.append(f"   Na {nome}: alarme falso (sede forte na conta, sem quebra no IBGE): "
+                          f"{_lista(forte['alarmes_falsos'])}; quebra no IBGE que ficou abaixo do nível: "
+                          f"{_lista(forte['quebras_abaixo_do_nivel'])}.")
     aviso = sede["aviso"]
     perto = sede.get("maior_falta_sem_quebra")
-    if sede["alarmes_falsos_na_referencia"]:
-        aviso += (f" Na própria conta de referência já há alarme falso: "
-                  f"{_lista(sede['alarmes_falsos_na_referencia'])}.")
-    elif perto:
+    if perto:
         aviso += (f" Por exemplo: a safra {perto['safra']} teve falta de {n(perto['falta_do_milho_pct'])}% na conta "
                   f"de referência, perto do nível, e colheu {perto['rendimento_kg_ha']} kg/ha, sem quebra.")
     return linhas + [f"   {aviso}"]

@@ -282,10 +282,16 @@ def _safra(numeros, agua_no_plantio, chuva, com_braquiaria):
     return saida
 
 
-def _com_sede_forte(tabela, nivel):
-    """As safras com falta do milho igual ou maior que o nível de sede forte (sem nível, não conta)."""
+def _com_sede_forte(tabela, nivel, quebras=()):
+    """As safras com falta do milho igual ou maior que o nível de sede forte (sem nível, não conta).
+
+    O nível e as faltas se comparam com uma casa, como aparecem na resposta: quem lê refaz a conta com o que vê.
+    `alarmes_falsos`: safras no nível ou acima, sem quebra no IBGE; `quebras_abaixo_do_nivel`: o contrário.
+    """
     quais = [] if nivel is None else [s for s, n in tabela.items() if n["milho"]["falta_relativa_pct"] >= nivel]
-    return {"nivel_pct": nivel, "quantas": None if nivel is None else len(quais), "quais": quais}
+    return {"nivel_pct": nivel, "quantas": None if nivel is None else len(quais), "quais": quais,
+            "alarmes_falsos": [s for s in quais if s not in quebras],
+            "quebras_abaixo_do_nivel": [] if nivel is None else [s for s in quebras if s in tabela and s not in quais]}
 
 
 def _numeros_da_rotacao(dias, com_braquiaria, par, terra, chuvas, chuva_a_parte, criterio, disputa=0.0):
@@ -417,7 +423,7 @@ def responder(entrada, par=None, dias=None, rendimentos=None):
     def numeros(com_braquiaria, disputa=0.0):
         bloco, parte, falta = _numeros_da_rotacao(dias, com_braquiaria, par, entrada["terra"], chuvas,
                                                    chuva_a_parte, criterio, disputa)
-        bloco["safras_com_sede_forte"] = _com_sede_forte(bloco["safras"], nivel)
+        bloco["safras_com_sede_forte"] = _com_sede_forte(bloco["safras"], nivel, sede_forte["safras_de_quebra"])
         return bloco, parte, falta
 
     rot, a_parte = {}, {}

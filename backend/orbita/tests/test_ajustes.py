@@ -270,6 +270,10 @@ class SedeForte(unittest.TestCase):
             self.assertEqual(rot["safras_com_sede_forte"]["quais"], quais)
             self.assertEqual(rot["safras_com_sede_forte"]["quantas"], len(quais))
             self.assertEqual(rot["safras_com_sede_forte"]["nivel_pct"], nivel)
+            quebras = RESPOSTA["sede_forte"]["safras_de_quebra"]
+            self.assertEqual(rot["safras_com_sede_forte"]["alarmes_falsos"], [s for s in quais if s not in quebras])
+            self.assertEqual(rot["safras_com_sede_forte"]["quebras_abaixo_do_nivel"],
+                             [s for s in quebras if s not in quais])
             self.assertEqual(rot["safras_com_sede"]["criterio_pct"], 20)          # os campos antigos continuam
             self.assertIn("com_10_pct", rot["safras_com_sede"])
             self.assertIn("com_30_pct", rot["safras_com_sede"])
@@ -279,6 +283,10 @@ class SedeForte(unittest.TestCase):
     def test_o_nivel_e_o_mesmo_em_qualquer_terra_e_leva_o_aviso(self):
         pouca = motor.responder(dict(ENTRADA, terra="pouca"))
         self.assertEqual(pouca["sede_forte"]["nivel_pct"], RESPOSTA["sede_forte"]["nivel_pct"])
+        forte = pouca["rotacoes"]["atual"]["safras_com_sede_forte"]      # o alarme falso aparece com o nome da safra
+        if forte["alarmes_falsos"]:
+            self.assertIn("alarme falso (sede forte na conta, sem quebra no IBGE): " + forte["alarmes_falsos"][0],
+                          explicacao.texto(pouca))
         aviso = RESPOSTA["sede_forte"]["aviso"]
         self.assertIn("alarme falso", aviso)
         self.assertIn("poucas safras", aviso)
