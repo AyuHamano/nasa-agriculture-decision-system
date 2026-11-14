@@ -1,0 +1,1 @@
+https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR,T2M_MAX,T2M_MIN&community=AG&longitude=-50.92&latitude=-17.79&start=19810101&end=20261113&format=JSON&time-standard=LST
