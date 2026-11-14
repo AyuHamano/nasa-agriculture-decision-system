@@ -1,0 +1,1 @@
+# Gerado com IA (Claude)
