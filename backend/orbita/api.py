@@ -184,7 +184,10 @@ class Porta(BaseHTTPRequestHandler):
     def _descartar_corpo(self):
         """Lê e joga fora o corpo de um pedido recusado (até um teto), para a resposta chegar inteira a quem pediu."""
         self._corpo_lido = True
-        self._ler_do_fio(min(self._tamanho_do_corpo() or 0, DESCARTE_MAXIMO), guardar=False)
+        try:
+            self._ler_do_fio(min(self._tamanho_do_corpo() or 0, DESCARTE_MAXIMO), guardar=False)
+        except ErroDaApi:                  # o corpo recusado demorou: o erro que vale é o do pedido, e ele sai já
+            pass
 
     def _ler_corpo(self):
         tipo = (self.headers.get("Content-Type") or "").split(";")[0].strip().lower()
@@ -221,10 +224,7 @@ class Porta(BaseHTTPRequestHandler):
                 self._enviar(200, resposta)
             except ErroDaApi as erro:
                 if not self._corpo_lido:
-                    try:
-                        self._descartar_corpo()
-                    except ErroDaApi as demora:                        # o corpo recusado também demorou: vale a demora
-                        erro = demora
+                    self._descartar_corpo()
                 self._enviar(erro.codigo, {"erro": erro.mensagem}, erro.cabecalhos)
         except OSError:                                                # quem pediu sumiu ou demorou demais
             pass

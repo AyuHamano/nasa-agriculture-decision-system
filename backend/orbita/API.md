@@ -17,7 +17,9 @@ De dentro de `backend/`:
     python3 -m orbita.api --origem https://o-site.exemplo   # só esse site lê as respostas pelo navegador (padrão: *)
 
 Fora do `127.0.0.1` a API fica aberta a quem alcançar a máquina. Para pôr na internet, ela precisa ficar atrás de uma
-proteção (um proxy com HTTPS e limite de pedidos); isso não está feito.
+proteção (um proxy com HTTPS e limite de pedidos); isso não está feito. O que ela já faz sozinha: o corpo tem limite de
+tamanho e 10 segundos para chegar inteiro, e uma ligação parada cai em 15 segundos. O que ela não faz: não limita
+quantos pedidos chegam ao mesmo tempo, e os cabeçalhos de um pedido ainda podem chegar devagar.
 
 ## As rotas
 | rota | o que entra | o que sai |

@@ -195,14 +195,15 @@ class PorHttp(unittest.TestCase):
     def test_corpo_que_chega_aos_poucos_nao_segura_a_ligacao(self):
         prazo, self.servidor.prazo_do_corpo = self.servidor.prazo_do_corpo, 0.4
         try:
-            for rota, tipo in (("/recomendacao", "application/json"), ("/nada", "application/json"),
-                               ("/mensagem", "text/plain")):          # o corpo lido e o corpo jogado fora
+            for rota, tipo, codigo, pedaco in (("/recomendacao", "application/json", 408, "demorou"),
+                                               ("/nada", "application/json", 404, "não existe"),   # o corpo jogado
+                                               ("/mensagem", "text/plain", 415, "application/json")):   # fora
                 with socket.create_connection(("127.0.0.1", self.porta), timeout=3) as fio:
                     fio.sendall(f"POST {rota} HTTP/1.1\r\nHost: x\r\nContent-Type: {tipo}\r\n"
                                 "Content-Length: 500\r\n\r\n{".encode("utf-8"))      # promete 500 bytes, manda 1
                     resposta = ate_o_fim(fio)                                           # sem o prazo, isto esperaria 15 s
-                self.assertIn(" 408 ", resposta.split("\r\n")[0], rota)
-                self.assertIn("demorou", resposta)
+                self.assertIn(f" {codigo} ", resposta.split("\r\n")[0], rota)
+                self.assertIn(pedaco, resposta)                       # o erro chega inteiro e em português
         finally:
             self.servidor.prazo_do_corpo = prazo
         self.assertLessEqual(prazo, 15)
