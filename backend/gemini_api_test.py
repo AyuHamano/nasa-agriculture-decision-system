@@ -1,5 +1,3 @@
-# Gera recomendações agrícolas usando a API Gemini.
-
 
 import argparse
 import json
@@ -11,7 +9,6 @@ from google import genai
 from google.genai import types
 from dotenv import load_dotenv
 import requests
-
 
 DEFAULT_MODEL = "gemini-3.5-flash-lite"
 DEFAULT_MAX_OUTPUT_TOKENS = 200
@@ -39,7 +36,6 @@ indique quais dados devem ser consultados. Responda em português do Brasil.
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 CACHE_DIR = PROJECT_ROOT / "data" / "cache"
 load_dotenv(PROJECT_ROOT / ".env")
-
 
 def _nome_cache(latitude: float, longitude: float, ano_inicio: int, ano_fim: int) -> Path:
     """Gera um nome de cache específico para o ponto e período."""

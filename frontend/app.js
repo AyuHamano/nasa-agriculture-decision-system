@@ -2,20 +2,10 @@ const state = {
   activePage: 'properties',
   drawMode: false,
   editMode: false,
-  points: [
-    [-17.7898, -50.9236], [-17.7865, -50.9178], [-17.7892, -50.9122],
-    [-17.7960, -50.9135], [-17.7968, -50.9209]
-  ],
+  points: [],
   markers: [],
   map: null,
   polygon: null
-};
-
-const climateByCity = {
-  '-16.6869,-49.2648': { rain: '1.570 mm', dry: 'Mai–Set', risk: 'Moderado' },
-  '-17.7923,-50.9190': { rain: '1.480 mm', dry: 'Mai–Set', risk: 'Moderado' },
-  '-17.8814,-51.7144': { rain: '1.615 mm', dry: 'Mai–Ago', risk: 'Baixo' },
-  '-18.9146,-48.2754': { rain: '1.420 mm', dry: 'Mai–Set', risk: 'Moderado' }
 };
 
 function showToast(message) {
@@ -58,7 +48,7 @@ function polygonArea(points) {
 function updatePlotSummary() {
   const area = polygonArea(state.points);
   const centroid = state.points.length ? state.points.reduce((acc, p) => [acc[0] + p[0], acc[1] + p[1]], [0, 0]).map(v => v / state.points.length) : [0, 0];
-  document.getElementById('plotArea').textContent = `${area.toLocaleString('pt-BR', { maximumFractionDigits: 1 })} ha`;
+  document.getElementById('plotArea').textContent = state.points.length >= 3 ? `${area.toLocaleString('pt-BR', { maximumFractionDigits: 1 })} ha` : '—';
   document.getElementById('plotCentroid').textContent = state.points.length ? `${centroid[0].toFixed(4)}, ${centroid[1].toFixed(4)}` : '—';
   document.getElementById('vertexCount').textContent = state.points.length;
   document.getElementById('coordinatesPanel').textContent = state.points.length ? state.points.map((p, i) => `${i + 1}. ${p[0].toFixed(6)}, ${p[1].toFixed(6)}`).join('\n') : 'Nenhuma coordenada definida.';
@@ -94,7 +84,7 @@ function initMap() {
     mapNode.innerHTML = '<div style="display:grid;place-items:center;height:100%;padding:30px;text-align:center">Não foi possível carregar o mapa. Verifique sua conexão com a internet.</div>';
     return;
   }
-  state.map = L.map('map', { zoomControl: true, doubleClickZoom: false }).setView([-17.7923, -50.9190], 15);
+  state.map = L.map('map', { zoomControl: true, doubleClickZoom: false, dragging: true }).setView([-15.5, -51.5], 5);
   L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
     maxZoom: 19, attribution: 'Imagery © Esri, NASA, USGS'
   }).addTo(state.map);
@@ -104,7 +94,6 @@ function initMap() {
     renderPolygon();
   });
   renderPolygon();
-  state.map.fitBounds(state.polygon.getBounds(), { padding: [60, 60] });
 
   document.getElementById('drawButton').addEventListener('click', () => {
     state.drawMode = !state.drawMode;
@@ -135,10 +124,7 @@ function initMap() {
 
 function updateClimate() {
   const select = document.getElementById('municipality');
-  const climate = climateByCity[select.value] || climateByCity['-17.7923,-50.9190'];
-  document.getElementById('annualRain').textContent = climate.rain;
-  document.getElementById('dryMonths').textContent = climate.dry;
-  document.getElementById('waterRisk').textContent = climate.risk;
+  if (!select.value) return;
   const [lat, lng] = select.value.split(',').map(Number);
   if (state.map) state.map.flyTo([lat, lng], 14, { duration: .8 });
 }
@@ -154,6 +140,10 @@ function saveProperty(event) {
     name: document.getElementById('propertyName').value.trim(),
     municipality: select.options[select.selectedIndex].text,
     producer: document.getElementById('producerName').value.trim(),
+    document: document.getElementById('documentNumber').value.trim(),
+    phone: document.getElementById('phoneNumber').value.trim(),
+    email: document.getElementById('emailAddress').value.trim(),
+    declaredArea: document.getElementById('declaredArea').value,
     soil: document.getElementById('soil').value,
     irrigation: document.getElementById('irrigation').value,
     rotation: document.getElementById('rotation').value,
@@ -161,11 +151,11 @@ function saveProperty(event) {
     coordinates: state.points,
     savedAt: new Date().toISOString()
   };
-  const properties = JSON.parse(localStorage.getItem('terraPonteProperties') || '[]');
+  const properties = JSON.parse(localStorage.getItem('terraPontePropertiesV2') || '[]');
   properties.push(record);
-  localStorage.setItem('terraPonteProperties', JSON.stringify(properties));
-  document.getElementById('propertyCount').textContent = 18 + properties.length;
-  document.getElementById('modalText').textContent = `${record.name}, com ${record.area} ha, foi adicionada à carteira da cooperativa.`;
+  localStorage.setItem('terraPontePropertiesV2', JSON.stringify(properties));
+  updatePropertyCount(properties.length);
+  document.getElementById('modalText').textContent = `${record.name} foi cadastrada com sucesso. Os dados de análise ainda serão preenchidos quando estiverem disponíveis.`;
   document.getElementById('modalBackdrop').hidden = false;
 }
 
@@ -176,13 +166,8 @@ function initPropertyActions() {
     const panel = document.getElementById('coordinatesPanel');
     panel.hidden = !panel.hidden;
   });
-  document.getElementById('refreshClimate').addEventListener('click', () => {
-    const button = document.getElementById('refreshClimate');
-    button.classList.add('loading');
-    setTimeout(() => { button.classList.remove('loading'); updateClimate(); showToast('Contexto climático atualizado.'); }, 700);
-  });
   document.getElementById('savedPropertiesButton').addEventListener('click', () => {
-    const count = JSON.parse(localStorage.getItem('terraPonteProperties') || '[]').length;
+    const count = JSON.parse(localStorage.getItem('terraPontePropertiesV2') || '[]').length;
     showToast(count ? `${count} propriedade(s) salva(s) neste navegador.` : 'Nenhuma propriedade nova salva ainda.');
   });
 }
@@ -197,19 +182,37 @@ function initModal() {
 function initCalendar() {
   const days = [26,27,28,29,30,31,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,1,2,3,4,5,6];
   const grid = document.getElementById('calendarGrid');
+  if (!grid) return;
   grid.innerHTML = days.map((day, i) => `<button class="${i < 6 || i > 35 ? 'muted ' : ''}${day === 14 && i > 6 ? 'today ' : ''}${[20,23,26].includes(i) ? 'event' : ''}">${day}</button>`).join('');
 }
 
 function initExtras() {
-  document.getElementById('newDemand').addEventListener('click', () => showToast('Nova demanda iniciada. Preencha os dados do cooperado.'));
-  document.getElementById('exportReport').addEventListener('click', () => showToast('Relatório preparado para exportação.'));
-  document.querySelectorAll('.step').forEach((step, index, all) => step.addEventListener('click', () => {
-    all.forEach((item, i) => item.classList.toggle('active', i <= index));
-    showToast(index === 0 ? 'Delimite o talhão no mapa.' : index === 1 ? 'Etapa de dados locais selecionada.' : 'Comparação de rotações selecionada.');
-  }));
+  document.getElementById('newDemand')?.addEventListener('click', () => showToast('Nova demanda iniciada. Preencha os dados do cooperado.'));
+  document.getElementById('exportReport')?.addEventListener('click', () => showToast('Relatório preparado para exportação.'));
+}
+
+function updatePropertyCount(count) {
+  const counter = document.getElementById('propertyCount');
+  if (counter) counter.textContent = count;
+}
+
+function renderZeroStates() {
+  const pages = {
+    overview: ['Carteira vazia', 'Cadastre a primeira propriedade para visualizar indicadores e acompanhar a carteira.', 'Cadastrar propriedade'],
+    demands: ['Nenhuma demanda criada', 'As demandas técnicas aparecerão aqui quando forem registradas pela cooperativa.', 'Cadastrar propriedade'],
+    planning: ['Planejamento em branco', 'O calendário será formado após o cadastro de propriedades e atividades.', 'Cadastrar propriedade'],
+    reports: ['Sem relatórios disponíveis', 'Os relatórios serão gerados a partir de dados reais das propriedades cadastradas.', 'Cadastrar propriedade']
+  };
+  Object.entries(pages).forEach(([page, content]) => {
+    const target = document.querySelector(`[data-page-content="${page}"]`);
+    if (!target) return;
+    target.innerHTML = `<div class="empty-page"><span data-lucide="sprout"></span><span class="eyebrow">COOPERATIVA CERRADO VIVO</span><h1>${content[0]}</h1><p>${content[1]}</p><button class="primary-action" data-go="properties"><span data-lucide="plus"></span>${content[2]}</button></div>`;
+  });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  if (window.lucide) lucide.createIcons();
+  renderZeroStates();
   if (window.lucide) lucide.createIcons();
   initNavigation();
   initMap();
@@ -217,6 +220,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initModal();
   initCalendar();
   initExtras();
-  const properties = JSON.parse(localStorage.getItem('terraPonteProperties') || '[]');
-  document.getElementById('propertyCount').textContent = 18 + properties.length;
+  const properties = JSON.parse(localStorage.getItem('terraPontePropertiesV2') || '[]');
+  updatePropertyCount(properties.length);
 });

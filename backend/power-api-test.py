@@ -7,6 +7,7 @@ Uso:
 
 Requisitos: pip install requests pandas
 """
+
 import argparse
 import json
 import sys

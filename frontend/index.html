@@ -20,16 +20,13 @@
       <nav class="main-nav" aria-label="Navegação principal">
         <button class="nav-item" data-page="overview"><span data-lucide="layout-dashboard"></span>Visão geral</button>
         <button class="nav-item active" data-page="properties"><span data-lucide="sprout"></span>Propriedades</button>
-        <button class="nav-item" data-page="demands"><span data-lucide="clipboard-check"></span>Demandas <b class="nav-badge">4</b></button>
+        <button class="nav-item" data-page="demands"><span data-lucide="clipboard-check"></span>Demandas</button>
         <button class="nav-item" data-page="planning"><span data-lucide="calendar-days"></span>Planejamento</button>
         <button class="nav-item" data-page="reports"><span data-lucide="chart-no-axes-combined"></span>Relatórios</button>
       </nav>
 
       <div class="sidebar-footer">
-        <div class="season-progress">
-          <span>Safra 2026/27</span><strong>62%</strong>
-          <div><i></i></div>
-        </div>
+        <div class="empty-sidebar">Acompanhe dados reais após o cadastro das propriedades.</div>
         <button class="support"><span data-lucide="circle-help"></span>Central de ajuda</button>
       </div>
     </aside>
@@ -42,8 +39,8 @@
         <span class="divider"></span>
         <button class="notification" aria-label="Notificações"><span data-lucide="bell"></span><i></i></button>
         <button class="user-menu">
-          <span class="avatar">MS</span>
-          <span class="user-copy"><strong>Marina Souza</strong><small>Técnica agronômica</small></span>
+          <img class="avatar" src="assets/manager-avatar.png" alt="Rafael Martins, gerente da cooperativa">
+          <span class="user-copy"><strong>Rafael Martins</strong><small>Gerente da cooperativa</small></span>
           <span data-lucide="chevron-down"></span>
         </button>
       </header>
@@ -102,7 +99,7 @@
                 <div class="map-hint" id="mapHint"><span data-lucide="mouse-pointer-click"></span>Clique no mapa para adicionar os vértices</div>
               </div>
               <div class="plot-summary">
-                <span class="leaf-symbol">◒</span><strong id="plotName">Talhão 01</strong><i></i><span>Área estimada <b id="plotArea">8,4 ha</b></span><i></i><span>Centroide <b id="plotCentroid">-17,7923, -50,9190</b></span><i></i><span><b id="vertexCount">5</b> vértices</span>
+                <span class="leaf-symbol">◒</span><strong id="plotName">Novo talhão</strong><i></i><span>Área estimada <b id="plotArea">—</b></span><i></i><span>Centroide <b id="plotCentroid">—</b></span><i></i><span><b id="vertexCount">0</b> vértices</span>
                 <button id="coordinatesButton"><span data-lucide="chevron-down"></span>Ver coordenadas</button>
               </div>
               <pre class="coordinates-panel" id="coordinatesPanel" hidden></pre>
@@ -110,32 +107,24 @@
 
             <aside class="form-column">
               <form class="panel property-form" id="propertyForm">
-                <h2><span data-lucide="warehouse"></span>Dados da propriedade</h2>
-                <label>Nome <b>*</b><input id="propertyName" value="Fazenda São João" required></label>
-                <label>Município <b>*</b><select id="municipality" required><option value="-16.6869,-49.2648">Goiânia, GO</option><option selected value="-17.7923,-50.9190">Rio Verde, GO</option><option value="-17.8814,-51.7144">Jataí, GO</option><option value="-18.9146,-48.2754">Uberlândia, MG</option></select></label>
-                <label>Produtor <b>*</b><input id="producerName" value="João Silva" required></label>
-                <div class="form-pair"><label>Solo <b>*</b><select id="soil"><option>Argiloso</option><option>Arenoso</option><option>Textura média</option></select></label><label>Irrigação <b>*</b><select id="irrigation"><option>Não</option><option>Sim — pivô</option><option>Sim — gotejo</option></select></label></div>
-                <label>Rotação atual <b>*</b><select id="rotation"><option>Milho → Feijão</option><option>Soja → Milho safrinha → Pousio</option><option>Soja → Milho → Braquiária</option><option>Algodão → Soja</option></select></label>
-                <button class="save-button" type="submit"><span data-lucide="save"></span>Salvar talhão</button>
+                <div class="form-title"><span class="form-title-icon" data-lucide="contact-round"></span><div><h2>Dados do cliente</h2><p>Cadastre o responsável e a propriedade para iniciar a análise.</p></div></div>
+                <div class="section-label">Responsável</div>
+                <div class="form-pair"><label>Nome completo <b>*</b><input id="producerName" placeholder="Ex.: João da Silva" required></label><label>CPF ou CNPJ <b>*</b><input id="documentNumber" placeholder="000.000.000-00" required></label></div>
+                <div class="form-pair"><label>Telefone <b>*</b><input id="phoneNumber" placeholder="(00) 00000-0000" required></label><label>E-mail <b>*</b><input id="emailAddress" type="email" placeholder="nome@exemplo.com" required></label></div>
+                <div class="section-label">Propriedade</div>
+                <label>Nome da propriedade <b>*</b><input id="propertyName" placeholder="Ex.: Fazenda Santa Clara" required></label>
+                <div class="form-pair"><label>Município <b>*</b><select id="municipality" required><option value="">Selecione o município</option><option value="-16.6869,-49.2648">Goiânia, GO</option><option value="-17.7923,-50.9190">Rio Verde, GO</option><option value="-17.8814,-51.7144">Jataí, GO</option><option value="-18.9146,-48.2754">Uberlândia, MG</option></select></label><label>Área declarada (ha)<input id="declaredArea" type="number" min="0" placeholder="Ex.: 85"></label></div>
+                <div class="form-pair"><label>Tipo de solo<select id="soil"><option value="">Não informado</option><option>Argiloso</option><option>Arenoso</option><option>Textura média</option></select></label><label>Irrigação<select id="irrigation"><option value="">Não informado</option><option>Não</option><option>Sim — pivô</option><option>Sim — gotejo</option></select></label></div>
+                <label>Rotação atual<select id="rotation"><option value="">Não informada</option><option>Milho → Feijão</option><option>Soja → Milho safrinha → Pousio</option><option>Soja → Milho → Braquiária</option><option>Algodão → Soja</option></select></label>
+                <button class="save-button" type="submit"><span data-lucide="save"></span>Salvar cadastro</button>
               </form>
 
               <article class="panel climate-card">
-                <div class="climate-head"><h2><span data-lucide="cloud-rain-wind"></span>Contexto climático NASA</h2><button id="refreshClimate" title="Atualizar"><span data-lucide="refresh-cw"></span></button></div>
-                <div class="climate-metrics">
-                  <div><span data-lucide="droplet"></span><span>Chuva anual</span><strong id="annualRain">1.480 mm</strong></div>
-                  <div><span data-lucide="calendar-days"></span><span>Meses secos</span><strong id="dryMonths">Mai–Set</strong></div>
-                  <div><span data-lucide="triangle-alert"></span><span>Risco hídrico</span><strong><mark id="waterRisk">Moderado</mark></strong></div>
-                </div>
-                <footer><span><span data-lucide="satellite"></span>NASA POWER · histórico regional</span><span><span data-lucide="info"></span>Confirme no campo.</span></footer>
+                <div class="climate-head"><h2><span data-lucide="cloud-rain-wind"></span>Dados climáticos</h2></div>
+                <div class="empty-climate"><span data-lucide="cloud-off"></span><strong>Aguardando dados do talhão</strong><p>Os indicadores climáticos serão consultados somente após o cadastro e a coleta de dados reais.</p></div>
+                <footer><span><span data-lucide="satellite"></span>NASA POWER · quando disponível</span></footer>
               </article>
             </aside>
-          </div>
-
-          <div class="stepper">
-            <div class="next-copy"><span data-lucide="flag"></span><strong>Próximo passo</strong></div>
-            <button class="step active"><b>1</b><span>Delimitar talhão</span></button><i></i>
-            <button class="step"><b>2</b><span>Dados locais</span></button><i></i>
-            <button class="step"><b>3</b><span>Comparar rotações</span></button>
           </div>
         </section>
 
