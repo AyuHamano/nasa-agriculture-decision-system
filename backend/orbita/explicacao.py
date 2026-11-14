@@ -17,11 +17,12 @@ def n(numero):
 
 def _prioridade(p, r):
     hoje, alternativa = r["rotacoes"]["atual"], r["rotacoes"]["alternativa"]
-    seco = r["comparacao"]["ano_mais_seco"]
+    seco = r["comparacao"]["pior_ano"]
+    rotulo = "No pior ano" if r["regra_dos_anos"]["regra"] == "rendimento" else "No ano mais seco"
     linhas = [f"{p['nome']} (nota {p['nota']}): {QUEM[p['melhor']]}."]
     if p["id"] == "agua":
         a, b = hoje["safras"][seco]["total"], alternativa["safras"][seco]["total"]
-        linhas.append(f"   No ano mais seco (safra {seco}), faltaram {n(a['falta_mm'])} mm de água para a soja e o milho "
+        linhas.append(f"   {rotulo} (safra {seco}), faltaram {n(a['falta_mm'])} mm de água para a soja e o milho "
                       f"na rotação de hoje e {n(b['falta_mm'])} mm na alternativa (falta de água = o que a planta "
                       "pediu menos o que conseguiu beber).")
         linhas.append(f"   Das {len(hoje['safras'])} safras, o milho passou sede (falta de "
@@ -78,31 +79,45 @@ def texto(r):
     """O texto inteiro da resposta, a partir da resposta do motor."""
     hoje, alternativa = r["rotacoes"]["atual"], r["rotacoes"]["alternativa"]
     regra, local, terra = r["regra_dos_anos"], r["local"], r["terra"]
-    normal, seco = regra["ano_normal"], regra["ano_mais_seco"]
+    normal, seco = regra["ano_normal"], regra["pior_ano"]
+    agua_por_tipo = terra["agua_que_segura_mm"]
     t = ["ÓRBITA RURAL · motor provisório, sem site",
          f"{local['nome']}, ponto {local['latitude']}, {local['longitude']} · terra que segura "
          f"{'pouca' if terra['opcao'] == 'pouca' else ('muita' if terra['opcao'] == 'muita' else 'uma quantidade média de')}"
-         f" água ({n(terra['agua_que_segura_mm'])} mm na zona das raízes)",
+         f" água ({n(terra['agua_por_metro_mm'])} mm por metro de terra; na zona das raízes, "
+         f"{n(agua_por_tipo['soja'])} mm para a soja e {n(agua_por_tipo['milho'])} mm para o milho)",
          f"Pergunta: vale trocar \"{hoje['nome']}\" por \"{alternativa['nome']}\"?",
          "",
          "RESPOSTA",
          r["veredito"]["frase"],
-         f"Na sua maior nota entre o que foi medido ({r['prioridades'][[p['id'] for p in r['prioridades']].index(r['destaque']['prioridade'])]['nome'].lower()}"
-         f", nota {r['destaque']['nota']}): {QUEM[r['destaque']['melhor']]}.",
+         f"Na sua maior nota entre o que foi medido ({r['destaque']['nome'].lower()}, nota {r['destaque']['nota']}): "
+         f"{QUEM[r['destaque']['melhor']]}.",
          "",
          "SUAS PRIORIDADES, DA MAIOR NOTA PARA A MENOR (elas só mudam a ordem; nenhum número muda)"]
     for i, p in enumerate(r["prioridades"], start=1):
         linhas = _prioridade(p, r)
         t.append(f"{i}. {linhas[0]}")
         t.extend(linhas[1:])
+    chuva, temperatura = r["clima"]["chuva"], r["clima"]["temperatura"]
     t += ["",
-          "A PROVA (o clima da NASA POWER e a conta de água do FAO-56)",
-          f"Os anos foram escolhidos por uma regra fixada antes de ver o resultado: a chuva {regra['janela']}.",
-          f"A mediana das {len(regra['chuva_por_safra_mm'])} safras é {n(regra['mediana_mm'])} mm."]
+          "A PROVA (a chuva e a temperatura da NASA, e a conta de água do FAO-56)",
+          f"De onde vem cada número: a chuva é de {chuva['fonte']}; a temperatura é de {temperatura['fonte']}; a "
+          f"conta é a do {r['clima']['conta']}.",
+          f"Os anos foram escolhidos por uma regra fixada antes de rodar a conta: {regra['criterio']}."]
+    if regra["regra"] == "rendimento":
+        t.append(f"No IBGE, o milho de 2ª safra rendeu {regra['rendimento_por_safra_kg_ha'][seco]} kg/ha na safra "
+                 f"{seco} (o pior) e {regra['rendimento_por_safra_kg_ha'][normal]} kg/ha na safra {normal}; a mediana "
+                 f"das {len(regra['rendimento_por_safra_kg_ha'])} safras é {n(regra['mediana_kg_ha'])} kg/ha. "
+                 f"Fonte: {regra['fonte_do_rendimento']}.")
+        t.append(f"Se a regra fosse a da chuva (a menor chuva na janela), o pior ano seria a safra "
+                 f"{regra['pela_chuva_seria']['pior_ano']} e o normal, a safra {regra['pela_chuva_seria']['ano_normal']}.")
+    else:
+        t.append(f"A mediana da chuva das {len(regra['chuva_por_safra_mm'])} safras é {n(regra['mediana_mm'])} mm.")
     if regra["empate_do_ano_normal"]:
         t.append(f"As safras {' e '.join(regra['empate_do_ano_normal'])} ficam à mesma distância da mediana; "
                  "pelo desempate, vale a mais antiga.")
-    t += _ano("Ano normal", normal, r) + _ano("Ano mais seco", seco, r)
+    rotulo_do_pior = "Pior ano" if regra["regra"] == "rendimento" else "Ano mais seco"
+    t += _ano("Ano normal", normal, r) + _ano(rotulo_do_pior, seco, r)
     if "aviso_do_ano_mais_seco" in regra:
         t.append(f"Atenção ao ano mais seco: {regra['aviso_do_ano_mais_seco']}. Em 2025 a NASA POWER soma "
                  f"{n(regra['chuva_de_2025_mm'])} mm no ano. Por isso, a segunda safra mais seca vai ao lado:")
@@ -117,8 +132,8 @@ def texto(r):
                  f"{n(rot['soma_das_10_safras']['falta_da_soja_mm'])} mm de falta na soja, "
                  f"{n(rot['soma_das_10_safras']['falta_do_milho_mm'])} mm no milho e "
                  f"{rot['soma_das_10_safras']['dias_de_sede']} dias de sede.")
-    t.append(f"Fonte do clima: {r['clima']['fonte']}, de {r['clima']['primeiro_dia']} a {r['clima']['ultimo_dia']}, "
-             f"baixado em {r['clima']['baixado_em']}. A conta: {r['clima']['conta']}.")
+    t.append(f"O clima usado vai de {r['clima']['primeiro_dia']} a {r['clima']['ultimo_dia']}; a temperatura foi "
+             f"baixada em {temperatura['baixado_em']}; a origem da chuva: {chuva['origem']}.")
     extra = r["safra_2025_26"]
     t += ["",
           "O RISCO",
@@ -132,6 +147,7 @@ def texto(r):
           f"{n(extra['alternativa']['milho']['falta_relativa_pct'])}% na alternativa.",
           f"- {r['hipoteses']} parâmetros da conta ainda são hipótese (o comando com --json lista cada um, com a "
           "fonte e a etiqueta)."]
+    t += [f"- {aviso}" for aviso in r["clima"]["avisos"]]
     t += [f"- {limite}" for limite in r["limites"]]
     t += [""] + _ndvi(r)
     t += ["", "Valide com o agrônomo antes de decidir: isto é uma conta com o clima da região, não uma recomendação."]

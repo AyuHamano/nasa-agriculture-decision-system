@@ -60,6 +60,10 @@ class Calendario:
         self.braquiaria_p = v("culturas", "braquiaria_apos_milho", "p")
         self.dessecacao_dias = int(v("culturas", "braquiaria_apos_milho", "dessecacao_dias_antes_da_soja"))
         self.solo_nu_kc = v("culturas", "solo_nu", "kc")
+        # A profundidade das raízes de cada cobertura; a terra sem planta vale com a mais funda delas (o perfil).
+        self.raizes = {"soja": v("culturas", "soja", "raiz_m"), "milho": v("culturas", "milho_2a_safra", "raiz_m"),
+                       BRAQUIARIA: v("culturas", "braquiaria_apos_milho", "raiz_m")}
+        self.raizes[SEM_PLANTA] = max(self.raizes.values())
         for nome, fases in (("soja", self.soja_fases), ("milho", self.milho_fases)):
             if len(fases) != 4 or any(f <= 0 for f in fases):
                 raise ValueError(f"As fases da cultura ({nome}) têm de ser 4 números de dias, todos acima de zero.")

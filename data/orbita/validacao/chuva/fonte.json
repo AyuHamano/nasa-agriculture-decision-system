@@ -1,0 +1,598 @@
+{
+  "o_que_e": "Endereço exato e hora de cada consulta que gerou os CSV desta pasta.",
+  "ponto": {
+    "latitude": -17.79,
+    "longitude": -50.92,
+    "lugar": "Rio Verde (GO)"
+  },
+  "periodo_pedido": {
+    "inicio": "2014-07-01",
+    "fim": "2026-10-31"
+  },
+  "fontes": {
+    "open-meteo": {
+      "arquivo": "open-meteo.csv",
+      "primeiro_dia": "2014-07-01",
+      "ultimo_dia": "2026-10-31",
+      "dias": 4506,
+      "dias_sem_dado": {
+        "chuva_mm": 0,
+        "tmax_c": 0,
+        "tmin_c": 0,
+        "eto_mm": 0
+      },
+      "grade_devolvida": {
+        "latitude": -17.75044,
+        "longitude": -50.930237,
+        "altitude_m": 763.0
+      },
+      "fuso": "America/Sao_Paulo",
+      "o_que_e": "Arquivo histórico do Open-Meteo, consulta padrão (best match): reanálise, ou seja, clima recalculado por modelo com as observações; não é pluviômetro.",
+      "documentacao": "https://open-meteo.com/en/docs/historical-weather-api",
+      "consultas": [
+        {
+          "endereco": "https://archive-api.open-meteo.com/v1/archive?latitude=-17.79&longitude=-50.92&start_date=2014-07-01&end_date=2026-10-31&daily=precipitation_sum,temperature_2m_max,temperature_2m_min,et0_fao_evapotranspiration&timezone=America%2FSao_Paulo",
+          "baixado_em": "2026-11-14T19:20:51-03:00",
+          "bruto": "bruto/open-meteo.json"
+        }
+      ],
+      "conferencia_do_modelo": {
+        "como": "A mesma consulta foi repetida só com o ERA5 e só com o ECMWF IFS. Aqui está, por ano, em quantos dias o valor da série padrão é igual ao de cada modelo (diferença menor que 0,005).",
+        "consulta_so_ifs": {
+          "endereco": "https://archive-api.open-meteo.com/v1/archive?latitude=-17.79&longitude=-50.92&start_date=2014-07-01&end_date=2026-10-31&daily=precipitation_sum,temperature_2m_max,temperature_2m_min,et0_fao_evapotranspiration&timezone=America%2FSao_Paulo&models=ecmwf_ifs",
+          "baixado_em": "2026-11-14T19:20:51-03:00",
+          "bruto": "bruto/open-meteo-ifs.json"
+        },
+        "por_variavel_e_ano": {
+          "precipitation_sum": {
+            "2014": {
+              "dias_comparados_com_era5": 86,
+              "iguais_ao_era5": 86,
+              "dias_comparados_com_ifs": 0,
+              "iguais_ao_ifs": 0
+            },
+            "2015": {
+              "dias_comparados_com_era5": 216,
+              "iguais_ao_era5": 216,
+              "dias_comparados_com_ifs": 0,
+              "iguais_ao_ifs": 0
+            },
+            "2016": {
+              "dias_comparados_com_era5": 194,
+              "iguais_ao_era5": 194,
+              "dias_comparados_com_ifs": 0,
+              "iguais_ao_ifs": 0
+            },
+            "2017": {
+              "dias_comparados_com_era5": 209,
+              "iguais_ao_era5": 7,
+              "dias_comparados_com_ifs": 199,
+              "iguais_ao_ifs": 199
+            },
+            "2018": {
+              "dias_comparados_com_era5": 224,
+              "iguais_ao_era5": 6,
+              "dias_comparados_com_ifs": 211,
+              "iguais_ao_ifs": 211
+            },
+            "2019": {
+              "dias_comparados_com_era5": 213,
+              "iguais_ao_era5": 2,
+              "dias_comparados_com_ifs": 193,
+              "iguais_ao_ifs": 193
+            },
+            "2020": {
+              "dias_comparados_com_era5": 190,
+              "iguais_ao_era5": 1,
+              "dias_comparados_com_ifs": 175,
+              "iguais_ao_ifs": 175
+            },
+            "2021": {
+              "dias_comparados_com_era5": 193,
+              "iguais_ao_era5": 6,
+              "dias_comparados_com_ifs": 171,
+              "iguais_ao_ifs": 171
+            },
+            "2022": {
+              "dias_comparados_com_era5": 203,
+              "iguais_ao_era5": 6,
+              "dias_comparados_com_ifs": 184,
+              "iguais_ao_ifs": 184
+            },
+            "2023": {
+              "dias_comparados_com_era5": 225,
+              "iguais_ao_era5": 8,
+              "dias_comparados_com_ifs": 206,
+              "iguais_ao_ifs": 206
+            },
+            "2024": {
+              "dias_comparados_com_era5": 192,
+              "iguais_ao_era5": 2,
+              "dias_comparados_com_ifs": 186,
+              "iguais_ao_ifs": 186
+            },
+            "2025": {
+              "dias_comparados_com_era5": 210,
+              "iguais_ao_era5": 5,
+              "dias_comparados_com_ifs": 187,
+              "iguais_ao_ifs": 187
+            },
+            "2026": {
+              "dias_comparados_com_era5": 170,
+              "iguais_ao_era5": 5,
+              "dias_comparados_com_ifs": 164,
+              "iguais_ao_ifs": 164
+            }
+          },
+          "et0_fao_evapotranspiration": {
+            "2014": {
+              "dias_comparados_com_era5": 184,
+              "iguais_ao_era5": 2,
+              "dias_comparados_com_ifs": 0,
+              "iguais_ao_ifs": 0
+            },
+            "2015": {
+              "dias_comparados_com_era5": 365,
+              "iguais_ao_era5": 10,
+              "dias_comparados_com_ifs": 0,
+              "iguais_ao_ifs": 0
+            },
+            "2016": {
+              "dias_comparados_com_era5": 366,
+              "iguais_ao_era5": 7,
+              "dias_comparados_com_ifs": 0,
+              "iguais_ao_ifs": 0
+            },
+            "2017": {
+              "dias_comparados_com_era5": 365,
+              "iguais_ao_era5": 6,
+              "dias_comparados_com_ifs": 365,
+              "iguais_ao_ifs": 365
+            },
+            "2018": {
+              "dias_comparados_com_era5": 365,
+              "iguais_ao_era5": 5,
+              "dias_comparados_com_ifs": 365,
+              "iguais_ao_ifs": 365
+            },
+            "2019": {
+              "dias_comparados_com_era5": 365,
+              "iguais_ao_era5": 4,
+              "dias_comparados_com_ifs": 365,
+              "iguais_ao_ifs": 365
+            },
+            "2020": {
+              "dias_comparados_com_era5": 366,
+              "iguais_ao_era5": 4,
+              "dias_comparados_com_ifs": 366,
+              "iguais_ao_ifs": 366
+            },
+            "2021": {
+              "dias_comparados_com_era5": 365,
+              "iguais_ao_era5": 3,
+              "dias_comparados_com_ifs": 365,
+              "iguais_ao_ifs": 365
+            },
+            "2022": {
+              "dias_comparados_com_era5": 365,
+              "iguais_ao_era5": 3,
+              "dias_comparados_com_ifs": 365,
+              "iguais_ao_ifs": 365
+            },
+            "2023": {
+              "dias_comparados_com_era5": 365,
+              "iguais_ao_era5": 2,
+              "dias_comparados_com_ifs": 365,
+              "iguais_ao_ifs": 365
+            },
+            "2024": {
+              "dias_comparados_com_era5": 366,
+              "iguais_ao_era5": 4,
+              "dias_comparados_com_ifs": 366,
+              "iguais_ao_ifs": 366
+            },
+            "2025": {
+              "dias_comparados_com_era5": 365,
+              "iguais_ao_era5": 5,
+              "dias_comparados_com_ifs": 365,
+              "iguais_ao_ifs": 365
+            },
+            "2026": {
+              "dias_comparados_com_era5": 304,
+              "iguais_ao_era5": 2,
+              "dias_comparados_com_ifs": 304,
+              "iguais_ao_ifs": 304
+            }
+          },
+          "temperature_2m_max": {
+            "2014": {
+              "dias_comparados_com_era5": 184,
+              "iguais_ao_era5": 5,
+              "dias_comparados_com_ifs": 0,
+              "iguais_ao_ifs": 0
+            },
+            "2015": {
+              "dias_comparados_com_era5": 365,
+              "iguais_ao_era5": 7,
+              "dias_comparados_com_ifs": 0,
+              "iguais_ao_ifs": 0
+            },
+            "2016": {
+              "dias_comparados_com_era5": 366,
+              "iguais_ao_era5": 8,
+              "dias_comparados_com_ifs": 0,
+              "iguais_ao_ifs": 0
+            },
+            "2017": {
+              "dias_comparados_com_era5": 365,
+              "iguais_ao_era5": 10,
+              "dias_comparados_com_ifs": 0,
+              "iguais_ao_ifs": 0
+            },
+            "2018": {
+              "dias_comparados_com_era5": 365,
+              "iguais_ao_era5": 14,
+              "dias_comparados_com_ifs": 0,
+              "iguais_ao_ifs": 0
+            },
+            "2019": {
+              "dias_comparados_com_era5": 365,
+              "iguais_ao_era5": 8,
+              "dias_comparados_com_ifs": 0,
+              "iguais_ao_ifs": 0
+            },
+            "2020": {
+              "dias_comparados_com_era5": 366,
+              "iguais_ao_era5": 8,
+              "dias_comparados_com_ifs": 0,
+              "iguais_ao_ifs": 0
+            },
+            "2021": {
+              "dias_comparados_com_era5": 365,
+              "iguais_ao_era5": 11,
+              "dias_comparados_com_ifs": 0,
+              "iguais_ao_ifs": 0
+            },
+            "2022": {
+              "dias_comparados_com_era5": 365,
+              "iguais_ao_era5": 11,
+              "dias_comparados_com_ifs": 0,
+              "iguais_ao_ifs": 0
+            },
+            "2023": {
+              "dias_comparados_com_era5": 365,
+              "iguais_ao_era5": 9,
+              "dias_comparados_com_ifs": 0,
+              "iguais_ao_ifs": 0
+            },
+            "2024": {
+              "dias_comparados_com_era5": 366,
+              "iguais_ao_era5": 11,
+              "dias_comparados_com_ifs": 1,
+              "iguais_ao_ifs": 0
+            },
+            "2025": {
+              "dias_comparados_com_era5": 365,
+              "iguais_ao_era5": 12,
+              "dias_comparados_com_ifs": 101,
+              "iguais_ao_ifs": 32
+            },
+            "2026": {
+              "dias_comparados_com_era5": 304,
+              "iguais_ao_era5": 13,
+              "dias_comparados_com_ifs": 304,
+              "iguais_ao_ifs": 121
+            }
+          }
+        }
+      }
+    },
+    "open-meteo-era5": {
+      "arquivo": "open-meteo-era5.csv",
+      "primeiro_dia": "2014-07-01",
+      "ultimo_dia": "2026-10-31",
+      "dias": 4506,
+      "dias_sem_dado": {
+        "chuva_mm": 0,
+        "tmax_c": 0,
+        "tmin_c": 0,
+        "eto_mm": 0
+      },
+      "grade_devolvida": {
+        "latitude": -17.75,
+        "longitude": -51.0,
+        "altitude_m": 763.0
+      },
+      "fuso": "America/Sao_Paulo",
+      "o_que_e": "Arquivo histórico do Open-Meteo, só o modelo ERA5 (reanálise do ECMWF/Copernicus, grade de 0,25 grau): um modelo só no período inteiro.",
+      "documentacao": "https://open-meteo.com/en/docs/historical-weather-api",
+      "consultas": [
+        {
+          "endereco": "https://archive-api.open-meteo.com/v1/archive?latitude=-17.79&longitude=-50.92&start_date=2014-07-01&end_date=2026-10-31&daily=precipitation_sum,temperature_2m_max,temperature_2m_min,et0_fao_evapotranspiration&timezone=America%2FSao_Paulo&models=era5",
+          "baixado_em": "2026-11-14T19:20:51-03:00",
+          "bruto": "bruto/open-meteo-era5.json"
+        }
+      ]
+    },
+    "imerg": {
+      "arquivo": "imerg.csv",
+      "o_que_e": "GPM IMERG: chuva estimada por satélites (a missão GPM, da NASA e da JAXA), servida por ponto pela NASA POWER no parâmetro IMERG_PRECTOT.",
+      "definicao_na_lista_da_power": {
+        "type": "METEOROLOGY",
+        "temporal": "DAILY",
+        "source": "SOURCE",
+        "community": "AG",
+        "calculated": false,
+        "inputs": null,
+        "units": "mm/day",
+        "name": "Total Precipitation",
+        "definition": "The average IMERG total precipitation at the surface of the earth."
+      },
+      "consultas": [
+        {
+          "endereco": "https://power.larc.nasa.gov/api/system/manager/parameters?community=AG&temporal=daily",
+          "baixado_em": "2026-11-14T19:20:52-03:00",
+          "bruto": "bruto/power-parametro-imerg.json",
+          "para_que": "ver se a POWER oferece a chuva do IMERG por ponto"
+        },
+        {
+          "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-50.92&latitude=-17.79&start=20140701&end=20261031&format=JSON&time-standard=UTC",
+          "baixado_em": "2026-11-14T19:20:54-03:00",
+          "bruto": "bruto/imerg-power.json"
+        }
+      ],
+      "cabecalho_da_resposta": {
+        "title": "NASA/POWER Source Native Resolution Daily Data",
+        "api": {
+          "version": "v2.10.3",
+          "name": "POWER Daily API"
+        },
+        "sources": [
+          "IMERG"
+        ],
+        "fill_value": -999.0,
+        "time_standard": "UTC",
+        "start": "20140701",
+        "end": "20261031"
+      },
+      "avisos_da_resposta": [],
+      "ponto_devolvido": [
+        -50.92,
+        -17.79,
+        625.31
+      ],
+      "horario": "UTC (o dia vai das 21h do dia anterior às 21h do dia, em Brasília)",
+      "primeiro_dia": "2014-07-01",
+      "ultimo_dia": "2026-10-31",
+      "dias": 4506,
+      "dias_sem_dado": 47,
+      "lista_dos_dias_sem_dado": [
+        "2026-09-15",
+        "2026-09-16",
+        "2026-09-17",
+        "2026-09-18",
+        "2026-09-19",
+        "2026-09-20",
+        "2026-09-21",
+        "2026-09-22",
+        "2026-09-23",
+        "2026-09-24",
+        "2026-09-25",
+        "2026-09-26",
+        "2026-09-27",
+        "2026-09-28",
+        "2026-09-29",
+        "2026-09-30",
+        "2026-10-01",
+        "2026-10-02",
+        "2026-10-03",
+        "2026-10-04",
+        "2026-10-05",
+        "2026-10-06",
+        "2026-10-07",
+        "2026-10-08",
+        "2026-10-09",
+        "2026-10-10",
+        "2026-10-11",
+        "2026-10-12",
+        "2026-10-13",
+        "2026-10-14",
+        "2026-10-15",
+        "2026-10-16",
+        "2026-10-17",
+        "2026-10-18",
+        "2026-10-19",
+        "2026-10-20",
+        "2026-10-21",
+        "2026-10-22",
+        "2026-10-23",
+        "2026-10-24",
+        "2026-10-25",
+        "2026-10-26",
+        "2026-10-27",
+        "2026-10-28",
+        "2026-10-29",
+        "2026-10-30",
+        "2026-10-31"
+      ],
+      "ultimo_dia_com_dado": "2026-09-14"
+    },
+    "chirps": {
+      "arquivo": "chirps.csv",
+      "o_que_e": "CHIRPS (UCSB): chuva estimada por satélite (infravermelho) e ajustada com pluviômetros, servida pelo ClimateSERV (SERVIR) como o conjunto 0, 'UCSB CHIRPS Rainfall'.",
+      "lista_dos_conjuntos": "https://pypi.org/project/climateserv/",
+      "operacao": "média (avg) sobre a geometria pedida, que aqui é um ponto",
+      "consultas": [
+        {
+          "pedaco": [
+            "2014-07-01",
+            "2014-12-31"
+          ],
+          "endereco_do_pedido": "https://climateserv.servirglobal.net/api/submitDataRequest/?datatype=0&begintime=07%2F01%2F2014&endtime=12%2F31%2F2014&intervaltype=0&operationtype=5&dateType_Category=default&isZip_CurrentDataType=false&geometry=%7B%22type%22%3A%22Point%22%2C%22coordinates%22%3A%5B-50.92%2C-17.79%5D%7D",
+          "endereco_dos_dados": "https://climateserv.servirglobal.net/api/getDataFromRequest/?id=7976ed47-f16c-4951-87aa-8217c0c4b8ca",
+          "baixado_em": "2026-11-14T19:21:47-03:00",
+          "dias_devolvidos": 184
+        },
+        {
+          "pedaco": [
+            "2015-01-01",
+            "2015-12-31"
+          ],
+          "endereco_do_pedido": "https://climateserv.servirglobal.net/api/submitDataRequest/?datatype=0&begintime=01%2F01%2F2015&endtime=12%2F31%2F2015&intervaltype=0&operationtype=5&dateType_Category=default&isZip_CurrentDataType=false&geometry=%7B%22type%22%3A%22Point%22%2C%22coordinates%22%3A%5B-50.92%2C-17.79%5D%7D",
+          "endereco_dos_dados": "https://climateserv.servirglobal.net/api/getDataFromRequest/?id=6f6e54bc-d246-418e-b433-37b238ff9805",
+          "baixado_em": "2026-11-14T19:21:55-03:00",
+          "dias_devolvidos": 365
+        },
+        {
+          "pedaco": [
+            "2016-01-01",
+            "2016-12-31"
+          ],
+          "endereco_do_pedido": "https://climateserv.servirglobal.net/api/submitDataRequest/?datatype=0&begintime=01%2F01%2F2016&endtime=12%2F31%2F2016&intervaltype=0&operationtype=5&dateType_Category=default&isZip_CurrentDataType=false&geometry=%7B%22type%22%3A%22Point%22%2C%22coordinates%22%3A%5B-50.92%2C-17.79%5D%7D",
+          "endereco_dos_dados": "https://climateserv.servirglobal.net/api/getDataFromRequest/?id=75d4633c-a0a3-4462-93d9-7974eb2ca49a",
+          "baixado_em": "2026-11-14T19:22:03-03:00",
+          "dias_devolvidos": 366
+        },
+        {
+          "pedaco": [
+            "2017-01-01",
+            "2017-12-31"
+          ],
+          "endereco_do_pedido": "https://climateserv.servirglobal.net/api/submitDataRequest/?datatype=0&begintime=01%2F01%2F2017&endtime=12%2F31%2F2017&intervaltype=0&operationtype=5&dateType_Category=default&isZip_CurrentDataType=false&geometry=%7B%22type%22%3A%22Point%22%2C%22coordinates%22%3A%5B-50.92%2C-17.79%5D%7D",
+          "endereco_dos_dados": "https://climateserv.servirglobal.net/api/getDataFromRequest/?id=7d2e9733-e4be-4a79-936e-b5b23961e990",
+          "baixado_em": "2026-11-14T19:22:11-03:00",
+          "dias_devolvidos": 365
+        },
+        {
+          "pedaco": [
+            "2018-01-01",
+            "2018-12-31"
+          ],
+          "endereco_do_pedido": "https://climateserv.servirglobal.net/api/submitDataRequest/?datatype=0&begintime=01%2F01%2F2018&endtime=12%2F31%2F2018&intervaltype=0&operationtype=5&dateType_Category=default&isZip_CurrentDataType=false&geometry=%7B%22type%22%3A%22Point%22%2C%22coordinates%22%3A%5B-50.92%2C-17.79%5D%7D",
+          "endereco_dos_dados": "https://climateserv.servirglobal.net/api/getDataFromRequest/?id=dd932536-1c8d-4105-9cd7-662b12317ee1",
+          "baixado_em": "2026-11-14T19:22:18-03:00",
+          "dias_devolvidos": 365
+        },
+        {
+          "pedaco": [
+            "2019-01-01",
+            "2019-12-31"
+          ],
+          "endereco_do_pedido": "https://climateserv.servirglobal.net/api/submitDataRequest/?datatype=0&begintime=01%2F01%2F2019&endtime=12%2F31%2F2019&intervaltype=0&operationtype=5&dateType_Category=default&isZip_CurrentDataType=false&geometry=%7B%22type%22%3A%22Point%22%2C%22coordinates%22%3A%5B-50.92%2C-17.79%5D%7D",
+          "endereco_dos_dados": "https://climateserv.servirglobal.net/api/getDataFromRequest/?id=e1947b39-ea75-42f0-bc99-55ea4a276199",
+          "baixado_em": "2026-11-14T19:22:25-03:00",
+          "dias_devolvidos": 365
+        },
+        {
+          "pedaco": [
+            "2020-01-01",
+            "2020-12-31"
+          ],
+          "endereco_do_pedido": "https://climateserv.servirglobal.net/api/submitDataRequest/?datatype=0&begintime=01%2F01%2F2020&endtime=12%2F31%2F2020&intervaltype=0&operationtype=5&dateType_Category=default&isZip_CurrentDataType=false&geometry=%7B%22type%22%3A%22Point%22%2C%22coordinates%22%3A%5B-50.92%2C-17.79%5D%7D",
+          "endereco_dos_dados": "https://climateserv.servirglobal.net/api/getDataFromRequest/?id=68815881-9ba7-406a-a88e-88a861976c6c",
+          "baixado_em": "2026-11-14T19:22:37-03:00",
+          "dias_devolvidos": 366
+        },
+        {
+          "pedaco": [
+            "2021-01-01",
+            "2021-12-31"
+          ],
+          "endereco_do_pedido": "https://climateserv.servirglobal.net/api/submitDataRequest/?datatype=0&begintime=01%2F01%2F2021&endtime=12%2F31%2F2021&intervaltype=0&operationtype=5&dateType_Category=default&isZip_CurrentDataType=false&geometry=%7B%22type%22%3A%22Point%22%2C%22coordinates%22%3A%5B-50.92%2C-17.79%5D%7D",
+          "endereco_dos_dados": "https://climateserv.servirglobal.net/api/getDataFromRequest/?id=5d5018cb-01a5-4645-b345-08691bc38872",
+          "baixado_em": "2026-11-14T19:22:44-03:00",
+          "dias_devolvidos": 365
+        },
+        {
+          "pedaco": [
+            "2022-01-01",
+            "2022-12-31"
+          ],
+          "endereco_do_pedido": "https://climateserv.servirglobal.net/api/submitDataRequest/?datatype=0&begintime=01%2F01%2F2022&endtime=12%2F31%2F2022&intervaltype=0&operationtype=5&dateType_Category=default&isZip_CurrentDataType=false&geometry=%7B%22type%22%3A%22Point%22%2C%22coordinates%22%3A%5B-50.92%2C-17.79%5D%7D",
+          "endereco_dos_dados": "https://climateserv.servirglobal.net/api/getDataFromRequest/?id=fe741215-fbb9-44c0-850a-82afcec9a4d5",
+          "baixado_em": "2026-11-14T19:22:51-03:00",
+          "dias_devolvidos": 365
+        },
+        {
+          "pedaco": [
+            "2023-01-01",
+            "2023-12-31"
+          ],
+          "endereco_do_pedido": "https://climateserv.servirglobal.net/api/submitDataRequest/?datatype=0&begintime=01%2F01%2F2023&endtime=12%2F31%2F2023&intervaltype=0&operationtype=5&dateType_Category=default&isZip_CurrentDataType=false&geometry=%7B%22type%22%3A%22Point%22%2C%22coordinates%22%3A%5B-50.92%2C-17.79%5D%7D",
+          "endereco_dos_dados": "https://climateserv.servirglobal.net/api/getDataFromRequest/?id=ab3a351e-8eff-42b4-a818-4df454d9ed05",
+          "baixado_em": "2026-11-14T19:22:58-03:00",
+          "dias_devolvidos": 365
+        },
+        {
+          "pedaco": [
+            "2024-01-01",
+            "2024-12-31"
+          ],
+          "endereco_do_pedido": "https://climateserv.servirglobal.net/api/submitDataRequest/?datatype=0&begintime=01%2F01%2F2024&endtime=12%2F31%2F2024&intervaltype=0&operationtype=5&dateType_Category=default&isZip_CurrentDataType=false&geometry=%7B%22type%22%3A%22Point%22%2C%22coordinates%22%3A%5B-50.92%2C-17.79%5D%7D",
+          "endereco_dos_dados": "https://climateserv.servirglobal.net/api/getDataFromRequest/?id=6f671f7b-97d9-4ae6-addf-f4423b4e06bd",
+          "baixado_em": "2026-11-14T19:23:05-03:00",
+          "dias_devolvidos": 366
+        },
+        {
+          "pedaco": [
+            "2025-01-01",
+            "2025-12-31"
+          ],
+          "endereco_do_pedido": "https://climateserv.servirglobal.net/api/submitDataRequest/?datatype=0&begintime=01%2F01%2F2025&endtime=12%2F31%2F2025&intervaltype=0&operationtype=5&dateType_Category=default&isZip_CurrentDataType=false&geometry=%7B%22type%22%3A%22Point%22%2C%22coordinates%22%3A%5B-50.92%2C-17.79%5D%7D",
+          "endereco_dos_dados": "https://climateserv.servirglobal.net/api/getDataFromRequest/?id=2b76e7c4-b970-43d2-9964-1f5935f0a607",
+          "baixado_em": "2026-11-14T19:23:12-03:00",
+          "dias_devolvidos": 365
+        },
+        {
+          "pedaco": [
+            "2026-01-01",
+            "2026-10-31"
+          ],
+          "endereco_do_pedido": "https://climateserv.servirglobal.net/api/submitDataRequest/?datatype=0&begintime=01%2F01%2F2026&endtime=10%2F31%2F2026&intervaltype=0&operationtype=5&dateType_Category=default&isZip_CurrentDataType=false&geometry=%7B%22type%22%3A%22Point%22%2C%22coordinates%22%3A%5B-50.92%2C-17.79%5D%7D",
+          "endereco_dos_dados": "https://climateserv.servirglobal.net/api/getDataFromRequest/?id=d0113293-4caa-419c-bf61-f2c469e7bb4d",
+          "baixado_em": "2026-11-14T19:23:20-03:00",
+          "dias_devolvidos": 273
+        }
+      ],
+      "falhas": [],
+      "bruto": "bruto/chirps-climateserv.json",
+      "primeiro_dia_com_dado": "2014-07-01",
+      "ultimo_dia_com_dado": "2026-09-30",
+      "dias_no_csv": 4506,
+      "dias_sem_dado": 31,
+      "lista_dos_dias_sem_dado": [
+        "2026-10-01",
+        "2026-10-02",
+        "2026-10-03",
+        "2026-10-04",
+        "2026-10-05",
+        "2026-10-06",
+        "2026-10-07",
+        "2026-10-08",
+        "2026-10-09",
+        "2026-10-10",
+        "2026-10-11",
+        "2026-10-12",
+        "2026-10-13",
+        "2026-10-14",
+        "2026-10-15",
+        "2026-10-16",
+        "2026-10-17",
+        "2026-10-18",
+        "2026-10-19",
+        "2026-10-20",
+        "2026-10-21",
+        "2026-10-22",
+        "2026-10-23",
+        "2026-10-24",
+        "2026-10-25",
+        "2026-10-26",
+        "2026-10-27",
+        "2026-10-28",
+        "2026-10-29",
+        "2026-10-30",
+        "2026-10-31"
+      ]
+    }
+  }
+}

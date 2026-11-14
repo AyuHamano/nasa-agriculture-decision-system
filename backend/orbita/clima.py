@@ -19,6 +19,17 @@ INICIO_DA_SIMULACAO = datetime.date(2014, 7, 1)
 SEM_DADO = -999.0
 CONSTANTE_SOLAR = 0.0820  # MJ/m²/min (FAO-56, eq. 21)
 
+PASTA_DA_CHUVA = PASTA_DOS_DADOS / "validacao" / "chuva"
+FONTES_DE_CHUVA = ("imerg", "chirps", "era5", "power")
+ORIGENS_DA_CHUVA = {
+    "imerg": "o satélite de chuva GPM IMERG, da NASA (o parâmetro IMERG_PRECTOT, entregue por ponto pela API da "
+             "NASA POWER; o dia dele é o UTC)",
+    "chirps": "o CHIRPS (chuva de satélite acertada com estações em terra)",
+    "era5": "o modelo ERA5 (a chuva do arquivo histórico do Open-Meteo)",
+    "power": "o modelo da NASA POWER (o parâmetro PRECTOTCORR), que fica só como comparação",
+}
+ORIGEM_DA_TEMPERATURA = "a NASA POWER (API diária, comunidade AG): T2M_MAX e T2M_MIN, no dia local"
+
 Dia = collections.namedtuple("Dia", "data chuva tmax tmin eto")
 
 
@@ -101,6 +112,56 @@ def _ler(caminho, inicio):
 def ler_serie(pasta=PASTA_NASA_POWER, inicio=INICIO_DA_SIMULACAO):
     """A série guardada em data/orbita/nasa-power/, já com a ETo de cada dia."""
     return list(_ler(str(Path(pasta) / "resposta.json"), inicio))
+
+
+def ler_chuva_csv(caminho):
+    """Um CSV `data,chuva_mm` (pode ter mais colunas): data -> chuva em mm, ou None no dia em branco."""
+    import csv
+    valores = {}
+    with open(caminho, encoding="utf-8", newline="") as arquivo:
+        for linha in csv.DictReader(arquivo):
+            texto = (linha.get("chuva_mm") or "").strip()
+            valores[datetime.date.fromisoformat(linha["data"].strip())] = float(texto) if texto else None
+    return valores
+
+
+@functools.lru_cache(maxsize=8)
+def _serie_com_aviso(chuva, pasta_da_chuva):
+    dias = ler_serie()
+    if chuva == "power":
+        return tuple(dias), ("A chuva de modelo da NASA POWER (PRECTOTCORR) fica só como comparação: em Rio Verde "
+                             "ela fica bem abaixo da estação em terra do INMET de 2021 para cá (o comando validar "
+                             "mostra safra por safra).",)
+    if chuva not in FONTES_DE_CHUVA:
+        raise ValueError(f"Fonte de chuva desconhecida: '{chuva}'. Use imerg, chirps, era5 ou power.")
+    arquivo = Path(pasta_da_chuva) / f"{chuva}.csv"
+    if not arquivo.exists():
+        raise ValueError(f"A chuva '{chuva}' não está guardada: falta o arquivo {arquivo}.")
+    valores = ler_chuva_csv(arquivo)
+    pares = [(dia, valores.get(dia.data)) for dia in dias]
+    cortados = 0
+    while pares and pares[-1][1] is None:
+        pares.pop()
+        cortados += 1
+    buracos = [dia.data for dia, valor in pares if valor is None]
+    if buracos or not pares:
+        raise ValueError(f"A chuva '{chuva}' tem {len(buracos)} dia(s) sem dado no meio da série (o primeiro: "
+                         f"{buracos[0].isoformat() if buracos else 'todos'}). O motor não troca dia sem dado por "
+                         "zero: escolha outra fonte de chuva ou baixe a série de novo.")
+    avisos = []
+    if cortados:
+        avisos.append(f"A chuva desta fonte vai até {pares[-1][0].data.isoformat()}: os {cortados} dias seguintes da "
+                      "série, sem dado de chuva, ficaram fora da conta (dia sem dado nunca vira zero).")
+    if chuva == "imerg":
+        avisos.append("O dia do IMERG é o UTC (começa 3 horas antes do dia de Rio Verde); a temperatura é do dia "
+                      "local. A chuva de um fim de tarde pode cair no dia seguinte da conta.")
+    return tuple(dia._replace(chuva=valor) for dia, valor in pares), tuple(avisos)
+
+
+def ler_serie_com_aviso(chuva="power", pasta_da_chuva=PASTA_DA_CHUVA):
+    """A série do motor com a chuva da fonte pedida (a temperatura e a ETo são sempre da NASA POWER) e os avisos."""
+    dias, avisos = _serie_com_aviso(chuva, str(pasta_da_chuva))
+    return list(dias), list(avisos)
 
 
 def origem_da_serie(pasta=PASTA_NASA_POWER):

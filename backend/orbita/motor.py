@@ -1,9 +1,14 @@
 # Gerado com IA (Claude)
 """O motor: recebe a entrada, roda as duas rotações no clima guardado e devolve a resposta com os números.
 
-A regra dos anos, o critério de "safra com sede" e a regra do veredito foram fixados antes de ver o resultado
-(o guia do motor, 2026-11-14). As prioridades só mudam a ordem e o destaque da explicação: nenhum número muda.
+O critério de "safra com sede" e a regra do veredito foram fixados antes de ver o resultado (o guia do motor,
+2026-11-14). As prioridades só mudam a ordem e o destaque da explicação: nenhum número muda.
+
+A chuva e a regra dos anos são parâmetros. O padrão (a decisão do dono do projeto, 2026-11-14, depois da validação
+cruzada): a chuva do satélite GPM IMERG e o pior ano pela colheita do IBGE. A chuva de modelo da NASA POWER e a
+regra pela chuva (a do guia) continuam como opção, para comparar.
 """
+import csv
 import statistics
 
 from orbita import balanco, clima, parametros, rotacoes
@@ -15,17 +20,21 @@ ORDEM_DE_DESEMPATE = ("agua", "solo", "erosao", "renda")
 NOMES = {"agua": "Água", "solo": "Solo", "erosao": "Erosão", "renda": "Renda"}
 NAO_MEDIDO = "não medido"
 SAFRA_A_PARTE = "2025-26"
+CHUVA_PADRAO, REGRA_PADRAO = "imerg", "rendimento"
+REGRAS = ("rendimento", "chuva")
+ARQUIVO_DO_IBGE = clima.PASTA_DOS_DADOS / "validacao" / "ibge" / "rendimento_rio_verde.csv"
 LIMITES = [
     "É um caso só: Rio Verde (GO), uma rotação de hoje e uma alternativa, com um calendário fixo (as mesmas datas "
     "de plantio em todos os anos).",
-    "O clima é o do quadrado da NASA POWER (uns 50 km), não o da fazenda. A evaporação de referência (ETo) vem de "
-    "Hargreaves, que só usa a temperatura; o FAO-56 avisa que ela pode errar com vento forte ou ar muito úmido.",
+    "O clima é o de quadrados do mapa (a temperatura da NASA POWER, uns 50 km), não o da fazenda. A evaporação de "
+    "referência (ETo) vem de Hargreaves, que só usa a temperatura; o FAO-56 avisa que ela pode errar com vento "
+    "forte ou ar muito úmido.",
     "A conta não mede renda, preço, custo nem produtividade: falta de água não é quebra de safra.",
     "A conta não mede o efeito da palha do capim (menos evaporação, mais chuva entrando na terra) nem a enxurrada: "
     "toda chuva entra na terra até encher. Só entra o lado em que a braquiária bebe água.",
     "Enquanto o milho está na terra, a braquiária debaixo dele não aumenta o pedido de água (hipótese).",
-    "A raiz vale com a profundidade final desde o dia do plantio; por isso a sede do começo da soja pode sair maior "
-    "do que é.",
+    "A raiz vale com a profundidade final desde o dia do plantio, e na troca de cultura a caixa nova começa com a "
+    "mesma fração de água da anterior; por isso a sede do começo da soja pode sair diferente do que é.",
 ]
 
 
@@ -63,39 +72,84 @@ def validar_entrada(entrada):
     terra = entrada.get("terra") or "media"
     if terra not in TERRAS:
         problemas.append(f'terra "{terra}" não existe: use pouca, media ou muita (quanta água a terra segura)')
+    chuva = entrada.get("chuva") or CHUVA_PADRAO
+    if chuva not in clima.FONTES_DE_CHUVA:
+        problemas.append(f'chuva "{chuva}" não existe: use imerg, chirps, era5 ou power (a fonte da chuva)')
+    regra = entrada.get("regra") or REGRA_PADRAO
+    if regra not in REGRAS:
+        problemas.append(f'regra "{regra}" não existe: use rendimento (o pior ano pela colheita do IBGE) ou chuva '
+                         "(o ano mais seco pela chuva de fevereiro a junho)")
     if problemas:
         raise ValueError("Entrada fora do formato: " + "; ".join(problemas) + ".")
     return {"cidade_id": cidade, "rotacao_atual": list(ROTACAO_DE_HOJE),
-            "prioridades": {nome: notas[nome] for nome in ("agua", "solo", "renda", "erosao")}, "terra": terra}
+            "prioridades": {nome: notas[nome] for nome in ("agua", "solo", "renda", "erosao")}, "terra": terra,
+            "chuva": chuva, "regra": regra}
+
+
+def ler_rendimento_do_milho(arquivo=ARQUIVO_DO_IBGE):
+    """O rendimento do milho de 2ª safra em Rio Verde no IBGE, por safra (kg/ha). O ano N do IBGE é a safra (N-1)/N."""
+    rendimentos = {}
+    with open(arquivo, encoding="utf-8", newline="") as f:
+        for linha in csv.DictReader(f):
+            if linha["produto"].strip() == "milho_2a_safra" and linha["rendimento_kg_ha"].strip():
+                ano = int(linha["ano"])
+                rendimentos[f"{ano - 1}-{ano % 100:02d}"] = float(linha["rendimento_kg_ha"])
+    return rendimentos
+
+
+def _pior_e_normal(valores):
+    """Do dicionário safra -> valor: (a safra do menor valor, a mais perto da mediana, as empatadas, a mediana)."""
+    mediana = statistics.median(valores.values())
+    menor = min(abs(v - mediana) for v in valores.values())
+    empatadas = [s for s, v in valores.items() if abs(abs(v - mediana) - menor) < 1e-9]
+    return min(valores, key=valores.get), empatadas[0], (empatadas if len(empatadas) > 1 else []), mediana
 
 
 def escolher_anos(chuvas):
-    """A regra dos anos. `chuvas`: safra -> chuva de 1/fev a 30/jun (mm), em ordem de tempo.
+    """A regra pela chuva (a do guia). `chuvas`: safra -> chuva de 1/fev a 30/jun (mm), em ordem de tempo.
 
-    O ano mais seco é a menor chuva. O ano normal é a chuva mais perto da mediana. Com número par de safras, as duas
-    do meio ficam sempre à mesma distância da mediana: vale a mais antiga (desempate fixado antes de ver o resultado).
+    O pior ano é o mais seco (a menor chuva). O ano normal é a chuva mais perto da mediana. Com número par de safras,
+    as duas do meio ficam sempre à mesma distância da mediana: vale a mais antiga (desempate fixado antes do resultado).
     """
-    mediana = statistics.median(chuvas.values())
-    menor = min(abs(v - mediana) for v in chuvas.values())
-    empatadas = [s for s, v in chuvas.items() if abs(abs(v - mediana) - menor) < 1e-9]
-    return {"janela": "de 1/fev a 30/jun (a janela da 2ª safra), na NASA POWER",
+    pior, normal, empatadas, mediana = _pior_e_normal(chuvas)
+    return {"regra": "chuva",
+            "criterio": "o pior ano é o mais seco: a menor chuva de 1/fev a 30/jun (a janela da 2ª safra); o ano "
+                        "normal é o da chuva mais perto da mediana",
             "chuva_por_safra_mm": {s: r1(v) for s, v in chuvas.items()},
-            "mediana_mm": r1(mediana),
-            "ano_mais_seco": min(chuvas, key=chuvas.get),
-            "ano_normal": empatadas[0],
-            "empate_do_ano_normal": empatadas if len(empatadas) > 1 else [],
+            "mediana_mm": r1(mediana), "pior_ano": pior, "ano_normal": normal, "empate_do_ano_normal": empatadas,
             "desempate": "com 10 safras, a 5ª e a 6ª ficam à mesma distância da mediana; vale a mais antiga"}
 
 
+def escolher_pelo_rendimento(rendimentos, chuvas):
+    """A regra pela colheita: o pior ano é a safra do pior rendimento do milho de 2ª safra no IBGE."""
+    faltam = [s for s in chuvas if s not in rendimentos]
+    if faltam:
+        raise ValueError("A regra do rendimento precisa do rendimento do milho de 2ª safra no IBGE em todas as "
+                         "safras; faltam: " + ", ".join(faltam) + ".")
+    valores = {s: rendimentos[s] for s in chuvas}
+    pior, normal, empatadas, mediana = _pior_e_normal(valores)
+    pela_chuva = escolher_anos(chuvas)
+    return {"regra": "rendimento",
+            "criterio": "o pior ano é a safra do pior rendimento do milho de 2ª safra em Rio Verde no IBGE (o ano N "
+                        "do IBGE é a safra (N-1)/N); o ano normal é a do rendimento mais perto da mediana",
+            "fonte_do_rendimento": "IBGE, Produção Agrícola Municipal (SIDRA), Rio Verde (GO), milho de 2ª safra",
+            "rendimento_por_safra_kg_ha": {s: int(v) for s, v in valores.items()},
+            "mediana_kg_ha": r1(mediana),
+            "chuva_por_safra_mm": pela_chuva["chuva_por_safra_mm"], "mediana_mm": pela_chuva["mediana_mm"],
+            "pior_ano": pior, "ano_normal": normal, "empate_do_ano_normal": empatadas,
+            "desempate": pela_chuva["desempate"],
+            "pela_chuva_seria": {"pior_ano": pela_chuva["pior_ano"], "ano_normal": pela_chuva["ano_normal"]}}
+
+
 def comparar_agua(falta_atual, falta_alternativa, sede_atual, sede_alternativa, empate_mm):
-    """Quem se saiu melhor na água, por duas medidas: a falta no ano mais seco (mm) e as safras com sede."""
+    """Quem se saiu melhor na água, por duas medidas: a falta no pior ano (mm) e as safras com sede."""
     diferenca = falta_alternativa - falta_atual
     por_falta = "empate" if abs(diferenca) < empate_mm else ("alternativa" if diferenca < 0 else "atual")
     por_sede = "empate" if sede_alternativa == sede_atual else (
         "alternativa" if sede_alternativa < sede_atual else "atual")
     discordam = "empate" not in (por_falta, por_sede) and por_falta != por_sede
     melhor = "empate" if discordam else (por_sede if por_falta == "empate" else por_falta)
-    return {"melhor": melhor, "pela_falta_no_ano_mais_seco": por_falta, "pelas_safras_com_sede": por_sede,
+    return {"melhor": melhor, "pela_falta_no_pior_ano": por_falta, "pelas_safras_com_sede": por_sede,
             "as_medidas_discordam": discordam, "diferenca_mm": r1(diferenca), "empate_abaixo_de_mm": empate_mm}
 
 
@@ -144,31 +198,45 @@ def _com_sede(tabela, criterio):
             "com_30_pct": sum(1 for n in tabela.values() if n["milho"]["falta_relativa_pct"] >= 30)}
 
 
-def _ndvi(par):
+def _ndvi(par, dias_pelo_calendario):
+    """O verde visto pelo satélite: prova só da rotação de hoje. Sem a peça ou sem os dados, diz o que falta."""
     try:
         from orbita import ndvi
     except ImportError:
         return {"disponivel": False, "aviso": "A peça do NDVI (o verde visto pelo satélite) ainda não foi ligada."}
     try:
-        return dict(ndvi.resumo(par), disponivel=True)
+        folha = par["ndvi"]["fracao_da_amplitude"]
+        resumo = ndvi.resumo(folha["valor"])
+        comparacao = ndvi.comparar_com_calendario(dias_pelo_calendario, resumo)
     except (OSError, ValueError, KeyError) as erro:
         return {"disponivel": False, "aviso": f"O NDVI não pôde ser lido: {erro}"}
+    regra = dict(resumo["regra"], etiqueta_da_fracao=folha["etiqueta"], fonte_da_fracao=folha["fonte"])
+    return {"disponivel": True, "prova_de": "só da rotação de hoje", "fonte": ndvi.FONTE, "regra": regra,
+            "comparacao": comparacao, "limites_por_ponto": resumo["limites"],
+            "dias_sem_planta_verde": resumo["dias_sem_planta_verde"], "anos_de_fora": resumo["anos_de_fora"],
+            "ano_em_andamento": resumo["ano_em_andamento"],
+            "frases": [comparacao["frase"], comparacao["nota"], ndvi.AVISO, ndvi.AVISO_DOS_PONTOS]}
 
 
 def responder(entrada, par=None, dias=None):
     """A resposta inteira do motor, pronta para virar JSON."""
     entrada = validar_entrada(entrada)
     par = par or parametros.carregar()
-    dias = dias if dias is not None else clima.ler_serie()
+    avisos = []
+    if dias is None:
+        dias, avisos = clima.ler_serie_com_aviso(entrada["chuva"])
     cidade = CIDADES[entrada["cidade_id"]]
     chuvas = {s: balanco.chuva_da_janela(dias, int(s[:4]) + 1) for s in balanco.SAFRAS_DO_ESTUDO}
-    regra = escolher_anos(chuvas)
-    regra["segunda_mais_seca"] = sorted(chuvas, key=chuvas.get)[1]
-    if regra["ano_mais_seco"] == "2024-25":
-        regra["chuva_de_2025_mm"] = r1(sum(d.chuva for d in dias if d.data.year == 2025))
-        regra["aviso_do_ano_mais_seco"] = (
-            "a janela desta safra (fevereiro a junho de 2025) cai no ano em que a chuva da NASA POWER é suspeita "
-            "de baixa; confira nas outras fontes (python3 -m orbita.validar)")
+    if entrada["regra"] == "rendimento":
+        regra = escolher_pelo_rendimento(ler_rendimento_do_milho(), chuvas)
+    else:
+        regra = escolher_anos(chuvas)
+        regra["segunda_mais_seca"] = sorted(chuvas, key=chuvas.get)[1]
+        if entrada["chuva"] == "power" and regra["pior_ano"] == "2024-25":
+            regra["chuva_de_2025_mm"] = r1(sum(d.chuva for d in dias if d.data.year == 2025))
+            regra["aviso_do_ano_mais_seco"] = (
+                "a janela desta safra (fevereiro a junho de 2025) cai no ano em que a chuva de modelo da NASA POWER "
+                "é suspeita de baixa; confira nas outras fontes (python3 -m orbita.validar)")
     criterio = parametros.valor(par, "regras", "sede_da_2a_safra_pct")
     calendario = rotacoes.resumo_do_calendario(par)
     agua = balanco.agua_da_terra(par, entrada["terra"])
@@ -188,9 +256,9 @@ def responder(entrada, par=None, dias=None):
                          "dias_de_sede": sum(numeros[s]["total"]["dias_de_sede"] for s in tabela)}}
         a_parte[nome] = _safra(numeros[SAFRA_A_PARTE], no_plantio.get(SAFRA_A_PARTE), chuva_a_parte,
                                info["com_braquiaria"])
-    seco, normal = regra["ano_mais_seco"], regra["ano_normal"]
+    pior, normal = regra["pior_ano"], regra["ano_normal"]
     comparacao_da_agua = comparar_agua(
-        rot["atual"]["safras"][seco]["total"]["falta_mm"], rot["alternativa"]["safras"][seco]["total"]["falta_mm"],
+        rot["atual"]["safras"][pior]["total"]["falta_mm"], rot["alternativa"]["safras"][pior]["total"]["falta_mm"],
         rot["atual"]["safras_com_sede"]["quantas"], rot["alternativa"]["safras_com_sede"]["quantas"],
         parametros.valor(par, "regras", "empate_mm"))
     dias_hoje = calendario["atual"]["dias_sem_planta_viva"]
@@ -199,37 +267,51 @@ def responder(entrada, par=None, dias=None):
     melhores = {"agua": comparacao_da_agua["melhor"], "solo": solo, "erosao": solo, "renda": NAO_MEDIDO}
     notas = entrada["prioridades"]
     ordem = sorted(ORDEM_DE_DESEMPATE, key=lambda p: -notas[p])
-    medidas = {"agua": "a falta de água da soja e do milho no ano mais seco e as safras em que o milho passou sede",
+    medidas = {"agua": "a falta de água da soja e do milho no pior ano e as safras em que o milho passou sede",
                "solo": "os dias do ano sem planta viva na terra (o mesmo número da erosão)",
                "erosao": "os dias do ano sem planta viva na terra (o mesmo número do solo)",
                "renda": "não medido: o motor não tem preço, custo nem produtividade"}
     prioridades = [{"id": p, "nome": NOMES[p], "nota": notas[p], "melhor": melhores[p], "medida": medidas[p]}
                    for p in ordem]
     primeira_medida = next(p for p in prioridades if p["melhor"] != NAO_MEDIDO)
+    temperatura = clima.origem_da_serie()
+    if entrada["chuva"] == "power":
+        aviso_a_parte = ("a conferir: a chuva de 2025 na NASA POWER é suspeita de baixa; esta safra fica fora das 10 "
+                         "e fora da regra dos anos")
+    else:
+        aviso_a_parte = ("a conferir: é a safra mais recente, com o dado ainda provisório; fica fora das 10 e fora "
+                         "da regra dos anos")
     return {
         "aviso": "Motor provisório, sem site. Não é recomendação agronômica: valide com o agrônomo.",
         "pergunta": "Com o clima que a NASA registrou na minha região, vale trocar a minha rotação de hoje por outra?",
         "entrada": entrada,
         "local": dict(cidade, id=entrada["cidade_id"]),
-        "clima": dict(clima.origem_da_serie(), primeiro_dia=dias[0].data.isoformat(),
-                      ultimo_dia=dias[-1].data.isoformat(),
-                      conta="FAO-56: ETo de Hargreaves (eq. 52), Kc por fase, balanço diário da água (cap. 8)"),
+        "clima": {"chuva": {"id": entrada["chuva"], "fonte": clima.ORIGENS_DA_CHUVA[entrada["chuva"]],
+                            "origem": "data/orbita/nasa-power/ (LEIA-ME.md)" if entrada["chuva"] == "power"
+                                      else f"data/orbita/validacao/chuva/{entrada['chuva']}.csv (o endereço e a hora "
+                                           "da consulta estão em fonte.json, na mesma pasta)"},
+                  "temperatura": {"fonte": clima.ORIGEM_DA_TEMPERATURA, "consulta": temperatura["consulta"],
+                                  "baixado_em": temperatura["baixado_em"]},
+                  "primeiro_dia": dias[0].data.isoformat(), "ultimo_dia": dias[-1].data.isoformat(),
+                  "avisos": list(avisos),
+                  "conta": "FAO-56: ETo de Hargreaves (eq. 52), Kc por fase, balanço diário da água (cap. 8)"},
         "terra": {"opcao": entrada["terra"], "classe": parametros.valor(par, "terra", entrada["terra"], "classe"),
-                  "agua_que_segura_mm": r1(agua["taw"]), "agua_por_metro_mm": r1(agua["agua_mm_por_m"]),
-                  "raizes_m": agua["raizes_m"]},
+                  "agua_por_metro_mm": r1(agua["agua_mm_por_m"]),
+                  "raizes_m": {tipo: raiz for tipo, raiz in agua["raizes_m"].items()},
+                  "agua_que_segura_mm": {tipo: r1(valor) for tipo, valor in agua["taw"].items()}},
         "calendario": {k: calendario[k] for k in ("soja", "milho", "braquiaria", "entre_a_soja_e_o_milho_dias")},
         "regra_dos_anos": regra,
         "rotacoes": rot,
-        "comparacao": {"ano_normal": normal, "ano_mais_seco": seco, "agua": comparacao_da_agua,
+        "comparacao": {"ano_normal": normal, "pior_ano": pior, "agua": comparacao_da_agua,
                        "solo_e_erosao": {"melhor": solo, "dias_sem_planta_viva_hoje": dias_hoje,
                                          "dias_sem_planta_viva_alternativa": dias_alternativa}},
         "prioridades": prioridades,
-        "destaque": {"prioridade": primeira_medida["id"], "nota": primeira_medida["nota"],
-                     "melhor": primeira_medida["melhor"]},
+        "destaque": {"prioridade": primeira_medida["id"], "nome": primeira_medida["nome"],
+                     "nota": primeira_medida["nota"], "melhor": primeira_medida["melhor"]},
         "veredito": veredito(melhores),
-        "safra_2025_26": dict(a_parte, aviso="a conferir: a chuva de 2025 na NASA POWER é suspeita de baixa; esta "
-                              "safra fica fora das 10 e fora da regra dos anos", chuva_da_janela_mm=r1(chuva_a_parte)),
-        "ndvi": _ndvi(par),
+        "safra_2025_26": dict(a_parte, safra=SAFRA_A_PARTE, aviso=aviso_a_parte,
+                              chuva_da_janela_mm=r1(chuva_a_parte)),
+        "ndvi": _ndvi(par, dias_hoje),
         "parametros": [{"parametro": c, "valor": p["valor"], "etiqueta": p["etiqueta"], "fonte": p["fonte"],
                         "trecho": p["trecho"]} for c, p in parametros.folhas(par)],
         "hipoteses": len(parametros.hipoteses(par)),

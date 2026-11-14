@@ -6,11 +6,12 @@ import io
 import json
 import unittest
 
-from orbita import explicacao, motor, perguntar
+from orbita import clima, conferencia, explicacao, motor, perguntar
 
 ENTRADA = {"cidade_id": "rio_verde", "rotacao_atual": ["soja", "milho", "pousio"],
            "prioridades": {"agua": 5, "solo": 4, "renda": 2, "erosao": 3}, "terra": "media"}
-RESPOSTA = motor.responder(ENTRADA)
+RESPOSTA = motor.responder(ENTRADA)                                             # o padrão: imerg + rendimento
+RESPOSTA_DO_GUIA = motor.responder(dict(ENTRADA, chuva="power", regra="chuva"))  # a regra do guia, para comparar
 
 
 def erro_de(entrada):
@@ -43,7 +44,7 @@ class RegraDosAnos(unittest.TestCase):
     def test_o_mais_seco_e_o_mais_perto_da_mediana(self):
         chuvas = {"2015-16": 500.0, "2016-17": 300.0, "2017-18": 455.0, "2018-19": 610.0, "2019-20": 700.0}
         regra = motor.escolher_anos(chuvas)
-        self.assertEqual(regra["ano_mais_seco"], "2016-17")
+        self.assertEqual(regra["pior_ano"], "2016-17")
         self.assertEqual(regra["mediana_mm"], 500.0)
         self.assertEqual(regra["ano_normal"], "2015-16")
 
@@ -56,21 +57,66 @@ class RegraDosAnos(unittest.TestCase):
         self.assertEqual(regra["ano_normal"], "2015-16")
 
     def test_na_serie_guardada(self):
-        regra = RESPOSTA["regra_dos_anos"]
+        regra = RESPOSTA_DO_GUIA["regra_dos_anos"]
         chuvas = regra["chuva_por_safra_mm"]
         self.assertEqual(len(chuvas), 10)
-        self.assertEqual(regra["ano_mais_seco"], min(chuvas, key=chuvas.get))
-        self.assertNotEqual(regra["ano_normal"], regra["ano_mais_seco"])
+        self.assertEqual(regra["pior_ano"], min(chuvas, key=chuvas.get))
+        self.assertNotEqual(regra["ano_normal"], regra["pior_ano"])
         self.assertEqual(regra["segunda_mais_seca"], sorted(chuvas, key=chuvas.get)[1])
 
     def test_ano_mais_seco_em_2025_leva_o_aviso_da_chuva_suspeita(self):
-        regra = RESPOSTA["regra_dos_anos"]
-        if regra["ano_mais_seco"] == "2024-25":
+        regra = RESPOSTA_DO_GUIA["regra_dos_anos"]
+        if regra["pior_ano"] == "2024-25":
             self.assertIn("suspeita", regra["aviso_do_ano_mais_seco"])
             self.assertAlmostEqual(regra["chuva_de_2025_mm"], 678, delta=1)
-            self.assertIn("Segunda safra mais seca", explicacao.texto(RESPOSTA))
+            self.assertIn("Segunda safra mais seca", explicacao.texto(RESPOSTA_DO_GUIA))
         else:
             self.assertNotIn("aviso_do_ano_mais_seco", regra)
+
+
+class ChuvaERegraComoParametro(unittest.TestCase):
+    def test_o_padrao_e_o_satelite_da_nasa_e_a_colheita_do_ibge(self):
+        self.assertEqual(RESPOSTA["entrada"]["chuva"], "imerg")
+        self.assertEqual(RESPOSTA["entrada"]["regra"], "rendimento")
+        self.assertIn("IMERG", RESPOSTA["clima"]["chuva"]["fonte"])
+        self.assertIn("NASA POWER", RESPOSTA["clima"]["temperatura"]["fonte"])
+        self.assertTrue(any("UTC" in aviso for aviso in RESPOSTA["clima"]["avisos"]))
+        self.assertEqual(RESPOSTA["clima"]["ultimo_dia"], "2026-09-14")
+
+    def test_regra_do_rendimento_com_os_numeros_do_ibge(self):
+        # IBGE (PAM), Rio Verde, milho de 2ª safra, kg/ha, anos de 2016 a 2025: 3300, 6000, 5400, 8000, 6750, 7200,
+        # 5100, 7000, 6700, 7560. O pior é 2016 (a safra 2015-16). A mediana é (6700 + 6750) / 2 = 6725: empatam 2020
+        # (a safra 2019-20) e 2024 (a safra 2023-24), e vale a mais antiga.
+        regra = RESPOSTA["regra_dos_anos"]
+        self.assertEqual(regra["pior_ano"], "2015-16")
+        self.assertEqual(regra["rendimento_por_safra_kg_ha"]["2015-16"], 3300)
+        self.assertEqual(regra["mediana_kg_ha"], 6725.0)
+        self.assertEqual(regra["empate_do_ano_normal"], ["2019-20", "2023-24"])
+        self.assertEqual(regra["ano_normal"], "2019-20")
+
+    def test_a_temperatura_e_a_mesma_em_todas_as_fontes_de_chuva(self):
+        power, _ = clima.ler_serie_com_aviso("power")
+        for fonte in ("imerg", "chirps", "era5"):
+            dias, _ = clima.ler_serie_com_aviso(fonte)
+            self.assertEqual([(d.data, d.tmax, d.eto) for d in dias], [(d.data, d.tmax, d.eto) for d in power[:len(dias)]])
+            self.assertNotEqual([d.chuva for d in dias], [d.chuva for d in power[:len(dias)]])
+
+    def test_dia_sem_dado_no_meio_nunca_vira_zero(self):
+        import pathlib
+        import tempfile
+        with tempfile.TemporaryDirectory() as pasta:
+            (pathlib.Path(pasta) / "chirps.csv").write_text(
+                "data,chuva_mm\n2014-07-01,1.0\n2014-07-02,\n2014-07-03,2.0\n", encoding="utf-8")
+            with self.assertRaises(ValueError) as erro:
+                clima.ler_serie_com_aviso("chirps", pasta)
+            self.assertIn("sem dado", str(erro.exception))
+
+    def test_fonte_e_regra_desconhecidas_sao_erro(self):
+        self.assertIn("chuva", erro_de(dict(ENTRADA, chuva="radar")))
+        self.assertIn("regra", erro_de(dict(ENTRADA, regra="sorte")))
+
+    def test_a_chuva_da_nasa_power_leva_o_aviso_de_comparacao(self):
+        self.assertTrue(any("comparação" in aviso for aviso in RESPOSTA_DO_GUIA["clima"]["avisos"]))
 
 
 class Numeros(unittest.TestCase):
@@ -141,9 +187,20 @@ class Explicacao(unittest.TestCase):
     def test_texto_tem_o_porque_a_prova_o_risco_e_o_agronomo(self):
         texto = explicacao.texto(RESPOSTA)
         for trecho in ("RESPOSTA", "A PROVA", "O RISCO", "alide com o agrônomo", "não medido", "NASA POWER", "FAO-56",
-                       RESPOSTA["regra_dos_anos"]["ano_mais_seco"], RESPOSTA["regra_dos_anos"]["ano_normal"]):
+                       RESPOSTA["regra_dos_anos"]["pior_ano"], RESPOSTA["regra_dos_anos"]["ano_normal"]):
             self.assertIn(trecho, texto)
-        self.assertNotIn("terra descoberta", texto.lower())
+        self.assertNotIn("terra descoberta", texto.lower().replace('não é "terra descoberta"', ""))
+
+    def test_todo_numero_do_texto_esta_na_conta(self):
+        for resposta in (RESPOSTA, RESPOSTA_DO_GUIA):
+            self.assertEqual(conferencia.conferir_texto(explicacao.texto(resposta), resposta), [])
+
+    def test_o_ndvi_entra_como_prova_so_da_rotacao_de_hoje(self):
+        ndvi = RESPOSTA["ndvi"]
+        self.assertTrue(ndvi["disponivel"])
+        self.assertEqual(ndvi["comparacao"]["dias_pelo_calendario"],
+                         RESPOSTA["rotacoes"]["atual"]["sem_planta_viva"]["dias_sem_planta_viva"])
+        self.assertIn("sem planta verde", explicacao.texto(RESPOSTA))
 
     def test_perguntar_em_texto_e_em_json(self):
         args = ["--agua", "5", "--solo", "4", "--renda", "2", "--erosao", "3", "--terra", "media"]

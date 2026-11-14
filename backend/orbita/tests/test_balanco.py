@@ -53,13 +53,22 @@ class ContaNaMao(unittest.TestCase):
         self.assertAlmostEqual(r[0].agua_na_terra, 100.0)
 
     def test_a_agua_nao_some_nem_aparece(self):
-        dias = clima.ler_serie()[:800]
-        r = balanco.simular(dias, com_braquiaria=True)
+        # Em cada dia: água de hoje = água de ontem (na caixa de hoje) + chuva - bebido - o que escorreu para baixo.
+        r = balanco.simular(clima.ler_serie()[:800], com_braquiaria=True)
+        for ontem, hoje in zip(r, r[1:]):
+            antes = ontem.agua_na_terra / ontem.taw * hoje.taw
+            self.assertAlmostEqual(antes + hoje.chuva - hoje.bebido - hoje.percolacao, hoje.agua_na_terra, places=6)
+
+    def test_cada_cobertura_com_a_sua_raiz(self):
         par = parametros.carregar()
-        taw = balanco.agua_da_terra(par, "media")["taw"]
-        entrou = sum(x.chuva for x in r)
-        saiu = sum(x.bebido + x.percolacao for x in r)
-        self.assertAlmostEqual(taw * 0.5 + entrou - saiu, r[-1].agua_na_terra, places=6)
+        agua = balanco.agua_da_terra(par, "media")
+        por_metro = parametros.valor(par, "terra", "media", "agua_mm_por_m")
+        self.assertAlmostEqual(agua["taw"]["soja"], por_metro * parametros.valor(par, "culturas", "soja", "raiz_m"))
+        self.assertEqual(agua["taw"][balanco.SEM_PLANTA], max(agua["taw"].values()))
+        r = balanco.balanco_diario(dias_iguais(3, 0.0, 5.0), sempre_soja, taw={"soja": 80.0, "milho": 50.0,
+                                   "braquiaria": 100.0, "sem_planta": 100.0}, tew=20.0, rew=8.0, fracao_inicial=1.0)
+        self.assertAlmostEqual(r[2].agua_na_terra, 65.0)
+        self.assertEqual(r[2].taw, 80.0)
 
 
 class Propriedades(unittest.TestCase):

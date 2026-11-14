@@ -11,6 +11,8 @@ O que a planta pede = Kc x ETo; o que bebe = Ks x o que pede; a falta de água =
 
 Terra sem planta viva: a evaporação não é zero, mas só seca a camada de cima (FAO-56, cap. 7, eq. 74: o freio Kr
 cai de 1 a 0 entre REW e TEW, a água que a evaporação consegue tirar; Tabela 19).
+Cada cobertura tem a sua profundidade de raízes, e por isso a sua caixa. Na troca de cobertura, a caixa nova
+começa com a mesma fração de água da anterior (hipótese: a terra está igual em toda a profundidade).
 Fora da conta (limites): a enxurrada (toda chuva entra até encher), a subida de água do lençol e a irrigação.
 """
 import collections
@@ -19,22 +21,29 @@ import datetime
 from orbita import parametros, rotacoes
 from orbita.rotacoes import BRAQUIARIA, CULTURAS, SEM_PLANTA  # noqa: F401 (reexportados)
 
-Registro = collections.namedtuple("Registro", "data tipo chuva eto pedido bebido ks agua_na_terra percolacao")
+Registro = collections.namedtuple("Registro", "data tipo chuva eto pedido bebido ks agua_na_terra percolacao taw")
 SAFRAS_DO_ESTUDO = tuple(f"{ano}-{(ano + 1) % 100:02d}" for ano in range(2015, 2025))
 TIPOS = ("soja", "milho", BRAQUIARIA, SEM_PLANTA)
 
 
 def balanco_diario(dias, cobertura, taw, tew, rew, ajustar_p=True, fracao_inicial=0.5):
-    """Roda a caixa-d'água em todos os dias, em sequência. `cobertura(data)` devolve (tipo, Kc, p)."""
-    if taw <= 0 or tew <= rew or rew < 0:
+    """Roda a caixa-d'água em todos os dias, em sequência. `cobertura(data)` devolve (tipo, Kc, p).
+
+    `taw` é um número (a mesma caixa para tudo) ou um dicionário tipo -> TAW (cada cobertura com a sua raiz).
+    """
+    taws = dict(taw) if isinstance(taw, dict) else {tipo: float(taw) for tipo in TIPOS}
+    if any(valor <= 0 for valor in taws.values()) or tew <= rew or rew < 0:
         raise ValueError("A terra precisa de TAW acima de zero e de TEW maior que REW.")
     if not 0.0 <= fracao_inicial <= 1.0:
         raise ValueError("A água do começo é uma fração entre 0 (terra seca) e 1 (terra cheia).")
-    dr = taw * (1.0 - fracao_inicial)   # a falta na zona das raízes
-    de = min(tew, dr)                   # a falta na camada de cima
+    vazio = 1.0 - fracao_inicial        # a fração da caixa que está vazia
+    de = None                           # a falta na camada de cima (mm)
     registros = []
     for dia in dias:
         tipo, kc, p_da_tabela = cobertura(dia.data)
+        caixa = taws[tipo]
+        dr = vazio * caixa              # a falta na zona das raízes (mm)
+        de = min(tew, dr) if de is None else min(de, dr)
         pedido = kc * dia.eto
         if tipo == SEM_PLANTA:
             ks = 1.0 if de <= rew else max(0.0, (tew - de) / (tew - rew))
@@ -42,31 +51,35 @@ def balanco_diario(dias, cobertura, taw, tew, rew, ajustar_p=True, fracao_inicia
             p = p_da_tabela
             if ajustar_p:
                 p = min(0.8, max(0.1, p_da_tabela + 0.04 * (5.0 - pedido)))
-            ks = 1.0 if dr <= p * taw else max(0.0, (taw - dr) / ((1.0 - p) * taw))
-        bebido = max(0.0, min(ks * pedido, taw - dr + dia.chuva))
+            ks = 1.0 if dr <= p * caixa else max(0.0, (caixa - dr) / ((1.0 - p) * caixa))
+        bebido = max(0.0, min(ks * pedido, caixa - dr + dia.chuva))
         novo = dr - dia.chuva + bebido
         percolacao = max(0.0, -novo)
-        dr = min(taw, max(0.0, novo))
+        dr = min(caixa, max(0.0, novo))
         de = min(tew, max(0.0, de - dia.chuva + bebido), dr)
-        registros.append(Registro(dia.data, tipo, dia.chuva, dia.eto, pedido, bebido, ks, taw - dr, percolacao))
+        vazio = dr / caixa
+        registros.append(Registro(dia.data, tipo, dia.chuva, dia.eto, pedido, bebido, ks, caixa - dr, percolacao,
+                                  caixa))
     return registros
 
 
-def agua_da_terra(par, terra):
-    """TAW, TEW e REW da opção de terra (pouca, media ou muita)."""
+def agua_da_terra(par, terra, cal=None):
+    """A água que a terra segura por cobertura (TAW, eq. 82), mais TEW e REW da opção de terra."""
     if terra not in par["terra"]:
         raise ValueError(f"Terra desconhecida: '{terra}'. Use pouca, media ou muita (quanta água a terra segura).")
+    cal = cal or rotacoes.calendario(par)
     por_metro = parametros.valor(par, "terra", terra, "agua_mm_por_m")
-    raizes = parametros.valor(par, "raizes_m")
-    return {"taw": por_metro * raizes, "tew": parametros.valor(par, "terra", terra, "tew_mm"),
-            "rew": parametros.valor(par, "terra", terra, "rew_mm"), "agua_mm_por_m": por_metro, "raizes_m": raizes}
+    return {"taw": {tipo: por_metro * raiz for tipo, raiz in cal.raizes.items()},
+            "tew": parametros.valor(par, "terra", terra, "tew_mm"),
+            "rew": parametros.valor(par, "terra", terra, "rew_mm"),
+            "agua_mm_por_m": por_metro, "raizes_m": dict(cal.raizes)}
 
 
 def simular(dias, com_braquiaria, par=None, terra="media", fracao_inicial=0.5):
     """A simulação contínua de uma rotação em todos os dias da série."""
     par = par or parametros.carregar()
     cal = rotacoes.calendario(par)
-    agua = agua_da_terra(par, terra)
+    agua = agua_da_terra(par, terra, cal)
     return balanco_diario(dias, lambda data: rotacoes.cobertura_do_dia(data, com_braquiaria, cal),
                           agua["taw"], agua["tew"], agua["rew"],
                           ajustar_p=parametros.valor(par, "ajustar_p_pela_demanda"), fracao_inicial=fracao_inicial)
@@ -114,11 +127,11 @@ def numeros_por_safra(registros):
 
 
 def agua_no_plantio_da_soja(registros):
-    """Por safra: a água na terra (mm) no fim do dia anterior ao plantio da soja."""
+    """Por safra: a água (mm) na zona das raízes da soja no dia do plantio, antes da chuva do dia."""
     saida = {}
     for anterior, atual in zip(registros, registros[1:]):
         if atual.tipo == "soja" and anterior.tipo != "soja":
-            saida[nome_da_safra(atual.data)] = anterior.agua_na_terra
+            saida[nome_da_safra(atual.data)] = anterior.agua_na_terra / anterior.taw * atual.taw
     return saida
 
 

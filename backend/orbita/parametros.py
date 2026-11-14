@@ -35,6 +35,7 @@ PADRAO = {
             "kc_meio": _p(1.15, FAO6, "FAO-56, Tabela 12, Soybeans: Kc mid 1.15."),
             "kc_fim": _p(0.5, FAO6, "FAO-56, Tabela 12, Soybeans: Kc end 0.50."),
             "p": _p(0.5, FAO8, "FAO-56, Tabela 22, Soybeans: p 0.50 (a parte da água que a planta tira sem sede)."),
+            "raiz_m": _p(1.0, FAO8, "FAO-56, Tabela 22, Soybeans: raízes de 0.6 a 1.3 m; 1,0 m é escolha."),
         },
         "milho_2a_safra": {
             "plantio_mes_dia": _p("02-10", "", "Escolha desta versão (10 de fevereiro, logo depois de colher a soja), "
@@ -46,11 +47,13 @@ PADRAO = {
             "kc_fim": _p(0.35, FAO6, "FAO-56, Tabela 12, Maize, Field (grain): Kc end 0.60-0.35; 0.35 é o do grão "
                          "que seca no campo (nota 11 da tabela)."),
             "p": _p(0.55, FAO8, "FAO-56, Tabela 22, Maize, Field (grain): p 0.55."),
+            "raiz_m": _p(1.0, FAO8, "FAO-56, Tabela 22, Maize, Field (grain): raízes de 1.0 a 1.7 m; 1,0 m é escolha."),
         },
         "braquiaria_apos_milho": {
             "kc": _p(0.75, FAO6, "FAO-56, Tabela 12, Grazing Pasture, Extensive Grazing: Kc mid 0.75. Usar o Kc de "
                      "pastagem para a braquiária depois do milho é hipótese."),
             "p": _p(0.6, FAO8, "FAO-56, Tabela 22, Grazing Pasture: p 0.60."),
+            "raiz_m": _p(1.0, FAO8, "FAO-56, Tabela 22, Grazing Pasture: raízes de 0.5 a 1.5 m; 1,0 m é escolha."),
             "dessecacao_dias_antes_da_soja": _p(20, "", "Escolha desta versão: o capim é seco (dessecado) 20 dias "
                                                 "antes de plantar a soja. Sem fonte conferida."),
         },
@@ -83,8 +86,6 @@ PADRAO = {
             "rew_mm": _p(10.0, FAO7, "FAO-56, Tabela 19, Clay: REW 8-12 mm (o meio da faixa)."),
         },
     },
-    "raizes_m": _p(1.0, FAO8, "FAO-56, Tabela 22: soja 0.6-1.3 m, milho 1.0-1.7 m, pastagem 0.5-1.5 m. Usar 1,0 m "
-                   "para todas, desde o plantio, é escolha desta versão (cabe nas três faixas)."),
     "ajustar_p_pela_demanda": _p(True, FAO8, "FAO-56, cap. 8: 'p = pTable 22 + 0.04 (5 - ETc)', limitado entre 0.1 e "
                                  "0.8, com a ETc em mm/dia.", PUBLICADO),
     "regras": {
@@ -117,22 +118,57 @@ def folhas(par, prefixo=""):
     return saida
 
 
-def _adotar(base, conferido):
-    """Troca, na base, cada parâmetro que o arquivo conferido traz no mesmo caminho. Devolve os caminhos trocados."""
-    trocados = []
-    for chave, coisa in conferido.items():
-        if chave not in base or not isinstance(coisa, dict):
-            continue
-        if eh_folha(base[chave]) and eh_folha(coisa):
-            if type(coisa["valor"]) is type(base[chave]["valor"]) or (
-                    isinstance(coisa["valor"], (int, float)) and not isinstance(coisa["valor"], bool)
-                    and isinstance(base[chave]["valor"], (int, float)) and not isinstance(base[chave]["valor"], bool)):
-                base[chave] = {"valor": coisa["valor"], "fonte": coisa.get("fonte") or "",
-                               "trecho": coisa.get("trecho") or "", "etiqueta": coisa["etiqueta"]}
-                trocados.append(chave)
-        elif isinstance(base[chave], dict) and not eh_folha(base[chave]) and not eh_folha(coisa):
-            trocados.extend(f"{chave}.{c}" for c in _adotar(base[chave], coisa))
-    return trocados
+def _folha_de(conferido, caminho):
+    coisa = conferido
+    for chave in caminho:
+        if not isinstance(coisa, dict) or chave not in coisa:
+            return None
+        coisa = coisa[chave]
+    return coisa if eh_folha(coisa) else None
+
+
+def _adotar(par, conferido):
+    """Põe em `par` os valores, os links e as etiquetas do arquivo conferido. Devolve os caminhos adotados.
+
+    O arquivo conferido usa outros nomes em três lugares: `kc_med` (aqui `kc_meio`), `plantio_mm_dd` (aqui
+    `plantio_mes_dia`) e as fases em quatro chaves (aqui a lista `fases_dias`).
+    """
+    adotados = []
+
+    def por(destino, folha):
+        alvo = par
+        for chave in destino[:-1]:
+            alvo = alvo[chave]
+        etiqueta = folha["etiqueta"] if folha["etiqueta"] in (PUBLICADO, HIPOTESE) else HIPOTESE
+        if etiqueta == PUBLICADO and not str(folha.get("fonte") or "").startswith("http"):
+            etiqueta = HIPOTESE
+        alvo[destino[-1]] = {"valor": folha["valor"], "fonte": folha.get("fonte") or "",
+                             "trecho": folha.get("trecho") or "(sem trecho no arquivo conferido)", "etiqueta": etiqueta}
+        adotados.append(".".join(destino))
+
+    for cultura in ("soja", "milho_2a_safra"):
+        for la, ca in (("kc_ini", "kc_ini"), ("kc_med", "kc_meio"), ("kc_fim", "kc_fim"), ("raiz_m", "raiz_m"),
+                       ("p", "p"), ("plantio_mm_dd", "plantio_mes_dia")):
+            folha = _folha_de(conferido, ("culturas", cultura, la))
+            if folha:
+                por(("culturas", cultura, ca), folha)
+        fases = [_folha_de(conferido, ("culturas", cultura, chave)) for chave in
+                 ("fase_inicial_dias", "fase_crescimento_dias", "fase_media_dias", "fase_final_dias")]
+        if all(fases):
+            por(("culturas", cultura, "fases_dias"), {
+                "valor": [f["valor"] for f in fases], "fonte": fases[0].get("fonte"),
+                "trecho": " / ".join(dict.fromkeys(str(f.get("trecho") or "") for f in fases)),
+                "etiqueta": PUBLICADO if all(f["etiqueta"] == PUBLICADO for f in fases) else HIPOTESE})
+    for chave in ("kc", "raiz_m", "p", "dessecacao_dias_antes_da_soja"):
+        folha = _folha_de(conferido, ("culturas", "braquiaria_apos_milho", chave))
+        if folha:
+            por(("culturas", "braquiaria_apos_milho", chave), folha)
+    for caminho in [("culturas", "solo_nu", "kc"), ("ndvi", "fracao_da_amplitude")] + [
+            ("terra", terra, "agua_mm_por_m") for terra in ("pouca", "media", "muita")]:
+        folha = _folha_de(conferido, caminho)
+        if folha:
+            por(caminho, folha)
+    return adotados
 
 
 def carregar(arquivo_conferido=ARQUIVO_CONFERIDO):

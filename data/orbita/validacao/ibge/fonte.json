@@ -1,0 +1,89 @@
+{
+  "o_que_e": "IBGE, Produção Agrícola Municipal (PAM), pela API do SIDRA: o que o município colheu por ano.",
+  "arquivo": "rendimento_rio_verde.csv",
+  "municipio": {
+    "codigo": "5218805",
+    "nome": "Rio Verde (GO)"
+  },
+  "consultas": [
+    {
+      "produto": "milho_2a_safra",
+      "endereco": "https://apisidra.ibge.gov.br/values/t/839/n6/5218805/v/216,214,112/p/all/c81/114254",
+      "baixado_em": "2026-11-14T19:22:08-03:00",
+      "bruto": "bruto/sidra-tabela-839-milho_2a_safra.json"
+    },
+    {
+      "produto": "soja",
+      "endereco": "https://apisidra.ibge.gov.br/values/t/1612/n6/5218805/v/216,214,112/p/all/c81/2713",
+      "baixado_em": "2026-11-14T19:22:09-03:00",
+      "bruto": "bruto/sidra-tabela-1612-soja.json"
+    }
+  ],
+  "codigos_conferidos_na_resposta": {
+    "milho_2a_safra": {
+      "tabela": "839",
+      "classificacao": "c81 (Produto das lavouras temporárias)",
+      "categoria": "114254",
+      "nome_da_categoria_na_resposta": "Milho (em grão) - 2ª safra",
+      "municipio_na_resposta": "Rio Verde (GO)",
+      "variaveis_na_resposta": {
+        "112": {
+          "nome": "Rendimento médio da produção",
+          "unidade": "Quilogramas por Hectare"
+        },
+        "216": {
+          "nome": "Área colhida",
+          "unidade": "Hectares"
+        },
+        "214": {
+          "nome": "Quantidade produzida",
+          "unidade": "Toneladas"
+        }
+      },
+      "anos_publicados": [
+        "2003",
+        "2025"
+      ]
+    },
+    "soja": {
+      "tabela": "1612",
+      "classificacao": "c81 (Produto das lavouras temporárias)",
+      "categoria": "2713",
+      "nome_da_categoria_na_resposta": "Soja (em grão)",
+      "municipio_na_resposta": "Rio Verde (GO)",
+      "variaveis_na_resposta": {
+        "112": {
+          "nome": "Rendimento médio da produção",
+          "unidade": "Quilogramas por Hectare"
+        },
+        "216": {
+          "nome": "Área colhida",
+          "unidade": "Hectares"
+        },
+        "214": {
+          "nome": "Quantidade produzida",
+          "unidade": "Toneladas"
+        }
+      },
+      "anos_publicados": [
+        "1974",
+        "2025"
+      ]
+    }
+  },
+  "anos_no_csv": [
+    2015,
+    2025
+  ],
+  "linhas_no_csv": 22,
+  "como_os_codigos_foram_achados": [
+    {
+      "endereco": "https://apisidra.ibge.gov.br/values/t/839/n6/5218805/v/all/p/2020/c81/all",
+      "para_que": "listar todas as variáveis e categorias da tabela 839 com o nome de cada código"
+    },
+    {
+      "endereco": "https://apisidra.ibge.gov.br/values/t/1612/n6/5218805/v/all/p/2020/c81/all",
+      "para_que": "listar todas as variáveis e categorias da tabela 1612 com o nome de cada código"
+    }
+  ]
+}
