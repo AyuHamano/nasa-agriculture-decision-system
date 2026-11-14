@@ -14,14 +14,17 @@ Os indicadores são salvos em data/cache/indicadores_ndvi_<nome>.json, na raiz d
 Requisitos: pip install requests pandas
 """
 import argparse
-import json
-import os
 import sys
 import time
 from pathlib import Path
 
 import pandas as pd
-import requests
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from backend.scripts.appeears_utils import download_task_csv, earthdata_headers
 
 API = "https://appeears.earthdatacloud.nasa.gov/api"
 PRODUTO = "MOD13Q1.061"  # MODIS Terra, 250 m, composto de 16 dias
@@ -37,13 +40,7 @@ FILL = -3000
 
 
 def login():
-    user, senha = os.getenv("EARTHDATA_USER"), os.getenv("EARTHDATA_PASS")
-    if not user or not senha:
-        sys.exit("Defina EARTHDATA_USER e EARTHDATA_PASS (variáveis de ambiente).")
-    r = requests.post(f"{API}/login", auth=(user, senha), timeout=60)
-    if r.status_code != 200:
-        sys.exit(f"Falha no login ({r.status_code}): {r.text[:300]}")
-    return {"Authorization": f"Bearer {r.json()['token']}"}
+    return earthdata_headers()
 
 
 def baixar(lat, lon, ano_ini, ano_fim, nome):
@@ -54,7 +51,6 @@ def baixar(lat, lon, ano_ini, ano_fim, nome):
         print(f"[cache] usando {destino}")
         return destino
 
-    h = login()
     tarefa = {
         "task_type": "point",
         "task_name": f"raizviva_{nome}_{int(time.time())}",
@@ -67,32 +63,9 @@ def baixar(lat, lon, ano_ini, ano_fim, nome):
             "coordinates": [{"id": "0", "category": nome, "latitude": lat, "longitude": lon}],
         },
     }
-    r = requests.post(f"{API}/task", json=tarefa, headers=h, timeout=60)
-    if r.status_code not in (200, 202):
-        sys.exit(f"Erro ao criar tarefa ({r.status_code}): {r.text[:500]}")
-    tid = r.json()["task_id"]
-    print(f"[api] tarefa criada: {tid}")
-
-    # espera (costuma levar de 1 a 10 minutos)
-    while True:
-        s = requests.get(f"{API}/task/{tid}", headers=h, timeout=60).json()
-        status = s.get("status")
-        print(f"[api] status: {status}")
-        if status == "done":
-            break
-        if status in ("error", "failed"):
-            sys.exit(f"Tarefa falhou: {s}")
-        time.sleep(20)
-
-    arquivos = requests.get(f"{API}/bundle/{tid}", headers=h, timeout=60).json()["files"]
-    alvo = next((f for f in arquivos if f["file_name"].endswith("-results.csv")), None)
-    if alvo is None:
-        sys.exit(f"CSV de resultados não encontrado. Arquivos: {[f['file_name'] for f in arquivos]}")
-    r = requests.get(f"{API}/bundle/{tid}/{alvo['file_id']}", headers=h, timeout=300)
-    r.raise_for_status()
-    destino.write_bytes(r.content)
-    print(f"[cache] salvo em {destino}")
-    return destino
+    headers = login()
+    task_id_file = CACHE_DIR / f"modis_task_id_{nome}_{ano_ini}_{ano_fim}.txt"
+    return download_task_csv(tarefa, headers, destino, task_id_file)
 
 
 def processar(csv_path):

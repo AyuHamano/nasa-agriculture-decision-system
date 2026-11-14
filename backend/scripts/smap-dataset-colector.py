@@ -18,7 +18,6 @@ Requisitos: pip install requests pandas   (opcional: python-dotenv)
 """
 import argparse
 import json
-import os
 import re
 import sys
 import time
@@ -26,6 +25,12 @@ from pathlib import Path
 
 import pandas as pd
 import requests
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from backend.scripts.appeears_utils import download_task_csv, earthdata_headers
 
 try:
     from dotenv import load_dotenv
@@ -36,7 +41,7 @@ except ImportError:
 API = "https://appeears.earthdatacloud.nasa.gov/api"
 PRODUTO_BASE = "SPL3SMP_E"        # SMAP Enhanced L3, 9 km, diário
 PRODUTO_PADRAO = "SPL3SMP_E.006"  # usado se a lista de produtos não puder ser lida
-CACHE_DIR = Path("data/cache")
+CACHE_DIR = PROJECT_ROOT / "data" / "cache"
 PCT_SECO = 20                      # "dia seco" = abaixo do percentil 20 da série da própria cidade
 CIDADES_PADRAO = {
     "espumoso": (-28.725, -52.85),
@@ -48,13 +53,7 @@ RE_QA = re.compile(r"retrieval_data_(am|pm)_retrieval_qual_flag(_pm)?$", re.I)
 
 
 def login():
-    user, senha = os.getenv("EARTHDATA_USER"), os.getenv("EARTHDATA_PASS")
-    if not user or not senha:
-        sys.exit("Defina EARTHDATA_USER e EARTHDATA_PASS (variáveis de ambiente ou .env).")
-    r = requests.post(f"{API}/login", auth=(user, senha), timeout=60)
-    if r.status_code != 200:
-        sys.exit(f"Falha no login ({r.status_code}): {r.text[:300]}")
-    return {"Authorization": f"Bearer {r.json()['token']}"}
+    return earthdata_headers()
 
 
 def descobrir_produto(forcar=None):
@@ -95,7 +94,6 @@ def baixar(cidades, ano_ini, ano_fim, produto, nome_arq):
 
     sm, qa, _ = escolher_layers(produto)
     print(f"[api] produto {produto} | layers: {sm + qa}")
-    h = login()
     tarefa = {
         "task_type": "point",
         "task_name": f"raizviva_smap_{nome_arq}_{int(time.time())}",
@@ -108,32 +106,9 @@ def baixar(cidades, ano_ini, ano_fim, produto, nome_arq):
             ],
         },
     }
-    r = requests.post(f"{API}/task", json=tarefa, headers=h, timeout=60)
-    if r.status_code not in (200, 202):
-        sys.exit(f"Erro ao criar tarefa ({r.status_code}): {r.text[:500]}")
-    tid = r.json()["task_id"]
-    (CACHE_DIR / f"smap_task_id_{nome_arq}.txt").write_text(tid)  # evita perder a tarefa se interromper
-    print(f"[api] tarefa criada: {tid} (id salvo em {CACHE_DIR}/smap_task_id_{nome_arq}.txt)")
-
-    while True:
-        s = requests.get(f"{API}/task/{tid}", headers=h, timeout=60).json()
-        status = s.get("status")
-        print(f"[api] status: {status}")
-        if status == "done":
-            break
-        if status in ("error", "failed"):
-            sys.exit(f"Tarefa falhou: {s}")
-        time.sleep(30)
-
-    arquivos = requests.get(f"{API}/bundle/{tid}", headers=h, timeout=60).json()["files"]
-    alvo = next((f for f in arquivos if f["file_name"].endswith("-results.csv")), None)
-    if alvo is None:
-        sys.exit(f"CSV de resultados não encontrado: {[f['file_name'] for f in arquivos]}")
-    r = requests.get(f"{API}/bundle/{tid}/{alvo['file_id']}", headers=h, timeout=300)
-    r.raise_for_status()
-    destino.write_bytes(r.content)
-    print(f"[cache] salvo em {destino}")
-    return destino
+    headers = login()
+    task_id_file = CACHE_DIR / f"smap_task_id_{nome_arq}.txt"
+    return download_task_csv(tarefa, headers, destino, task_id_file)
 
 
 def _num(s):
