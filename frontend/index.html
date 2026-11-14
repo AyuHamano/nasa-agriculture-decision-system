@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Terra Ponte — inteligência climática para cooperativas agrícolas">
+  <title>Terra Ponte | Painel técnico</title>
+  <link rel="preconnect" href="https://unpkg.com">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#" aria-label="Terra Ponte">
+        <span class="brand-mark"><i></i><i></i><i></i></span>
+        <span>TERRA<br>PONTE</span>
+      </a>
+
+      <nav class="main-nav" aria-label="Navegação principal">
+        <button class="nav-item" data-page="overview"><span data-lucide="layout-dashboard"></span>Visão geral</button>
+        <button class="nav-item active" data-page="properties"><span data-lucide="sprout"></span>Propriedades</button>
+        <button class="nav-item" data-page="demands"><span data-lucide="clipboard-check"></span>Demandas <b class="nav-badge">4</b></button>
+        <button class="nav-item" data-page="planning"><span data-lucide="calendar-days"></span>Planejamento</button>
+        <button class="nav-item" data-page="reports"><span data-lucide="chart-no-axes-combined"></span>Relatórios</button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="season-progress">
+          <span>Safra 2026/27</span><strong>62%</strong>
+          <div><i></i></div>
+        </div>
+        <button class="support"><span data-lucide="circle-help"></span>Central de ajuda</button>
+      </div>
+    </aside>
+
+    <div class="workspace">
+      <header class="topbar">
+        <button class="icon-button mobile-menu" id="menuButton" aria-label="Abrir menu"><span data-lucide="menu"></span></button>
+        <div class="topbar-spacer"></div>
+        <button class="coop-switch"><span data-lucide="users"></span><span>Cooperativa Cerrado Vivo</span><span data-lucide="chevron-down"></span></button>
+        <span class="divider"></span>
+        <button class="notification" aria-label="Notificações"><span data-lucide="bell"></span><i></i></button>
+        <button class="user-menu">
+          <span class="avatar">MS</span>
+          <span class="user-copy"><strong>Marina Souza</strong><small>Técnica agronômica</small></span>
+          <span data-lucide="chevron-down"></span>
+        </button>
+      </header>
+
+      <main>
+        <section class="page" data-page-content="overview">
+          <div class="page-heading">
+            <div><span class="eyebrow">VISÃO OPERACIONAL</span><h1>Bom dia, Marina</h1><p>Acompanhe a situação das propriedades atendidas pela cooperativa.</p></div>
+            <button class="primary-action" data-go="properties"><span data-lucide="plus"></span>Nova propriedade</button>
+          </div>
+          <div class="metric-grid">
+            <article class="metric-card"><span class="metric-icon green"><span data-lucide="land-plot"></span></span><div><small>Área monitorada</small><strong>2.486 ha</strong><em>+12% nesta safra</em></div></article>
+            <article class="metric-card"><span class="metric-icon blue"><span data-lucide="cloud-rain"></span></span><div><small>Propriedades</small><strong id="propertyCount">18</strong><em>16 com dados atualizados</em></div></article>
+            <article class="metric-card"><span class="metric-icon amber"><span data-lucide="triangle-alert"></span></span><div><small>Alertas hídricos</small><strong>4</strong><em>2 exigem atenção</em></div></article>
+            <article class="metric-card"><span class="metric-icon violet"><span data-lucide="clipboard-check"></span></span><div><small>Demandas abertas</small><strong>7</strong><em>3 para esta semana</em></div></article>
+          </div>
+          <div class="dashboard-grid">
+            <article class="panel chart-panel">
+              <div class="panel-head"><div><span class="eyebrow">BALANÇO HÍDRICO</span><h2>Últimos 6 meses</h2></div><select><option>Todas as propriedades</option><option>Região norte</option></select></div>
+              <div class="chart-legend"><span><i class="rain"></i>Precipitação</span><span><i class="evap"></i>Evapotranspiração</span></div>
+              <div class="bar-chart" aria-label="Gráfico de balanço hídrico">
+                <div><i style="--rain:72%;--evap:45%"></i><span>Mai</span></div><div><i style="--rain:35%;--evap:52%"></i><span>Jun</span></div><div><i style="--rain:20%;--evap:57%"></i><span>Jul</span></div><div><i style="--rain:28%;--evap:61%"></i><span>Ago</span></div><div><i style="--rain:54%;--evap:68%"></i><span>Set</span></div><div><i style="--rain:88%;--evap:63%"></i><span>Out</span></div>
+              </div>
+            </article>
+            <article class="panel attention-panel">
+              <div class="panel-head"><div><span class="eyebrow">PRIORIDADES</span><h2>Requerem atenção</h2></div><button class="text-button">Ver todas</button></div>
+              <div class="attention-list">
+                <button><span class="risk high"><span data-lucide="droplets"></span></span><div><strong>Fazenda Horizonte</strong><small>Risco hídrico alto · Rio Verde</small></div><span data-lucide="chevron-right"></span></button>
+                <button><span class="risk medium"><span data-lucide="wheat"></span></span><div><strong>Sítio Boa Esperança</strong><small>Janela de plantio em 4 dias</small></div><span data-lucide="chevron-right"></span></button>
+                <button><span class="risk low"><span data-lucide="leaf"></span></span><div><strong>Fazenda São João</strong><small>Revisar rotação recomendada</small></div><span data-lucide="chevron-right"></span></button>
+              </div>
+            </article>
+          </div>
+          <article class="panel properties-table-panel">
+            <div class="panel-head"><div><span class="eyebrow">CARTEIRA</span><h2>Propriedades recentes</h2></div><button class="text-button" data-go="properties">Gerenciar propriedades</button></div>
+            <div class="table-wrap"><table><thead><tr><th>Propriedade</th><th>Município</th><th>Área</th><th>Rotação</th><th>Risco hídrico</th><th>Status</th></tr></thead><tbody id="overviewProperties"><tr><td><strong>Fazenda São João</strong><small>João Silva</small></td><td>Goiânia, GO</td><td>84 ha</td><td>Milho → Feijão</td><td><span class="status warning">Moderado</span></td><td><span class="status success">Monitorando</span></td></tr><tr><td><strong>Fazenda Horizonte</strong><small>Carlos Mendes</small></td><td>Rio Verde, GO</td><td>142 ha</td><td>Soja → Milho</td><td><span class="status danger">Alto</span></td><td><span class="status success">Monitorando</span></td></tr></tbody></table></div>
+          </article>
+        </section>
+
+        <section class="page active" data-page-content="properties">
+          <div class="page-heading property-heading">
+            <button class="back-button" aria-label="Voltar"><span data-lucide="arrow-left"></span></button>
+            <div><h1>Cadastrar propriedade</h1><p>Desenhe o talhão no mapa para definir sua área de análise</p></div>
+            <button class="ghost-action" id="savedPropertiesButton"><span data-lucide="list"></span>Propriedades salvas</button>
+          </div>
+
+          <div class="property-layout">
+            <div class="map-column">
+              <div class="map-shell">
+                <div id="map" aria-label="Mapa para delimitação do talhão"></div>
+                <div class="map-tools">
+                  <button class="active" id="drawButton"><span data-lucide="pentagon"></span>Desenhar polígono</button>
+                  <button id="editButton"><span data-lucide="mouse-pointer-2"></span>Editar pontos</button>
+                  <button id="clearButton"><span data-lucide="trash-2"></span>Limpar</button>
+                </div>
+                <div class="map-hint" id="mapHint"><span data-lucide="mouse-pointer-click"></span>Clique no mapa para adicionar os vértices</div>
+              </div>
+              <div class="plot-summary">
+                <span class="leaf-symbol">◒</span><strong id="plotName">Talhão 01</strong><i></i><span>Área estimada <b id="plotArea">8,4 ha</b></span><i></i><span>Centroide <b id="plotCentroid">-17,7923, -50,9190</b></span><i></i><span><b id="vertexCount">5</b> vértices</span>
+                <button id="coordinatesButton"><span data-lucide="chevron-down"></span>Ver coordenadas</button>
+              </div>
+              <pre class="coordinates-panel" id="coordinatesPanel" hidden></pre>
+            </div>
+
+            <aside class="form-column">
+              <form class="panel property-form" id="propertyForm">
+                <h2><span data-lucide="warehouse"></span>Dados da propriedade</h2>
+                <label>Nome <b>*</b><input id="propertyName" value="Fazenda São João" required></label>
+                <label>Município <b>*</b><select id="municipality" required><option value="-16.6869,-49.2648">Goiânia, GO</option><option selected value="-17.7923,-50.9190">Rio Verde, GO</option><option value="-17.8814,-51.7144">Jataí, GO</option><option value="-18.9146,-48.2754">Uberlândia, MG</option></select></label>
+                <label>Produtor <b>*</b><input id="producerName" value="João Silva" required></label>
+                <div class="form-pair"><label>Solo <b>*</b><select id="soil"><option>Argiloso</option><option>Arenoso</option><option>Textura média</option></select></label><label>Irrigação <b>*</b><select id="irrigation"><option>Não</option><option>Sim — pivô</option><option>Sim — gotejo</option></select></label></div>
+                <label>Rotação atual <b>*</b><select id="rotation"><option>Milho → Feijão</option><option>Soja → Milho safrinha → Pousio</option><option>Soja → Milho → Braquiária</option><option>Algodão → Soja</option></select></label>
+                <button class="save-button" type="submit"><span data-lucide="save"></span>Salvar talhão</button>
+              </form>
+
+              <article class="panel climate-card">
+                <div class="climate-head"><h2><span data-lucide="cloud-rain-wind"></span>Contexto climático NASA</h2><button id="refreshClimate" title="Atualizar"><span data-lucide="refresh-cw"></span></button></div>
+                <div class="climate-metrics">
+                  <div><span data-lucide="droplet"></span><span>Chuva anual</span><strong id="annualRain">1.480 mm</strong></div>
+                  <div><span data-lucide="calendar-days"></span><span>Meses secos</span><strong id="dryMonths">Mai–Set</strong></div>
+                  <div><span data-lucide="triangle-alert"></span><span>Risco hídrico</span><strong><mark id="waterRisk">Moderado</mark></strong></div>
+                </div>
+                <footer><span><span data-lucide="satellite"></span>NASA POWER · histórico regional</span><span><span data-lucide="info"></span>Confirme no campo.</span></footer>
+              </article>
+            </aside>
+          </div>
+
+          <div class="stepper">
+            <div class="next-copy"><span data-lucide="flag"></span><strong>Próximo passo</strong></div>
+            <button class="step active"><b>1</b><span>Delimitar talhão</span></button><i></i>
+            <button class="step"><b>2</b><span>Dados locais</span></button><i></i>
+            <button class="step"><b>3</b><span>Comparar rotações</span></button>
+          </div>
+        </section>
+
+        <section class="page" data-page-content="demands">
+          <div class="page-heading"><div><span class="eyebrow">ATENDIMENTO TÉCNICO</span><h1>Demandas</h1><p>Organize visitas, análises e recomendações para os cooperados.</p></div><button class="primary-action" id="newDemand"><span data-lucide="plus"></span>Nova demanda</button></div>
+          <div class="demand-filters"><button class="active">Todas <b>7</b></button><button>Alta prioridade <b>2</b></button><button>Visitas <b>3</b></button><div class="search-box"><span data-lucide="search"></span><input placeholder="Buscar produtor ou propriedade"></div></div>
+          <div class="kanban">
+            <section><header><span class="dot neutral"></span><strong>Novas</strong><b>2</b></header><article class="demand-card"><span class="priority high">Alta prioridade</span><h3>Avaliar estresse hídrico</h3><p>Fazenda Horizonte · Carlos Mendes</p><footer><span><span data-lucide="calendar"></span>Hoje</span><span class="avatar small">CM</span></footer></article><article class="demand-card"><span class="priority normal">Planejamento</span><h3>Revisar rotação 2027</h3><p>Fazenda São João · João Silva</p><footer><span><span data-lucide="calendar"></span>18 nov.</span><span class="avatar small">JS</span></footer></article></section>
+            <section><header><span class="dot progress"></span><strong>Em andamento</strong><b>3</b></header><article class="demand-card"><span class="priority normal">Análise</span><h3>Coleta de solo e umidade</h3><p>Sítio Boa Esperança · Ana Costa</p><footer><span><span data-lucide="calendar"></span>Amanhã</span><span class="avatar small">AC</span></footer></article><article class="demand-card"><span class="priority low">Relatório</span><h3>Consolidar indicadores NASA</h3><p>Núcleo regional Norte</p><footer><span><span data-lucide="calendar"></span>20 nov.</span><span class="avatar small">NS</span></footer></article></section>
+            <section><header><span class="dot done"></span><strong>Concluídas</strong><b>2</b></header><article class="demand-card completed"><span class="priority low">Visita</span><h3>Diagnóstico de erosão</h3><p>Fazenda Santa Rita · Paulo Nunes</p><footer><span><span data-lucide="circle-check"></span>Concluída</span><span class="avatar small">PN</span></footer></article></section>
+          </div>
+        </section>
+
+        <section class="page" data-page-content="planning">
+          <div class="page-heading"><div><span class="eyebrow">SAFRA 2026/27</span><h1>Planejamento</h1><p>Janelas de plantio e agenda técnica da cooperativa.</p></div><button class="primary-action"><span data-lucide="calendar-plus"></span>Agendar atividade</button></div>
+          <div class="planning-grid"><article class="panel calendar-panel"><div class="panel-head"><button class="icon-button"><span data-lucide="chevron-left"></span></button><h2>Novembro 2026</h2><button class="icon-button"><span data-lucide="chevron-right"></span></button></div><div class="weekdays"><span>DOM</span><span>SEG</span><span>TER</span><span>QUA</span><span>QUI</span><span>SEX</span><span>SÁB</span></div><div class="calendar-grid" id="calendarGrid"></div></article><aside class="panel agenda"><div class="panel-head"><div><span class="eyebrow">AGENDA</span><h2>Próximas atividades</h2></div></div><div class="agenda-item"><time>15<small>NOV</small></time><div><strong>Visita técnica · Fazenda Horizonte</strong><span>08:30 · Rio Verde, GO</span></div></div><div class="agenda-item"><time>18<small>NOV</small></time><div><strong>Coleta de solo · Sítio Esperança</strong><span>14:00 · Jataí, GO</span></div></div><div class="agenda-item"><time>21<small>NOV</small></time><div><strong>Reunião de planejamento</strong><span>09:00 · Sede da cooperativa</span></div></div></aside></div>
+        </section>
+
+        <section class="page" data-page-content="reports">
+          <div class="page-heading"><div><span class="eyebrow">INTELIGÊNCIA REGIONAL</span><h1>Relatórios</h1><p>Indicadores consolidados para apoiar decisões da cooperativa.</p></div><button class="primary-action" id="exportReport"><span data-lucide="download"></span>Exportar relatório</button></div>
+          <div class="report-banner"><div><span data-lucide="sparkles"></span></div><section><span class="eyebrow">INSIGHT DA SEMANA</span><h2>Atenção à janela hídrica do milho safrinha</h2><p>Quatro propriedades apresentam saldo hídrico abaixo da média regional. Priorize cobertura de solo e reveja o calendário de plantio.</p></section><button>Ver análise completa<span data-lucide="arrow-right"></span></button></div>
+          <div class="metric-grid"><article class="metric-card"><span class="metric-icon green"><span data-lucide="droplets"></span></span><div><small>Economia estimada</small><strong>18,6%</strong><em>água por hectare</em></div></article><article class="metric-card"><span class="metric-icon blue"><span data-lucide="cloud-sun"></span></span><div><small>Chuva regional</small><strong>1.412 mm</strong><em>média histórica anual</em></div></article><article class="metric-card"><span class="metric-icon amber"><span data-lucide="shield-alert"></span></span><div><small>Área em risco</small><strong>326 ha</strong><em>13% da carteira</em></div></article></div>
+          <article class="panel comparison"><div class="panel-head"><div><span class="eyebrow">COMPARATIVO</span><h2>Eficiência das rotações</h2></div><select><option>Safra 2026/27</option></select></div><div class="comparison-row"><span>Soja → Milho → Braquiária</span><div><i style="width:88%"></i></div><strong>88%</strong></div><div class="comparison-row"><span>Soja → Milho → Pousio</span><div><i style="width:61%"></i></div><strong>61%</strong></div><div class="comparison-row"><span>Milho → Feijão</span><div><i style="width:73%"></i></div><strong>73%</strong></div></article>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="modalBackdrop" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button class="modal-close" id="modalClose" aria-label="Fechar"><span data-lucide="x"></span></button>
+      <span class="modal-icon"><span data-lucide="circle-check"></span></span><h2 id="modalTitle">Talhão salvo</h2><p id="modalText">A propriedade foi adicionada à carteira da cooperativa.</p><button class="save-button" id="modalConfirm">Continuar</button>
+    </div>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
