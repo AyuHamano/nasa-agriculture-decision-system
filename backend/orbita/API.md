@@ -46,6 +46,7 @@ comando `perguntar` deixa trocar, não entram por aqui (vale o padrão do motor)
 | 400 | entrada errada: JSON torto, campo que falta, nota fora de 1 a 5, campo que a API não aceita |
 | 404 | rota que não existe |
 | 405 | método errado (o cabeçalho `Allow` diz o certo) |
+| 408 | o corpo demorou mais de 10 segundos para chegar |
 | 411 | faltou o tamanho do corpo (`Content-Length`) |
 | 413 | corpo maior que 16.384 bytes |
 | 415 | o corpo não veio como `application/json` |
@@ -69,9 +70,9 @@ A resposta é a mesma do `python3 -m orbita.perguntar ... --json` (uns 32 KB). A
     {"aviso": "...", "pergunta": "...", "entrada": {...}, "local": {...}, "clima": {...}, "terra": {...},
      "calendario": {...}, "regra_dos_anos": {...}, "rotacoes": {"atual": {...}, "alternativa": {...}},
      "comparacao": {...}, "prioridades": [...],
-     "destaque": {"prioridade": "agua", "nome": "Água", "nota": 5, "melhor": "empate"},
-     "veredito": {"codigo": "vale_testar_a_troca", "frase": "Pelo que foi medido, vale testar a troca: a alternativa se saiu melhor em solo e erosão e não ficou pior em nada do que foi medido.", "a_favor_da_troca": ["solo", "erosao"], "contra_a_troca": []},
-     "safra_2025_26": {...}, "ndvi": {...}, "parametros": [...], "hipoteses": 17, "limites": [...]}
+     "destaque": {"prioridade": "agua", "nome": "Água", "nota": 5, "melhor": "atual"},
+     "veredito": {"codigo": "depende", "frase": "Depende do que pesa mais para você: a alternativa se saiu melhor em solo e erosão e pior em água.", "a_favor_da_troca": ["solo", "erosao"], "contra_a_troca": ["agua"]},
+     "safra_2025_26": {...}, "ndvi": {...}, "parametros": [...], "hipoteses": 18, "limites": [...]}
 
 O motor pode ganhar campos novos; os nomes de hoje não mudam.
 
@@ -80,7 +81,7 @@ O motor pode ganhar campos novos; os nomes de hoje não mudam.
     curl -s -X POST http://127.0.0.1:8000/mensagem -H 'Content-Type: application/json' \
       -d '{"cidade_id": "rio_verde", "rotacao_atual": ["soja", "milho", "pousio"], "prioridades": {"agua": 5, "solo": 4, "renda": 2, "erosao": 3}, "terra": "media"}'
 
-    {"texto": "Órbita Rural · Rio Verde (GO)\nPergunta: vale trocar \"soja → milho safrinha → pousio (terra parada)\" por \"soja → milho com braquiária (capim)\"?\n\nResposta: Pelo que foi medido, vale testar a troca: a alternativa se saiu melhor em solo e erosão e não ficou pior em nada do que foi medido.\n\nNas suas maiores notas:\nÁgua (nota 5): empate.\nSolo (nota 4): a alternativa se saiu melhor.\n\nA prova: no pior ano (safra 2015-16), faltaram 224,2 mm de água na rotação de hoje e 227,2 mm na alternativa. Fontes: o satélite de chuva GPM IMERG, da NASA (a chuva) e a FAO (a conta de água). Pelo calendário das culturas, a terra fica 122 dias por ano sem planta viva hoje e 30 na alternativa.\n\nO risco: a braquiária também bebe água depois do milho, e a terra pode chegar mais seca ao plantio da soja.\n\nIsto é uma conta, não uma recomendação: valide com o agrônomo antes de decidir."}
+    {"texto": "Órbita Rural · Rio Verde (GO)\nPergunta: vale trocar \"soja → milho safrinha → pousio (terra parada)\" por \"soja → milho com braquiária (capim)\"?\n\nResposta: Depende do que pesa mais para você: a alternativa se saiu melhor em solo e erosão e pior em água.\n\nNas suas maiores notas:\nÁgua (nota 5): a rotação de hoje se saiu melhor.\nSolo (nota 4): a alternativa se saiu melhor.\n\nA prova: no pior ano (safra 2015-16), faltaram 232,9 mm de água na rotação de hoje e 243,5 mm na alternativa. Fontes: o satélite de chuva GPM IMERG, da NASA (a chuva) e a FAO (a conta de água). Pelo calendário das culturas, a terra fica 122 dias por ano sem planta viva hoje e 30 na alternativa.\n\nO risco: a braquiária também bebe água depois do milho, e a terra pode chegar mais seca ao plantio da soja.\n\nIsto é uma conta, não uma recomendação: valide com o agrônomo antes de decidir."}
 
 O texto não tem tabela nem markdown e cabe em uns 900 caracteres. Traz a pergunta, a resposta, o resultado nas duas
 prioridades de maior nota, um número de prova de cada medida mostrada (com a fonte em palavras), o risco em uma frase

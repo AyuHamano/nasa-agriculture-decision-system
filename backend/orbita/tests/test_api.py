@@ -14,6 +14,16 @@ RESPOSTA = json.loads(json.dumps(motor.responder(ENTRADA)))     # como ela chega
 JSON = {"Content-Type": "application/json"}
 
 
+def ate_o_fim(fio):
+    """Tudo o que o servidor mandou por uma ligação crua, até ele fechar."""
+    pedacos = []
+    while True:
+        pedaco = fio.recv(4096)
+        if not pedaco:
+            return b"".join(pedacos).decode("utf-8")
+        pedacos.append(pedaco)
+
+
 def erro_de(funcao, *argumentos):
     with unittest.TestCase().assertRaises(api.ErroDaApi) as erro:
         funcao(*argumentos)
@@ -179,8 +189,23 @@ class PorHttp(unittest.TestCase):
     def test_sem_o_tamanho_do_corpo_e_411(self):
         with socket.create_connection(("127.0.0.1", self.porta), timeout=10) as fio:
             fio.sendall(b"POST /recomendacao HTTP/1.1\r\nHost: x\r\nContent-Type: application/json\r\n\r\n")
-            resposta = fio.recv(4096).decode("utf-8")
+            resposta = ate_o_fim(fio)
         self.assertIn(" 411 ", resposta.split("\r\n")[0])
+
+    def test_corpo_que_chega_aos_poucos_nao_segura_a_ligacao(self):
+        prazo, self.servidor.prazo_do_corpo = self.servidor.prazo_do_corpo, 0.4
+        try:
+            for rota, tipo in (("/recomendacao", "application/json"), ("/nada", "application/json"),
+                               ("/mensagem", "text/plain")):          # o corpo lido e o corpo jogado fora
+                with socket.create_connection(("127.0.0.1", self.porta), timeout=3) as fio:
+                    fio.sendall(f"POST {rota} HTTP/1.1\r\nHost: x\r\nContent-Type: {tipo}\r\n"
+                                "Content-Length: 500\r\n\r\n{".encode("utf-8"))      # promete 500 bytes, manda 1
+                    resposta = ate_o_fim(fio)                                           # sem o prazo, isto esperaria 15 s
+                self.assertIn(" 408 ", resposta.split("\r\n")[0], rota)
+                self.assertIn("demorou", resposta)
+        finally:
+            self.servidor.prazo_do_corpo = prazo
+        self.assertLessEqual(prazo, 15)
 
     def test_o_site_pode_ler_cors_e_o_pedido_de_licenca(self):
         codigo, resposta, _ = self.pedir("OPTIONS", "/recomendacao")
@@ -194,7 +219,7 @@ class PorHttp(unittest.TestCase):
         self.assertNotIn("Python", resposta.getheader("Server") or "")
         with socket.create_connection(("127.0.0.1", self.porta), timeout=10) as fio:
             fio.sendall(b"ISTO NAO E HTTP\r\n\r\n")
-            torto = fio.recv(4096).decode("utf-8")
+            torto = ate_o_fim(fio)
         self.assertIn('"erro"', torto)
         self.assertNotIn("Error response", torto)
 

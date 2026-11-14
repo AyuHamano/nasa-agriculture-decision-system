@@ -13,7 +13,7 @@ As rotas (o `API.md` desta pasta traz um exemplo de cada uma):
     POST /conversa       -> {"estado": ..., "resposta": ...}     (corpo: {"estado": ..., "texto": ...})
 
 Os cuidados: o corpo tem limite de tamanho e só entra JSON; os erros saem em português, com o código certo (400 para
-entrada errada, 404, 405, 411, 413, 415); nada que vem de fora escolhe arquivo (a fonte da chuva e a regra dos anos,
+entrada errada, 404, 405, 408, 411, 413, 415); nada que vem de fora escolhe arquivo (a fonte da chuva e a regra dos anos,
 que o comando `perguntar` deixa trocar, não entram por aqui); nada é guardado, nem o corpo dos pedidos no registro.
 Nenhum WhatsApp está ligado: a rota /conversa só devolve texto para quem chamou.
 """
@@ -21,6 +21,7 @@ import argparse
 import json
 import signal
 import sys
+import time
 import traceback
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
@@ -29,6 +30,7 @@ from orbita import conversa, mensagem, motor
 LIMITE_DO_CORPO = 16 * 1024               # bytes: a pergunta e o estado da conversa cabem com muita folga
 DESCARTE_MAXIMO = 1024 * 1024             # até quanto de um corpo recusado é lido e jogado fora antes de responder
 ESPERA = 15                               # segundos sem chegar nada: a ligação é fechada
+PRAZO_DO_CORPO = 10                       # segundos para o corpo inteiro chegar (mandar aos poucos não adianta)
 ROTAS = {"/saude": "GET", "/recomendacao": "POST", "/mensagem": "POST", "/conversa": "POST"}
 CAMPOS_DA_PERGUNTA = ("cidade_id", "rotacao_atual", "prioridades", "terra")
 CAMPOS_DA_CONVERSA = ("estado", "texto")
@@ -129,6 +131,7 @@ class Porta(BaseHTTPRequestHandler):
 
     server_version, sys_version = "OrbitaRural", ""        # não conta a versão do Python a quem pergunta
     timeout = ESPERA
+    wbufsize = 64 * 1024                                   # os cabeçalhos e o corpo saem juntos, de uma vez
 
     def version_string(self):
         return self.server_version
@@ -147,6 +150,7 @@ class Porta(BaseHTTPRequestHandler):
         self.end_headers()
         if self.command != "HEAD":
             self.wfile.write(corpo)
+        self.wfile.flush()
 
     def _tamanho_do_corpo(self):
         """O Content-Length do pedido; None se não veio ou não é um número."""
@@ -156,14 +160,31 @@ class Porta(BaseHTTPRequestHandler):
             return None
         return tamanho if tamanho >= 0 else None
 
+    def _ler_do_fio(self, tamanho, guardar=True):
+        """Lê `tamanho` bytes do corpo, com um prazo para o corpo inteiro: quem manda aos poucos não segura a ligação."""
+        fim, pedacos, falta = time.monotonic() + self.server.prazo_do_corpo, [], tamanho
+        try:
+            while falta > 0:
+                resta = fim - time.monotonic()
+                if resta <= 0:
+                    raise TimeoutError
+                self.connection.settimeout(resta)
+                pedaco = self.rfile.read1(min(falta, 65536))
+                if not pedaco:
+                    break
+                falta -= len(pedaco)
+                if guardar:
+                    pedacos.append(pedaco)
+        except TimeoutError:
+            raise ErroDaApi(408, "O corpo do pedido demorou demais para chegar.") from None
+        finally:
+            self.connection.settimeout(ESPERA)
+        return b"".join(pedacos)
+
     def _descartar_corpo(self):
         """Lê e joga fora o corpo de um pedido recusado (até um teto), para a resposta chegar inteira a quem pediu."""
-        falta = min(self._tamanho_do_corpo() or 0, DESCARTE_MAXIMO)
-        while falta > 0:
-            pedaco = self.rfile.read(min(falta, 65536))
-            if not pedaco:
-                break
-            falta -= len(pedaco)
+        self._corpo_lido = True
+        self._ler_do_fio(min(self._tamanho_do_corpo() or 0, DESCARTE_MAXIMO), guardar=False)
 
     def _ler_corpo(self):
         tipo = (self.headers.get("Content-Type") or "").split(";")[0].strip().lower()
@@ -175,7 +196,7 @@ class Porta(BaseHTTPRequestHandler):
         if tamanho > LIMITE_DO_CORPO:
             raise ErroDaApi(413, f"Corpo grande demais: o limite é de {LIMITE_DO_CORPO} bytes.")
         self._corpo_lido = True
-        corpo = self.rfile.read(tamanho)
+        corpo = self._ler_do_fio(tamanho)
         if len(corpo) != tamanho:
             raise ErroDaApi(400, "O corpo chegou incompleto.")
         return ler_json(corpo)
@@ -200,7 +221,10 @@ class Porta(BaseHTTPRequestHandler):
                 self._enviar(200, resposta)
             except ErroDaApi as erro:
                 if not self._corpo_lido:
-                    self._descartar_corpo()
+                    try:
+                        self._descartar_corpo()
+                    except ErroDaApi as demora:                        # o corpo recusado também demorou: vale a demora
+                        erro = demora
                 self._enviar(erro.codigo, {"erro": erro.mensagem}, erro.cabecalhos)
         except OSError:                                                # quem pediu sumiu ou demorou demais
             pass
@@ -238,7 +262,7 @@ class Servidor(ThreadingHTTPServer):
     daemon_threads = True
 
     def __init__(self, onde, origem="*", silencioso=False):
-        self.origem, self.silencioso = origem, silencioso
+        self.origem, self.silencioso, self.prazo_do_corpo = origem, silencioso, PRAZO_DO_CORPO
         super().__init__(onde, Porta)
 
 

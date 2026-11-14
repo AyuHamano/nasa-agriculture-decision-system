@@ -48,8 +48,9 @@ class OTexto(unittest.TestCase):
 
     def test_mostra_as_prioridades_de_maior_nota(self):
         texto = mensagem.texto(RESPOSTA)
-        self.assertIn("Água (nota 5): empate", texto)
-        self.assertIn("Solo (nota 4): a alternativa se saiu melhor", texto)
+        for p in RESPOSTA["prioridades"][:2]:                  # o resultado vem da conta, não do teste
+            self.assertIn(f"{p['nome']} (nota {p['nota']}): {mensagem.QUEM[p['melhor']]}.", texto)
+        self.assertEqual([p["id"] for p in RESPOSTA["prioridades"][:2]], ["agua", "solo"])
         self.assertNotIn("Erosão (nota", texto)
         self.assertNotIn("Renda (nota", texto)
         self.assertLess(texto.index("Água (nota 5)"), texto.index("Solo (nota 4)"))
