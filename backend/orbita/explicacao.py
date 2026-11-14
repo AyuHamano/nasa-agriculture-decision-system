@@ -6,6 +6,45 @@ Não há IA aqui (não há chave ligada). Todo número que aparece no texto vem 
 
 QUEM = {"atual": "a rotação de hoje se saiu melhor", "alternativa": "a alternativa se saiu melhor",
         "empate": "empate", "não medido": "não medido"}
+PELA_FAIXA = {"alternativa_melhor": "a alternativa se saiu melhor", "alternativa_pior": "a alternativa se saiu pior",
+              "empate": "empate", "depende_da_hipotese": "depende da hipótese"}
+
+
+def _quem(item):
+    """Quem se saiu melhor, em palavras; na água vale o veredito pela faixa."""
+    return PELA_FAIXA.get(item.get("veredito_pela_faixa"), QUEM[item["melhor"]])
+
+
+def _lista(safras):
+    return ", ".join(safras) or "nenhuma"
+
+
+def _sede_forte(r):
+    """As linhas da sede forte: o nível, de onde saiu, quantas safras em cada rotação e o aviso."""
+    sede = r["sede_forte"]
+    hoje = r["rotacoes"]["atual"]["safras_com_sede_forte"]
+    alternativa = r["rotacoes"]["alternativa"]["safras_com_sede_forte"]
+    if sede["nivel_pct"] is None:
+        return [f"   Sede forte: {sede['aviso']}"]
+    total = len(r["rotacoes"]["atual"]["safras"])
+    faixa = alternativa["faixa"]
+    quantas = (f"{faixa['menor']}" if faixa["menor"] == faixa["maior"]
+               else f"de {faixa['menor']} a {faixa['maior']}, conforme a disputa")
+    linhas = [f"   Sede forte (falta do milho de {n(sede['nivel_pct'])}% ou mais do que ele pediu): {hoje['quantas']} "
+              f"de {total} safras na rotação de hoje ({_lista(hoje['quais'])}) e {quantas} na alternativa "
+              f"({_lista(alternativa['quais'])} na hipótese do meio).",
+              f"   De onde sai o nível: é a menor falta do milho entre as safras de quebra, as de "
+              f"{sede['safra_de_quebra']}: {_lista(sede['safras_de_quebra'])} (abaixo de {n(sede['limite_kg_ha'])} "
+              f"kg/ha), na conta da rotação de hoje com a terra média e a chuva padrão."]
+    aviso = sede["aviso"]
+    perto = sede.get("maior_falta_sem_quebra")
+    if sede["alarmes_falsos_na_referencia"]:
+        aviso += (f" Na própria conta de referência já há alarme falso: "
+                  f"{_lista(sede['alarmes_falsos_na_referencia'])}.")
+    elif perto:
+        aviso += (f" Por exemplo: a safra {perto['safra']} teve falta de {n(perto['falta_do_milho_pct'])}% na conta "
+                  f"de referência, perto do nível, e colheu {perto['rendimento_kg_ha']} kg/ha, sem quebra.")
+    return linhas + [f"   {aviso}"]
 
 
 def n(numero):
@@ -19,18 +58,17 @@ def _prioridade(p, r):
     hoje, alternativa = r["rotacoes"]["atual"], r["rotacoes"]["alternativa"]
     seco = r["comparacao"]["pior_ano"]
     rotulo = "No pior ano" if r["regra_dos_anos"]["regra"] == "rendimento" else "No ano mais seco"
-    linhas = [f"{p['nome']} (nota {p['nota']}): {QUEM[p['melhor']]}."]
+    linhas = [f"{p['nome']} (nota {p['nota']}): {_quem(p)}."]
     if p["id"] == "agua":
-        a, b = hoje["safras"][seco]["total"], alternativa["safras"][seco]["total"]
+        a, faixa = hoje["safras"][seco]["total"], alternativa["faixa"][seco]["falta_total_mm"]
+        meio = alternativa["safras"][seco]["total"]
+        linhas.append(f"   {r['comparacao']['agua']['pela_faixa']['frase']}")
         linhas.append(f"   {rotulo} (safra {seco}), faltaram {n(a['falta_mm'])} mm de água para a soja e o milho "
-                      f"na rotação de hoje e {n(b['falta_mm'])} mm na alternativa (falta de água = o que a planta "
-                      "pediu menos o que conseguiu beber).")
-        linhas.append(f"   Das {len(hoje['safras'])} safras, o milho passou sede (falta de "
-                      f"{hoje['safras_com_sede']['criterio_pct']}% ou mais do que pediu) em "
-                      f"{hoje['safras_com_sede']['quantas']} na rotação de hoje e em "
-                      f"{alternativa['safras_com_sede']['quantas']} na alternativa.")
-        if r["comparacao"]["agua"]["as_medidas_discordam"]:
-            linhas.append("   As duas medidas apontam para lados diferentes; por isso, empate.")
+                      f"na rotação de hoje; na alternativa, de {n(faixa['menor'])} a {n(faixa['maior'])} mm, com "
+                      f"{n(meio['falta_mm'])} mm na hipótese do meio (falta de água = o que a planta pediu menos o "
+                      "que conseguiu beber). A alternativa vai em faixa porque não se sabe quanto o capim disputa "
+                      "água com o milho.")
+        linhas += _sede_forte(r)
     elif p["id"] in ("solo", "erosao"):
         a, b = hoje["sem_planta_viva"], alternativa["sem_planta_viva"]
         outro = "da erosão" if p["id"] == "solo" else "do solo"
@@ -50,6 +88,10 @@ def _linha_da_safra(safra, r):
         s = r["rotacoes"][chave]["safras"][safra]
         partes.append(f"{rotulo}: soja {n(s['soja']['falta_mm'])} mm, milho {n(s['milho']['falta_mm'])} mm "
                       f"({n(s['milho']['falta_relativa_pct'])}%), {s['total']['dias_de_sede']} dias de sede")
+    faixa = r["rotacoes"]["alternativa"]["faixa"][safra]
+    partes.append(f"faixa do milho na alternativa: de {n(faixa['falta_do_milho_mm']['menor'])} a "
+                  f"{n(faixa['falta_do_milho_mm']['maior'])} mm ({n(faixa['falta_do_milho_pct']['menor'])}% a "
+                  f"{n(faixa['falta_do_milho_pct']['maior'])}%)")
     return " | ".join(partes)
 
 
@@ -63,9 +105,29 @@ def _ano(rotulo, safra, r):
                  f"{s['milho']['dias_de_sede']}); a terra tinha "
                  f"{n(s['agua_na_terra_no_plantio_da_soja_mm'])} mm de água no plantio da soja")
         if "braquiaria" in s:
-            linha += f"; a braquiária bebeu {n(s['braquiaria']['bebido_mm'])} mm depois do milho"
+            faixa = r["rotacoes"][chave]["faixa"][safra]
+            linha += (f"; a braquiária bebeu {n(s['braquiaria']['bebido_junto_com_o_milho_mm'])} mm junto com o "
+                      f"milho e {n(s['braquiaria']['bebido_mm'])} mm depois dele. Estes são os números da hipótese "
+                      f"do meio; na faixa (de sem disputa a disputa alta), a falta de água vai de "
+                      f"{n(faixa['falta_total_mm']['menor'])} a {n(faixa['falta_total_mm']['maior'])} mm e a do "
+                      f"milho, de {n(faixa['falta_do_milho_mm']['menor'])} a {n(faixa['falta_do_milho_mm']['maior'])} "
+                      f"mm ({n(faixa['falta_do_milho_pct']['menor'])}% a {n(faixa['falta_do_milho_pct']['maior'])}%)")
         linhas.append(linha + ".")
     return linhas
+
+
+def _palha_e_disputa(r):
+    hoje, alternativa = r["rotacoes"]["atual"]["palha"], r["rotacoes"]["alternativa"]["palha"]
+    cenarios = r["rotacoes"]["alternativa"]["disputa_com_o_milho"]["cenarios"]
+    return [f"A palha entra nas duas rotações ({hoje['regra']}): {hoje['de_que']} cobre {n(hoje['cobertura_pct'])}% da "
+            f"terra na rotação de hoje e tira {n(hoje['evaporacao_a_menos_pct'])}% da evaporação; "
+            f"{alternativa['de_que']} cobre {n(alternativa['cobertura_pct'])}% na alternativa e tira "
+            f"{n(alternativa['evaporacao_a_menos_pct'])}%. Vale {hoje['onde_vale']}. As duas coberturas são "
+            f"{hoje['etiqueta_da_cobertura']}.",
+            "A disputa do capim com o milho é hipótese, e por isso a alternativa sai em faixa: sem disputa (o capim "
+            f"não tira água do milho), meio (o conjunto pede {n(cenarios['meio']['pedido_a_mais_pct'])}% a mais de "
+            f"água que o milho sozinho) e alta ({n(cenarios['alta']['pedido_a_mais_pct'])}% a mais). Os números da "
+            "alternativa fora da faixa são os da hipótese do meio."]
 
 
 def _ndvi(r):
@@ -91,7 +153,7 @@ def texto(r):
          "RESPOSTA",
          r["veredito"]["frase"],
          f"Na sua maior nota entre o que foi medido ({r['destaque']['nome'].lower()}, nota {r['destaque']['nota']}): "
-         f"{QUEM[r['destaque']['melhor']]}.",
+         f"{_quem(r['destaque'])}.",
          "",
          "SUAS PRIORIDADES, DA MAIOR NOTA PARA A MENOR (elas só mudam a ordem; nenhum número muda)"]
     for i, p in enumerate(r["prioridades"], start=1):
@@ -117,12 +179,14 @@ def texto(r):
         t.append(f"As safras {' e '.join(regra['empate_do_ano_normal'])} ficam à mesma distância da mediana; "
                  "pelo desempate, vale a mais antiga.")
     rotulo_do_pior = "Pior ano" if regra["regra"] == "rendimento" else "Ano mais seco"
+    t += _palha_e_disputa(r)
     t += _ano("Ano normal", normal, r) + _ano(rotulo_do_pior, seco, r)
     if "aviso_do_ano_mais_seco" in regra:
         t.append(f"Atenção ao ano mais seco: {regra['aviso_do_ano_mais_seco']}. Em 2025 a NASA POWER soma "
                  f"{n(regra['chuva_de_2025_mm'])} mm no ano. Por isso, a segunda safra mais seca vai ao lado:")
         t += _ano("Segunda safra mais seca", regra["segunda_mais_seca"], r)
-    t += ["Safra por safra (a falta de água em mm; entre parênteses, a falta do milho em % do que ele pediu):"]
+    t += ["Safra por safra (a falta de água em mm; entre parênteses, a falta do milho em % do que ele pediu; a "
+          "alternativa na hipótese do meio e, no fim da linha, a faixa do milho):"]
     t += [_linha_da_safra(s, r) for s in regra["chuva_por_safra_mm"]]
     for nome, rot in (("rotação de hoje", hoje), ("alternativa", alternativa)):
         sede = rot["safras_com_sede"]
@@ -137,14 +201,19 @@ def texto(r):
     extra = r["safra_2025_26"]
     t += ["",
           "O RISCO",
-          "- A braquiária também bebe água depois do milho: a terra pode chegar mais seca ao plantio da soja "
-          "(os números de água na terra no plantio, acima, mostram quanto). Na soma das "
+          "- A braquiária bebe água junto com o milho (quanto, é hipótese: por isso a faixa) e depois dele: a "
+          "terra pode chegar mais seca ao plantio da soja (os números de água na terra no plantio, acima, mostram "
+          "quanto). Na soma das "
           f"{len(hoje['safras'])} safras, a falta de água da soja foi de "
           f"{n(hoje['soma_das_10_safras']['falta_da_soja_mm'])} mm na rotação de hoje e de "
-          f"{n(alternativa['soma_das_10_safras']['falta_da_soja_mm'])} mm na alternativa.",
+          f"{n(alternativa['soma_das_10_safras']['falta_da_soja_mm'])} mm na alternativa (hipótese do meio); a do milho, "
+          f"de {n(hoje['soma_das_10_safras']['falta_do_milho_mm'])} mm na rotação de hoje e de "
+          f"{n(alternativa['faixa_da_soma_das_10_safras']['falta_do_milho_mm']['menor'])} a "
+          f"{n(alternativa['faixa_da_soma_das_10_safras']['falta_do_milho_mm']['maior'])} mm na alternativa.",
           f"- A safra 2025-26 ficou à parte ({extra['aviso']}): chuva de {n(extra['chuva_da_janela_mm'])} mm na "
           f"janela; falta do milho de {n(extra['atual']['milho']['falta_relativa_pct'])}% na rotação de hoje e de "
-          f"{n(extra['alternativa']['milho']['falta_relativa_pct'])}% na alternativa.",
+          f"{n(extra['faixa_da_alternativa']['falta_do_milho_pct']['menor'])}% a "
+          f"{n(extra['faixa_da_alternativa']['falta_do_milho_pct']['maior'])}% na alternativa.",
           f"- {r['hipoteses']} parâmetros da conta ainda são hipótese (o comando com --json lista cada um, com a "
           "fonte e a etiqueta)."]
     t += [f"- {aviso}" for aviso in r["clima"]["avisos"]]

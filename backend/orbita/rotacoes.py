@@ -5,7 +5,11 @@
 - A alternativa, uma só: soja -> milho com braquiária (capim). O capim nasce junto com o milho, fica vivo depois da
   colheita e é seco (dessecado) alguns dias antes de plantar a soja.
 A curva do Kc por fase é a do FAO-56, cap. 6 (eq. 66): https://www.fao.org/4/X0490E/x0490e0b.htm
-Hipótese declarada: enquanto o milho está na terra, a braquiária debaixo dele não aumenta o pedido de água.
+A palha (FAO-56, cap. 10, "Effects of surface mulches": https://www.fao.org/4/X0490E/x0490e0g.htm): a evaporação da
+terra cai uns 5% a cada 10% de terra coberta por palha. Vale nas DUAS rotações (no plantio direto a palha do milho
+também fica), com coberturas diferentes, nos dias sem planta viva e na fase inicial da soja (o Kc ini).
+A disputa do capim com o milho (hipótese, em faixa): enquanto os dois crescem juntos, o conjunto pede
+(1 + fator) x o pedido do milho. Com o fator em zero, o capim não tira nada do milho.
 """
 import datetime
 
@@ -19,6 +23,18 @@ ROTACOES = {
     "alternativa": {"nome": "soja → milho com braquiária (capim)", "com_braquiaria": True},
 }
 DIAS_DO_MES = 365 / 12
+
+
+def fator_da_palha(cobertura, reducao):
+    """Por quanto se multiplica a evaporação da terra com a fração `cobertura` (0 a 1) coberta de palha.
+
+    FAO-56, cap. 10: "reduce the amount of soil water evaporation by about 5% for each 10% of soil surface that is
+    effectively covered by an organic mulch" (reducao = 0,5): com 50% de cobertura, 25% a menos.
+    """
+    if not 0.0 <= cobertura <= 1.0 or not 0.0 <= reducao <= 1.0:
+        raise ValueError("A cobertura de palha e a redução por cobertura são frações entre 0 e 1 "
+                         f"(vieram {cobertura} e {reducao}).")
+    return 1.0 - reducao * cobertura
 
 
 def _mes_dia(texto):
@@ -61,6 +77,12 @@ class Calendario:
         self.braquiaria_p = v("culturas", "braquiaria_apos_milho", "p")
         self.dessecacao_dias = int(v("culturas", "braquiaria_apos_milho", "dessecacao_dias_antes_da_soja"))
         self.solo_nu_kc = v("culturas", "solo_nu", "kc")
+        # A palha: a cobertura de cada rotação (False = a de hoje, True = a alternativa) e o fator na evaporação.
+        self.palha_reducao = v("palha", "reducao_por_cobertura")
+        self.cobertura_de_palha = {False: v("palha", "cobertura_do_milho_solteiro"),
+                                   True: v("palha", "cobertura_do_milho_com_braquiaria")}
+        self.fator_da_palha = {com: fator_da_palha(cobertura, self.palha_reducao)
+                               for com, cobertura in self.cobertura_de_palha.items()}
         # A profundidade das raízes de cada cobertura; a terra sem planta vale com a mais funda delas (o perfil).
         self.raizes = {"soja": v("culturas", "soja", "raiz_m"), "milho": v("culturas", "milho_2a_safra", "raiz_m"),
                        BRAQUIARIA: v("culturas", "braquiaria_apos_milho", "raiz_m")}
@@ -99,18 +121,25 @@ def calendario(par):
     return Calendario(par)
 
 
-def cobertura_do_dia(data, com_braquiaria, cal):
-    """O que está na terra no dia: (tipo, Kc do dia, p). Tipos: soja, milho, braquiaria, sem_planta."""
+def cobertura_do_dia(data, com_braquiaria, cal, disputa=0.0):
+    """O que está na terra no dia: (tipo, Kc do dia, p). Tipos: soja, milho, braquiaria, sem_planta.
+
+    A palha da rotação baixa o Kc nos dias sem planta e na fase inicial da soja. Com `disputa` acima de zero (só na
+    alternativa), o dia de milho devolve um 4º valor: o fator a mais que o capim põe no pedido de água do conjunto.
+    """
+    palha = cal.fator_da_palha[bool(com_braquiaria)]
     for ano in (data.year, data.year - 1):
         n = (data - cal.plantio_da_soja(ano)).days
         if 0 <= n < cal.soja_ciclo:
-            return ("soja", kc_da_fase(n, cal.soja_fases, *cal.soja_kc), cal.soja_p)
+            kc = kc_da_fase(n, cal.soja_fases, *cal.soja_kc)
+            return ("soja", kc * palha if n < cal.soja_fases[0] else kc, cal.soja_p)
     n = (data - cal.plantio_do_milho(data.year)).days
     if 0 <= n < cal.milho_ciclo:
-        return ("milho", kc_da_fase(n, cal.milho_fases, *cal.milho_kc), cal.milho_p)
+        milho = ("milho", kc_da_fase(n, cal.milho_fases, *cal.milho_kc), cal.milho_p)
+        return milho + (disputa,) if com_braquiaria and disputa else milho
     if com_braquiaria and cal.fim_do_milho(data.year) <= data < cal.dessecacao(data.year):
         return (BRAQUIARIA, cal.braquiaria_kc, cal.braquiaria_p)
-    return (SEM_PLANTA, cal.solo_nu_kc, None)
+    return (SEM_PLANTA, cal.solo_nu_kc * palha, None)
 
 
 def resumo_do_calendario(par):

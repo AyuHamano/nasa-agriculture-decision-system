@@ -16,6 +16,7 @@ ARQUIVO_CONFERIDO = Path(__file__).resolve().parents[2] / "data" / "orbita" / "p
 FAO6 = "https://www.fao.org/4/X0490E/x0490e0b.htm"  # cap. 6: Tabelas 11 (fases) e 12 (Kc)
 FAO7 = "https://www.fao.org/4/X0490E/x0490e0c.htm"  # cap. 7: Tabela 19 (a terra) e a evaporação do solo (eq. 73, 74)
 FAO8 = "https://www.fao.org/4/X0490E/x0490e0e.htm"  # cap. 8: Tabela 22 (raízes e p) e o balanço (eq. 82 a 88)
+FAO10 = "https://www.fao.org/4/X0490E/x0490e0g.htm"  # cap. 10: a palha (surface mulches) e o consórcio (intercropping)
 PUBLICADO, HIPOTESE = "publicado", "hipótese"
 
 
@@ -62,7 +63,7 @@ PADRAO = {
                      "da ETo (FAO-56, cap. 7, eq. 72: o teto, Kc max, é 1,2). O freio vem da camada de cima "
                      "secando (Kr, eq. 74), não de um Kc baixo. O valor de solo seco conferido na fonte (kc_seco, "
                      "0,15 a 0,20) fica guardado e não entra na conta: junto com o Kr, frearia a evaporação duas "
-                     "vezes. A palha do milho, que reduz a evaporação, não entra."),
+                     "vezes. A palha, que reduz a evaporação, entra à parte (ver 'palha')."),
         },
     },
     "terra": {
@@ -88,11 +89,31 @@ PADRAO = {
             "rew_mm": _p(10.0, FAO7, "FAO-56, Tabela 19, Clay: REW 8-12 mm (o meio da faixa)."),
         },
     },
+    "palha": {
+        "reducao_por_cobertura": _p(0.5, FAO10, "FAO-56, cap. 10, Effects of surface mulches, Organic mulches: 'A "
+                                    "general rule when applying Kc from Table 12 is to reduce the amount of soil "
+                                    "water evaporation by about 5% for each 10% of soil surface that is effectively "
+                                    "covered by an organic mulch.' E: 'In the case of Kc ini, which represents mostly "
+                                    "evaporation from soil, one would reduce Kc ini by about 25% in this situation' "
+                                    "(com 50% da terra coberta). 0,5 = 5% a cada 10%.", PUBLICADO),
+        "cobertura_do_milho_solteiro": _p(0.6, "", "A PREENCHER"),
+        "cobertura_do_milho_com_braquiaria": _p(0.9, "", "A PREENCHER"),
+    },
+    "disputa_com_o_milho": {
+        "sem_disputa": _p(0.0, "", "A PREENCHER"),
+        "meio": _p(0.04, "", "A PREENCHER"),
+        "alta": _p(0.08, "", "A PREENCHER"),
+    },
     "ajustar_p_pela_demanda": _p(True, FAO8, "FAO-56, cap. 8: 'p = pTable 22 + 0.04 (5 - ETc)', limitado entre 0.1 e "
                                  "0.8, com a ETc em mm/dia.", PUBLICADO),
     "regras": {
         "sede_da_2a_safra_pct": _p(20, "", "Escolha fixada antes de ver o resultado: 'safra com sede' = falta "
                                    "relativa de água do milho de 20% ou mais. O motor mostra também com 10% e 30%."),
+        "quebra_fracao_da_mediana": _p(0.8, "", "Decisão do dono do projeto (2026-11-14): safra de quebra = rendimento "
+                                       "do milho de 2ª safra no IBGE abaixo de 80% da mediana das 10 safras. O "
+                                       "nível de 'sede forte' é a menor falta do milho entre as safras de quebra "
+                                       "(rotação de hoje, terra média, chuva padrão): sai do IBGE e da conta, não "
+                                       "está escrito à mão. O limite de 80% é escolha."),
         "empate_mm": _p(5.0, "", "Escolha fixada antes de ver o resultado: diferença de falta de água menor que 5 mm "
                         "entre as rotações conta como empate."),
     },

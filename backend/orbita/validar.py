@@ -219,6 +219,23 @@ def _parte_4(pasta, p):
         p(f"   Com a chuva {f}, a safra de maior falta de água do milho é {pior} ({_n(faltas[f][pior], 1)}%).")
     pior_ibge = min(safras, key=lambda s: rendimento[s])
     p(f"   No IBGE, o pior rendimento das {len(safras)} safras é o da {pior_ibge} ({_n(rendimento[pior_ibge])} kg/ha).")
+    if motor.CHUVA_PADRAO in faltas:
+        fracao = parametros.valor(par, "regras", "quebra_fracao_da_mediana")
+        nivel = motor.nivel_de_sede_forte(
+            rendimento, {s: motor.r1(faltas[motor.CHUVA_PADRAO][s]) for s in safras}, fracao)
+        if nivel["nivel_pct"] is None:
+            p(f"   Sede forte: nenhuma safra abaixo de {_n(100 * fracao)}% da mediana do IBGE; não há nível.")
+        else:
+            perto = nivel["maior_falta_sem_quebra"]
+            p(f"   Sede forte (com a chuva {motor.CHUVA_PADRAO}): as safras de quebra (rendimento abaixo de "
+              f"{_n(100 * fracao)}% da mediana de {_n(nivel['mediana_kg_ha'])} kg/ha, ou seja, abaixo de "
+              f"{_n(nivel['limite_kg_ha'])} kg/ha) são {', '.join(nivel['safras_de_quebra'])}; o nível é a menor "
+              f"falta do milho entre elas: {_n(nivel['nivel_pct'], 1)}%.")
+            p("   Alarmes falsos (falta no nível ou acima, sem quebra no IBGE): "
+              + (", ".join(nivel["alarmes_falsos"]) or "nenhum nestas safras")
+              + (f"; a safra sem quebra de maior falta é {perto['safra']} ({_n(perto['falta_do_milho_pct'], 1)}%, "
+                 f"{_n(perto['rendimento_kg_ha'])} kg/ha)" if perto else "")
+              + ". O nível sai de poucas safras: é régua de comparação, não previsão de quebra.")
     validas = {f: c for f, c in correlacoes.items() if c is not None}
     if validas:
         melhor = min(validas, key=validas.get)
