@@ -44,7 +44,7 @@ PRODUTO_PADRAO = "SPL3SMP_E.006"  # usado se a lista de produtos não puder ser 
 CACHE_DIR = PROJECT_ROOT / "data" / "cache"
 PCT_SECO = 20                      # "dia seco" = abaixo do percentil 20 da série da própria cidade
 CIDADES_PADRAO = {
-    "espumoso": (-28.725, -52.85),
+    # "espumoso": (-28.725, -52.85),
     "silvania": (-16.66, -48.61),
 }
 
