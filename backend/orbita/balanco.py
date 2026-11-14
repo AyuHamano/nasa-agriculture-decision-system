@@ -21,16 +21,21 @@ import datetime
 from orbita import parametros, rotacoes
 from orbita.rotacoes import BRAQUIARIA, CULTURAS, SEM_PLANTA  # noqa: F401 (reexportados)
 
-Registro = collections.namedtuple("Registro", "data tipo chuva eto pedido bebido ks agua_na_terra percolacao taw")
+Registro = collections.namedtuple("Registro",
+                                  "data tipo chuva eto pedido bebido ks agua_na_terra percolacao taw falta_em_cima")
+CAMADA_DE_CIMA_M = 0.10  # a camada que a evaporação seca: os TEW da Tabela 19 do FAO-56 valem para Ze = 0,10 m
 SAFRAS_DO_ESTUDO = tuple(f"{ano}-{(ano + 1) % 100:02d}" for ano in range(2015, 2025))
 TIPOS = ("soja", "milho", BRAQUIARIA, SEM_PLANTA)
 
 
-def balanco_diario(dias, cobertura, taw, tew, rew, ajustar_p=True, fracao_inicial=0.5):
+def balanco_diario(dias, cobertura, taw, tew, rew, ajustar_p=True, fracao_inicial=0.5, parte_de_cima=None):
     """Roda a caixa-d'água em todos os dias, em sequência. `cobertura(data)` devolve (tipo, Kc, p).
 
     `taw` é um número (a mesma caixa para tudo) ou um dicionário tipo -> TAW (cada cobertura com a sua raiz).
+    `parte_de_cima`: tipo -> a parte do que a planta bebe que sai da camada de cima (sem isso, tudo). A camada de
+    cima tem o seu próprio balanço (FAO-56, eq. 77): a troca de cobertura não mexe nela; terra cheia, camada cheia.
     """
+    parte_de_cima = parte_de_cima or {}
     taws = dict(taw) if isinstance(taw, dict) else {tipo: float(taw) for tipo in TIPOS}
     if any(valor <= 0 for valor in taws.values()) or tew <= rew or rew < 0:
         raise ValueError("A terra precisa de TAW acima de zero e de TEW maior que REW.")
@@ -43,7 +48,8 @@ def balanco_diario(dias, cobertura, taw, tew, rew, ajustar_p=True, fracao_inicia
         tipo, kc, p_da_tabela = cobertura(dia.data)
         caixa = taws[tipo]
         dr = vazio * caixa              # a falta na zona das raízes (mm)
-        de = min(tew, dr) if de is None else min(de, dr)
+        if de is None:
+            de = min(tew, dr)
         pedido = kc * dia.eto
         if tipo == SEM_PLANTA:
             ks = 1.0 if de <= rew else max(0.0, (tew - de) / (tew - rew))
@@ -56,10 +62,11 @@ def balanco_diario(dias, cobertura, taw, tew, rew, ajustar_p=True, fracao_inicia
         novo = dr - dia.chuva + bebido
         percolacao = max(0.0, -novo)
         dr = min(caixa, max(0.0, novo))
-        de = min(tew, max(0.0, de - dia.chuva + bebido), dr)
+        parte = 1.0 if tipo == SEM_PLANTA else parte_de_cima.get(tipo, 1.0)
+        de = 0.0 if dr == 0.0 else min(tew, max(0.0, de - dia.chuva + bebido * parte))
         vazio = dr / caixa
         registros.append(Registro(dia.data, tipo, dia.chuva, dia.eto, pedido, bebido, ks, caixa - dr, percolacao,
-                                  caixa))
+                                  caixa, de))
     return registros
 
 
@@ -82,7 +89,8 @@ def simular(dias, com_braquiaria, par=None, terra="media", fracao_inicial=0.5):
     agua = agua_da_terra(par, terra, cal)
     return balanco_diario(dias, lambda data: rotacoes.cobertura_do_dia(data, com_braquiaria, cal),
                           agua["taw"], agua["tew"], agua["rew"],
-                          ajustar_p=parametros.valor(par, "ajustar_p_pela_demanda"), fracao_inicial=fracao_inicial)
+                          ajustar_p=parametros.valor(par, "ajustar_p_pela_demanda"), fracao_inicial=fracao_inicial,
+                          parte_de_cima={tipo: min(1.0, CAMADA_DE_CIMA_M / raiz) for tipo, raiz in cal.raizes.items()})
 
 
 def nome_da_safra(data):

@@ -39,10 +39,15 @@ class Comando(unittest.TestCase):
         saida = io.StringIO()
         self.assertEqual(validar.main([], saida=saida), 0)
         texto = saida.getvalue()
-        for trecho in ("1. A CHUVA", "2. A NASA POWER CONTRA A ESTAÇÃO", "3. A ETo", "4. A FALTA DE ÁGUA", "5. O NDVI",
+        for trecho in ("1. A CHUVA", "2. AS FONTES DE CHUVA CONTRA A ESTAÇÃO", "3. A ETo", "4. A FALTA DE ÁGUA", "5. O NDVI",
                        "imerg", "correlação de postos"):
             self.assertIn(trecho, texto)
         self.assertNotIn("FALTA:", texto)
+        # Achado da revisão: todas as fontes de chuva vão contra a estação, não só a NASA POWER.
+        parte_2 = texto.split("2. AS FONTES DE CHUVA CONTRA A ESTAÇÃO")[1].split("3. A ETo")[0]
+        for fonte in ("power", "imerg", "chirps", "era5"):
+            self.assertIn(fonte, parte_2)
+        self.assertIn("mais perto da estação", parte_2)
 
     def test_sem_os_arquivos_diz_o_que_falta_sem_quebrar(self):
         saida = io.StringIO()

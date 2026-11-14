@@ -3,7 +3,7 @@
 
 Lê data/orbita/validacao/ (ver o LEIA-ME de lá) e mostra:
 1. a chuva de 1/fev a 30/jun por safra em cada fonte, e a safra mais seca de cada uma;
-2. a chuva de modelo da NASA POWER contra a estação em terra do INMET (dia em branco não vira zero);
+2. cada fonte de chuva contra a estação em terra do INMET (dia em branco não vira zero);
 3. a ETo do motor (Hargreaves) contra a ETo do FAO que o Open-Meteo entrega;
 4. a falta de água simulada do milho, com cada fonte de chuva, contra o rendimento do milho de 2ª safra no IBGE;
 5. o NDVI (o verde visto pelo satélite) contra o calendário.
@@ -109,34 +109,53 @@ def _parte_1(pasta, p):
 
 def _parte_2(fontes, p):
     p("")
-    p("2. A NASA POWER CONTRA A ESTAÇÃO EM TERRA DO INMET (a chuva de modelo PRECTOTCORR contra a chuva medida)")
+    p("2. AS FONTES DE CHUVA CONTRA A ESTAÇÃO EM TERRA DO INMET (a chuva medida em Rio Verde)")
     if "inmet" not in fontes:
         p("FALTA: chuva/inmet.csv (data,chuva_mm; a estação do INMET de Rio Verde, com o dia sem dado em branco).")
         return
-    inmet, power = fontes["inmet"], fontes["power"]
+    inmet = fontes["inmet"]
+    outras = [nome for nome in fontes if nome != "inmet"]
+    p(f"   Em cada janela, a fonte é somada só nos dias em que a estação tem dado; janela com mais de "
+      f"{BRANCOS_TOLERADOS} dias em branco na estação não é comparada. O número é o total da fonte em % do da estação.")
 
     def comparar(rotulo, inicio, fim):
         _, brancos = soma_da_janela(inmet, inicio, fim)
         if brancos > BRANCOS_TOLERADOS:
             p(f"   {rotulo}: não comparado ({brancos} dias em branco na estação)")
-            return None
-        dias = [d for d in inmet if inicio <= d <= fim and inmet[d] is not None and power.get(d) is not None]
-        medido, modelo = sum(inmet[d] for d in dias), sum(power[d] for d in dias)
-        razao = 100 * modelo / medido if medido else None
-        p(f"   {rotulo}: estação {_n(medido)} mm, NASA POWER {_n(modelo)} mm nos mesmos dias "
-          f"({_n(razao)}% da estação; {brancos} dias em branco)")
-        return razao
+            return {}
+        validos = [d for d in inmet if inicio <= d <= fim and inmet[d] is not None]
+        razoes = {}
+        for nome in outras:
+            dias = [d for d in validos if fontes[nome].get(d) is not None]
+            medido = sum(inmet[d] for d in dias)
+            if len(dias) >= len(validos) - BRANCOS_TOLERADOS and medido > 0:
+                razoes[nome] = 100 * sum(fontes[nome][d] for d in dias) / medido
+        p(f"   {rotulo}: estação {_n(sum(inmet[d] for d in validos))} mm ({brancos} em branco) | " + " | ".join(
+            f"{nome} {_n(razoes.get(nome))}%" for nome in outras))
+        return razoes
 
     p("   De 1/fev a 30/jun, por safra:")
-    razoes = {safra: comparar(f"safra {safra}", *_janela(safra)) for safra in SAFRAS}
+    por_safra = {safra: comparar(f"safra {safra}", *_janela(safra)) for safra in SAFRAS}
     p("   No ano inteiro:")
     for ano in range(2015, 2026):
         comparar(f"ano {ano}", datetime.date(ano, 1, 1), datetime.date(ano, 12, 31))
-    antes = [r for s, r in razoes.items() if r is not None and int(s[:4]) + 1 <= 2020]
-    depois = [r for s, r in razoes.items() if r is not None and int(s[:4]) + 1 >= 2021]
+    erros = {}
+    for nome in outras:
+        distancias = [abs(r[nome] - 100) for r in por_safra.values() if nome in r]
+        if distancias:
+            erros[nome] = (sum(distancias) / len(distancias), len(distancias))
+    if erros:
+        p("   O critério: o erro médio de cada fonte = a média, nas safras comparadas, da distância entre o total da "
+          "fonte e o da estação na janela, em % da estação. " + "; ".join(
+              f"{nome} {_n(erro, 1)}% ({quantas} safras)" for nome, (erro, quantas) in erros.items()) + ".")
+        melhor = min(erros, key=lambda nome: erros[nome][0])
+        p(f"   A fonte mais perto da estação por esse critério: {melhor} (erro médio de {_n(erros[melhor][0], 1)}%). "
+          "A estação é um ponto; as outras fontes são quadrados do mapa.")
+    antes = [r["power"] for s, r in por_safra.items() if "power" in r and int(s[:4]) + 1 <= 2020]
+    depois = [r["power"] for s, r in por_safra.items() if "power" in r and int(s[:4]) + 1 >= 2021]
     if antes and depois:
-        p(f"   Na janela da 2ª safra, a NASA POWER deu em média {_n(sum(antes) / len(antes))}% da estação até 2020 "
-          f"({len(antes)} safras comparadas) e {_n(sum(depois) / len(depois))}% de 2021 em diante ({len(depois)} "
+        p(f"   A chuva de modelo da NASA POWER deu, na janela, em média {_n(sum(antes) / len(antes))}% da estação até "
+          f"2020 ({len(antes)} safras comparadas) e {_n(sum(depois) / len(depois))}% de 2021 em diante ({len(depois)} "
           "safras comparadas).")
 
 

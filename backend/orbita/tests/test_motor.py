@@ -136,6 +136,13 @@ class Numeros(unittest.TestCase):
                 self.assertEqual(r["safras_com_sede"][chave], n)
             self.assertEqual(r["safras_com_sede"]["criterio_pct"], 20)
 
+    def test_a_classificacao_usa_o_numero_inteiro_nao_o_arredondado(self):
+        # Achado da revisão: 19,96% aparecia como 20,0% e contava como safra com sede.
+        sede = motor._com_sede({"2015-16": 19.96, "2016-17": 20.0, "2017-18": 9.99}, 20)
+        self.assertEqual(sede["quantas"], 1)
+        self.assertEqual(sede["quais"], ["2016-17"])
+        self.assertEqual(sede["com_10_pct"], 2)
+
     def test_a_falta_e_o_pedido_menos_o_bebido(self):
         for rotacao in ("atual", "alternativa"):
             for s in RESPOSTA["rotacoes"][rotacao]["safras"].values():

@@ -7,7 +7,7 @@ A rotação de hoje é soja → milho safrinha → pousio (terra parada). A alte
 braquiária (capim). A resposta pode ser "fique como está": nada é escrito antes de a conta rodar.
 
 **Uso de IA.** Todo o código, os testes e este texto foram gerados com IA (Claude, da Anthropic), a pedido do time, e
-revisados por outra IA (GPT). Cada arquivo leva o cabeçalho "Gerado com IA (Claude)". A explicação que o motor
+revisados por outra IA (GPT, uma volta: 5 achados, os 5 consertados com teste). Cada arquivo leva o cabeçalho "Gerado com IA (Claude)". A explicação que o motor
 escreve **não** usa IA: são frases prontas, preenchidas só com os números da conta, e uma conferência
 (`conferencia.py`) lista todo número do texto que não esteja na conta.
 
@@ -52,18 +52,25 @@ De dentro de `backend/`:
 A validação cruzada (`python3 -m orbita.validar`, 2026-11-14) mostrou que a chuva de modelo da NASA POWER fica bem
 abaixo da estação em terra do INMET de 2021 para cá (na janela de fevereiro a junho: em média 51% da estação nas 4
 safras comparadas de 2021 em diante, contra 86% nas 4 comparadas até 2020; no ano de 2025, 678 mm contra 1.548 mm).
-Com a chuva do IMERG, a falta de água simulada do milho acompanha melhor o rendimento do IBGE (correlação de postos
+O IMERG é a fonte mais perto da estação (erro médio do total da janela: 12,1% nas 8 safras comparadas; CHIRPS
+17,6%; ERA5 26,7%; NASA POWER 33,2%). Com a chuva do IMERG, a falta de água simulada do milho também acompanha
+melhor o rendimento do IBGE (correlação de postos
 -0,52; CHIRPS -0,42; ERA5 -0,41; NASA POWER -0,26; são só 10 safras: indício, não prova). O dono do projeto decidiu:
 o padrão é a chuva do IMERG e o pior ano é o da pior colheita no IBGE (2015-16: 3.300 kg/ha). As outras opções
 continuam, para comparar.
 
 ## O que a conta deu em 2026-11-14 (terra média; rode os comandos para ver tudo)
-- Padrão (`--chuva imerg --regra rendimento`): ano normal 2019-20, pior ano 2015-16. Água: empate. No pior ano faltaram
-  224,2 mm na rotação de hoje e 227,2 mm na alternativa (67 e 73 dias de sede); no ano normal, 152,3 e 152,5 mm (60 e
-  60 dias). O milho passou sede (20% ou mais) em 10 das 10 safras nas duas rotações. Dias sem planta viva: 122 (hoje)
-  contra 30 (alternativa). Resposta: "vale testar a troca" (ganha em solo e erosão, não perde na água medida).
+- Padrão (`--chuva imerg --regra rendimento`): ano normal 2019-20, pior ano 2015-16. **Água: a rotação de hoje se saiu
+  melhor.** No pior ano faltaram 232,9 mm de água na rotação de hoje e 243,5 mm na alternativa (77 e 78 dias de sede);
+  no ano normal, 158,2 mm nas duas (61 dias de sede). O milho passou sede (20% ou mais) em 10 das 10 safras nas duas
+  rotações (com 30%, em 8). Dias sem planta viva: 122 (hoje) contra 30 (alternativa). **Resposta: "depende do que pesa
+  mais": a alternativa ganha em solo e erosão e perde em água.**
 - A falta de água do milho é igual nas duas rotações em todas as safras; a diferença aparece na soja (soma das 10
-  safras: 421,7 mm hoje, 427,2 mm na alternativa), porque a braquiária deixa a terra mais seca no plantio.
+  safras: 512,2 mm hoje, 538,7 mm na alternativa), porque a braquiária deixa a terra mais seca no plantio (no pior
+  ano, 26,5 mm de água na zona das raízes da soja na rotação de hoje e 10,6 mm na alternativa).
+- A resposta muda com as opções, e isso é parte do resultado: com `--regra chuva` (no IMERG: normal 2015-16, pior
+  2017-18) e com a chuva `power` (nas duas regras), a água empata e a resposta é "vale testar a troca"; com
+  `--terra muita`, a diferença contra a alternativa no pior ano sobe para 21,5 mm; com `--terra pouca`, empata (3,7 mm).
 - Com 10 de 10 safras "com sede", o critério de 20% não separa os anos: a conta, com a raiz do ZARC (0,5 m no milho)
   e sem enxurrada nem palha, pede conferência de um agrônomo antes de virar número de vitrine.
 - NDVI (prova só da rotação de hoje): pelo calendário, 122 dias sem planta; o satélite viu 96 dias seguidos sem planta
@@ -75,11 +82,12 @@ continuam, para comparar.
   braquiária bebe água. Enquanto o milho está na terra, o capim debaixo dele não aumenta o pedido de água (hipótese).
 - A ETo de Hargreaves ficou de 7% a 10% acima da ETo do FAO que o Open-Meteo entrega (o `validar` mostra).
 - O dia do IMERG é o UTC; a temperatura é do dia local. A safra 2025-26 fica à parte, "a conferir".
-- 17 parâmetros ainda são hipótese (o `--json` lista cada um): o dia de plantio e as fases da soja, o Kc, o p, a raiz
+- 18 parâmetros ainda são hipótese (o `--json` lista cada um): o dia de plantio e as fases da soja, o coeficiente da
+  terra sem planta com a camada de cima molhada, o Kc, o p, a raiz
   e a data de secar a braquiária, a classe de terra usada para a camada de cima (TEW e REW), o critério de 20% e o
   empate de 5 mm. **Valide com o agrônomo.**
 
 ## Os arquivos
 `clima.py` (a série e a ETo) · `parametros.py` · `rotacoes.py` (o calendário e o Kc) · `balanco.py` (a água dia a dia)
 · `motor.py` (a resposta) · `explicacao.py` (o texto) · `conferencia.py` (a conferência do texto) · `ndvi.py` ·
-`perguntar.py` e `validar.py` (os comandos) · `tests/` (143 testes).
+`perguntar.py` e `validar.py` (os comandos) · `tests/` (148 testes).

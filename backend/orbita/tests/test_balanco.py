@@ -71,6 +71,22 @@ class ContaNaMao(unittest.TestCase):
         self.assertEqual(r[2].taw, 80.0)
 
 
+class CamadaDeCima(unittest.TestCase):
+    def test_a_troca_de_cobertura_nao_molha_a_camada_de_cima(self):
+        # Achado da revisão: na troca para uma raiz mais rasa, a falta da camada de cima caía sem chover.
+        def cobertura(data):
+            return (balanco.SEM_PLANTA, 1.0, None) if data.day <= 5 else ("soja", 1.0, 0.5)
+        r = balanco.balanco_diario(dias_iguais(8, 0.0, 5.0), cobertura, taw={"soja": 50.0, "milho": 50.0,
+                                   "braquiaria": 100.0, "sem_planta": 100.0}, tew=20.0, rew=8.0, fracao_inicial=1.0)
+        self.assertGreater(r[4].falta_em_cima, 10.0)
+        self.assertGreaterEqual(r[5].falta_em_cima, r[4].falta_em_cima)
+
+    def test_a_cultura_so_tira_da_camada_de_cima_a_parte_dela(self):
+        r = balanco.balanco_diario(dias_iguais(2, 0.0, 5.0), sempre_soja, taw=100.0, tew=20.0, rew=8.0,
+                                   fracao_inicial=1.0, parte_de_cima={"soja": 0.2})
+        self.assertAlmostEqual(r[1].falta_em_cima, 2.0)   # 2 dias x 5 mm x 0,2
+
+
 class Propriedades(unittest.TestCase):
     def test_com_chuva_de_sobra_a_falta_e_zero(self):
         # Terra cheia no começo: o freio do dia olha a água do fim do dia anterior (a chuva do dia entra depois).

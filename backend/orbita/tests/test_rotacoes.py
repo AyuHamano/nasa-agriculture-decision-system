@@ -13,11 +13,20 @@ class CurvaDoKc(unittest.TestCase):
     def test_fases_15_25_50_20(self):
         fases, kc = [15, 25, 50, 20], (0.4, 1.15, 0.5)
         self.assertAlmostEqual(rotacoes.kc_da_fase(0, fases, *kc), 0.4)
-        self.assertAlmostEqual(rotacoes.kc_da_fase(15, fases, *kc), 0.4)
-        self.assertAlmostEqual(rotacoes.kc_da_fase(27, fases, *kc), 0.4 + 12 / 25 * 0.75)   # = 0,76
-        self.assertAlmostEqual(rotacoes.kc_da_fase(40, fases, *kc), 1.15)
-        self.assertAlmostEqual(rotacoes.kc_da_fase(90, fases, *kc), 1.15)
-        self.assertAlmostEqual(rotacoes.kc_da_fase(100, fases, *kc), 1.15 - 10 / 20 * 0.65)  # = 0,825
+        self.assertAlmostEqual(rotacoes.kc_da_fase(14, fases, *kc), 0.4)                    # dia 15: ainda no início
+        self.assertAlmostEqual(rotacoes.kc_da_fase(27, fases, *kc), 0.4 + 13 / 25 * 0.75)   # dia 28: 0,79
+        self.assertAlmostEqual(rotacoes.kc_da_fase(39, fases, *kc), 1.15)                   # dia 40: fim da subida
+        self.assertAlmostEqual(rotacoes.kc_da_fase(89, fases, *kc), 1.15)                   # dia 90: fim do meio
+        self.assertAlmostEqual(rotacoes.kc_da_fase(100, fases, *kc), 1.15 - 11 / 20 * 0.65)  # dia 101: 0,7925
+
+
+    def test_exemplo_28_do_fao56(self):
+        # FAO-56, cap. 6, Exemplo 28 (feijão seco; fases 25/25/30/20; Kc 0,15 / 1,19 / 0,35): no dia 40 do ciclo
+        # Kc = 0,77 e no dia 95, Kc = 0,56. O dia 1 é o do plantio (aqui, n = 0).
+        fases, kc = [25, 25, 30, 20], (0.15, 1.19, 0.35)
+        self.assertAlmostEqual(rotacoes.kc_da_fase(39, fases, *kc), 0.77, delta=0.005)
+        self.assertAlmostEqual(rotacoes.kc_da_fase(94, fases, *kc), 0.56, delta=0.005)
+        self.assertAlmostEqual(rotacoes.kc_da_fase(99, fases, *kc), 0.35)   # o último dia chega ao Kc final
 
 
 class Calendario(unittest.TestCase):
@@ -66,6 +75,15 @@ class ParametrosComFonte(unittest.TestCase):
             self.assertTrue(p["trecho"], caminho)
             if p["etiqueta"] == "publicado":
                 self.assertTrue(str(p["fonte"]).startswith("http"), caminho)
+
+    def test_terra_sem_planta_usa_o_coeficiente_de_superficie_molhada(self):
+        # Achado da revisão: o valor de solo seco (0,2), junto com o freio Kr, freava a evaporação duas vezes.
+        par = parametros.carregar()
+        self.assertGreaterEqual(par["culturas"]["solo_nu"]["kc"]["valor"], 0.9)
+        self.assertEqual(par["culturas"]["solo_nu"]["kc"]["etiqueta"], "hipótese")
+        self.assertEqual(rotacoes.calendario(par).solo_nu_kc, par["culturas"]["solo_nu"]["kc"]["valor"])
+        if parametros.ARQUIVO_CONFERIDO.exists():
+            self.assertLess(par["culturas"]["solo_nu"]["kc_seco"]["valor"], 0.5)
 
     def test_as_3_terras_em_ordem(self):
         par = parametros.carregar()

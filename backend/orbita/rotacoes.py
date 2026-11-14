@@ -33,13 +33,14 @@ def _mes_dia(texto):
 def kc_da_fase(n, fases, kc_ini, kc_meio, kc_fim):
     """O Kc no dia n do ciclo (0 = dia do plantio). FAO-56: constante no início e no meio, reta entre eles (eq. 66)."""
     inicio, crescimento, meio, final = fases
+    dia = n + 1  # no FAO-56 o dia do plantio é o dia 1 (Exemplo 28: dia 40 -> 0,77; dia 95 -> 0,56)
     if n < inicio:
         return kc_ini
     if n < inicio + crescimento:
-        return kc_ini + (n - inicio) / crescimento * (kc_meio - kc_ini)
+        return kc_ini + (dia - inicio) / crescimento * (kc_meio - kc_ini)
     if n < inicio + crescimento + meio:
         return kc_meio
-    return kc_meio + (n - inicio - crescimento - meio) / final * (kc_fim - kc_meio)
+    return kc_meio + (dia - inicio - crescimento - meio) / final * (kc_fim - kc_meio)
 
 
 class Calendario:

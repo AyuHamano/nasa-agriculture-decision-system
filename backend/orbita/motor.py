@@ -191,11 +191,12 @@ def _safra(numeros, agua_no_plantio, chuva, com_braquiaria):
     return saida
 
 
-def _com_sede(tabela, criterio):
-    quais = [s for s, n in tabela.items() if n["milho"]["falta_relativa_pct"] >= criterio]
+def _com_sede(faltas_do_milho, criterio):
+    """`faltas_do_milho`: safra -> falta relativa do milho em %, sem arredondar (19,96% não é 20%)."""
+    quais = [s for s, falta in faltas_do_milho.items() if falta >= criterio]
     return {"criterio_pct": criterio, "quantas": len(quais), "quais": quais,
-            "com_10_pct": sum(1 for n in tabela.values() if n["milho"]["falta_relativa_pct"] >= 10),
-            "com_30_pct": sum(1 for n in tabela.values() if n["milho"]["falta_relativa_pct"] >= 30)}
+            "com_10_pct": sum(1 for falta in faltas_do_milho.values() if falta >= 10),
+            "com_30_pct": sum(1 for falta in faltas_do_milho.values() if falta >= 30)}
 
 
 def _ndvi(par, dias_pelo_calendario):
@@ -241,7 +242,7 @@ def responder(entrada, par=None, dias=None):
     calendario = rotacoes.resumo_do_calendario(par)
     agua = balanco.agua_da_terra(par, entrada["terra"])
     chuva_a_parte = balanco.chuva_da_janela(dias, int(SAFRA_A_PARTE[:4]) + 1)
-    rot, a_parte = {}, {}
+    rot, a_parte, falta_no_pior_ano = {}, {}, {}
     for nome, info in rotacoes.ROTACOES.items():
         registros = balanco.simular(dias, info["com_braquiaria"], par, entrada["terra"])
         numeros = balanco.numeros_por_safra(registros)
@@ -249,16 +250,18 @@ def responder(entrada, par=None, dias=None):
         tabela = {s: _safra(numeros[s], no_plantio.get(s), chuvas[s], info["com_braquiaria"])
                   for s in balanco.SAFRAS_DO_ESTUDO}
         rot[nome] = {"nome": info["nome"], "sem_planta_viva": calendario[nome], "safras": tabela,
-                     "safras_com_sede": _com_sede(tabela, criterio),
+                     "safras_com_sede": _com_sede(
+                         {s: numeros[s]["milho"]["falta_relativa_pct"] for s in tabela}, criterio),
                      "soma_das_10_safras": {
                          "falta_da_soja_mm": r1(sum(numeros[s]["soja"]["falta_mm"] for s in tabela)),
                          "falta_do_milho_mm": r1(sum(numeros[s]["milho"]["falta_mm"] for s in tabela)),
                          "dias_de_sede": sum(numeros[s]["total"]["dias_de_sede"] for s in tabela)}}
+        falta_no_pior_ano[nome] = numeros[regra["pior_ano"]]["total"]["falta_mm"]
         a_parte[nome] = _safra(numeros[SAFRA_A_PARTE], no_plantio.get(SAFRA_A_PARTE), chuva_a_parte,
                                info["com_braquiaria"])
     pior, normal = regra["pior_ano"], regra["ano_normal"]
     comparacao_da_agua = comparar_agua(
-        rot["atual"]["safras"][pior]["total"]["falta_mm"], rot["alternativa"]["safras"][pior]["total"]["falta_mm"],
+        falta_no_pior_ano["atual"], falta_no_pior_ano["alternativa"],
         rot["atual"]["safras_com_sede"]["quantas"], rot["alternativa"]["safras_com_sede"]["quantas"],
         parametros.valor(par, "regras", "empate_mm"))
     dias_hoje = calendario["atual"]["dias_sem_planta_viva"]

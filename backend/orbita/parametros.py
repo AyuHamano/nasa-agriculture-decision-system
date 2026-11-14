@@ -58,9 +58,11 @@ PADRAO = {
                                                 "antes de plantar a soja. Sem fonte conferida."),
         },
         "solo_nu": {
-            "kc": _p(1.0, FAO7, "Hipótese: com a camada de cima molhada, a terra sem planta evapora perto da ETo "
-                     "(FAO-56, cap. 7: o Kc do solo molhado chega a 1,0-1,2). O freio vem da camada de cima "
-                     "secando (eq. 74), não de um Kc baixo. A palha do milho, que reduz isso, não entra."),
+            "kc": _p(1.0, FAO7, "Hipótese: o coeficiente da terra sem planta com a camada de cima molhada, perto "
+                     "da ETo (FAO-56, cap. 7, eq. 72: o teto, Kc max, é 1,2). O freio vem da camada de cima "
+                     "secando (Kr, eq. 74), não de um Kc baixo. O valor de solo seco conferido na fonte (kc_seco, "
+                     "0,15 a 0,20) fica guardado e não entra na conta: junto com o Kr, frearia a evaporação duas "
+                     "vezes. A palha do milho, que reduz a evaporação, não entra."),
         },
     },
     "terra": {
@@ -163,7 +165,10 @@ def _adotar(par, conferido):
         folha = _folha_de(conferido, ("culturas", "braquiaria_apos_milho", chave))
         if folha:
             por(("culturas", "braquiaria_apos_milho", chave), folha)
-    for caminho in [("culturas", "solo_nu", "kc"), ("ndvi", "fracao_da_amplitude")] + [
+    seco = _folha_de(conferido, ("culturas", "solo_nu", "kc"))
+    if seco:   # no arquivo conferido, este é o Kc do solo SECO (Kc min): guardado à parte, fora da conta
+        por(("culturas", "solo_nu", "kc_seco"), seco)
+    for caminho in [("ndvi", "fracao_da_amplitude")] + [
             ("terra", terra, "agua_mm_por_m") for terra in ("pouca", "media", "muita")]:
         folha = _folha_de(conferido, caminho)
         if folha:
