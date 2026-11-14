@@ -360,5 +360,33 @@ class Texto(unittest.TestCase):
         self.assertFalse(any("não mede o efeito da palha" in limite for limite in RESPOSTA["limites"]))
 
 
+class MensagemCurta(unittest.TestCase):
+    """O texto curto da API (mensagem.py) não pode contradizer o veredito da água pela faixa."""
+
+    def test_a_mensagem_diz_o_veredito_pela_faixa_e_cabe_no_limite(self):
+        from orbita import mensagem
+        palavras = {"alternativa_melhor": "Água (nota 5): a alternativa se saiu melhor.",
+                    "alternativa_pior": "Água (nota 5): a alternativa se saiu pior.", "empate": "Água (nota 5): empate.",
+                    "depende_da_hipotese": "Água (nota 5): depende da hipótese"}
+        for terra in ("pouca", "media", "muita"):
+            r = motor.responder(dict(ENTRADA, terra=terra))
+            texto = mensagem.texto(r)
+            self.assertLessEqual(len(texto), mensagem.LIMITE, terra)
+            self.assertIn(palavras[r["comparacao"]["agua"]["pela_faixa"]["codigo"]], texto, terra)
+            faixa = r["rotacoes"]["alternativa"]["faixa"][r["comparacao"]["pior_ano"]]["falta_total_mm"]
+            self.assertIn(f"de {explicacao.n(faixa['menor'])} a {explicacao.n(faixa['maior'])} mm na alternativa", texto)
+            self.assertEqual(conferencia.conferir_texto(texto, r), [], terra)
+
+    def test_sem_os_campos_novos_a_mensagem_sai_como_antes(self):
+        from orbita import mensagem
+        r = copy.deepcopy(RESPOSTA)
+        del r["rotacoes"]["alternativa"]["faixa"]
+        for p in r["prioridades"]:
+            p.pop("veredito_pela_faixa", None)
+        texto = mensagem.texto(r)
+        self.assertIn(mensagem.QUEM[RESPOSTA["comparacao"]["agua"]["melhor"]], texto)
+        self.assertNotIn("Água (nota 5): depende", texto)
+
+
 if __name__ == "__main__":
     unittest.main()

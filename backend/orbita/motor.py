@@ -250,7 +250,7 @@ def veredito(melhores, agua_pela_faixa=None):
         partes = ([f"a alternativa se saiu melhor em {nomes(a_favor)}"] if a_favor else []) + (
             [f"se saiu pior em {nomes(contra)}"] if contra else [])
         frase = ("Depende: " + (" e ".join(partes) + ", mas na água" if partes else "na água") + " o resultado muda "
-                 "conforme a hipótese da disputa do capim com o milho (a conta mostra as duas pontas da faixa).")
+                 "com a hipótese da disputa do capim com o milho.")
     elif a_favor and not contra:
         codigo = "vale_testar_a_troca"
         frase = (f"Pelo que foi medido, vale testar a troca: a alternativa se saiu melhor em {nomes(a_favor)} e não "

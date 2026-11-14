@@ -21,6 +21,11 @@ LIMITE = 900                    # o tamanho que o texto não passa com as respos
 QUANTAS_PRIORIDADES = 2         # quantas prioridades, da maior nota para a menor, entram no texto
 QUEM = {"atual": "a rotação de hoje se saiu melhor", "alternativa": "a alternativa se saiu melhor",
         "empate": "empate", "não medido": "não medido (a conta não tem preço, custo nem produtividade)"}
+# O veredito da água pela faixa (os ajustes de 2026-11-14): se a prioridade trouxer `veredito_pela_faixa`, é ele que
+# vai no texto; sem esse campo, vale o `melhor`, como antes.
+PELA_FAIXA = {"alternativa_melhor": "a alternativa se saiu melhor", "alternativa_pior": "a alternativa se saiu pior",
+              "empate": "empate",
+              "depende_da_hipotese": "depende da hipótese"}
 RISCO_DA_BRAQUIARIA = ("O risco: a braquiária também bebe água depois do milho, e a terra pode chegar mais seca ao "
                        "plantio da soja.")
 FECHO = "Isto é uma conta, não uma recomendação: valide com o agrônomo antes de decidir."
@@ -66,7 +71,8 @@ def _prioridades(r, quantas):
     for p in lista if isinstance(lista, list) else []:
         nome, quem = _frase(_pega(p, "nome")), _frase(_pega(p, "melhor"))
         if nome and quem in QUEM:
-            validas.append((_inteiro(_pega(p, "nota")), _frase(_pega(p, "id")), nome, QUEM[quem]))
+            pela_faixa = PELA_FAIXA.get(_frase(_pega(p, "veredito_pela_faixa")))
+            validas.append((_inteiro(_pega(p, "nota")), _frase(_pega(p, "id")), nome, pela_faixa or QUEM[quem]))
     validas.sort(key=lambda p: -p[0] if p[0] is not None else 1)       # a maior nota primeiro; o empate fica como veio
     return [(ident, f"{nome}{'' if nota is None else f' (nota {nota})'}: {quem}.")
             for nota, ident, nome, quem in validas[:max(quantas, 0)]]
@@ -86,6 +92,11 @@ def _prova_da_agua(r):
     if not (pior and hoje and alternativa):
         return None
     quando = "no ano mais seco" if _pega(r, "regra_dos_anos", "regra") == "chuva" else "no pior ano"
+    menor = _numero(_pega(r, "rotacoes", "alternativa", "faixa", pior, "falta_total_mm", "menor"))
+    maior = _numero(_pega(r, "rotacoes", "alternativa", "faixa", pior, "falta_total_mm", "maior"))
+    if menor and maior and menor != maior:      # a alternativa em faixa, pela disputa do capim com o milho
+        return (f"{quando} (safra {pior}), faltaram {hoje} mm de água na rotação de hoje e de {menor} a {maior} mm na "
+                f"alternativa. {_fonte_da_agua(r)}")
     return (f"{quando} (safra {pior}), faltaram {hoje} mm de água na rotação de hoje e {alternativa} mm na "
             f"alternativa. {_fonte_da_agua(r)}")
 

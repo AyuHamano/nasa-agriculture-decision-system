@@ -119,4 +119,4 @@ continuam, para comparar.
 ## Os arquivos
 `clima.py` (a série e a ETo) · `parametros.py` · `rotacoes.py` (o calendário e o Kc) · `balanco.py` (a água dia a dia)
 · `motor.py` (a resposta) · `explicacao.py` (o texto) · `conferencia.py` (a conferência do texto) · `ndvi.py` ·
-`perguntar.py` e `validar.py` (os comandos) · `tests/` (177 testes).
+`perguntar.py` e `validar.py` (os comandos) · `tests/` (227 testes, com os da API).

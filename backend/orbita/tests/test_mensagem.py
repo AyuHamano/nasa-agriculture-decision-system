@@ -36,9 +36,11 @@ class OTexto(unittest.TestCase):
         self.assertIn(RESPOSTA["rotacoes"]["alternativa"]["nome"], texto)
         self.assertIn(RESPOSTA["veredito"]["frase"], texto)
         self.assertIn("A prova:", texto)
-        for rotacao in ("atual", "alternativa"):
-            falta = RESPOSTA["rotacoes"][rotacao]["safras"][pior]["total"]["falta_mm"]
-            self.assertIn(f"{falta:.1f}".replace(".", ",") + " mm", texto)
+        hoje = RESPOSTA["rotacoes"]["atual"]["safras"][pior]["total"]["falta_mm"]
+        self.assertIn(f"{hoje:.1f}".replace(".", ",") + " mm", texto)
+        faixa = RESPOSTA["rotacoes"]["alternativa"]["faixa"][pior]["falta_total_mm"]   # a alternativa vai em faixa
+        for ponta in ("menor", "maior"):
+            self.assertIn(f"{faixa[ponta]:.1f}".replace(".", ","), texto)
         self.assertIn(f"safra {pior}", texto)
         self.assertIn("satélite", texto)                       # a fonte dita em palavras
         self.assertIn("NASA", texto)
@@ -49,7 +51,8 @@ class OTexto(unittest.TestCase):
     def test_mostra_as_prioridades_de_maior_nota(self):
         texto = mensagem.texto(RESPOSTA)
         for p in RESPOSTA["prioridades"][:2]:                  # o resultado vem da conta, não do teste
-            self.assertIn(f"{p['nome']} (nota {p['nota']}): {mensagem.QUEM[p['melhor']]}.", texto)
+            quem = mensagem.PELA_FAIXA.get(p.get("veredito_pela_faixa")) or mensagem.QUEM[p["melhor"]]
+            self.assertIn(f"{p['nome']} (nota {p['nota']}): {quem}.", texto)
         self.assertEqual([p["id"] for p in RESPOSTA["prioridades"][:2]], ["agua", "solo"])
         self.assertNotIn("Erosão (nota", texto)
         self.assertNotIn("Renda (nota", texto)
