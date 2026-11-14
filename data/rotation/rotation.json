@@ -1,0 +1,221 @@
+{
+  "aviso": "Valores aproximados, baseados em conhecimento agronômico geral. NÃO vêm de uma fonte única verificada. Validar cada campo com Embrapa, ZARC e Emater antes do uso real. As pontuações 0 a 5 são estimativas editoriais do time para alimentar o score.",
+  "escala_pontuacoes_0a5": {
+    "economia_de_agua": "5 = consome pouca água; 0 = consome muita",
+    "tolerancia_seca": "5 = muito tolerante",
+    "tolerancia_geada": "5 = muito tolerante",
+    "fixacao_nitrogenio": "5 = fixa muito N; 0 = não fixa",
+    "cobertura_solo": "5 = deixa muita palha e protege bem contra erosão",
+    "raiz_profunda": "5 = raiz profunda que ajuda infiltração e descompactação",
+    "materia_organica": "5 = contribui muito com matéria orgânica",
+    "renda": "5 = mercado forte e fácil de vender",
+    "forragem": "5 = ótimo valor como forragem ou silagem"
+  },
+  "culturas": [
+    {
+      "id": "soja",
+      "nome": "Soja",
+      "grupo": "leguminosa de verão",
+      "ciclo_dias": { "min": 100, "max": 140 },
+      "janela_plantio": {
+        "RS": "outubro a dezembro (conferir ZARC por município)",
+        "GO": "outubro a novembro, após o início das chuvas e respeitando o vazio sanitário (conferir ZARC)"
+      },
+      "temperatura_c": { "otima_min": 20, "otima_max": 30 },
+      "agua": {
+        "necessidade_mm_ciclo": { "min": 450, "max": 800 },
+        "fases_criticas": ["germinação e emergência", "floração", "enchimento de grãos"]
+      },
+      "sensibilidades": {
+        "deficit_hidrico": "alta na floração e no enchimento de grãos",
+        "geada": "alta",
+        "calor_extremo": "média",
+        "excesso_de_chuva_na_colheita": "alta"
+      },
+      "solo": {
+        "fixa_nitrogenio": true,
+        "raiz": "pivotante, profundidade moderada",
+        "palha": "pouca e de decomposição rápida",
+        "protecao_contra_erosao": "média, melhora com palhada de gramínea antes",
+        "materia_organica": "contribuição baixa a média"
+      },
+      "pragas_e_doencas": ["ferrugem-asiática", "nematoides", "percevejos", "mofo-branco em áreas frias e úmidas"],
+      "rotacao": {
+        "bom_apos": ["milho", "trigo", "plantas de cobertura"],
+        "evitar_apos": ["soja"],
+        "observacao": "Soja sobre soja aumenta pressão de pragas e doenças. Alternar com gramíneas ajuda a quebrar o ciclo."
+      },
+      "mercado": { "liquidez": "alta", "uso": "grão", "observacao": "Preço sujeito a volatilidade; conferir cotação local." },
+      "pontuacoes_0a5": {
+        "economia_de_agua": 2,
+        "tolerancia_seca": 2,
+        "tolerancia_geada": 1,
+        "fixacao_nitrogenio": 5,
+        "cobertura_solo": 2,
+        "raiz_profunda": 3,
+        "materia_organica": 2,
+        "renda": 5,
+        "forragem": 1
+      },
+      "indicadores_da_ficha_relacionados": ["freq_deficit_pct", "sm_p10", "dias_geada", "dias_calor", "chuva_mm"],
+      "riscos_e_lacunas": [
+        "Perda forte se faltar chuva na floração ou no enchimento de grãos.",
+        "Cultivar, população de plantas e preço local não estão na ficha."
+      ]
+    },
+    {
+      "id": "milho",
+      "nome": "Milho",
+      "grupo": "gramínea de verão (1ª safra) ou safrinha (2ª safra)",
+      "ciclo_dias": { "min": 110, "max": 160 },
+      "janela_plantio": {
+        "RS": "setembro a dezembro (1ª safra; conferir ZARC)",
+        "GO": "1ª safra: outubro a novembro. Safrinha: janeiro a março, logo após a soja, com risco de a chuva acabar antes do fim do ciclo (conferir ZARC)"
+      },
+      "temperatura_c": { "otima_min": 20, "otima_max": 30 },
+      "agua": {
+        "necessidade_mm_ciclo": { "min": 400, "max": 800 },
+        "fases_criticas": ["pendoamento e espigamento", "enchimento de grãos"]
+      },
+      "sensibilidades": {
+        "deficit_hidrico": "alta no pendoamento e no espigamento",
+        "geada": "média a alta",
+        "calor_extremo": "média",
+        "excesso_de_chuva_na_colheita": "média"
+      },
+      "solo": {
+        "fixa_nitrogenio": false,
+        "raiz": "fasciculada, boa exploração do solo",
+        "palha": "muita e de decomposição lenta",
+        "protecao_contra_erosao": "boa, pela palhada",
+        "materia_organica": "contribuição alta"
+      },
+      "pragas_e_doencas": ["cigarrinha e enfezamentos", "lagarta-do-cartucho", "doenças foliares"],
+      "rotacao": {
+        "bom_apos": ["soja", "leguminosas de cobertura"],
+        "evitar_apos": ["milho sem manejo de pragas e de nitrogênio"],
+        "observacao": "Bom para formar palha depois da soja. Exige adubação nitrogenada, pois não fixa nitrogênio."
+      },
+      "mercado": { "liquidez": "alta", "uso": "grão, silagem, ração", "observacao": "Conferir preço e custo de frete local." },
+      "pontuacoes_0a5": {
+        "economia_de_agua": 2,
+        "tolerancia_seca": 2,
+        "tolerancia_geada": 2,
+        "fixacao_nitrogenio": 0,
+        "cobertura_solo": 4,
+        "raiz_profunda": 3,
+        "materia_organica": 4,
+        "renda": 4,
+        "forragem": 4
+      },
+      "indicadores_da_ficha_relacionados": ["freq_deficit_pct", "sm_p10", "pct_dias_secos", "dias_geada", "dias_calor", "pct_solo_descoberto"],
+      "riscos_e_lacunas": [
+        "A safrinha no Cerrado depende de a estação chuvosa durar até o enchimento de grãos.",
+        "Custo de adubação nitrogenada e preço local não estão na ficha."
+      ]
+    },
+    {
+      "id": "trigo",
+      "nome": "Trigo",
+      "grupo": "gramínea de inverno",
+      "ciclo_dias": { "min": 110, "max": 150 },
+      "janela_plantio": {
+        "RS": "maio a julho (cultura de inverno; conferir ZARC)",
+        "GO": "pouco usual em sequeiro no Cerrado; exige cultivar tropical ou irrigação (conferir ZARC e recomendação local)"
+      },
+      "temperatura_c": { "otima_min": 15, "otima_max": 22 },
+      "agua": {
+        "necessidade_mm_ciclo": { "min": 350, "max": 650 },
+        "fases_criticas": ["emborrachamento e espigamento", "enchimento de grãos"]
+      },
+      "sensibilidades": {
+        "deficit_hidrico": "média a alta no espigamento",
+        "geada": "alta na floração e no espigamento; tolera frio na fase vegetativa",
+        "calor_extremo": "alta no enchimento de grãos",
+        "excesso_de_chuva_na_colheita": "alta, risco de germinação na espiga e de doenças como giberela"
+      },
+      "solo": {
+        "fixa_nitrogenio": false,
+        "raiz": "fasciculada, superficial a moderada",
+        "palha": "média",
+        "protecao_contra_erosao": "boa no inverno, quando ocupa o solo que ficaria descoberto",
+        "materia_organica": "contribuição média"
+      },
+      "pragas_e_doencas": ["giberela", "brusone", "ferrugens", "oídio"],
+      "rotacao": {
+        "bom_apos": ["soja"],
+        "evitar_apos": ["trigo", "outros cereais de inverno sem intervalo"],
+        "observacao": "Quebra o ciclo de pragas e doenças da soja e ocupa a área no inverno. Evitar trigo sobre trigo."
+      },
+      "mercado": { "liquidez": "média a alta", "uso": "grão", "observacao": "Qualidade do grão afeta o preço; chuva na colheita reduz a qualidade." },
+      "pontuacoes_0a5": {
+        "economia_de_agua": 3,
+        "tolerancia_seca": 2,
+        "tolerancia_geada": 3,
+        "fixacao_nitrogenio": 0,
+        "cobertura_solo": 3,
+        "raiz_profunda": 2,
+        "materia_organica": 3,
+        "renda": 3,
+        "forragem": 2
+      },
+      "indicadores_da_ficha_relacionados": ["dias_geada", "chuva_mm", "freq_deficit_pct", "pct_solo_descoberto"],
+      "riscos_e_lacunas": [
+        "Geada no espigamento e chuva na colheita são os maiores riscos no RS.",
+        "Preço, qualidade exigida e cultivar adaptada à região não estão na ficha."
+      ]
+    },
+    {
+      "id": "guandu",
+      "nome": "Feijão-guandu",
+      "grupo": "leguminosa de cobertura e adubação verde",
+      "ciclo_dias": { "min": 120, "max": 240 },
+      "janela_plantio": {
+        "RS": "pouco adequado onde há geada severa; conferir adaptação local com a Emater",
+        "GO": "dentro do período chuvoso, como cobertura ou em consórcio; conferir recomendação local"
+      },
+      "temperatura_c": { "otima_min": 20, "otima_max": 30 },
+      "agua": {
+        "necessidade_mm_ciclo": { "min": 300, "max": 600 },
+        "fases_criticas": ["estabelecimento inicial"]
+      },
+      "sensibilidades": {
+        "deficit_hidrico": "baixa depois de estabelecido, muito tolerante à seca",
+        "geada": "alta",
+        "calor_extremo": "baixa",
+        "excesso_de_chuva_na_colheita": "baixa"
+      },
+      "solo": {
+        "fixa_nitrogenio": true,
+        "raiz": "pivotante e profunda, ajuda a romper camadas compactadas",
+        "palha": "muita biomassa",
+        "protecao_contra_erosao": "alta",
+        "materia_organica": "contribuição alta"
+      },
+      "pragas_e_doencas": ["verificar a reação a nematoides da área antes de usar"],
+      "rotacao": {
+        "bom_apos": ["soja", "milho"],
+        "evitar_apos": [],
+        "observacao": "Usado entre safras para cobrir o solo, fixar nitrogênio e melhorar a infiltração. Dá menos renda direta."
+      },
+      "mercado": { "liquidez": "baixa", "uso": "adubação verde, forragem, grão em nichos", "observacao": "Valor principal é agronômico; o mercado local de grão pode ser limitado." },
+      "pontuacoes_0a5": {
+        "economia_de_agua": 4,
+        "tolerancia_seca": 5,
+        "tolerancia_geada": 1,
+        "fixacao_nitrogenio": 4,
+        "cobertura_solo": 5,
+        "raiz_profunda": 5,
+        "materia_organica": 5,
+        "renda": 1,
+        "forragem": 4
+      },
+      "indicadores_da_ficha_relacionados": ["pct_solo_descoberto", "freq_deficit_pct", "sm_p10", "dias_geada"],
+      "riscos_e_lacunas": [
+        "Sensível a geada, o que limita o uso no Sul.",
+        "Pouca renda direta; depende de forragem ou de ganho agronômico.",
+        "Quantidade real de nitrogênio fixado varia com a área e não está na ficha."
+      ]
+    }
+  ]
+}

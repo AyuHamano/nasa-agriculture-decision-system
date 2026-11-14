@@ -1,0 +1,116 @@
+{
+  "dataset": "NASA MODIS Terra MOD13Q1.061",
+  "location": {
+    "name": "Silvânia",
+    "latitude": -16.66,
+    "longitude": -48.61
+  },
+  "period": {
+    "start": "2000-03-05",
+    "end": "2026-10-16"
+  },
+  "spatial_resolution": "250 m",
+  "temporal_resolution": "composto de 16 dias, agregado em climatologia mensal",
+  "quality_filter": "pixel_reliability <= 1; fill value removido",
+  "valid_observations": 518,
+  "monthly_indicators": [
+    {
+      "mes": 1,
+      "ndvi_medio": 0.4,
+      "ndvi_min": 0.33,
+      "ndvi_max": 0.48,
+      "pct_solo_descoberto": 0.0,
+      "anos_com_dado": 22
+    },
+    {
+      "mes": 2,
+      "ndvi_medio": 0.42,
+      "ndvi_min": 0.34,
+      "ndvi_max": 0.49,
+      "pct_solo_descoberto": 0.0,
+      "anos_com_dado": 24
+    },
+    {
+      "mes": 3,
+      "ndvi_medio": 0.39,
+      "ndvi_min": 0.3,
+      "ndvi_max": 0.48,
+      "pct_solo_descoberto": 0.0,
+      "anos_com_dado": 24
+    },
+    {
+      "mes": 4,
+      "ndvi_medio": 0.38,
+      "ndvi_min": 0.31,
+      "ndvi_max": 0.48,
+      "pct_solo_descoberto": 6.0,
+      "anos_com_dado": 24
+    },
+    {
+      "mes": 5,
+      "ndvi_medio": 0.35,
+      "ndvi_min": 0.29,
+      "ndvi_max": 0.41,
+      "pct_solo_descoberto": 6.0,
+      "anos_com_dado": 24
+    },
+    {
+      "mes": 6,
+      "ndvi_medio": 0.32,
+      "ndvi_min": 0.28,
+      "ndvi_max": 0.36,
+      "pct_solo_descoberto": 22.0,
+      "anos_com_dado": 25
+    },
+    {
+      "mes": 7,
+      "ndvi_medio": 0.29,
+      "ndvi_min": 0.25,
+      "ndvi_max": 0.33,
+      "pct_solo_descoberto": 66.0,
+      "anos_com_dado": 25
+    },
+    {
+      "mes": 8,
+      "ndvi_medio": 0.28,
+      "ndvi_min": 0.23,
+      "ndvi_max": 0.34,
+      "pct_solo_descoberto": 84.0,
+      "anos_com_dado": 25
+    },
+    {
+      "mes": 9,
+      "ndvi_medio": 0.3,
+      "ndvi_min": 0.24,
+      "ndvi_max": 0.41,
+      "pct_solo_descoberto": 54.0,
+      "anos_com_dado": 25
+    },
+    {
+      "mes": 10,
+      "ndvi_medio": 0.34,
+      "ndvi_min": 0.29,
+      "ndvi_max": 0.42,
+      "pct_solo_descoberto": 21.0,
+      "anos_com_dado": 24
+    },
+    {
+      "mes": 11,
+      "ndvi_medio": 0.36,
+      "ndvi_min": 0.28,
+      "ndvi_max": 0.46,
+      "pct_solo_descoberto": 13.0,
+      "anos_com_dado": 23
+    },
+    {
+      "mes": 12,
+      "ndvi_medio": 0.42,
+      "ndvi_min": 0.33,
+      "ndvi_max": 0.55,
+      "pct_solo_descoberto": 0.0,
+      "anos_com_dado": 24
+    }
+  ],
+  "source_csv": "data/csv/modis_ndvi_silvania_2000_2026.csv",
+  "limitations": "NDVI é um indicador de vigor da vegetação, não identifica a cultura nem mede diretamente a umidade ou a saúde do solo. Dados de um ponto, não de cada talhão; validar com observações locais."
+}

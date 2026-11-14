@@ -1,5 +1,7 @@
 .venv
 .env
+.env
 .env.*
 !.env.example
 data/cache/power_*.json
+__pycache__
