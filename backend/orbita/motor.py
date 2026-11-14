@@ -32,8 +32,8 @@ CENARIO_DOS_CAMPOS_ANTIGOS = "meio"             # o cenário que enche os campos
 NOMES_DOS_CENARIOS = {"sem_disputa": "sem disputa do capim com o milho", "meio": "com a disputa do meio",
                       "alta": "com a disputa alta"}
 TERRA_DE_REFERENCIA = "media"                   # a terra da conta que dá o nível de sede forte
-AGUA_NO_VOCABULARIO_ANTIGO = {"alternativa_melhor": "alternativa", "alternativa_pior": "atual", "empate": "empate",
-                              "depende_da_hipotese": "empate"}
+AGUA_PELA_FAIXA = {"alternativa_melhor": "alternativa", "alternativa_pior": "atual", "empate": "empate",
+                   "depende_da_hipotese": "empate"}   # como a água entra no veredito geral (o "depende" tem frase própria)
 AVISO_DA_SEDE_FORTE = ("O nível de sede forte foi tirado de poucas safras e de uma conta só (a rotação de hoje, a "
                        "terra média e a chuva padrão): pode haver alarme falso (safra com falta alta e colheita boa) "
                        "e quebra que a conta não vê. Rendimento também depende de praga, adubo, semente e data de "
@@ -205,10 +205,11 @@ def veredito_da_agua_pela_faixa(falta_atual, faltas_da_alternativa, empate_mm):
     def classe(diferenca):
         return "empate" if abs(diferenca) < empate_mm else ("melhor" if diferenca < 0 else "pior")
 
+    # As pontas e a classe saem da diferença sem arredondar (4,96 mm é empate; 5,04 mm não é); só a saída arredonda.
     por_cenario = {c: {"falta_mm": r1(f), "diferenca_mm": r1(f - falta_atual), "classe": classe(f - falta_atual)}
-                   for c, f in faltas_da_alternativa.items()}   # a classe sai da diferença sem arredondar
-    menor = min(por_cenario, key=lambda c: por_cenario[c]["diferenca_mm"])
-    maior = max(por_cenario, key=lambda c: por_cenario[c]["diferenca_mm"])
+                   for c, f in faltas_da_alternativa.items()}
+    menor = min(faltas_da_alternativa, key=faltas_da_alternativa.get)
+    maior = max(faltas_da_alternativa, key=faltas_da_alternativa.get)
     a, b = por_cenario[menor]["diferenca_mm"], por_cenario[maior]["diferenca_mm"]
     n = lambda x: f"{abs(x):.1f}".replace(".", ",")  # noqa: E731
     nome = lambda c: NOMES_DOS_CENARIOS.get(c, c)  # noqa: E731
@@ -239,6 +240,8 @@ def veredito_da_agua_pela_faixa(falta_atual, faltas_da_alternativa, empate_mm):
 
 def veredito(melhores, agua_pela_faixa=None):
     """A resposta em uma linha, só pelo que foi medido (água, solo e erosão). Não depende das notas."""
+    if agua_pela_faixa is not None:     # na água vale o veredito pela faixa, não a comparação de um cenário só
+        melhores = dict(melhores, agua=AGUA_PELA_FAIXA[agua_pela_faixa])
     a_favor = [p for p in ("agua", "solo", "erosao") if melhores[p] == "alternativa"]
     contra = [p for p in ("agua", "solo", "erosao") if melhores[p] == "atual"]
     nomes = lambda lista: " e ".join(NOMES[p].lower() for p in lista)  # noqa: E731
@@ -282,16 +285,18 @@ def _safra(numeros, agua_no_plantio, chuva, com_braquiaria):
     return saida
 
 
-def _com_sede_forte(tabela, nivel, quebras=()):
+def _com_sede_forte(faltas_do_milho, nivel, quebras=()):
     """As safras com falta do milho igual ou maior que o nível de sede forte (sem nível, não conta).
 
-    O nível e as faltas se comparam com uma casa, como aparecem na resposta: quem lê refaz a conta com o que vê.
+    `faltas_do_milho` (safra -> %) e `nivel` vêm sem arredondar: 49,56% não chega a um nível de 49,64%, embora os
+    dois apareçam como 49,6. Só a saída arredonda.
     `alarmes_falsos`: safras no nível ou acima, sem quebra no IBGE; `quebras_abaixo_do_nivel`: o contrário.
     """
-    quais = [] if nivel is None else [s for s, n in tabela.items() if n["milho"]["falta_relativa_pct"] >= nivel]
-    return {"nivel_pct": nivel, "quantas": None if nivel is None else len(quais), "quais": quais,
-            "alarmes_falsos": [s for s in quais if s not in quebras],
-            "quebras_abaixo_do_nivel": [] if nivel is None else [s for s in quebras if s in tabela and s not in quais]}
+    quais = [] if nivel is None else [s for s, falta in faltas_do_milho.items() if falta >= nivel]
+    return {"nivel_pct": None if nivel is None else r1(nivel), "quantas": None if nivel is None else len(quais),
+            "quais": quais, "alarmes_falsos": [s for s in quais if s not in quebras],
+            "quebras_abaixo_do_nivel": [] if nivel is None else [
+                s for s in quebras if s in faltas_do_milho and s not in quais]}
 
 
 def _numeros_da_rotacao(dias, com_braquiaria, par, terra, chuvas, chuva_a_parte, criterio, disputa=0.0):
@@ -306,7 +311,8 @@ def _numeros_da_rotacao(dias, com_braquiaria, par, terra, chuvas, chuva_a_parte,
                  "falta_da_soja_mm": r1(sum(numeros[s]["soja"]["falta_mm"] for s in tabela)),
                  "falta_do_milho_mm": r1(sum(numeros[s]["milho"]["falta_mm"] for s in tabela)),
                  "dias_de_sede": sum(numeros[s]["total"]["dias_de_sede"] for s in tabela)}}
-    sem_arredondar = {s: numeros[s]["total"]["falta_mm"] for s in tabela}   # para comparar (4,96 mm não é 5)
+    sem_arredondar = {"total_mm": {s: numeros[s]["total"]["falta_mm"] for s in tabela},      # para comparar: 4,96 mm
+                      "milho_pct": {s: numeros[s]["milho"]["falta_relativa_pct"] for s in tabela}}   # não é 5
     return (bloco, _safra(numeros[SAFRA_A_PARTE], no_plantio.get(SAFRA_A_PARTE), chuva_a_parte, com_braquiaria),
             sem_arredondar)
 
@@ -316,7 +322,10 @@ def _menor_e_maior(valores):
 
 
 def _sede_forte(par, entrada, dias, dias_injetados, rendimentos):
-    """O nível de sede forte: sai do IBGE e da conta de referência (rotação de hoje, terra média, chuva padrão)."""
+    """O nível de sede forte: sai do IBGE e da conta de referência (rotação de hoje, terra média, chuva padrão).
+
+    Devolve o bloco da resposta (arredondado) e o nível sem arredondar, que é o que se usa para contar.
+    """
     fracao = parametros.valor(par, "regras", "quebra_fracao_da_mediana")
     saida = {"o_que_e": "safra com sede forte = falta de água do milho igual ou maior que o nível; o nível é a menor "
                         "falta do milho entre as safras de quebra",
@@ -335,21 +344,22 @@ def _sede_forte(par, entrada, dias, dias_injetados, rendimentos):
             dias_da_referencia, _ = clima.ler_serie_com_aviso(CHUVA_PADRAO)
     except (OSError, ValueError) as erro:
         return dict(saida, nivel_pct=None, safras_de_quebra=[], alarmes_falsos_na_referencia=[],
-                    aviso=f"Não deu para tirar o nível de sede forte: {erro}")
+                    aviso=f"Não deu para tirar o nível de sede forte: {erro}"), None
     numeros = balanco.numeros_por_safra(balanco.simular(dias_da_referencia, False, par, TERRA_DE_REFERENCIA))
-    faltas = {s: r1(numeros[s]["milho"]["falta_relativa_pct"]) for s in balanco.SAFRAS_DO_ESTUDO}
+    faltas = {s: numeros[s]["milho"]["falta_relativa_pct"] for s in balanco.SAFRAS_DO_ESTUDO}   # sem arredondar
     nivel = nivel_de_sede_forte(rendimentos, faltas, fracao)
-    quebras = nivel["safras_de_quebra"]
-    saida.update(nivel_pct=nivel["nivel_pct"], safras_de_quebra=quebras, quantas_safras_de_quebra=len(quebras),
+    quebras, perto = nivel["safras_de_quebra"], nivel["maior_falta_sem_quebra"]
+    saida.update(nivel_pct=None if nivel["nivel_pct"] is None else r1(nivel["nivel_pct"]),
+                 safras_de_quebra=quebras, quantas_safras_de_quebra=len(quebras),
                  mediana_kg_ha=nivel["mediana_kg_ha"], limite_kg_ha=nivel["limite_kg_ha"],
                  rendimento_das_safras_de_quebra_kg_ha={s: int(rendimentos[s]) for s in quebras},
-                 falta_do_milho_na_referencia_pct=faltas,
+                 falta_do_milho_na_referencia_pct={s: r1(falta) for s, falta in faltas.items()},
                  alarmes_falsos_na_referencia=nivel["alarmes_falsos"],
-                 maior_falta_sem_quebra=nivel["maior_falta_sem_quebra"])
+                 maior_falta_sem_quebra=perto and dict(perto, falta_do_milho_pct=r1(perto["falta_do_milho_pct"])))
     if not quebras:
         saida["aviso"] = ("Nenhuma safra do estudo ficou abaixo do limite de quebra no IBGE: não há nível de sede "
                           "forte para contar.")
-    return saida
+    return saida, nivel["nivel_pct"]
 
 
 def _com_sede(faltas_do_milho, criterio):
@@ -407,8 +417,7 @@ def responder(entrada, par=None, dias=None, rendimentos=None):
     calendario = rotacoes.resumo_do_calendario(par)
     agua = balanco.agua_da_terra(par, entrada["terra"])
     chuva_a_parte = balanco.chuva_da_janela(dias, int(SAFRA_A_PARTE[:4]) + 1)
-    sede_forte = _sede_forte(par, entrada, dias, dias_injetados, rendimentos)
-    nivel = sede_forte["nivel_pct"]
+    sede_forte, nivel = _sede_forte(par, entrada, dias, dias_injetados, rendimentos)
     cal = rotacoes.calendario(par)
     reducao = parametros.valor(par, "palha", "reducao_por_cobertura")
 
@@ -423,7 +432,7 @@ def responder(entrada, par=None, dias=None, rendimentos=None):
     def numeros(com_braquiaria, disputa=0.0):
         bloco, parte, falta = _numeros_da_rotacao(dias, com_braquiaria, par, entrada["terra"], chuvas,
                                                    chuva_a_parte, criterio, disputa)
-        bloco["safras_com_sede_forte"] = _com_sede_forte(bloco["safras"], nivel, sede_forte["safras_de_quebra"])
+        bloco["safras_com_sede_forte"] = _com_sede_forte(falta["milho_pct"], nivel, sede_forte["safras_de_quebra"])
         return bloco, parte, falta
 
     rot, a_parte = {}, {}
@@ -464,26 +473,28 @@ def responder(entrada, par=None, dias=None, rendimentos=None):
     a_parte["faixa_da_alternativa"] = {"falta_do_milho_pct": _menor_e_maior(
         [a_parte_por_cenario[c]["milho"]["falta_relativa_pct"] for c in CENARIOS])}
     pior, normal = regra["pior_ano"], regra["ano_normal"]
-    falta_no_pior_ano = {"atual": falta_de_hoje[pior],
-                         "alternativa": falta_por_cenario[CENARIO_DOS_CAMPOS_ANTIGOS][pior]}
+    falta_no_pior_ano = {"atual": falta_de_hoje["total_mm"][pior],
+                         "alternativa": falta_por_cenario[CENARIO_DOS_CAMPOS_ANTIGOS]["total_mm"][pior]}
     comparacao_da_agua = comparar_agua(
         falta_no_pior_ano["atual"], falta_no_pior_ano["alternativa"],
         rot["atual"]["safras_com_sede"]["quantas"], rot["alternativa"]["safras_com_sede"]["quantas"],
         parametros.valor(par, "regras", "empate_mm"))
 
     def pela_faixa(safra):
-        return veredito_da_agua_pela_faixa(falta_de_hoje[safra], {c: falta_por_cenario[c][safra] for c in CENARIOS},
+        return veredito_da_agua_pela_faixa(falta_de_hoje["total_mm"][safra],
+                                           {c: falta_por_cenario[c]["total_mm"][safra] for c in CENARIOS},
                                            parametros.valor(par, "regras", "empate_mm"))
 
     agua_pela_faixa = dict(pela_faixa(pior), medida="a falta de água da soja e do milho no pior ano, nas duas pontas "
                            "da faixa da disputa do capim com o milho", safra=pior)
     no_ano_normal = pela_faixa(normal)
     comparacao_da_agua.update(
-        melhor=AGUA_NO_VOCABULARIO_ANTIGO[agua_pela_faixa["codigo"]], pela_faixa=agua_pela_faixa,
+        pela_faixa=agua_pela_faixa,
         no_ano_normal={"safra": normal, "codigo": no_ano_normal["codigo"], "diferenca_mm": no_ano_normal["diferenca_mm"],
                        "por_cenario": no_ano_normal["por_cenario"]},
-        nota="o campo 'melhor' fala o vocabulário antigo (atual, alternativa, empate): 'depende da hipótese' aparece "
-             "nele como empate; o veredito inteiro está em 'pela_faixa'")
+        nota="os campos antigos (melhor, pela_falta_no_pior_ano, pelas_safras_com_sede, diferenca_mm) comparam a "
+             "rotação de hoje com a alternativa na hipótese do meio, como antes comparavam com a alternativa única; "
+             "o veredito da água, que olha as duas pontas da faixa, está em 'pela_faixa'")
     dias_hoje = calendario["atual"]["dias_sem_planta_viva"]
     dias_alternativa = calendario["alternativa"]["dias_sem_planta_viva"]
     solo = "empate" if dias_hoje == dias_alternativa else ("alternativa" if dias_alternativa < dias_hoje else "atual")

@@ -222,7 +222,7 @@ def _parte_4(pasta, p):
     if motor.CHUVA_PADRAO in faltas:
         fracao = parametros.valor(par, "regras", "quebra_fracao_da_mediana")
         nivel = motor.nivel_de_sede_forte(
-            rendimento, {s: motor.r1(faltas[motor.CHUVA_PADRAO][s]) for s in safras}, fracao)
+            rendimento, {s: faltas[motor.CHUVA_PADRAO][s] for s in safras}, fracao)   # sem arredondar
         if nivel["nivel_pct"] is None:
             p(f"   Sede forte: nenhuma safra abaixo de {_n(100 * fracao)}% da mediana do IBGE; não há nível.")
         else:

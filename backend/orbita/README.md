@@ -50,7 +50,10 @@ De dentro de `backend/`:
    no nível ou acima, diz quais são, quais são alarme falso (sem quebra no IBGE) e que quebra ficou abaixo do nível.
 6. **O veredito da água** sai das duas pontas da faixa, pela falta de água da soja e do milho no pior ano: "a
    alternativa se saiu melhor", "pior", "empate" (menos de 5 mm nas duas pontas) ou "depende da hipótese" (muda
-   dentro da faixa). Nenhuma vencedora está escrita no código.
+   dentro da faixa). Nenhuma vencedora está escrita no código. Está em `comparacao.agua.pela_faixa` e em
+   `prioridades[].veredito_pela_faixa`, e é ele que entra no `veredito` geral. Os campos antigos (`comparacao.agua.melhor`
+   e o `melhor` de cada prioridade) continuam com o sentido de antes: comparam a rotação de hoje com a alternativa
+   num cenário só, que agora é o da hipótese do meio. Quem mostra a água deve ler o campo novo.
 
 ## As fontes (cada arquivo guardado leva o endereço e a hora da consulta)
 | o quê | fonte | onde está |
@@ -116,4 +119,4 @@ continuam, para comparar.
 ## Os arquivos
 `clima.py` (a série e a ETo) · `parametros.py` · `rotacoes.py` (o calendário e o Kc) · `balanco.py` (a água dia a dia)
 · `motor.py` (a resposta) · `explicacao.py` (o texto) · `conferencia.py` (a conferência do texto) · `ndvi.py` ·
-`perguntar.py` e `validar.py` (os comandos) · `tests/` (173 testes).
+`perguntar.py` e `validar.py` (os comandos) · `tests/` (177 testes).

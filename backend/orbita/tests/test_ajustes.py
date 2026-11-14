@@ -208,10 +208,39 @@ class VereditoDaAgua(unittest.TestCase):
         esperado = {frozenset({"melhor"}): "alternativa_melhor", frozenset({"pior"}): "alternativa_pior",
                     frozenset({"empate"}): "empate"}.get(frozenset(pontas), "depende_da_hipotese")
         self.assertEqual(pela_faixa["codigo"], esperado)
-        antigo = {"alternativa_melhor": "alternativa", "alternativa_pior": "atual", "empate": "empate",
-                  "depende_da_hipotese": "empate"}[pela_faixa["codigo"]]
-        self.assertEqual(r["comparacao"]["agua"]["melhor"], antigo)
         self.assertIn(pela_faixa["frase"], explicacao.texto(r))
+
+    def test_os_campos_antigos_da_agua_guardam_a_comparacao_antiga(self):
+        # Achado 1 da revisão: "depende da hipótese" não pode virar "empate" nos campos antigos. Eles comparam a
+        # rotação de hoje com a alternativa na hipótese do meio, como antes comparavam com a alternativa única.
+        r = RESPOSTA
+        agua, pior = r["comparacao"]["agua"], r["comparacao"]["pior_ano"]
+        meio = (r["rotacoes"]["alternativa"]["safras"][pior]["total"]["falta_mm"]
+                - r["rotacoes"]["atual"]["safras"][pior]["total"]["falta_mm"])
+        self.assertEqual(agua["pela_faixa"]["codigo"], "depende_da_hipotese")
+        self.assertGreater(meio, agua["empate_abaixo_de_mm"] + 0.2)      # no meio, a alternativa fica pior
+        self.assertEqual(agua["pela_falta_no_pior_ano"], "atual")
+        self.assertEqual(agua["melhor"], "atual")
+        self.assertAlmostEqual(agua["diferenca_mm"], meio, delta=0.11)
+        por_id = {p["id"]: p for p in r["prioridades"]}
+        self.assertEqual(por_id["agua"]["melhor"], "atual")
+        self.assertEqual(por_id["agua"]["veredito_pela_faixa"], "depende_da_hipotese")
+
+    def test_o_veredito_geral_usa_a_faixa_e_nao_o_campo_antigo(self):
+        v = motor.veredito({"agua": "atual", "solo": "alternativa", "erosao": "alternativa"},
+                           agua_pela_faixa="depende_da_hipotese")
+        self.assertEqual((v["codigo"], v["contra_a_troca"]), ("depende", []))
+        self.assertNotIn("pior em água", v["frase"])
+        v = motor.veredito({"agua": "empate", "solo": "alternativa", "erosao": "alternativa"},
+                           agua_pela_faixa="alternativa_pior")
+        self.assertEqual((v["codigo"], v["contra_a_troca"]), ("depende", ["agua"]))
+        v = motor.veredito({"agua": "atual", "solo": "alternativa", "erosao": "alternativa"}, agua_pela_faixa="empate")
+        self.assertEqual(v["codigo"], "vale_testar_a_troca")
+
+    def test_as_pontas_se_escolhem_sem_arredondar(self):
+        # Achado 2 da revisão: 4,96 mm é empate e 5,04 mm é pior, embora os dois apareçam como 5,0.
+        self.assertEqual(self.codigo(100.0, (104.96, 105.00, 105.04)), "depende_da_hipotese")
+        self.assertEqual(self.codigo(100.0, (95.04, 95.00, 94.96)), "depende_da_hipotese")
 
     def test_se_a_agua_depende_da_hipotese_a_resposta_nao_diz_que_nao_ficou_pior(self):
         v = motor.veredito({"agua": "empate", "solo": "alternativa", "erosao": "alternativa"},
@@ -233,6 +262,16 @@ class SedeForte(unittest.TestCase):
         outro = motor.nivel_de_sede_forte(dict(rendimentos, c=60.0), faltas, 0.8)   # mediana 80; 80% = 64
         self.assertEqual(outro["safras_de_quebra"], ["b", "c"])
         self.assertEqual(outro["nivel_pct"], 20.0)
+
+    def test_a_sede_forte_conta_sem_arredondar(self):
+        # Achado 3 da revisão: com o nível em 49,64%, a falta de 49,56% fica abaixo, embora as duas apareçam como 49,6.
+        forte = motor._com_sede_forte({"a": 49.56, "b": 49.64, "c": 60.0}, 49.64, ["b"])
+        self.assertEqual(forte["quais"], ["b", "c"])
+        self.assertEqual(forte["nivel_pct"], 49.6)
+        self.assertEqual(forte["alarmes_falsos"], ["c"])
+        nivel = motor.nivel_de_sede_forte({"a": 100.0, "b": 50.0, "c": 90.0}, {"a": 49.56, "b": 49.64, "c": 10.0}, 0.8)
+        self.assertEqual(nivel["nivel_pct"], 49.64)
+        self.assertEqual(nivel["alarmes_falsos"], [])
 
     def test_sem_safra_de_quebra_nao_ha_nivel(self):
         nivel = motor.nivel_de_sede_forte({"a": 100.0, "b": 95.0, "c": 90.0}, {"a": 10.0, "b": 40.0, "c": 20.0}, 0.8)
@@ -272,14 +311,18 @@ class SedeForte(unittest.TestCase):
         self.assertEqual(outra["rotacoes"]["atual"]["safras_com_sede_forte"]["quantas"], 10)
 
     def test_cada_rotacao_conta_as_safras_no_nivel_e_diz_quais(self):
-        nivel = RESPOSTA["sede_forte"]["nivel_pct"]
-        for nome in ("atual", "alternativa"):
+        par, quebras = parametros.carregar(), RESPOSTA["sede_forte"]["safras_de_quebra"]
+        referencia = balanco.numeros_por_safra(balanco.simular(DIAS, False, par, "media"))
+        nivel = min(referencia[s]["milho"]["falta_relativa_pct"] for s in quebras)      # sem arredondar
+        self.assertAlmostEqual(RESPOSTA["sede_forte"]["nivel_pct"], nivel, delta=0.05)
+        meio = parametros.valor(par, "disputa_com_o_milho", "meio")
+        for nome, com_braquiaria, disputa in (("atual", False, 0.0), ("alternativa", True, meio)):
+            numeros = balanco.numeros_por_safra(balanco.simular(DIAS, com_braquiaria, par, "media", disputa=disputa))
+            quais = [s for s in balanco.SAFRAS_DO_ESTUDO if numeros[s]["milho"]["falta_relativa_pct"] >= nivel]
             rot = RESPOSTA["rotacoes"][nome]
-            quais = [s for s, n in rot["safras"].items() if n["milho"]["falta_relativa_pct"] >= nivel]
             self.assertEqual(rot["safras_com_sede_forte"]["quais"], quais)
             self.assertEqual(rot["safras_com_sede_forte"]["quantas"], len(quais))
-            self.assertEqual(rot["safras_com_sede_forte"]["nivel_pct"], nivel)
-            quebras = RESPOSTA["sede_forte"]["safras_de_quebra"]
+            self.assertEqual(rot["safras_com_sede_forte"]["nivel_pct"], RESPOSTA["sede_forte"]["nivel_pct"])
             self.assertEqual(rot["safras_com_sede_forte"]["alarmes_falsos"], [s for s in quais if s not in quebras])
             self.assertEqual(rot["safras_com_sede_forte"]["quebras_abaixo_do_nivel"],
                              [s for s in quebras if s not in quais])
