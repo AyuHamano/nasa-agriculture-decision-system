@@ -107,14 +107,14 @@ def _ano(rotulo, safra, r):
                  f"{s['milho']['dias_de_sede']}); a terra tinha "
                  f"{n(s['agua_na_terra_no_plantio_da_soja_mm'])} mm de água no plantio da soja")
         if "braquiaria" in s:
-            faixa = r["rotacoes"][chave]["faixa"][safra]
             linha += (f"; a braquiária bebeu {n(s['braquiaria']['bebido_junto_com_o_milho_mm'])} mm junto com o "
-                      f"milho e {n(s['braquiaria']['bebido_mm'])} mm depois dele. Estes são os números da hipótese "
-                      f"do meio; na faixa (de sem disputa a disputa alta), a falta de água vai de "
-                      f"{n(faixa['falta_total_mm']['menor'])} a {n(faixa['falta_total_mm']['maior'])} mm e a do "
-                      f"milho, de {n(faixa['falta_do_milho_mm']['menor'])} a {n(faixa['falta_do_milho_mm']['maior'])} "
-                      f"mm ({n(faixa['falta_do_milho_pct']['menor'])}% a {n(faixa['falta_do_milho_pct']['maior'])}%)")
+                      f"milho e {n(s['braquiaria']['bebido_mm'])} mm depois dele (números da hipótese do meio)")
         linhas.append(linha + ".")
+    faixa = r["rotacoes"]["alternativa"]["faixa"][safra]
+    linhas.append(f"  - a alternativa em faixa (de sem disputa a disputa alta): falta de água de "
+                  f"{n(faixa['falta_total_mm']['menor'])} a {n(faixa['falta_total_mm']['maior'])} mm; a do milho, de "
+                  f"{n(faixa['falta_do_milho_mm']['menor'])} a {n(faixa['falta_do_milho_mm']['maior'])} mm "
+                  f"({n(faixa['falta_do_milho_pct']['menor'])}% a {n(faixa['falta_do_milho_pct']['maior'])}%).")
     return linhas
 
 

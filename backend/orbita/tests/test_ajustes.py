@@ -239,6 +239,15 @@ class SedeForte(unittest.TestCase):
         self.assertEqual(nivel["safras_de_quebra"], [])
         self.assertIsNone(nivel["nivel_pct"])
 
+    def test_sem_quebra_no_ibge_a_resposta_diz_que_nao_ha_nivel(self):
+        r = motor.responder(ENTRADA, rendimentos={s: 7000.0 for s in balanco.SAFRAS_DO_ESTUDO})
+        self.assertIsNone(r["sede_forte"]["nivel_pct"])
+        self.assertIsNone(r["rotacoes"]["atual"]["safras_com_sede_forte"]["quantas"])
+        self.assertEqual(r["rotacoes"]["alternativa"]["safras_com_sede_forte"]["quais"], [])
+        texto = explicacao.texto(r)
+        self.assertIn("não há nível", texto)
+        self.assertEqual(conferencia.conferir_texto(texto, r), [])
+
     def test_o_nivel_sai_do_ibge_e_nao_esta_escrito_a_mao(self):
         rendimento = {}
         with open(motor.ARQUIVO_DO_IBGE, encoding="utf-8", newline="") as f:
