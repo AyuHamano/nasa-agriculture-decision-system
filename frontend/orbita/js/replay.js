@@ -8,13 +8,15 @@
   var C = window.ORBITA_COMPARACAO, esc = C.esc, fmt = C.fmt;
   function ic(nome) { return window.ORBITA_ICONE ? window.ORBITA_ICONE(nome) : ""; }
   var MESES = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
-  var MS_POR_DIA = 90, PARADA_MS = 1300, PARADA_FORTE_MS = 3600;
+  var MS_POR_DIA = 55, PARADA_MS = 900, PARADA_FORTE_MS = 3600;      // um ano inteiro com os marcos cabe em uns 30 segundos
   var ativo = null;   // o replay montado agora (só um por vez)
 
   function partesDaData(iso) {
     var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso || ""));
     return m ? { dia: String(Number(m[3])), mes: MESES[Number(m[2]) - 1] + " de " + m[1] } : { dia: "", mes: String(iso || "") };
   }
+  // O nome de cada cobertura como o motor manda ("milho", "sem_planta") vira a palavra do produtor.
+  function nomeDaCultura(tipo) { var n = t("replay.culturas." + tipo); return n === "replay.culturas." + tipo ? String(tipo == null ? "" : tipo).replace(/_/g, " ") : n; }
   function maiorDe(dias, campo) { var m = 0; dias.forEach(function (d) { if (typeof d[campo] === "number" && d[campo] > m) m = d[campo]; }); return m; }
 
   function desenho(dias) {
@@ -42,7 +44,7 @@
   function culturas(dias) {
     var saida = "", ultima = null, inicio = 0, n = dias.length;
     function trecho(nome, a, b) {      // trecho curto demais (uns dias entre uma cultura e outra) fica só com o risco, sem o nome
-      return '<span style="left:' + (100 * a / n).toFixed(2) + "%;width:" + (100 * (b - a) / n).toFixed(2) + '%">' + ((b - a) / n >= 0.06 ? esc(nome) : "") + "</span>";
+      return '<span style="left:' + (100 * a / n).toFixed(2) + "%;width:" + (100 * (b - a) / n).toFixed(2) + '%">' + ((b - a) / n >= 0.06 ? esc(nomeDaCultura(nome)) : "") + "</span>";
     }
     dias.forEach(function (d, i) { if (d.cultura !== ultima) { if (ultima !== null) saida += trecho(ultima, inicio, i); ultima = d.cultura; inicio = i; } });
     return saida + trecho(ultima, inicio, n);
@@ -50,24 +52,29 @@
 
   function montar(el, replay, cidade) {
     desmontar();
+    cidade = (replay && replay.local && replay.local.nome) || cidade || "";
     var dias = (replay && Array.isArray(replay.dias) ? replay.dias : []).filter(function (d) { return d && d.data; });
     if (!dias.length) { el.innerHTML = '<div class="palco-dentro"><p class="rp-sem">' + esc(t("replay.sem")) + "</p></div>"; el.classList.add("sem-replay"); return; }
     el.classList.remove("sem-replay");
     var n = dias.length, indice = {};
     dias.forEach(function (d, i) { indice[d.data] = i; });
     var marcos = (Array.isArray(replay.marcos) ? replay.marcos : []).filter(function (m) { return m && indice[m.data] !== undefined; })
-      .map(function (m) { return { i: indice[m.data], tipo: m.tipo, frase: m.frase || "" }; }).sort(function (a, b) { return a.i - b.i; });
+      .map(function (m) { return { i: indice[m.data], tipo: m.tipo, frase: m.frase || "", cultura: m.cultura || "", principal: m.principal === true }; }).sort(function (a, b) { return a.i - b.i; });
+    // O marco do pulso: o que o motor marcou como principal; sem essa marca, o único (ou o último) "a água acabou".
+    if (!marcos.some(function (m) { return m.principal; })) {
+      var deAgua = marcos.filter(function (m) { return m.tipo === "agua_acabou"; });
+      if (deAgua.length) deAgua[deAgua.length - 1].principal = true;
+    }
     var maiorAgua = maiorDe(dias, "agua_na_terra_mm") || 1, temTmax = dias.some(function (d) { return typeof d.tmax_c === "number"; });
-    var andar = 0, ultimoPct = -100;
     var bandeiras = marcos.map(function (m, k) {
       var pct = 100 * (m.i + 0.5) / n;
-      var aEsquerda = pct > 70;      // perto do fim, a etiqueta abre para a esquerda e pode cobrir a do marco anterior: sobe um andar
-      andar = pct - ultimoPct < (aEsquerda ? 46 : 18) ? andar + 1 : 0; ultimoPct = pct;
-      var nome = t("replay.marcos." + m.tipo);
-      return '<span class="rp-marco m-' + esc(m.tipo) + " andar-" + (andar % 3) + (aEsquerda ? " a-esquerda" : "") + '" data-marco="' + k + '" style="left:' + pct.toFixed(2) + '%"><b>' + esc(nome === "replay.marcos." + m.tipo ? m.tipo : nome) + "</b></span>";
+      var nome = t(m.tipo === "agua_acabou" && !m.principal ? "replay.marcos.sede" : "replay.marcos." + m.tipo);
+      if (nome === "replay.marcos." + m.tipo) nome = m.tipo;
+      if ((m.tipo === "plantio" || m.tipo === "colheita") && m.cultura) nome += ": " + nomeDaCultura(m.cultura);
+      return '<span class="rp-marco m-' + esc(m.tipo) + (m.principal ? " principal" : "") + '" data-marco="' + k + '" style="left:' + pct.toFixed(2) + '%"><b>' + esc(nome) + "</b></span>";
     }).join("");
 
-    el.innerHTML = '<div class="palco-dentro"><header class="palco-topo"><h2 id="tituloDoReplay">' + esc(t("replay.titulo", { safra: replay.safra || "" })) + "</h2><p>" + esc(t("replay.texto", { cidade: cidade || "" })) + "</p></header>" +
+    el.innerHTML = '<div class="palco-dentro"><header class="palco-topo"><h2 id="tituloDoReplay">' + esc(t("replay.titulo", { safra: replay.safra || "" })) + "</h2><p>" + esc(t(cidade ? "replay.texto" : "replay.textoSemLugar", { cidade: cidade })) + (replay.rotacao && replay.rotacao.nome ? " " + esc(t("replay.rotacao", { nome: replay.rotacao.nome })) : "") + "</p></header>" +
       '<div class="replay" id="replay">' +
         '<div class="rp-leitura"><p class="rp-data"><span class="rp-dia" id="rpDia"></span><span class="rp-mes" id="rpMes"></span></p>' +
           '<p class="rp-cultura" id="rpCultura"></p><p class="rp-conta" id="rpConta"></p>' +
@@ -90,13 +97,28 @@
     function $(id) { return el.querySelector("#" + id); }
     var pecas = { dia: $("rpDia"), mes: $("rpMes"), cultura: $("rpCultura"), conta: $("rpConta"), nivel: $("rpNivel"), agua: $("rpAgua"), chuva: $("rpChuva"), falta: $("rpFalta"), tmax: $("rpTmax"),
                   sede: $("rpSede"), calor: $("rpCalor"), corte: $("rpCorteRet"), agulha: $("rpAgulha"), frase: $("rpFrase"), tocar: $("rpTocar"), linha: $("rpLinha"), velocidade: $("rpVelocidade"), caixa: el.querySelector(".rp-caixa") };
-    var bandeirasEl = el.querySelectorAll(".rp-marco"), quadro = $("replay");
+    var bandeirasEl = el.querySelectorAll(".rp-marco"), quadro = $("replay"), grafico = el.querySelector(".rp-grafico");
+    // As etiquetas dos marcos: cada uma no andar mais baixo em que não cobre outra (medido na tela, porque a largura muda).
+    function arrumarMarcos() {
+      var largura = grafico.clientWidth, ocupados = [], maior = 0;
+      if (!largura) return;
+      Array.prototype.forEach.call(bandeirasEl, function (b, k) {
+        var etiqueta = b.firstElementChild, w = etiqueta.offsetWidth, x = largura * (marcos[k].i + 0.5) / n;
+        var aEsquerda = x + 5 + w > largura;
+        b.classList.toggle("a-esquerda", aEsquerda);
+        var x0 = aEsquerda ? x - 5 - w : x + 5, x1 = x0 + w, andar = 0;
+        while (ocupados[andar] && ocupados[andar].some(function (o) { return x0 < o[1] + 6 && x1 > o[0] - 6; })) andar += 1;
+        (ocupados[andar] = ocupados[andar] || []).push([x0, x1]);
+        etiqueta.style.top = (andar * 24) + "px"; maior = Math.max(maior, andar);
+      });
+      grafico.style.setProperty("--andares", maior + 1);
+    }
     var st = { i: 0, tocando: false, velocidade: 1, antes: 0, resto: 0, parada: 0, quadro: 0, comecou: false };
 
     function mostrar(i) {
       var d = dias[i], p = partesDaData(d.data);
-      pecas.dia.textContent = p.dia; pecas.mes.textContent = p.mes;
-      pecas.cultura.textContent = d.cultura ? d.cultura + " " + t("replay.naTerra") : "";
+      pecas.dia.textContent = p.dia.length < 2 ? "0" + p.dia : p.dia; pecas.mes.textContent = p.mes;      // dois algarismos sempre: a data não dança
+      pecas.cultura.textContent = !d.cultura ? "" : d.cultura === "sem_planta" || d.cultura === "sem planta" ? t("replay.semPlanta") : nomeDaCultura(d.cultura) + " " + t("replay.naTerra");
       pecas.conta.textContent = t("replay.dia", { n: i + 1, total: n });
       pecas.agua.textContent = fmt(d.agua_na_terra_mm); pecas.chuva.textContent = fmt(d.chuva_mm); pecas.falta.textContent = fmt(d.falta_mm);
       if (pecas.tmax) pecas.tmax.textContent = fmt(d.tmax_c);
@@ -109,13 +131,17 @@
       pecas.linha.setAttribute("aria-valuetext", p.dia + " de " + p.mes);
       var ultimo = null;
       marcos.forEach(function (m, k) { var passou = m.i <= i; bandeirasEl[k].classList.toggle("passou", passou); if (passou) ultimo = m; });
-      var acabou = !!(ultimo && ultimo.tipo === "agua_acabou");
+      // No marco principal entra o pulso da demonstração (três frases, sem número), com a frase da conta embaixo.
+      var pulso = !!(ultimo && ultimo.principal && st.comecou), acabou = !!(ultimo && ultimo.tipo === "agua_acabou");
       var texto = st.comecou ? (ultimo ? ultimo.frase : "") : t("replay.comeco");
-      if (pecas.frase.getAttribute("data-texto") !== texto) {      // uma frase por linha: no marco da água, cada uma pesa sozinha
-        pecas.frase.setAttribute("data-texto", texto);
-        pecas.frase.innerHTML = (texto.match(/[^.!?]+[.!?]*/g) || []).map(function (f) { return "<span>" + esc(f.trim()) + "</span>"; }).join(" ");
+      var chave = (pulso ? "pulso|" : "") + texto;
+      if (pecas.frase.getAttribute("data-texto") !== chave) {
+        pecas.frase.setAttribute("data-texto", chave);
+        pecas.frase.innerHTML = pulso
+          ? '<strong class="rp-pulso">' + [].concat(t("replay.pulso")).map(function (f) { return "<span>" + esc(f) + "</span>"; }).join(" ") + "</strong>" + (texto ? "<small>" + esc(texto) + "</small>" : "")
+          : "<span>" + esc(texto) + "</span>";
       }
-      pecas.frase.classList.toggle("forte", acabou && st.comecou);
+      pecas.frase.classList.toggle("forte", pulso);
       quadro.classList.toggle("sem-agua", acabou);
     }
     function botao() {
@@ -131,7 +157,7 @@
         var cada = MS_POR_DIA / st.velocidade;
         while (st.resto >= cada && st.i < n - 1 && st.parada <= 0) {
           st.resto -= cada; st.i += 1;
-          for (var k = 0; k < marcos.length; k++) if (marcos[k].i === st.i) st.parada = Math.max(st.parada, (marcos[k].tipo === "agua_acabou" ? PARADA_FORTE_MS : PARADA_MS) / st.velocidade);
+          for (var k = 0; k < marcos.length; k++) if (marcos[k].i === st.i) st.parada = Math.max(st.parada, (marcos[k].principal ? PARADA_FORTE_MS : PARADA_MS) / st.velocidade);
         }
         mostrar(st.i);
         if (st.i >= n - 1) { parar(); return; }
@@ -155,11 +181,15 @@
     });
     Array.prototype.forEach.call(bandeirasEl, function (b) { b.addEventListener("click", function () { parar(); st.comecou = true; irPara(marcos[Number(b.getAttribute("data-marco"))].i); }); });
 
-    ativo = { parar: parar };
-    botao(); mostrar(0);
+    var relogioDaLargura = 0;
+    function aoMudarALargura() { clearTimeout(relogioDaLargura); relogioDaLargura = setTimeout(arrumarMarcos, 120); }
+    window.addEventListener("resize", aoMudarALargura); document.addEventListener("fullscreenchange", aoMudarALargura);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(arrumarMarcos);
+    ativo = { parar: function () { parar(); }, soltar: function () { window.removeEventListener("resize", aoMudarALargura); document.removeEventListener("fullscreenchange", aoMudarALargura); } };
+    botao(); mostrar(0); arrumarMarcos();
   }
 
-  function desmontar() { if (ativo) { ativo.parar(); ativo = null; } }
+  function desmontar() { if (ativo) { ativo.parar(); ativo.soltar(); ativo = null; } }
 
   window.ORBITA_REPLAY = { montar: montar, parar: function () { if (ativo) ativo.parar(); } };
 })();

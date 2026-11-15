@@ -268,7 +268,7 @@ a { color: var(--agua); font-weight: 700; }
 .replay { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; }
 .rp-leitura { display: grid; gap: 10px; align-content: start; }
 .rp-data { display: flex; align-items: flex-end; gap: 12px; }
-.rp-dia { font: 400 clamp(4.4rem, 15vw, 7rem)/.86 var(--titulo); font-variant-numeric: tabular-nums; min-width: 1.05em; }
+.rp-dia { font: 400 clamp(4.4rem, 15vw, 7rem)/.86 var(--titulo); font-variant-numeric: tabular-nums; }
 .rp-mes { font: 400 clamp(1.2rem, 3.4vw, 1.6rem)/1.05 var(--titulo); text-transform: uppercase; letter-spacing: .02em; padding-bottom: .1em; }
 .rp-cultura { font-weight: 700; color: #DCECDB; }
 .rp-conta { font-size: .82rem; font-weight: 600; color: #A9C6AB; font-variant-numeric: tabular-nums; }
@@ -289,19 +289,17 @@ a { color: var(--agua); font-weight: 700; }
 .sinal.aceso.calor { background: #F3A441; border-color: #F3A441; color: var(--tinta); }
 
 .rp-quadro { min-width: 0; display: grid; gap: 6px; }
-.rp-grafico { position: relative; height: clamp(190px, 46vw, 330px); margin-top: 48px; }
+.rp-grafico { position: relative; height: clamp(190px, 46vw, 330px); margin-top: calc(var(--andares, 2) * 24px + 4px); }
 .rp-svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; overflow: visible; }
 .fx-a { fill: rgba(255, 255, 255, .045); } .fx-b { fill: rgba(255, 255, 255, .09); }
 .rp-chao { stroke: rgba(255, 255, 255, .55); stroke-width: 1; vector-effect: non-scaling-stroke; }
 .rp-chuva rect { fill: #C4E6F4; } .rp-agua { fill: #3F9CC0; } .rp-sede rect { fill: #E4593C; } .rp-calor rect { fill: #F3A441; }
 .rp-agulha { position: absolute; top: -8px; bottom: 0; left: 0; width: 2px; margin-left: -1px; background: #fff; pointer-events: none; }
 .rp-marcos { position: absolute; inset: 0; pointer-events: none; }
-.rp-marco { position: absolute; top: -48px; bottom: 0; width: 0; border-left: 1.5px dashed rgba(255, 255, 255, .22); }
+.rp-marco { position: absolute; top: calc(var(--andares, 2) * -24px - 4px); bottom: 0; width: 0; border-left: 1.5px dashed rgba(255, 255, 255, .22); }
 .rp-marco.passou { border-left-color: rgba(255, 255, 255, .7); }
 .rp-marco b { position: absolute; top: 0; left: 5px; font-size: .76rem; font-weight: 700; line-height: 1; white-space: nowrap; background: #fff; color: var(--tinta); padding: 4px 8px; border-radius: 999px; opacity: 0; pointer-events: auto; cursor: pointer; }
 .rp-marco.passou b { opacity: 1; }
-.rp-marco.andar-1 b { top: 22px; }
-.rp-marco.andar-2 b { top: 44px; }
 .rp-marco.a-esquerda b { left: auto; right: 5px; }
 .rp-marco.m-agua_acabou b { background: #E4593C; color: #fff; }
 .rp-marco.m-calor_forte b { background: #F3A441; }
@@ -311,9 +309,12 @@ a { color: var(--agua); font-weight: 700; }
 .rp-legenda span::before { content: ""; display: inline-block; width: 11px; height: 11px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
 .l-chuva::before { background: #C4E6F4; } .l-agua::before { background: #3F9CC0; } .l-sede::before { background: #E4593C; } .l-calor::before { background: #F3A441; }
 
-.rp-frase { display: flex; flex-wrap: wrap; align-content: center; gap: 0 .35em; min-height: 4.6rem; font-size: 1.12rem; font-weight: 600; color: #DCECDB; }
-.rp-frase.forte { display: grid; gap: 0; align-content: center; font: 400 clamp(1.9rem, 7.4vw, 3.5rem)/1.06 var(--titulo); text-transform: uppercase; letter-spacing: .006em; color: #fff; }
-.rp-frase.forte span:first-child { color: #FF9478; }
+.rp-frase { display: grid; align-content: center; gap: 8px; min-height: 9.4rem; font-size: 1.1rem; font-weight: 600; line-height: 1.45; color: #DCECDB; }
+.rp-frase > span { max-width: 62ch; }
+.rp-pulso { display: grid; font: 400 clamp(1.9rem, 7.4vw, 3.5rem)/1.06 var(--titulo); text-transform: uppercase; letter-spacing: .006em; color: #fff; }
+.rp-pulso span:first-child { color: #FF9478; }
+.rp-frase small { font-size: .92rem; font-weight: 600; color: #CFE3D0; max-width: 70ch; }
+.rp-marco.m-agua_acabou:not(.principal) b { background: #fff; color: var(--sede); }
 .rp-controles { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .rp-botao { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-width: 46px; min-height: 46px; padding: 0 10px; border-radius: 999px; border: 1.5px solid rgba(255, 255, 255, .6); background: none; color: #fff; font-weight: 700; font-size: .9rem; }
 .rp-botao:hover { background: rgba(255, 255, 255, .14); }
@@ -329,10 +330,10 @@ a { color: var(--agua); font-weight: 700; }
   .rp-controles { flex-wrap: nowrap; }
   .rp-controles input[type="range"] { order: 0; flex: 1 1 0; width: 0; }
   .rp-controles #rpVelocidade { margin-left: 0; }
-  .rp-frase { min-height: 7.6rem; }
-  .rp-frase.forte { font-size: clamp(2.2rem, 3.4vw, 3.4rem); display: flex; gap: 0 .4em; }
+  .rp-frase { min-height: 9.6rem; }
+  .rp-pulso { font-size: clamp(2.2rem, 3.4vw, 3.4rem); display: flex; flex-wrap: wrap; gap: 0 .4em; }
 }
-@media (max-width: 899px) { .rp-frase.forte { min-height: 6.4em; } .rp-frase { min-height: 6.4rem; } }
+@media (max-width: 899px) { .rp-frase { min-height: 15rem; } }
 .palco:fullscreen { display: grid; align-content: center; overflow: auto; margin: 0; padding: 3vh 0; }
 
 /* ---------- a leitura do agrônomo ---------- */
