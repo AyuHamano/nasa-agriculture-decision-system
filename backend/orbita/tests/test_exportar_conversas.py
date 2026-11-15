@@ -126,13 +126,42 @@ class AsConversasGuardadas(unittest.TestCase):
             self.assertNotIn("999", json.dumps(saida["estado"], ensure_ascii=False))
         self.assertIn(["999"], [s["conferencia"]["sobras"] for s in saidas])
         self.assertGreater(resumo["barrados_pela_conferencia"], 0)
+        self.assertIn("barradas pela conferência em todas as tentativas", " ".join(resumo["avisos"]))
 
     def test_a_ia_que_nao_chega_ao_momento_e_trocada_pelo_roteiro_e_isso_e_dito(self):
-        resumo, objeto = self.gravar(IaDeRoteiro(muda=True))
+        ia_muda = IaDeRoteiro(muda=True)
+        resumo, objeto = self.gravar(ia_muda)
         conversas = self.conferir_o_formato(objeto)
         self.assertEqual(len(resumo["avisos"]), 4)
         self.assertIn("pelo roteiro", resumo["avisos"][0])
+        self.assertEqual(ia_muda.uso["pedidos"] > 4 * 2 * exportar_conversas.TENTATIVAS_COM_A_IA, True)   # tentou 3 vezes
         self.assertEqual({c["texto_de"] for c in conversas}, {"frases_prontas"})
+
+    def test_com_a_ia_fica_a_tentativa_sem_fala_barrada_e_sem_replay_a_mais(self):
+        class IaQueMelhora(IaDeRoteiro):
+            """Na 1ª vez de cada conversa inventa um número; na 2ª pede um replay que ninguém pediu; na 3ª acerta."""
+
+            def __init__(self):
+                super().__init__()
+                self.vezes = {}
+
+            def responder(self, mensagens, definicoes):
+                resposta = super().responder(mensagens, definicoes)
+                primeira = mensagens[1]["texto"] if len(mensagens) > 1 else ""
+                if len(mensagens) == 2:                              # a 1ª fala da conversa: começou outra tentativa
+                    self.vezes[primeira] = self.vezes.get(primeira, 0) + 1
+                vez = self.vezes.get(primeira, 1)
+                if vez == 1 and not resposta["chamadas"] and mensagens[-1]["de"] == "ferramenta":
+                    return fala("O sorgo rende 999 sacas.")
+                if vez == 2 and [c["nome"] for c in resposta["chamadas"]] == ["ensaio_da_rotacao"]:
+                    return fala("", exportar_conversas.chamada("ensaio_da_rotacao", safra="pior_ano"))
+                return resposta
+
+        resumo, objeto = self.gravar(IaQueMelhora())
+        conversas = self.conferir_o_formato(objeto)
+        self.assertEqual((resumo["barrados_pela_conferencia"], resumo["avisos"]), (0, []))
+        self.assertEqual([bool(c["replay"]) for c in conversas], [False, True, False, False])
+        self.assertNotIn("999", json.dumps(objeto, ensure_ascii=False))
 
     def test_a_chave_nao_entra_em_arquivo_nenhum(self):
         os.environ["OPENROUTER_API_KEY"] = CHAVE

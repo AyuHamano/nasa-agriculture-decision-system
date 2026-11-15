@@ -75,6 +75,8 @@ SEM_CONTA = ("Sobre isso eu não tenho conta, e por isso não dou número. O que
              "comparação aqui embaixo. Para esse assunto, converse com o agrônomo.")
 SEM_NUMERO = "Fiz a conta. O resultado de cada rotação está na comparação aqui embaixo."
 FALA_LONGA = "(Resposta longa: o resultado de cada rotação está na comparação.)"
+TAMBEM_COMPAREI = ("Também comparei {quantas} rotações, contando a sua de hoje: a evidência, o benefício, o risco e o "
+                   "que falta saber de cada uma estão na comparação aqui embaixo.")
 CONTA_RECUSADA = "Não consegui fazer a conta com essa ficha. {motivo} Diga o que corrigir."
 AVISO_DA_TRAVA = ("A conferência barrou o seu texto por causa disto: {sobras}. Cada item é um número que não está "
                   "no que as ferramentas devolveram nesta fala, ou um número dito com o sentido trocado. Escreva a "
@@ -117,6 +119,9 @@ ensaio_da_rotacao com a safra (vale "pior_ano"). No replay de uma safra, conte o
 data; o dia a dia inteiro a tela mostra.
 - Depois da colheita ("o que a terra mostrou?", "quantos dias ficou sem planta?"): verde_do_satelite, com a safra \
 se ele falar de uma.
+- O argumento safra só entra quando o produtor pergunta por uma safra ("como foi a pior safra?", "e na safra \
+2015-16?"). Para "vale trocar?", "milho ou sorgo?" ou "e a braquiária?", chame ensaio_da_rotacao sem safra. Uma \
+consulta por pergunta costuma bastar: não repita a mesma consulta.
 
 As regras que nunca mudam:
 - Você não cria número. Todo número que você escrever tem de estar, igual, no que uma ferramenta devolveu nesta \
@@ -480,7 +485,9 @@ def _frases_prontas(consultas, comparacao, lugar):
             if marcos:
                 partes.append(f"A safra {replay.get('safra')} em {lugar}, dia a dia:\n" + "\n".join(
                     f"• {_data_do_marco(m.get('data'))}: {m['frase']}" for m in marcos[:QUANTOS_MARCOS]))
-    return "\n\n".join(dict.fromkeys(partes + [_frases_da_comparacao(comparacao, lugar)]))
+    if not partes:                                    # a fala foi só sobre a comparação: a evidência de cada uma
+        return _frases_da_comparacao(comparacao, lugar)
+    return "\n\n".join(dict.fromkeys(partes + [TAMBEM_COMPAREI.format(quantas=len(comparacao))]))
 
 
 def _conta_recusada(estado, texto, erro, hoje):

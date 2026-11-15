@@ -20,8 +20,9 @@ e adubo), que sai com o aviso de conhecimento geral.
 Os cuidados: cada texto do agente é conferido de novo contra a conta ao gravar (`agente.conferir_saida`); se
 sobrar número, nada é gravado. A chave da IA não entra em arquivo nenhum (e é procurada no que vai ser gravado).
 Sem chave, o roteiro de cada fala diz que ferramentas consultar, e o agente responde com as frases prontas: o
-arquivo sai completo, só que sem o texto da IA. Com a IA, a conversa que não chegar ao seu momento (ou o replay
-que não vier) é gravada de novo pelo roteiro, e isso é dito.
+arquivo sai completo, só que sem o texto da IA. Com a IA, cada conversa é tentada até 3 vezes e fica a melhor (a
+que não teve fala barrada pela conferência nem replay que o produtor não pediu); a que não chegar ao seu momento
+(ou o replay que não vier) é gravada pelo roteiro, e isso é dito.
 """
 import datetime
 import json
@@ -37,6 +38,7 @@ RIO_VERDE = dict(cidade_id="rio_verde", rotacao_atual="soja_milho_pousio", terra
 FICHA_DE_RIO_VERDE = ("Minha lavoura é em Rio Verde. Planto soja e depois milho safrinha, e a terra fica parada na "
                       "seca. A terra é de textura média. O que mais me preocupa é a falta de água.")
 ENSAIO = chamada("ensaio_da_rotacao")
+TENTATIVAS_COM_A_IA = 3
 
 # Cada fala do produtor e o roteiro dela: as ferramentas que o modelo de mentira consulta quando não há IA.
 CONVERSAS = (
@@ -99,15 +101,42 @@ def _serve(conversa, gravada):
             and (not conversa["id"].startswith("replay-") or bool(gravada["replay"] and gravada["replay"].get("dias"))))
 
 
+def _barradas(gravada):
+    return sum(1 for p in gravada["passos"] if p["de"] == "agente" and not p["saida"]["conferencia"]["passou"])
+
+
+def _falhas(conversa, gravada):
+    """O que desabona uma conversa gravada com a IA: cada fala barrada pela conferência (ali saíram as frases
+    prontas) e um replay que a conversa não pediu (só a conversa do replay leva os dias de uma safra)."""
+    replay_a_mais = 0 if conversa["id"].startswith("replay-") or not gravada["replay"] else 1
+    return _barradas(gravada) + replay_a_mais
+
+
+def _com_a_ia(conversa, ia, hoje):
+    """A melhor de até 3 tentativas com a IA, entre as que chegaram ao seu momento; None se nenhuma chegou."""
+    boas = []
+    for _ in range(TENTATIVAS_COM_A_IA):
+        gravada = _conversar(conversa, ia, hoje)
+        if _serve(conversa, gravada):
+            boas.append(gravada)
+            if not _falhas(conversa, gravada):
+                break
+    return min(boas, key=lambda gravada: _falhas(conversa, gravada)) if boas else None
+
+
 def conversar(ia=None, hoje=None):
     """As conversas de exemplo, prontas para gravar: (a lista das conversas, os avisos do que saiu pelo roteiro)."""
     hoje = hoje or datetime.date.today()
     conversas, avisos = [], []
     for conversa in CONVERSAS:
-        gravada = _conversar(conversa, ia, hoje)
-        if ia is not None and not _serve(conversa, gravada):
+        gravada = _com_a_ia(conversa, ia, hoje) if ia is not None else None
+        if ia is not None and gravada is None:
             avisos.append(f'A conversa "{conversa["id"]}" não chegou ao seu momento com a IA: foi gravada pelo '
                           "roteiro, com as frases prontas.")
+        elif gravada is not None and _barradas(gravada):
+            avisos.append(f'Na conversa "{conversa["id"]}", {_barradas(gravada)} fala(s) da IA foram barradas pela '
+                          "conferência em todas as tentativas: nelas saíram as frases prontas.")
+        if gravada is None:
             gravada = _conversar(conversa, None, hoje)
         if not _serve(conversa, gravada):
             raise ValueError(f'A conversa "{conversa["id"]}" não chegou ao seu momento nem pelo roteiro: confira o '

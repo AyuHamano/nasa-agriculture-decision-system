@@ -329,8 +329,10 @@ class AResposta(ComODuble):
         estado, saida, _ = self.passo(self.confirmada(), "como foi?", fala("", REPLAY, CLIMA, VERDE))
         for pedaco in ("A safra 2015-16 em Jataí (GO), dia a dia:", "• 14/03/2016: Neste dia a água da terra acabou",
                        "a pior safra foi a de 2015-16 e a safra normal, a de 2019-20", "O satélite viu 96 dias",
-                       "não vê a palha", "comparei 3 rotações"):
+                       "não vê a palha", "Também comparei 3 rotações"):
             self.assertIn(pedaco, saida["resposta"])
+        self.assertNotIn("No pior ano faltaram 187,5 mm", saida["resposta"])     # a evidência de cada uma fica embaixo
+        self.assertLess(len(saida["resposta"]), 1200)
         self.assertEqual(saida["texto_de"], "frases_prontas")
 
     def test_mudar_a_ficha_depois_de_confirmada_pede_o_sim_de_novo(self):
