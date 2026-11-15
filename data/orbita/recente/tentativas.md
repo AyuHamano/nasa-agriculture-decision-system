@@ -79,7 +79,7 @@ As ideias 1, 2, 3, 5 e 6 não deram.
 
 ## O que faltaria para ter o dado exato (5 linhas)
 
-1. Uma conta Earthdata (grátis, `https://urs.earthdata.nasa.gov/users/new`), criada pelo Juca, com o aplicativo "NASA GESDISC DATA ARCHIVE" autorizado.
+1. Uma conta Earthdata (grátis, `https://urs.earthdata.nasa.gov/users/new`), criada por quem for usar, com o aplicativo "NASA GESDISC DATA ARCHIVE" autorizado.
 2. O usuário e a senha (ou o token) no `.env` da V4 ou num `~/.netrc` (`machine urs.earthdata.nasa.gov`).
 3. O endereço: OPeNDAP do IMERG Late diário, `https://gpm1.gesdisc.eosdis.nasa.gov/opendap/GPM_L3/GPM_3IMERGDL.07/AAAA/MM/3B-DAY-L.MS.MRG.3IMERG.AAAAMMDD-S000000-E235959.V07C.nc4.ascii?precipitation[0:0][LON:LON][LAT:LAT]` (Early: `GPM_3IMERGDE.07` e `3B-DAY-E`).
 4. O catálogo aberto do CMR já mostra o dia 2026-11-13 publicado nos dois (atraso de 2 dias), em mm/dia e sem faixa de cor.

@@ -96,7 +96,7 @@ class AsRegrasDaIA(unittest.TestCase):
     def test_o_pedido_a_ia_poe_o_estado_da_lavoura_no_ultimo_dia_com_dado_e_nao_fala_em_valor_real(self):
         # Lido nas conversas guardadas de 2026-11-15: "Em 15/11/2026, a soja está na terra" (o dado era de 11/11/2026),
         # "o valor real deve estar entre esses dois" e um "Hoje é 15/11/2026." solto numa resposta da comparação.
-        # Em 2026-11-15 a água passou a ser um número só e o atraso do dado deixou de ser ressalva (o Juca).
+        # Em 2026-11-15 a água passou a ser um número só e o atraso do dado deixou de ser ressalva (o dono do projeto).
         for sai in ("os dois valores", "valor real", "atraso do dado", "dias o dado tem de atraso"):
             self.assertNotIn(sai, " ".join(agente.REGRAS.split()))
         for trecho in ('com o verbo no passado ("a soja estava em crescimento")',
