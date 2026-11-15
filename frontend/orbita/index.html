@@ -15,7 +15,7 @@
 
   <header class="topo">
     <a class="marca" href="index.html" aria-label="Órbita Rural, início">
-      <img src="marca/logo-verde.png" width="554" height="255" alt="Órbita Rural. Inteligência do espaço. Decisões para a terra.">
+      <img src="marca/logo-verde-sem-lema.png" width="546" height="220" alt="Órbita Rural">
     </a>
     <div class="leituras" role="tablist" id="leituras">
       <button role="tab" id="abaProdutor" aria-controls="leituraProdutor" aria-selected="true" data-leitura="produtor"></button>
@@ -24,6 +24,7 @@
   </header>
 
   <div class="aviso-do-modo" id="avisoDoModo" role="status" hidden></div>
+  <p class="so-leitor" id="anuncio" aria-live="polite"></p>
 
   <main id="conteudo">
     <!-- A leitura do produtor: os três momentos, a conversa e o resultado -->
@@ -34,19 +35,20 @@
       </div>
 
       <div class="momentos" role="tablist" id="momentos"></div>
+      <p class="para-a-prova" id="paraAProva" hidden><button type="button" data-acao="ir-replay"></button></p>
 
-      <div class="bancada">
+      <div class="bancada" id="painelDoMomento" role="tabpanel">
         <section class="conversa" aria-labelledby="tituloDaConversa">
           <header class="conversa-topo">
             <h2 id="tituloDaConversa" data-t="conversa.titulo"></h2>
             <span class="modo" id="modo"></span>
           </header>
           <div class="outras" id="outras" hidden></div>
-          <ol class="falas" id="falas" aria-live="polite"></ol>
+          <ol class="falas" id="falas"></ol>
           <div class="compositor" id="compositor"></div>
         </section>
 
-        <section class="mesa" id="mesa" aria-live="polite"></section>
+        <section class="mesa" id="mesa"></section>
       </div>
 
       <section class="palco" id="prova" aria-labelledby="tituloDoReplay"></section>
@@ -64,6 +66,7 @@
   <footer class="rodape">
     <img src="marca/simbolo-verde.png" width="224" height="224" alt="">
     <div>
+      <p class="lema" data-t="rodape.lema"></p>
       <p data-t="rodape.fontes"></p>
       <p data-t="rodape.ia"></p>
       <p data-t="rodape.time"></p>

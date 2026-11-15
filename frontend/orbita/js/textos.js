@@ -18,6 +18,7 @@ var TEXTOS = {
       antes: { quando: "Antes de plantar", pergunta: "O que eu planto agora?", comeco: "Planto soja e depois milho safrinha em Rio Verde. Vale trocar a minha rotação?" },
       durante: { quando: "Durante a safra", pergunta: "Como está a minha lavoura?", comeco: "Como está a água da minha lavoura hoje?" },
       depois: { quando: "Depois de colher", pergunta: "O que a terra mostrou?", comeco: "Colhi o milho. O que a terra mostrou nesta safra?" },
+      prova: "Ver a prova: a safra {safra}, dia a dia",
       proximo: "Próximo passo do projeto",
       proximoTexto: "Este momento ainda não tem conversa pronta. Ele entra no próximo passo do projeto."
     },
@@ -146,6 +147,7 @@ var TEXTOS = {
       texto: "O produtor fica no centro. O técnico da cooperativa confere a mesma conta na leitura do agrônomo, lavoura por lavoura. Um painel para acompanhar vários produtores de uma vez é o próximo passo."
     },
     rodape: {
+      lema: "Inteligência do espaço. Decisões para a terra.",
       fontes: "De onde vêm os dados: a chuva é do satélite GPM IMERG, da NASA; a temperatura é da NASA POWER; o verde da lavoura é do satélite MODIS, da NASA. A conta da água segue o manual FAO-56. A colheita é do IBGE e a chuva medida em terra é da estação do INMET.",
       ia: "Uso de IA: esta tela foi programada com apoio de IA (Claude). Na conversa, o texto do agente é escrito por IA ou montado com frases prontas, e todo número é conferido com a conta antes de aparecer.",
       time: "Feito pela Equipe Agronautas no NASA Space Apps Challenge 2026. Ferramenta de apoio: converse com o agrônomo antes de decidir."

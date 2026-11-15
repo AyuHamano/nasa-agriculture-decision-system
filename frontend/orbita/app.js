@@ -44,8 +44,8 @@
   function desenharMomentos() {
     $("momentos").setAttribute("aria-label", t("momentos.rotulo"));
     $("momentos").innerHTML = MOMENTOS.map(function (m) {
-      var semConversa = !aoVivo() && !conversasDo(m).length, escolhido = m === app.momento;
-      return '<button class="momento' + (semConversa ? " adiante" : "") + '" role="tab" id="momento-' + m + '" data-momento="' + m + '" aria-selected="' + escolhido + '" tabindex="' + (escolhido ? "0" : "-1") + '">' +
+      var semConversa = !aoVivo() && todas().length > 0 && !conversasDo(m).length, escolhido = m === app.momento;   // há conversas, mas não deste momento
+      return '<button class="momento' + (semConversa ? " adiante" : "") + '" role="tab" id="momento-' + m + '" aria-controls="painelDoMomento" data-momento="' + m + '" aria-selected="' + escolhido + '" tabindex="' + (escolhido ? "0" : "-1") + '">' +
         '<span class="quando">' + esc(t("momentos." + m + ".quando")) + '</span><strong class="pergunta">' + esc(t("momentos." + m + ".pergunta")) + "</strong>" +
         (semConversa ? '<span class="estado">' + esc(t("momentos.proximo")) + "</span>" : "") + "</button>";
     }).join("");
@@ -55,6 +55,7 @@
       var escolhido = b.getAttribute("data-momento") === app.momento;
       b.setAttribute("aria-selected", escolhido); b.tabIndex = escolhido ? 0 : -1;
     });
+    $("painelDoMomento").setAttribute("aria-labelledby", "momento-" + app.momento);
   }
   function desenharOutras() {
     var el = $("outras"), lista = aoVivo() ? [] : conversasDo(app.momento), atual = conversaPorId(app.idDaConversa), html = "";
@@ -95,9 +96,11 @@
   function montarReplay(replay) {
     var c = conversaDoReplay(), el = $("prova");
     replay = replay || (c ? c.replay : null);
-    if (!replay || !Array.isArray(replay.dias) || !replay.dias.length) { el.hidden = true; return; }
+    if (!replay || !Array.isArray(replay.dias) || !replay.dias.length) { el.hidden = true; $("paraAProva").hidden = true; return; }
     if (app.replayNaTela === replay) return;
     app.replayNaTela = replay; el.hidden = false;
+    $("paraAProva").hidden = false;
+    $("paraAProva").firstElementChild.innerHTML = esc(t("momentos.prova", { safra: replay.safra || "" })) + ic("seta");
     var cidade = t("ficha.cidades." + replay.cidade_id);
     window.ORBITA_REPLAY.montar(el, replay, cidade === "ficha.cidades." + replay.cidade_id ? "" : cidade);
   }
@@ -199,6 +202,7 @@
     conversa = window.ORBITA_CONVERSA.criar($("falas"), $("compositor"), {
       aoResponder: function (saida) {
         app.corrigindo = false;
+        $("anuncio").textContent = t("conversa.agente") + ": " + String(saida.resposta || "");      // para o leitor de tela, só a resposta nova
         if (saida.replay) montarReplay(saida.replay);      // ao vivo, o agente pode mandar o replay junto da resposta
         if (aoVivo() && MOMENTOS.indexOf(saida.momento) >= 0 && saida.momento !== app.momento) { app.momento = saida.momento; marcarMomento(); }
       },
