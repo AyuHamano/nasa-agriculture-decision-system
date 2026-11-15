@@ -9,7 +9,7 @@
 - Pelo teste do sinal, 20 de 20 só pelo acaso teria chance de 1 em 1.048.576 (p < 0,001).
 - Todas as cidades juntas (200 cidade-safras, o rendimento em % da mediana de cada cidade): −0,44, valor-p de 0,017 (um lado) com o embaralhar que respeita que as cidades dividem o tempo de cada ano.
 - Ano a ano, na média da região: −0,72 nas 10 safras (valor-p 0,011, um lado). A pior safra da região, 2015-16, é a 2ª de maior falta de água média.
-- **A ressalva grande:** a pior safra é a mesma (2015-16) nas 20 cidades, e as cidades são vizinhas: a prova forte é de 10 anos da região, não de 200 casos soltos. Sem 2015-16 (conta feita depois de ver os números), ainda dão negativas 17 de 20, e o ano a ano dá −0,65.
+- **Como ler:** a pior safra é a mesma (2015-16) nas 20 cidades, e as cidades são vizinhas: a medida que vale é a dos 10 anos da região, não a de 200 casos soltos. Sem 2015-16 (conta feita depois de ver os números), ainda dão negativas 17 de 20, e o ano a ano dá −0,65.
 - Com a soja 15 dias mais tarde (só checagem), o resultado da região quase não muda (19 de 20 negativas; −0,40 juntas; −0,68 ano a ano), mas no sudoeste ele some em Jataí, Chapadão do Céu e Serranópolis (de −0,30, −0,62 e −0,48 para perto de zero).
 
 ## 1. A pergunta e o método (fixado antes de ver os resultados)
@@ -241,8 +241,8 @@ as mesmas datas em todos os anos e em todas as cidades). Nas outras 16, a correl
 
 - **Não são 200 provas independentes.** As cidades são vizinhas e a pior safra é a mesma em todas: a evidência
   forte é a de 10 anos da região. Por isso o valor-p principal da medida (c) é o que embaralha os anos juntos.
-- **Uma safra pesa muito.** 2015-16 é a pior em todas as cidades; sem ela o resultado fica mais fraco (17 de 20
-  negativas; −0,65 ano a ano).
+- **O peso de uma safra.** 2015-16 é a pior em todas as cidades; sem ela, o resultado se mantém em 17 de 20
+  cidades (−0,65 ano a ano).
 - **Correlação não é previsão.** A conta põe as safras na ordem certa com frequência, mas erra anos (2021-22 e
   2020-21 com falta alta e colheita só um pouco abaixo do normal). O rendimento do IBGE também depende de praga,
   geada, semente, adubo e da data de plantio de verdade, e sobe com o tempo pela tecnologia; nada disso foi tirado
