@@ -23,7 +23,7 @@ from orbita import balanco, calor, clima, explicacao, parametros, rotacoes
 CIDADES = {"rio_verde": {"nome": "Rio Verde (GO)", "latitude": -17.79, "longitude": -50.92},
            "jatai": {"nome": "Jataí (GO)", "latitude": -17.88, "longitude": -51.71},
            "silvania": {"nome": "Silvânia (GO)", "latitude": -16.66, "longitude": -48.61}}
-CIDADE_DA_PROVA = clima.CIDADE_DE_REFERENCIA    # Rio Verde: a única com a estação em terra e o verde do satélite
+CIDADE_DA_PROVA = clima.CIDADE_DE_REFERENCIA    # Rio Verde: a única com a estação em terra (o verde do satélite já existe nas três)
 ROTACAO_DE_HOJE = ["soja", "milho", "pousio"]
 TERRAS = ("pouca", "media", "muita")
 ORDEM_DE_DESEMPATE = ("agua", "solo", "erosao", "renda")
@@ -452,16 +452,16 @@ def _ndvi(par, dias_pelo_calendario, cidade_id=CIDADE_DA_PROVA):
                                                   f"em {CIDADES[CIDADE_DA_PROVA]['nome']}."}
     try:
         folha = par["ndvi"]["fracao_da_amplitude"]
-        resumo = ndvi.resumo(folha["valor"], pasta)
+        resumo = ndvi.resumo(folha["valor"], pasta, CIDADES[cidade_id]["nome"])
         comparacao = ndvi.comparar_com_calendario(dias_pelo_calendario, resumo)
     except (OSError, ValueError, KeyError) as erro:
         return {"disponivel": False, "aviso": f"O NDVI não pôde ser lido: {erro}"}
     regra = dict(resumo["regra"], etiqueta_da_fracao=folha["etiqueta"], fonte_da_fracao=folha["fonte"])
-    return {"disponivel": True, "prova_de": "só da rotação de hoje", "fonte": ndvi.FONTE, "regra": regra,
+    return {"disponivel": True, "prova_de": "só da rotação de hoje", "fonte": resumo["fonte"], "regra": regra,
             "comparacao": comparacao, "limites_por_ponto": resumo["limites"],
             "dias_sem_planta_verde": resumo["dias_sem_planta_verde"], "anos_de_fora": resumo["anos_de_fora"],
             "ano_em_andamento": resumo["ano_em_andamento"],
-            "frases": [comparacao["frase"], comparacao["nota"], ndvi.AVISO, ndvi.AVISO_DOS_PONTOS]}
+            "frases": [comparacao["frase"], comparacao["nota"], ndvi.AVISO, resumo["aviso_dos_pontos"]]}
 
 
 def _faixa(valores):

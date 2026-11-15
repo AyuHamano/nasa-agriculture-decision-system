@@ -54,8 +54,45 @@ FONTE = {
 }
 AVISO = ('"Sem planta verde" não é "terra descoberta": o satélite mede o verde das folhas e não vê a palha. '
          "Um ponto sem planta verde pode estar coberto de palha.")
-AVISO_DOS_PONTOS = ("Os pontos foram escolhidos no mapa, perto de Rio Verde (GO): não se sabe de quem são "
-                    "nem o que foi plantado em cada um. É prova só da rotação de hoje.")
+LUGAR_PADRAO = "Rio Verde (GO)"
+
+
+def aviso_dos_pontos(lugar=LUGAR_PADRAO):
+    """O aviso dos pontos de uma cidade. O de Rio Verde é o de sempre; o das outras diz também que ninguém foi ao campo."""
+    aviso = ("Os pontos foram escolhidos no mapa, perto de %s: não se sabe de quem são "
+             "nem o que foi plantado em cada um. É prova só da rotação de hoje." % lugar)
+    if lugar != LUGAR_PADRAO:
+        aviso += " Os pontos não foram conferidos em campo."
+    return aviso
+
+
+AVISO_DOS_PONTOS = aviso_dos_pontos()
+
+
+def fonte(pasta=None):
+    """A ficha da fonte dos pontos de uma pasta. Sem pasta (ou na de Rio Verde), a de sempre.
+
+    Nas outras cidades, o dia em que foi baixado, onde está e a regra da escolha dos pontos saem do `fonte.json`
+    que o programa de baixar (data/orbita/ndvi/baixar_ndvi.py) grava ao lado dos CSV.
+    """
+    ficha = dict(FONTE)
+    if pasta is None or Path(pasta).resolve() == PASTA_DOS_DADOS.resolve():
+        return ficha
+    pasta = Path(pasta).resolve()
+    try:
+        ficha["onde_esta"] = pasta.relative_to(PASTA_DOS_DADOS.parents[2]).as_posix() + "/"
+    except ValueError:
+        ficha["onde_esta"] = str(pasta)
+    ficha["onde_esta"] += " (um CSV por ponto; o fonte.json de lá guarda o endereço e a hora de cada consulta)"
+    ficha["baixado_em"] = None
+    arquivo = pasta / "fonte.json"
+    if arquivo.exists():
+        guardado = json.loads(arquivo.read_text(encoding="utf-8"))
+        ficha["baixado_em"] = (guardado.get("terminou_em_utc") or "")[:10] or None
+        regra = guardado.get("regra_da_escolha") or {}
+        ficha["escolha_dos_pontos"] = "Candidatos %s. Mapa: %s. Passa se %s. Ficam %s." % (
+            regra.get("candidatos"), regra.get("mapa"), regra.get("passa_se"), regra.get("ficam"))
+    return ficha
 
 
 def ler_csv(caminho):
@@ -143,7 +180,7 @@ def _inteiro_se_der(numero):
     return int(numero) if float(numero).is_integer() else numero
 
 
-def resumo(fracao=FRACAO_PADRAO, pasta=None):
+def resumo(fracao=FRACAO_PADRAO, pasta=None, lugar=LUGAR_PADRAO):
     """O resumo do verde: os dias por ponto e ano, os limites, a mediana, o menor e o maior."""
     pontos = ler_pontos(pasta)
     limites, fichas, dias, de_fora, parciais, abertos = {}, {}, {}, {}, {}, []
@@ -180,9 +217,9 @@ def resumo(fracao=FRACAO_PADRAO, pasta=None):
         }
     return {
         "o_que_e": "Dias seguidos sem planta verde, de junho em diante, vistos pelo satélite em cada ponto.",
-        "fonte": dict(FONTE),
+        "fonte": fonte(pasta),
         "aviso": AVISO,
-        "aviso_dos_pontos": AVISO_DOS_PONTOS,
+        "aviso_dos_pontos": aviso_dos_pontos(lugar),
         "regra": {
             "fracao": fracao,
             "etiqueta_da_fracao": ETIQUETA_DA_FRACAO,

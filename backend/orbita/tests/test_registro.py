@@ -1,9 +1,12 @@
 # Gerado com IA (Claude)
 """Testes do registro da safra (o "depois"): o que foi plantado, a água, o calor e a terra coberta."""
 import json
+import tempfile
 import unittest
+from pathlib import Path
+from unittest import mock
 
-from orbita import conferencia, motor
+from orbita import clima, conferencia, motor, parametros, registro
 
 ENTRADA = {"cidade_id": "rio_verde", "rotacao_atual": ["soja", "milho", "pousio"], "terra": "media"}
 RESPOSTA = motor.responder(ENTRADA)
@@ -50,8 +53,13 @@ class Registro(unittest.TestCase):
         self.assertEqual(com_medida["ano"], 2019)
         self.assertEqual(com_medida["pontos"], 6)
         self.assertTrue(com_medida["menor"] <= com_medida["dias_sem_planta_verde"] <= com_medida["maior"])
-        fora = motor.registro_da_safra(dict(ENTRADA, cidade_id="silvania"), "2018-19")
-        self.assertIsNone(fora["terra_coberta"]["pelo_satelite"])
+        # Silvânia ganhou o verde do satélite em 2026-11-15: o registro de lá passa a trazer os pontos de lá
+        de_la = motor.registro_da_safra(dict(ENTRADA, cidade_id="silvania"), "2018-19")["terra_coberta"]["pelo_satelite"]
+        self.assertEqual((de_la["ano"], de_la["pontos"]), (2019, 6))
+        self.assertIn("perto de Silvânia (GO)", de_la["aviso"])
+        self.assertNotIn("Rio Verde", de_la["aviso"])
+        with tempfile.TemporaryDirectory() as vazia, mock.patch.object(clima, "PASTA_DAS_CIDADES", Path(vazia) / "x"):
+            self.assertIsNone(registro._verde_do_ano("silvania", 2019, parametros.carregar()))
 
     def test_as_frases_so_tem_numero_da_conta_e_o_registro_vira_json(self):
         for safra in ("2015-16", "2018-19", "2025-26"):

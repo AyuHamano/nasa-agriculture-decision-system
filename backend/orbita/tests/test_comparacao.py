@@ -182,10 +182,8 @@ class TerraCoberta(unittest.TestCase):
         self.assertIn(verde["leitura"], ("bate", "dentro_da_faixa", "fora_da_faixa"))
         self.assertEqual(conferencia.conferir_texto(verde["frase"], verde), [])
         self.assertTrue(verde["aviso"])
-        sem = motor.verde_do_satelite("silvania")
-        self.assertEqual(sem["leitura"], "sem_medida")
-        self.assertIsNone(sem["dias_pelo_satelite"])
-        self.assertIn("122", sem["frase"])
+        # Silvânia ganhou o verde do satélite em 2026-11-15: o caso "sem medida" está em test_verde_das_cidades.py
+        self.assertNotEqual(motor.verde_do_satelite("silvania")["leitura"], "sem_medida")
         with self.assertRaises(ValueError) as erro:
             motor.verde_do_satelite("sorriso")
         self.assertTrue(str(erro.exception).startswith("Entrada fora do formato:"))

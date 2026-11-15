@@ -1,0 +1,1839 @@
+{
+ "gerado_com": "IA (Claude)",
+ "cidade_id": "jatai",
+ "ponto_da_cidade": {
+  "lat": -17.88,
+  "lon": -51.71
+ },
+ "produto": "MOD13Q1 v061 (MODIS/Terra, NDVI, a cada 16 dias, pixel de 250 m), NASA LP DAAC, https://doi.org/10.5067/MODIS/MOD13Q1.061",
+ "espelho": "Microsoft Planetary Computer, coleção modis-13Q1-061, sem login",
+ "periodo_pedido": {
+  "de": "2018-07-01",
+  "ate": "2026-11-15"
+ },
+ "comecou_em_utc": "2026-11-15T05:05:22+00:00",
+ "terminou_em_utc": "2026-11-15T05:06:05+00:00",
+ "regra_da_escolha": {
+  "candidatos": "a 15 e a 20 km do ponto da cidade, em 8 direções, na ordem: norte, leste, sul, oeste, nordeste, sudeste, sudoeste, noroeste (primeiro os de 15 km)",
+  "mapa": "io-lulc-annual-v02 (mapa anual de uso da terra de 10 m, Impact Observatory, Esri e Microsoft), https://planetarycomputer.microsoft.com/dataset/io-lulc-annual-v02",
+  "passa_se": "o centro e os 4 vizinhos a 0.001 grau (uns 110 m) são classe 5 (Crops, lavoura) nos mapas de 2018 e 2023",
+  "ficam": "os 6 primeiros que passam, na ordem dos candidatos",
+  "aviso": "Pontos escolhidos no mapa: não se sabe de quem são nem o que foi plantado em cada um. Ninguém conferiu em campo."
+ },
+ "candidatos": [
+  {
+   "nome": "norte-15km",
+   "lat": -17.745,
+   "lon": -51.71,
+   "passou": false,
+   "busca_no_catalogo": [
+    {
+     "endereco": "https://planetarycomputer.microsoft.com/api/stac/v1/search",
+     "metodo": "POST",
+     "corpo": {
+      "collections": [
+       "io-lulc-annual-v02"
+      ],
+      "intersects": {
+       "type": "Point",
+       "coordinates": [
+        -51.71,
+        -17.745
+       ]
+      },
+      "limit": 1000
+     },
+     "consultado_em_utc": "2026-11-15T05:05:23+00:00",
+     "imagens": 7
+    }
+   ],
+   "leituras": [
+    {
+     "ano": 2018,
+     "lugar": "centro",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.71,-17.745?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:23+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "norte",
+     "classe": 2,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.71,-17.744?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:24+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "sul",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.71,-17.746?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:24+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "leste",
+     "classe": 2,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.709,-17.745?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:25+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "oeste",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.711,-17.745?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:25+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "centro",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.71,-17.745?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:25+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "norte",
+     "classe": 2,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.71,-17.744?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:25+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "sul",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.71,-17.746?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:26+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "leste",
+     "classe": 2,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.709,-17.745?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:26+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "oeste",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.711,-17.745?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:28+00:00"
+    }
+   ]
+  },
+  {
+   "nome": "leste-15km",
+   "lat": -17.88,
+   "lon": -51.568,
+   "passou": false,
+   "busca_no_catalogo": [
+    {
+     "endereco": "https://planetarycomputer.microsoft.com/api/stac/v1/search",
+     "metodo": "POST",
+     "corpo": {
+      "collections": [
+       "io-lulc-annual-v02"
+      ],
+      "intersects": {
+       "type": "Point",
+       "coordinates": [
+        -51.568,
+        -17.88
+       ]
+      },
+      "limit": 1000
+     },
+     "consultado_em_utc": "2026-11-15T05:05:23+00:00",
+     "imagens": 7
+    }
+   ],
+   "leituras": [
+    {
+     "ano": 2018,
+     "lugar": "centro",
+     "classe": 2,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.568,-17.88?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:23+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "norte",
+     "classe": 2,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.568,-17.879?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:24+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "sul",
+     "classe": 2,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.568,-17.881?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:24+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "leste",
+     "classe": 2,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.567,-17.88?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:24+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "oeste",
+     "classe": 2,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.569,-17.88?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:25+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "centro",
+     "classe": 2,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.568,-17.88?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:25+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "norte",
+     "classe": 2,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.568,-17.879?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:26+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "sul",
+     "classe": 2,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.568,-17.881?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:26+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "leste",
+     "classe": 2,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.567,-17.88?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:26+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "oeste",
+     "classe": 2,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.569,-17.88?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:27+00:00"
+    }
+   ]
+  },
+  {
+   "nome": "sul-15km",
+   "lat": -18.015,
+   "lon": -51.71,
+   "passou": true,
+   "busca_no_catalogo": [
+    {
+     "endereco": "https://planetarycomputer.microsoft.com/api/stac/v1/search",
+     "metodo": "POST",
+     "corpo": {
+      "collections": [
+       "io-lulc-annual-v02"
+      ],
+      "intersects": {
+       "type": "Point",
+       "coordinates": [
+        -51.71,
+        -18.015
+       ]
+      },
+      "limit": 1000
+     },
+     "consultado_em_utc": "2026-11-15T05:05:23+00:00",
+     "imagens": 7
+    }
+   ],
+   "leituras": [
+    {
+     "ano": 2018,
+     "lugar": "centro",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.71,-18.015?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:23+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "norte",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.71,-18.014?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:24+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "sul",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.71,-18.016?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:24+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "leste",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.709,-18.015?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:24+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "oeste",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.711,-18.015?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:25+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "centro",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.71,-18.015?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:25+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "norte",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.71,-18.014?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:27+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "sul",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.71,-18.016?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:27+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "leste",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.709,-18.015?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:27+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "oeste",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.711,-18.015?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:28+00:00"
+    }
+   ]
+  },
+  {
+   "nome": "oeste-15km",
+   "lat": -17.88,
+   "lon": -51.852,
+   "passou": false,
+   "busca_no_catalogo": [
+    {
+     "endereco": "https://planetarycomputer.microsoft.com/api/stac/v1/search",
+     "metodo": "POST",
+     "corpo": {
+      "collections": [
+       "io-lulc-annual-v02"
+      ],
+      "intersects": {
+       "type": "Point",
+       "coordinates": [
+        -51.852,
+        -17.88
+       ]
+      },
+      "limit": 1000
+     },
+     "consultado_em_utc": "2026-11-15T05:05:23+00:00",
+     "imagens": 7
+    }
+   ],
+   "leituras": [
+    {
+     "ano": 2018,
+     "lugar": "centro",
+     "classe": 2,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.852,-17.88?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:23+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "norte",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.852,-17.879?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:24+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "sul",
+     "classe": 2,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.852,-17.881?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:24+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "leste",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.851,-17.88?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:24+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "oeste",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.853,-17.88?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:25+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "centro",
+     "classe": 2,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.852,-17.88?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:25+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "norte",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.852,-17.879?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:25+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "sul",
+     "classe": 2,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.852,-17.881?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:26+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "leste",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.851,-17.88?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:26+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "oeste",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.853,-17.88?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:26+00:00"
+    }
+   ]
+  },
+  {
+   "nome": "nordeste-15km",
+   "lat": -17.785,
+   "lon": -51.61,
+   "passou": true,
+   "busca_no_catalogo": [
+    {
+     "endereco": "https://planetarycomputer.microsoft.com/api/stac/v1/search",
+     "metodo": "POST",
+     "corpo": {
+      "collections": [
+       "io-lulc-annual-v02"
+      ],
+      "intersects": {
+       "type": "Point",
+       "coordinates": [
+        -51.61,
+        -17.785
+       ]
+      },
+      "limit": 1000
+     },
+     "consultado_em_utc": "2026-11-15T05:05:23+00:00",
+     "imagens": 7
+    }
+   ],
+   "leituras": [
+    {
+     "ano": 2018,
+     "lugar": "centro",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.61,-17.785?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:23+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "norte",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.61,-17.784?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:24+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "sul",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.61,-17.786?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:24+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "leste",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.609,-17.785?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:25+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "oeste",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.611,-17.785?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:25+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "centro",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.61,-17.785?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:25+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "norte",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.61,-17.784?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:26+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "sul",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.61,-17.786?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:26+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "leste",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.609,-17.785?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:26+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "oeste",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.611,-17.785?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:27+00:00"
+    }
+   ]
+  },
+  {
+   "nome": "sudeste-15km",
+   "lat": -17.975,
+   "lon": -51.61,
+   "passou": false,
+   "busca_no_catalogo": [
+    {
+     "endereco": "https://planetarycomputer.microsoft.com/api/stac/v1/search",
+     "metodo": "POST",
+     "corpo": {
+      "collections": [
+       "io-lulc-annual-v02"
+      ],
+      "intersects": {
+       "type": "Point",
+       "coordinates": [
+        -51.61,
+        -17.975
+       ]
+      },
+      "limit": 1000
+     },
+     "consultado_em_utc": "2026-11-15T05:05:23+00:00",
+     "imagens": 7
+    }
+   ],
+   "leituras": [
+    {
+     "ano": 2018,
+     "lugar": "centro",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.61,-17.975?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:23+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "norte",
+     "classe": 2,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.61,-17.974?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:24+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "sul",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.61,-17.976?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:24+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "leste",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.609,-17.975?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:25+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "oeste",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.611,-17.975?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:25+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "centro",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.61,-17.975?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:26+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "norte",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.61,-17.974?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:26+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "sul",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.61,-17.976?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:26+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "leste",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.609,-17.975?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:27+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "oeste",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.611,-17.975?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:27+00:00"
+    }
+   ]
+  },
+  {
+   "nome": "sudoeste-15km",
+   "lat": -17.975,
+   "lon": -51.81,
+   "passou": false,
+   "busca_no_catalogo": [
+    {
+     "endereco": "https://planetarycomputer.microsoft.com/api/stac/v1/search",
+     "metodo": "POST",
+     "corpo": {
+      "collections": [
+       "io-lulc-annual-v02"
+      ],
+      "intersects": {
+       "type": "Point",
+       "coordinates": [
+        -51.81,
+        -17.975
+       ]
+      },
+      "limit": 1000
+     },
+     "consultado_em_utc": "2026-11-15T05:05:23+00:00",
+     "imagens": 7
+    }
+   ],
+   "leituras": [
+    {
+     "ano": 2018,
+     "lugar": "centro",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.81,-17.975?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:23+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "norte",
+     "classe": 2,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.81,-17.974?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:24+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "sul",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.81,-17.976?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:24+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "leste",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.809,-17.975?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:24+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "oeste",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.811,-17.975?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:25+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "centro",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.81,-17.975?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:25+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "norte",
+     "classe": 2,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.81,-17.974?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:25+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "sul",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.81,-17.976?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:26+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "leste",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.809,-17.975?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:26+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "oeste",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.811,-17.975?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:26+00:00"
+    }
+   ]
+  },
+  {
+   "nome": "noroeste-15km",
+   "lat": -17.785,
+   "lon": -51.81,
+   "passou": false,
+   "busca_no_catalogo": [
+    {
+     "endereco": "https://planetarycomputer.microsoft.com/api/stac/v1/search",
+     "metodo": "POST",
+     "corpo": {
+      "collections": [
+       "io-lulc-annual-v02"
+      ],
+      "intersects": {
+       "type": "Point",
+       "coordinates": [
+        -51.81,
+        -17.785
+       ]
+      },
+      "limit": 1000
+     },
+     "consultado_em_utc": "2026-11-15T05:05:23+00:00",
+     "imagens": 7
+    }
+   ],
+   "leituras": [
+    {
+     "ano": 2018,
+     "lugar": "centro",
+     "classe": 11,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.81,-17.785?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:23+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "norte",
+     "classe": 11,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.81,-17.784?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:24+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "sul",
+     "classe": 11,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.81,-17.786?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:24+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "leste",
+     "classe": 11,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.809,-17.785?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:24+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "oeste",
+     "classe": 11,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.811,-17.785?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:25+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "centro",
+     "classe": 11,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.81,-17.785?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:25+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "norte",
+     "classe": 11,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.81,-17.784?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:25+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "sul",
+     "classe": 11,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.81,-17.786?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:26+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "leste",
+     "classe": 11,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.809,-17.785?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:26+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "oeste",
+     "classe": 11,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.811,-17.785?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:27+00:00"
+    }
+   ]
+  },
+  {
+   "nome": "norte-20km",
+   "lat": -17.7,
+   "lon": -51.71,
+   "passou": true,
+   "busca_no_catalogo": [
+    {
+     "endereco": "https://planetarycomputer.microsoft.com/api/stac/v1/search",
+     "metodo": "POST",
+     "corpo": {
+      "collections": [
+       "io-lulc-annual-v02"
+      ],
+      "intersects": {
+       "type": "Point",
+       "coordinates": [
+        -51.71,
+        -17.7
+       ]
+      },
+      "limit": 1000
+     },
+     "consultado_em_utc": "2026-11-15T05:05:26+00:00",
+     "imagens": 7
+    }
+   ],
+   "leituras": [
+    {
+     "ano": 2018,
+     "lugar": "centro",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.71,-17.7?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:27+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "norte",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.71,-17.699?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:27+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "sul",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.71,-17.701?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:27+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "leste",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.709,-17.7?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:28+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "oeste",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.711,-17.7?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:28+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "centro",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.71,-17.7?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:28+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "norte",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.71,-17.699?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:28+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "sul",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.71,-17.701?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:29+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "leste",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.709,-17.7?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:29+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "oeste",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.711,-17.7?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:29+00:00"
+    }
+   ]
+  },
+  {
+   "nome": "leste-20km",
+   "lat": -17.88,
+   "lon": -51.521,
+   "passou": true,
+   "busca_no_catalogo": [
+    {
+     "endereco": "https://planetarycomputer.microsoft.com/api/stac/v1/search",
+     "metodo": "POST",
+     "corpo": {
+      "collections": [
+       "io-lulc-annual-v02"
+      ],
+      "intersects": {
+       "type": "Point",
+       "coordinates": [
+        -51.521,
+        -17.88
+       ]
+      },
+      "limit": 1000
+     },
+     "consultado_em_utc": "2026-11-15T05:05:27+00:00",
+     "imagens": 7
+    }
+   ],
+   "leituras": [
+    {
+     "ano": 2018,
+     "lugar": "centro",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.521,-17.88?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:27+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "norte",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.521,-17.879?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:27+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "sul",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.521,-17.881?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:27+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "leste",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.52,-17.88?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:28+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "oeste",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.522,-17.88?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:28+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "centro",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.521,-17.88?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:29+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "norte",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.521,-17.879?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:29+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "sul",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.521,-17.881?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:29+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "leste",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.52,-17.88?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:30+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "oeste",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.522,-17.88?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:30+00:00"
+    }
+   ]
+  },
+  {
+   "nome": "sul-20km",
+   "lat": -18.06,
+   "lon": -51.71,
+   "passou": false,
+   "busca_no_catalogo": [
+    {
+     "endereco": "https://planetarycomputer.microsoft.com/api/stac/v1/search",
+     "metodo": "POST",
+     "corpo": {
+      "collections": [
+       "io-lulc-annual-v02"
+      ],
+      "intersects": {
+       "type": "Point",
+       "coordinates": [
+        -51.71,
+        -18.06
+       ]
+      },
+      "limit": 1000
+     },
+     "consultado_em_utc": "2026-11-15T05:05:27+00:00",
+     "imagens": 7
+    }
+   ],
+   "leituras": [
+    {
+     "ano": 2018,
+     "lugar": "centro",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.71,-18.06?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:27+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "norte",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.71,-18.059?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:27+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "sul",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.71,-18.061?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:28+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "leste",
+     "classe": 2,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.709,-18.06?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:28+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "oeste",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.711,-18.06?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:28+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "centro",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.71,-18.06?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:29+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "norte",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.71,-18.059?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:29+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "sul",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.71,-18.061?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:29+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "leste",
+     "classe": 2,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.709,-18.06?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:29+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "oeste",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.711,-18.06?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:30+00:00"
+    }
+   ]
+  },
+  {
+   "nome": "oeste-20km",
+   "lat": -17.88,
+   "lon": -51.899,
+   "passou": true,
+   "busca_no_catalogo": [
+    {
+     "endereco": "https://planetarycomputer.microsoft.com/api/stac/v1/search",
+     "metodo": "POST",
+     "corpo": {
+      "collections": [
+       "io-lulc-annual-v02"
+      ],
+      "intersects": {
+       "type": "Point",
+       "coordinates": [
+        -51.899,
+        -17.88
+       ]
+      },
+      "limit": 1000
+     },
+     "consultado_em_utc": "2026-11-15T05:05:27+00:00",
+     "imagens": 7
+    }
+   ],
+   "leituras": [
+    {
+     "ano": 2018,
+     "lugar": "centro",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.899,-17.88?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:27+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "norte",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.899,-17.879?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:27+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "sul",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.899,-17.881?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:28+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "leste",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.898,-17.88?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:28+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "oeste",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.9,-17.88?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:28+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "centro",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.899,-17.88?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:28+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "norte",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.899,-17.879?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:29+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "sul",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.899,-17.881?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:29+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "leste",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.898,-17.88?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:29+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "oeste",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.9,-17.88?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:30+00:00"
+    }
+   ]
+  },
+  {
+   "nome": "nordeste-20km",
+   "lat": -17.753,
+   "lon": -51.577,
+   "passou": true,
+   "busca_no_catalogo": [
+    {
+     "endereco": "https://planetarycomputer.microsoft.com/api/stac/v1/search",
+     "metodo": "POST",
+     "corpo": {
+      "collections": [
+       "io-lulc-annual-v02"
+      ],
+      "intersects": {
+       "type": "Point",
+       "coordinates": [
+        -51.577,
+        -17.753
+       ]
+      },
+      "limit": 1000
+     },
+     "consultado_em_utc": "2026-11-15T05:05:27+00:00",
+     "imagens": 7
+    }
+   ],
+   "leituras": [
+    {
+     "ano": 2018,
+     "lugar": "centro",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.577,-17.753?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:27+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "norte",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.577,-17.752?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:28+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "sul",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.577,-17.754?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:28+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "leste",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.576,-17.753?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:28+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "oeste",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.578,-17.753?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:28+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "centro",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.577,-17.753?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:29+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "norte",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.577,-17.752?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:29+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "sul",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.577,-17.754?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:29+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "leste",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.576,-17.753?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:29+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "oeste",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.578,-17.753?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:30+00:00"
+    }
+   ]
+  },
+  {
+   "nome": "sudeste-20km",
+   "lat": -18.007,
+   "lon": -51.577,
+   "passou": true,
+   "busca_no_catalogo": [
+    {
+     "endereco": "https://planetarycomputer.microsoft.com/api/stac/v1/search",
+     "metodo": "POST",
+     "corpo": {
+      "collections": [
+       "io-lulc-annual-v02"
+      ],
+      "intersects": {
+       "type": "Point",
+       "coordinates": [
+        -51.577,
+        -18.007
+       ]
+      },
+      "limit": 1000
+     },
+     "consultado_em_utc": "2026-11-15T05:05:27+00:00",
+     "imagens": 7
+    }
+   ],
+   "leituras": [
+    {
+     "ano": 2018,
+     "lugar": "centro",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.577,-18.007?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:27+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "norte",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.577,-18.006?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:28+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "sul",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.577,-18.008?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:28+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "leste",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.576,-18.007?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:28+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "oeste",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.578,-18.007?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:28+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "centro",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.577,-18.007?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:29+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "norte",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.577,-18.006?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:29+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "sul",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.577,-18.008?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:29+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "leste",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.576,-18.007?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:30+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "oeste",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.578,-18.007?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:30+00:00"
+    }
+   ]
+  },
+  {
+   "nome": "sudoeste-20km",
+   "lat": -18.007,
+   "lon": -51.843,
+   "passou": false,
+   "busca_no_catalogo": [
+    {
+     "endereco": "https://planetarycomputer.microsoft.com/api/stac/v1/search",
+     "metodo": "POST",
+     "corpo": {
+      "collections": [
+       "io-lulc-annual-v02"
+      ],
+      "intersects": {
+       "type": "Point",
+       "coordinates": [
+        -51.843,
+        -18.007
+       ]
+      },
+      "limit": 1000
+     },
+     "consultado_em_utc": "2026-11-15T05:05:28+00:00",
+     "imagens": 7
+    }
+   ],
+   "leituras": [
+    {
+     "ano": 2018,
+     "lugar": "centro",
+     "classe": 2,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.843,-18.007?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:28+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "norte",
+     "classe": 2,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.843,-18.006?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:28+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "sul",
+     "classe": 2,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.843,-18.008?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:29+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "leste",
+     "classe": 2,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.842,-18.007?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:29+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "oeste",
+     "classe": 2,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.844,-18.007?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:29+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "centro",
+     "classe": 5,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.843,-18.007?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:30+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "norte",
+     "classe": 2,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.843,-18.006?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:30+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "sul",
+     "classe": 2,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.843,-18.008?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:30+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "leste",
+     "classe": 2,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.842,-18.007?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:30+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "oeste",
+     "classe": 11,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.844,-18.007?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:31+00:00"
+    }
+   ]
+  },
+  {
+   "nome": "noroeste-20km",
+   "lat": -17.753,
+   "lon": -51.843,
+   "passou": false,
+   "busca_no_catalogo": [
+    {
+     "endereco": "https://planetarycomputer.microsoft.com/api/stac/v1/search",
+     "metodo": "POST",
+     "corpo": {
+      "collections": [
+       "io-lulc-annual-v02"
+      ],
+      "intersects": {
+       "type": "Point",
+       "coordinates": [
+        -51.843,
+        -17.753
+       ]
+      },
+      "limit": 1000
+     },
+     "consultado_em_utc": "2026-11-15T05:05:29+00:00",
+     "imagens": 7
+    }
+   ],
+   "leituras": [
+    {
+     "ano": 2018,
+     "lugar": "centro",
+     "classe": 11,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.843,-17.753?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:29+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "norte",
+     "classe": 2,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.843,-17.752?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:29+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "sul",
+     "classe": 11,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.843,-17.754?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:29+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "leste",
+     "classe": 11,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.842,-17.753?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:30+00:00"
+    },
+    {
+     "ano": 2018,
+     "lugar": "oeste",
+     "classe": 2,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.844,-17.753?collection=io-lulc-annual-v02&item=22K-2018&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:30+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "centro",
+     "classe": 11,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.843,-17.753?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:30+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "norte",
+     "classe": 2,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.843,-17.752?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:30+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "sul",
+     "classe": 11,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.843,-17.754?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:31+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "leste",
+     "classe": 11,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.842,-17.753?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:31+00:00"
+    },
+    {
+     "ano": 2023,
+     "lugar": "oeste",
+     "classe": 11,
+     "endereco": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.844,-17.753?collection=io-lulc-annual-v02&item=22K-2023&assets=data",
+     "consultado_em_utc": "2026-11-15T05:05:31+00:00"
+    }
+   ]
+  }
+ ],
+ "pontos": [
+  {
+   "arquivo": "sul-15km.csv",
+   "lat": -18.015,
+   "lon": -51.71,
+   "medidas": 154,
+   "primeira": "2018-06-26",
+   "ultima": "2026-10-16",
+   "datas_repetidas_no_espelho": 5,
+   "busca_no_catalogo": [
+    {
+     "endereco": "https://planetarycomputer.microsoft.com/api/stac/v1/search",
+     "metodo": "POST",
+     "corpo": {
+      "collections": [
+       "modis-13Q1-061"
+      ],
+      "intersects": {
+       "type": "Point",
+       "coordinates": [
+        -51.71,
+        -18.015
+       ]
+      },
+      "limit": 1000,
+      "query": {
+       "platform": {
+        "eq": "terra"
+       }
+      },
+      "datetime": "2018-07-01T00:00:00Z/2026-11-15T23:59:59Z"
+     },
+     "consultado_em_utc": "2026-11-15T05:05:32+00:00",
+     "imagens": 159
+    }
+   ],
+   "endereco_de_cada_medida": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.71,-18.015?collection=modis-13Q1-061&item=<a coluna item do CSV>&assets=250m_16_days_NDVI&assets=250m_16_days_pixel_reliability",
+   "hora_de_cada_medida": "a coluna consultado_em_utc do CSV"
+  },
+  {
+   "arquivo": "nordeste-15km.csv",
+   "lat": -17.785,
+   "lon": -51.61,
+   "medidas": 154,
+   "primeira": "2018-06-26",
+   "ultima": "2026-10-16",
+   "datas_repetidas_no_espelho": 5,
+   "busca_no_catalogo": [
+    {
+     "endereco": "https://planetarycomputer.microsoft.com/api/stac/v1/search",
+     "metodo": "POST",
+     "corpo": {
+      "collections": [
+       "modis-13Q1-061"
+      ],
+      "intersects": {
+       "type": "Point",
+       "coordinates": [
+        -51.61,
+        -17.785
+       ]
+      },
+      "limit": 1000,
+      "query": {
+       "platform": {
+        "eq": "terra"
+       }
+      },
+      "datetime": "2018-07-01T00:00:00Z/2026-11-15T23:59:59Z"
+     },
+     "consultado_em_utc": "2026-11-15T05:05:38+00:00",
+     "imagens": 159
+    }
+   ],
+   "endereco_de_cada_medida": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.61,-17.785?collection=modis-13Q1-061&item=<a coluna item do CSV>&assets=250m_16_days_NDVI&assets=250m_16_days_pixel_reliability",
+   "hora_de_cada_medida": "a coluna consultado_em_utc do CSV"
+  },
+  {
+   "arquivo": "norte-20km.csv",
+   "lat": -17.7,
+   "lon": -51.71,
+   "medidas": 154,
+   "primeira": "2018-06-26",
+   "ultima": "2026-10-16",
+   "datas_repetidas_no_espelho": 5,
+   "busca_no_catalogo": [
+    {
+     "endereco": "https://planetarycomputer.microsoft.com/api/stac/v1/search",
+     "metodo": "POST",
+     "corpo": {
+      "collections": [
+       "modis-13Q1-061"
+      ],
+      "intersects": {
+       "type": "Point",
+       "coordinates": [
+        -51.71,
+        -17.7
+       ]
+      },
+      "limit": 1000,
+      "query": {
+       "platform": {
+        "eq": "terra"
+       }
+      },
+      "datetime": "2018-07-01T00:00:00Z/2026-11-15T23:59:59Z"
+     },
+     "consultado_em_utc": "2026-11-15T05:05:44+00:00",
+     "imagens": 159
+    }
+   ],
+   "endereco_de_cada_medida": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.71,-17.7?collection=modis-13Q1-061&item=<a coluna item do CSV>&assets=250m_16_days_NDVI&assets=250m_16_days_pixel_reliability",
+   "hora_de_cada_medida": "a coluna consultado_em_utc do CSV"
+  },
+  {
+   "arquivo": "leste-20km.csv",
+   "lat": -17.88,
+   "lon": -51.521,
+   "medidas": 154,
+   "primeira": "2018-06-26",
+   "ultima": "2026-10-16",
+   "datas_repetidas_no_espelho": 5,
+   "busca_no_catalogo": [
+    {
+     "endereco": "https://planetarycomputer.microsoft.com/api/stac/v1/search",
+     "metodo": "POST",
+     "corpo": {
+      "collections": [
+       "modis-13Q1-061"
+      ],
+      "intersects": {
+       "type": "Point",
+       "coordinates": [
+        -51.521,
+        -17.88
+       ]
+      },
+      "limit": 1000,
+      "query": {
+       "platform": {
+        "eq": "terra"
+       }
+      },
+      "datetime": "2018-07-01T00:00:00Z/2026-11-15T23:59:59Z"
+     },
+     "consultado_em_utc": "2026-11-15T05:05:50+00:00",
+     "imagens": 159
+    }
+   ],
+   "endereco_de_cada_medida": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.521,-17.88?collection=modis-13Q1-061&item=<a coluna item do CSV>&assets=250m_16_days_NDVI&assets=250m_16_days_pixel_reliability",
+   "hora_de_cada_medida": "a coluna consultado_em_utc do CSV"
+  },
+  {
+   "arquivo": "oeste-20km.csv",
+   "lat": -17.88,
+   "lon": -51.899,
+   "medidas": 154,
+   "primeira": "2018-06-26",
+   "ultima": "2026-10-16",
+   "datas_repetidas_no_espelho": 5,
+   "busca_no_catalogo": [
+    {
+     "endereco": "https://planetarycomputer.microsoft.com/api/stac/v1/search",
+     "metodo": "POST",
+     "corpo": {
+      "collections": [
+       "modis-13Q1-061"
+      ],
+      "intersects": {
+       "type": "Point",
+       "coordinates": [
+        -51.899,
+        -17.88
+       ]
+      },
+      "limit": 1000,
+      "query": {
+       "platform": {
+        "eq": "terra"
+       }
+      },
+      "datetime": "2018-07-01T00:00:00Z/2026-11-15T23:59:59Z"
+     },
+     "consultado_em_utc": "2026-11-15T05:05:55+00:00",
+     "imagens": 159
+    }
+   ],
+   "endereco_de_cada_medida": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.899,-17.88?collection=modis-13Q1-061&item=<a coluna item do CSV>&assets=250m_16_days_NDVI&assets=250m_16_days_pixel_reliability",
+   "hora_de_cada_medida": "a coluna consultado_em_utc do CSV"
+  },
+  {
+   "arquivo": "nordeste-20km.csv",
+   "lat": -17.753,
+   "lon": -51.577,
+   "medidas": 154,
+   "primeira": "2018-06-26",
+   "ultima": "2026-10-16",
+   "datas_repetidas_no_espelho": 5,
+   "busca_no_catalogo": [
+    {
+     "endereco": "https://planetarycomputer.microsoft.com/api/stac/v1/search",
+     "metodo": "POST",
+     "corpo": {
+      "collections": [
+       "modis-13Q1-061"
+      ],
+      "intersects": {
+       "type": "Point",
+       "coordinates": [
+        -51.577,
+        -17.753
+       ]
+      },
+      "limit": 1000,
+      "query": {
+       "platform": {
+        "eq": "terra"
+       }
+      },
+      "datetime": "2018-07-01T00:00:00Z/2026-11-15T23:59:59Z"
+     },
+     "consultado_em_utc": "2026-11-15T05:06:00+00:00",
+     "imagens": 159
+    }
+   ],
+   "endereco_de_cada_medida": "https://planetarycomputer.microsoft.com/api/data/v1/item/point/-51.577,-17.753?collection=modis-13Q1-061&item=<a coluna item do CSV>&assets=250m_16_days_NDVI&assets=250m_16_days_pixel_reliability",
+   "hora_de_cada_medida": "a coluna consultado_em_utc do CSV"
+  }
+ ]
+}

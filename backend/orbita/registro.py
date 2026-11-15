@@ -27,7 +27,8 @@ def _verde_do_ano(cidade_id, ano, par):
         if not pasta.is_dir() or not list(pasta.glob("*.csv")):
             return None
     try:
-        resumo = ndvi.resumo(parametros.valor(par, "ndvi", "fracao_da_amplitude"), pasta)
+        resumo = ndvi.resumo(parametros.valor(par, "ndvi", "fracao_da_amplitude"), pasta,
+                             motor.CIDADES[cidade_id]["nome"])
     except (OSError, ValueError, KeyError):
         return None
     valores = [anos[str(ano)] for anos in resumo["dias_sem_planta_verde"].values() if str(ano) in anos]
@@ -36,7 +37,7 @@ def _verde_do_ano(cidade_id, ano, par):
     mediana = statistics.median(valores)
     return {"ano": ano, "dias_sem_planta_verde": int(mediana) if float(mediana).is_integer() else mediana,
             "menor": min(valores), "maior": max(valores), "pontos": len(valores),
-            "aviso": ndvi.AVISO + " " + ndvi.AVISO_DOS_PONTOS}
+            "aviso": ndvi.AVISO + " " + resumo["aviso_dos_pontos"]}
 
 
 def registro_da_safra(entrada, safra, par=None):
