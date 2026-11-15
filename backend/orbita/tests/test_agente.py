@@ -106,6 +106,7 @@ class AFichaNaConversa(ComODuble):
         self.assertEqual(saida["resposta"], ficha.resumo(estado["ficha"], self.listas))
         self.assertEqual(saida["ficha"], {"cidade_id": "jatai", "rotacao_atual": ["soja", "milho", "pousio"],
                                           "terra": "media", "plantio_da_soja": None, "preocupacao": "agua",
+                                          "lugar_dito": None, "rotacao_dita": None,
                                           "confirmada": False, "falta": []})
         self.assertEqual((saida["comparacao"], saida["apoio"], saida["texto_de"]), (None, None, "frases_prontas"))
         self.assertEqual(len(modelo.pedidos), 1)                         # a ficha fechou: não precisou de outra volta
@@ -312,7 +313,9 @@ class AResposta(ComODuble):
         # com número, o texto não sai: sai a frase pronta, que manda ao agrônomo
         estado, saida, _ = self.passo(self.confirmada(), "E as pragas?", fala("A lagarta tira 30% da safra."),
                                       fala("A lagarta tira 25% da safra."))
-        self.assertEqual((saida["resposta"], saida["texto_de"]), (agente.SEM_CONTA, "frases_prontas"))
+        self.assertEqual((True, saida["texto_de"]), (saida["resposta"].startswith("Para esse assunto eu não tenho conta. O que a conta mostra da sua "
+                                                       "rotação (soja → milho safrinha → pousio (terra parada)): No pior "
+                                                       "ano (safra 2015-16) faltaram 232,9 mm"), "frases_prontas"))
 
     def test_o_replay_vai_a_tela_com_os_dias_e_a_ia_so_le_os_marcos(self):
         estado, saida, modelo = self.passo(self.confirmada(), "como foi a pior safra, dia a dia?", fala("", REPLAY),
@@ -330,7 +333,8 @@ class AResposta(ComODuble):
         estado, saida, _ = self.passo(self.confirmada(), "como foi?", fala("", REPLAY, CLIMA, VERDE))
         for pedaco in ("A safra 2015-16 em Jataí (GO), dia a dia:", "• 14/03/2016: Neste dia começou a sede mais longa do milho",
                        "a pior safra foi a de 2015-16 e a safra normal, a de 2019-20", "O satélite viu 96 dias",
-                       "não vê a palha", "Também comparei 3 rotações"):
+                       "não vê a palha", "O que a conta indica em cada caminho:",
+                       "• soja → sorgo safrinha → pousio (terra parada): O sorgo aguenta melhor"):
             self.assertIn(pedaco, saida["resposta"])
         self.assertNotIn("No pior ano faltaram 187,5 mm", saida["resposta"])     # a evidência de cada uma fica embaixo
         self.assertLess(len(saida["resposta"]), 1200)
@@ -418,7 +422,7 @@ class OEstado(ComODuble):
         self.assertEqual(set(estado), {"v", "ficha", "selo", "pergunta", "momento", "falas"})
         self.assertEqual(len(estado["falas"]), agente.MAX_FALAS)
         self.assertEqual([f["de"] for f in estado["falas"]], ["produtor", "agente"] * 3)
-        self.assertEqual(set(estado["ficha"]), set(ficha.CAMPOS) | {"confirmada"})
+        self.assertEqual(set(estado["ficha"]), set(ficha.CAMPOS) | set(ficha.DITOS) | {"confirmada"})
         self.assertEqual(json.loads(json.dumps(estado)), estado)
 
     def test_o_estado_cabe_no_corpo_da_api_ate_no_pior_caso(self):
@@ -590,6 +594,132 @@ class OsMarcosDoReplayNasFrasesProntas(unittest.TestCase):
         for marco in marcos:
             self.assertIn(marco["frase"], texto)
         self.assertGreaterEqual(agente.QUANTOS_MARCOS, len(marcos))
+
+
+PAINEL = chamada("lavoura_hoje")
+DO_PAINEL = ("Em 14/11/2026 a soja tinha 30 dias e estava em crescimento, com 66,0 mm de água na terra. Sem chuva, a "
+             "sede começa em 7 dias, em 21/11/2026. A indicação: olhe o calor e o aviso de sede.")
+
+
+class OPainelDaLavoura(ComODuble):
+    """A 4ª ferramenta (2026-11-15): "como está a lavoura?" traz o painel, com os seis indicadores."""
+
+    def test_a_ia_consulta_o_painel_e_os_numeros_dele_passam_na_conferencia(self):
+        estado, saida, _ = self.passo(self.confirmada(), "como está a minha lavoura?", fala("", PAINEL), fala(DO_PAINEL))
+        self.assertEqual((saida["resposta"], saida["texto_de"], saida["apoio"], saida["momento"]),
+                         (DO_PAINEL, "ia", "conta", "durante"))
+        painel = saida["consultas"][0]
+        self.assertEqual((painel["ferramenta"], painel["argumentos"]), ("lavoura_hoje", {}))
+        self.assertEqual([i["id"] for i in painel["resultado"]["itens"]],
+                         ["fase", "agua", "calor", "verde", "terra_coberta", "aviso_de_sede"])
+        self.assertEqual(agente.conferir_saida(saida, HOJE), [])
+        self.assertEqual(conferencia.conferir_texto(DO_PAINEL, {"resultados": [painel["resultado"]]}), [])
+        self.assertTrue(conferencia.conferir_texto("A soja tinha 30 dias e 81,3 mm de água.",
+                                                   {"resultados": [painel["resultado"]]}))
+        self.conferir_a_comparacao(saida)
+
+    def test_numero_de_fora_do_painel_e_barrado_e_saem_o_resumo_e_uma_linha_por_item(self):
+        errada = fala("A soja tinha 30 dias e 81,3 mm de água na terra.")
+        estado, saida, _ = self.passo(self.confirmada(), "como está a minha lavoura?", fala("", PAINEL), errada, errada)
+        self.assertEqual((saida["texto_de"], saida["conferencia"]["passou"]), ("frases_prontas", False))
+        self.assertTrue(saida["resposta"].startswith("Em Jataí (GO), em 14/11/2026, a soja tinha 30 dias"))
+        self.assertEqual(saida["resposta"].split("\n\n")[0].count("\n• "), 6)          # uma linha por item
+        self.assertIn("• Em 14/11/2026, a conta dava 66,0 mm de água ao alcance da planta.", saida["resposta"])
+        self.assertNotIn("A segunda frase do item", saida["resposta"])
+        self.assertIn("O que a conta indica em cada caminho:", saida["resposta"])
+        saida_com_outro_numero = dict(saida, resposta="A soja tinha 30 dias e 81,3 mm de água.")
+        self.assertTrue(agente.conferir_saida(saida_com_outro_numero, HOJE))
+
+    def test_o_pedido_a_ia_leva_a_ferramenta_e_nao_a_data_da_consulta_nem_o_atraso(self):
+        _, _, modelo = self.passo(self.confirmada(), "como está a minha lavoura?", fala("", PAINEL), fala(DO_PAINEL))
+        self.assertIn("lavoura_hoje", [d["nome"] for d in modelo.pedidos[0][1]])
+        lido = json.dumps(modelo.pedidos[-1][0][-1]["resultado"], ensure_ascii=False)
+        self.assertLess(len(lido), 6000)
+        for fora in ("regra_da_situacao", "fonte_do_limite", "aviso_tecnico", "detalhe_tecnico", "atraso_dias",
+                     "ultimo_dia_com_dado_de", "2026-11-15"):
+            self.assertNotIn(fora, lido)
+
+
+class OPainelQueOMotorNaoTem(ComODuble):
+    opcoes = {"com_lavoura": False}
+
+    def test_sem_a_funcao_no_motor_a_ferramenta_avisa_e_a_resposta_sai_com_a_comparacao(self):
+        estado, saida, _ = self.passo(self.confirmada(), "como está a minha lavoura?", fala("", PAINEL),
+                                      fala("O painel de hoje ainda não está ligado."))
+        self.assertEqual(saida["consultas"][0]["resultado"], {"disponivel": False,
+                                                              "aviso": ferramentas.AVISO_SEM_LAVOURA})
+        self.assertEqual(saida["apoio"], "dados_do_lugar")
+        self.conferir_a_comparacao(saida)
+
+
+FORA = chamada("anotar_na_ficha", cidade_id="silvania", lugar_dito="Cristalina", rotacao_dita="feijão depois da soja",
+               rotacao_atual="soja_milho_pousio", terra="media", preocupacao="agua")
+SO_O_DITO = chamada("anotar_na_ficha", cidade_id="jatai", rotacao_dita="sorgo e milho 2", terra="media",
+                    preocupacao="agua")
+COM_O_FEIJAO = ("A conta que eu tenho é a da soja com milho safrinha: no pior ano faltaram 232,9 mm de água. Sobre o "
+                "feijão, por conhecimento geral: ele pede mais água na floração. A indicação: compare com o sorgo.")
+
+
+class OQueOProdutorDisseForaDasListas(ComODuble):
+    """Os campos "ditos" (2026-11-15): a rotação e o lugar de fora das listas não ficam sem resposta."""
+
+    def test_a_ficha_mostra_o_que_ele_disse_e_a_rotacao_e_o_lugar_guardados_que_a_conta_usa(self):
+        estado, saida, _ = self.passo(None, "Sou de Cristalina e planto feijão depois da soja.", fala("", FORA))
+        self.assertEqual((saida["ficha"]["lugar_dito"], saida["ficha"]["rotacao_dita"], saida["ficha"]["cidade_id"],
+                          saida["ficha"]["rotacao_atual"]),
+                         ("Cristalina", "feijão depois da soja", "silvania", ["soja", "milho", "pousio"]))
+        self.assertIn("• Lugar: Cristalina (uso o clima de Silvânia (GO), o lugar guardado mais próximo)",
+                      saida["resposta"])
+        self.assertIn("• O que planta hoje: feijão depois da soja (a conta compara com a rotação guardada mais "
+                      "parecida: soja → milho safrinha → pousio (terra parada))", saida["resposta"])
+        self.assertIsNone(saida["comparacao"])
+
+    def test_sem_a_rotacao_parecida_o_programa_escolhe_e_o_dito_nao_leva_algarismo(self):
+        estado, saida, _ = self.passo(None, "planto sorgo e milho em Jataí", fala("", SO_O_DITO))
+        self.assertEqual((saida["ficha"]["rotacao_dita"], saida["ficha"]["rotacao_atual"]),
+                         ("sorgo e milho", ["soja", "milho", "pousio"]))      # empate: a primeira do cardápio
+        self.assertFalse(saida["ficha"]["falta"])
+
+    def test_lugar_dito_sem_o_mais_proximo_vira_a_pergunta_de_qual_fica_mais_perto(self):
+        estado, saida, _ = self.passo(None, "sou de Cristalina", fala("", chamada("anotar_na_ficha",
+                                                                                   lugar_dito="Cristalina")))
+        self.assertIn("Não tenho os dados de Cristalina guardados. Qual destes fica mais perto da sua lavoura: "
+                      "Rio Verde (GO), Jataí (GO) ou Silvânia (GO)?", saida["resposta"])
+        estado, saida, _ = self.passo(estado, "Silvânia", fala("", chamada("anotar_na_ficha", cidade_id="silvania")))
+        self.assertEqual((saida["ficha"]["lugar_dito"], saida["ficha"]["cidade_id"]), ("Cristalina", "silvania"))
+
+    def test_a_resposta_diz_conhecimento_geral_escreva_a_ia_ou_nao(self):
+        estado = self.passo(None, "Sou de Cristalina e planto feijão depois da soja.", fala("", FORA))[0]
+        _, saida, _ = self.passo(estado, "sim", fala("", ENSAIO), fala(COM_O_FEIJAO))
+        self.assertEqual((saida["resposta"], saida["texto_de"], saida["apoio"]), (COM_O_FEIJAO, "ia", "conta"))
+        _, saida, modelo = self.passo(estado, "sim", fala("", ENSAIO), fala(BOA))    # a IA não marcou: o programa marca
+        self.assertTrue(saida["resposta"].startswith(BOA))
+        self.assertIn("é conhecimento geral: a conta é a da rotação guardada mais parecida, soja → milho safrinha",
+                      saida["resposta"])
+        self.assertIn("«feijão depois da soja»", modelo.pedidos[0][0][0]["texto"])
+        self.conferir_a_comparacao(saida)
+
+    def test_as_frases_prontas_tambem_trazem_a_indicacao_da_rotacao_parecida_e_o_lugar_do_clima(self):
+        estado = self.passo(None, "Sou de Cristalina e planto feijão depois da soja.", fala("", FORA))[0]
+        estado, saida, _ = self.passo(estado, "sim", fala("", ENSAIO), fala(INVENTADA), fala(INVENTADA))
+        for pedaco in ("Você planta feijão depois da soja: a conta que eu tenho é a da rotação guardada mais parecida, "
+                       "soja → milho safrinha → pousio (terra parada). No pior ano (safra 2015-16) faltaram 232,9 mm",
+                       "O clima é o de Silvânia (GO), o lugar guardado mais próximo de Cristalina.",
+                       "O que a conta indica em cada caminho:"):
+            self.assertIn(pedaco, saida["resposta"])
+        self.assertEqual(saida["texto_de"], "frases_prontas")
+
+    def test_mudar_o_dito_desfaz_a_confirmacao_e_o_selo_cobre_os_ditos(self):
+        estado = self.passo(None, "Sou de Cristalina e planto feijão depois da soja.", fala("", FORA))[0]
+        estado, saida, _ = self.passo(estado, "sim", fala("", ENSAIO), fala(COM_O_FEIJAO))
+        self.assertTrue(saida["ficha"]["confirmada"])
+        forjado = dict(estado, ficha=dict(estado["ficha"], rotacao_dita="algodão"))
+        _, saida, _ = self.passo(forjado, "e o sorgo?", fala("", ENSAIO), fala(BOA))
+        self.assertFalse(saida["ficha"]["confirmada"])                          # o selo não vale para outro "dito"
+        _, saida, _ = self.passo(estado, "na verdade planto algodão", fala("", chamada(
+            "anotar_na_ficha", rotacao_dita="algodão", rotacao_atual="soja_sorgo_pousio")))
+        self.assertEqual((saida["ficha"]["confirmada"], saida["ficha"]["rotacao_dita"]), (False, "algodão"))
+        self.assertIsNone(saida["comparacao"])
 
 
 if __name__ == "__main__":

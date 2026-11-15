@@ -68,7 +68,9 @@ class AsConversasGuardadas(unittest.TestCase):
         self.assertEqual(list(objeto)[:2], ["gerado_em", "gerado_por"])
         conversas = objeto["conversas"]
         self.assertEqual([c["id"] for c in conversas], ["antes-plantei-tarde", "replay-2015-16",
-                                                        "depois-o-que-a-terra-mostrou", "sem-conta-pragas-e-adubo"])
+                                                        "depois-o-que-a-terra-mostrou", "sem-conta-pragas-e-adubo",
+                                                        "fora-da-lista-sorgo-e-milho",
+                                                        "fora-da-lista-cristalina-feijao"])
         self.assertEqual({c["momento"] for c in conversas}, {"antes", "durante", "depois"})
         for conversa in conversas:
             self.assertEqual(list(conversa), ["id", "momento", "titulo", "texto_de", "replay", "passos"])
@@ -102,7 +104,20 @@ class AsConversasGuardadas(unittest.TestCase):
         self.assertEqual((objeto["modelo"], resumo["texto_da_ia"], resumo["barrados_pela_conferencia"]), (None, 0, 0))
         self.assertIn("Sem IA", objeto["uso_de_ia"])
         self.assertEqual(conversas[0]["passos"][1]["saida"]["ficha"]["plantio_da_soja"], "2026-11-10")
-        self.assertEqual(conversas[3]["passos"][-1]["saida"]["resposta"], agente.SEM_CONTA)
+        self.assertTrue(conversas[3]["passos"][-1]["saida"]["resposta"].startswith(
+            "Para esse assunto eu não tenho conta. O que a conta mostra da sua rotação ("))
+        # (a) "como está a minha lavoura?" sai com o painel; (c) e (d) trazem o que o produtor disse fora das listas
+        painel = conversas[1]["passos"][3]["saida"]
+        self.assertEqual((painel["consultas"][0]["ferramenta"], painel["momento"]), ("lavoura_hoje", "durante"))
+        self.assertEqual(len(painel["consultas"][0]["resultado"]["itens"]), 6)
+        sorgo, feijao = conversas[4]["passos"][-1]["saida"], conversas[5]["passos"][-1]["saida"]
+        self.assertEqual((sorgo["ficha"]["rotacao_dita"], sorgo["ficha"]["rotacao_atual"]),
+                         ("sorgo e milho", ["soja", "sorgo", "pousio"]))
+        self.assertEqual((feijao["ficha"]["lugar_dito"], feijao["ficha"]["cidade_id"]), ("Cristalina", "silvania"))
+        self.assertIn("a conta que eu tenho é a da rotação guardada mais parecida", sorgo["resposta"])
+        self.assertIn("o lugar guardado mais próximo de Cristalina", feijao["resposta"])
+        for conversa in conversas:                          # toda conversa termina numa indicação
+            self.assertEqual(exportar_conversas.sem_indicacao(conversa), 0, conversa["id"])
 
     def test_o_arquivo_da_tela_e_o_mesmo_objeto_e_nao_fica_resto(self):
         _, objeto = self.gravar()
@@ -137,7 +152,7 @@ class AsConversasGuardadas(unittest.TestCase):
         ia_muda = IaDeRoteiro(muda=True)
         resumo, objeto = self.gravar(ia_muda)
         conversas = self.conferir_o_formato(objeto)
-        self.assertEqual(len(resumo["avisos"]), 4)
+        self.assertEqual(len(resumo["avisos"]), 6)
         self.assertIn("pelo roteiro", resumo["avisos"][0])
         self.assertEqual(ia_muda.uso["pedidos"] > 4 * 2 * exportar_conversas.TENTATIVAS_COM_A_IA, True)   # tentou 3 vezes
         self.assertEqual({c["texto_de"] for c in conversas}, {"frases_prontas"})
@@ -165,7 +180,7 @@ class AsConversasGuardadas(unittest.TestCase):
         resumo, objeto = self.gravar(IaQueMelhora())
         conversas = self.conferir_o_formato(objeto)
         self.assertEqual((resumo["barrados_pela_conferencia"], resumo["avisos"]), (0, []))
-        self.assertEqual([bool(c["replay"]) for c in conversas], [False, True, False, False])
+        self.assertEqual([bool(c["replay"]) for c in conversas], [False, True, False, False, False, False])
         self.assertNotIn("999", _sem_o_selo(json.dumps(objeto, ensure_ascii=False)))
 
     def test_a_chave_nao_entra_em_arquivo_nenhum(self):

@@ -66,14 +66,12 @@ class AsFrasesDoProdutor(unittest.TestCase):
     def test_o_como_esta_hoje_escreve_as_duas_datas_e_nao_um_hoje_solto(self):
         agora = motor.como_esta_hoje(RIO_VERDE, hoje=DIA)
         ultimo = explicacao.data_br(agora["ultimo_dia_com_dado"])
-        antes = "1 dia" if agora["atraso_dias"] == 1 else f"{agora['atraso_dias']} dias"     # "1 dia", não "1 dias"
-        self.assertIn(f"o último dia com dado é {ultimo}, {antes} antes do dia desta consulta (15/11/2026).",
-                      agora["frase"])
+        self.assertIn(ultimo, agora["frase"])               # a data do dado, dita na frase (2026-11-15: sem o atraso)
         self.assertNotIn("antes de hoje", agora["frase"])
         self.assertIn("na camada de terra onde ficam as raízes", agora["frase"])
-        # Desde 2026-11-15 a água sai como um número só, com a chuva do satélite em mm de cada dia: a frase diz até
-        # onde vai essa chuva e não cita mais a conta com a chuva de modelo (que fica ao lado, só para comparar).
-        self.assertIn("a chuva do satélite, em mm de cada dia, vai até", agora["frase"])
+        # Desde 2026-11-15 a água sai como um número só e a frase ficou curta: até onde vai a chuva saiu da frase
+        # (foi para o detalhe técnico do motor), e ela não cita mais a conta com a chuva de modelo.
+        self.assertNotIn("chuva de modelo", agora["frase"])
         self.assertIn("a chuva medida por satélite da NASA (o GPM IMERG)", hoje.AVISO)
 
     def test_o_mesmo_numero_sai_escrito_do_mesmo_jeito(self):
@@ -90,19 +88,23 @@ class AsRegrasDaIA(unittest.TestCase):
     def test_o_pedido_a_ia_manda_falar_simples_e_escrever_o_numero_como_a_conta(self):
         for trecho in ('diga "o valor do meio"', 'diga "a camada de terra onde ficam as raízes"',
                        'diga "a chuva estimada por modelo de computador"', 'diga "a chuva medida por satélite da NASA"',
-                       "com a mesma casa depois da vírgula", "a data do dia da consulta e a data do último dia com dado",
+                       "com a mesma casa depois da vírgula", "diga a data do dado uma vez só",
                        "ficou perto do fundo sem acabar",
-                       'Não diga que uma rotação é "a que mais sofre"', "Escreva só em português"):
+                       'Não diga que uma rotação é "a melhor" ou "a pior"', "Escreva só em português"):
             self.assertIn(trecho, " ".join(agente.REGRAS.split()))
 
     def test_o_pedido_a_ia_poe_o_estado_da_lavoura_no_ultimo_dia_com_dado_e_nao_fala_em_valor_real(self):
         # Lido nas conversas guardadas de 2026-11-15: "Em 15/11/2026, a soja está na terra" (o dado era de 11/11/2026),
         # "o valor real deve estar entre esses dois" e um "Hoje é 15/11/2026." solto numa resposta da comparação.
-        for trecho in ("vale no último dia com dado, nunca no dia da consulta",
-                       'escreva "em 11/11/2026 a soja estava na terra", não "em 15/11/2026 a soja está na terra"',
-                       "Diga os dois valores, cada um com a sua chuva", 'Não escreva "valor real"',
-                       'não diga que o valor "deve estar entre" os dois',
+        # Em 2026-11-15 a água passou a ser um número só e o atraso do dado deixou de ser ressalva (o Juca).
+        for sai in ("os dois valores", "valor real", "atraso do dado", "dias o dado tem de atraso"):
+            self.assertNotIn(sai, " ".join(agente.REGRAS.split()))
+        for trecho in ('com o verbo no passado ("a soja estava em crescimento")',
+                       'Não escreva "atraso", "aproximada", "ainda não chegou"',
                        'não escreva "hoje é" nem a data do dia da consulta',
+                       'Comece a última frase por "A indicação:"', "Você nunca termina em recusa",
+                       "os seis indicadores: a fase da cultura, a água, o calor, o verde do satélite, a terra coberta "
+                       "e o aviso de sede",
                        "Em resposta de conhecimento geral, não escreva data nenhuma"):
             self.assertIn(trecho, " ".join(agente.REGRAS.split()))
 
@@ -149,7 +151,7 @@ class ORoteiroDasConversas(unittest.TestCase):
         conversa = next(c for c in exportar_conversas.CONVERSAS if c["momento"] == "durante")
         (ficha, _), (sim, depois_do_sim), (terceira, da_terceira) = conversa["falas"][:3]
         self.assertTrue(ficha.endswith("Como está a minha lavoura hoje?"))
-        self.assertEqual((sim, depois_do_sim), ("sim", [chamada("clima_do_lugar", hoje=True)]))
+        self.assertEqual((sim, depois_do_sim), ("sim", [chamada("lavoura_hoje")]))     # o painel (2026-11-15)
         self.assertEqual(da_terceira, [chamada("ensaio_da_rotacao", safra="pior_ano")])
 
     def test_as_travas_da_gravacao(self):
@@ -159,23 +161,27 @@ class ORoteiroDasConversas(unittest.TestCase):
         self.assertEqual(exportar_conversas.comecos_repetidos(gravada(igual + " Um.", igual + " Dois.")), 1)
         self.assertEqual(exportar_conversas.comecos_repetidos(gravada(igual, "Na safra 2015-16 foi diferente.")), 0)
         self.assertEqual(exportar_conversas.comecos_repetidos(gravada("Confira a sua ficha: a", "Confira a sua ficha: a")), 0)
-        self.assertEqual(exportar_conversas.hoje_sem_data(gravada("O último dia com dado foi 4 dias antes de hoje.")), 1)
-        self.assertEqual(exportar_conversas.hoje_sem_data(gravada("Até 11/11/2026, 4 dias antes de hoje (15/11/2026).")), 0)
+        self.assertEqual(exportar_conversas.falas_longas(gravada("curta", "x" * 901)), 1)
+        fim = {"passos": [{"de": "agente", "saida": {"resposta": "Os números. A indicação: compare o sorgo.",
+                                                     "comparacao": [{}]}}]}
+        self.assertEqual(exportar_conversas.sem_indicacao(fim), 0)
+        fim["passos"][0]["saida"]["resposta"] = "Não tenho essa conta."
+        self.assertEqual(exportar_conversas.sem_indicacao(fim), 1)
         solta = {"passos": [{"de": "agente", "saida": {"resposta": "Hoje é 15/11/2026. A decisão é sua.",
                                                        "consultas": [{"resultado": {"comparacao": []}}]}}]}
         do_hoje = {"passos": [{"de": "agente", "saida": {"resposta": "Hoje é 15/11/2026, e o último dado é de 11/11/2026.",
                                                          "consultas": [{"resultado": {"hoje": {"disponivel": True}}}]}}]}
         self.assertEqual(exportar_conversas.hoje_fora_de_hora(solta), 1)
-        self.assertEqual(exportar_conversas.hoje_fora_de_hora(do_hoje), 0)
+        self.assertEqual(exportar_conversas.hoje_fora_de_hora(do_hoje), 1)      # a data do dado basta (2026-11-15)
         self.assertEqual(exportar_conversas.palavras_da_conta(gravada("A mediana delas é 38,0%.")), 1)
         self.assertEqual(exportar_conversas.palavras_da_conta(gravada("O valor do meio delas é 38,0%.")), 0)
-        self.assertEqual(exportar_conversas.valor_real(gravada("Por isso, o valor real deve estar entre esses dois.")), 1)
-        self.assertEqual(exportar_conversas.valor_real(gravada("Com uma chuva, 63,0 mm; com a outra, 34,8 mm.")), 0)
         conversa = {"id": "replay-2015-16"}
-        com_valor_real = dict(gravada("O valor real fica no meio."), replay={"dias": [1]})
-        for passo in com_valor_real["passos"]:
-            passo["saida"]["conferencia"] = {"passou": True}
-        self.assertEqual(exportar_conversas._falhas(conversa, com_valor_real), 1)
+        sem_fim = dict(gravada("O valor fica no meio."), replay={"dias": [1]})
+        for passo in sem_fim["passos"]:
+            passo["saida"].update(conferencia={"passou": True}, comparacao=[{}])
+        self.assertEqual(exportar_conversas._falhas(conversa, sem_fim), 1)       # não termina numa indicação
+        sem_fim["passos"][-1]["saida"]["resposta"] += " A indicação: compare os dois."
+        self.assertEqual(exportar_conversas._falhas(conversa, sem_fim), 0)
 
 
 if __name__ == "__main__":

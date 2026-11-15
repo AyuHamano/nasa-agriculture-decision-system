@@ -1,5 +1,5 @@
 # Gerado com IA (Claude)
-"""As 3 ferramentas do agente: o clima do lugar, o ensaio da rotação e o verde do satélite.
+"""As 4 ferramentas do agente: o clima do lugar, o ensaio da rotação, o verde do satélite e a lavoura hoje (o painel).
 
 Cada ferramenta chama uma função do motor e devolve o que a IA pode ler. A IA não faz conta: ela pede, o motor
 responde, e o texto dela é conferido depois contra o que saiu daqui (`agente.py`).
@@ -25,7 +25,7 @@ import re
 
 from orbita import motor, rotacoes
 
-NOMES = ("clima_do_lugar", "ensaio_da_rotacao", "verde_do_satelite")
+NOMES = ("clima_do_lugar", "ensaio_da_rotacao", "verde_do_satelite", "lavoura_hoje")
 PREOCUPACOES = ("agua", "calor", "terra")           # o mapa, seção 7.2; vale a lista do motor, se ele tiver uma
 MINIMO_DE_ROTACOES = 3                              # contando a de hoje (a condição do desafio)
 FRASES_DA_ROTACAO = ("evidencia", "beneficio", "risco", "falta_saber")
@@ -35,6 +35,15 @@ TETO_PARA_A_IA = 24000                              # caracteres de JSON que uma
 PESADOS = ("dias", "parametros", "safras", "limites", "serie")     # o que não vai à IA (vai à tela, se for o caso)
 AVISO_SEM_HOJE = "O acompanhamento do dia de hoje ainda não está ligado: é o próximo passo."
 AVISO_SEM_REGISTRO = "O registro da safra ainda não está ligado: é o próximo passo."
+AVISO_SEM_LAVOURA = "O painel da lavoura hoje ainda não está ligado: é o próximo passo."
+CAMPOS_DA_LAVOURA = ("cidade_id", "rotacao_atual", "terra", "plantio_da_soja")     # o que motor.lavoura_hoje aceita
+TETO_DO_PAINEL = 6000                               # caracteres de JSON que o painel entrega à IA
+TEXTO_CURTO = 40                                    # texto maior que isto, fora a `frase`, não vai à IA no painel
+# O que não vai à IA no painel: a data da consulta e o atraso do dado (não viram ressalva) e as explicações longas.
+FORA_DO_PAINEL = ("hoje", "atraso_dias", "dia_da_consulta", "dias_ja_passados_ate_a_consulta", "sem_chuva_a_partir_de",
+                  "janela_dias", "horizonte_dias", "janela_do_consumo_dias", "dias_do_consumo", "dias_por_imagem",
+                  "ultimo_dia_com_temperatura", "dias_com_o_consumo_estimado", "consumo_estimado_desde",
+                  "situacao", "titulo")
 
 
 class ContaIndisponivel(Exception):
@@ -78,7 +87,10 @@ def listas():
     """As listas fechadas da ficha. Nenhuma é escrita aqui: todas saem do motor."""
     cidades = {str(ident): (dados.get("nome") if isinstance(dados, dict) else None) or str(ident)
                for ident, dados in motor.CIDADES.items()}
-    return {"cidades": cidades, "rotacoes": cardapio(), "terras": tuple(motor.TERRAS),
+    onde = {str(ident): (dados["latitude"], dados["longitude"]) for ident, dados in motor.CIDADES.items()
+            if isinstance(dados, dict) and isinstance(dados.get("latitude"), (int, float))
+            and isinstance(dados.get("longitude"), (int, float))}
+    return {"cidades": cidades, "onde": onde, "rotacoes": cardapio(), "terras": tuple(motor.TERRAS),
             "preocupacoes": tuple(getattr(motor, "PREOCUPACOES", PREOCUPACOES))}
 
 
@@ -205,6 +217,41 @@ def verde_do_satelite(ficha, safra=None):
     return resultado
 
 
+def _item_do_painel(item, com_numeros=True):
+    """Um item do painel como a IA o lê: o nome, a situação, a frase e os números soltos (sem as explicações)."""
+    enxuto = {"id": item.get("id"), "situacao": item.get("situacao_nome") or item.get("situacao"),
+              "frase": item.get("frase")}
+    for chave, valor in item.items() if com_numeros else ():
+        if chave in enxuto or chave in FORA_DO_PAINEL or chave == "situacao_nome" or valor is None:
+            continue
+        if isinstance(valor, (bool, int, float)) or (isinstance(valor, str) and len(valor) <= TEXTO_CURTO):
+            enxuto[chave] = valor
+    return enxuto
+
+
+def lavoura_hoje(ficha):
+    """O painel da lavoura hoje, enxuto: o resumo e os 6 itens (a fase, a água, o calor, o verde do satélite, a
+    terra coberta e o aviso de sede), cada um com a frase, a situação e os números. Sem a função no motor, um aviso."""
+    entrada = {campo: valor for campo, valor in entrada_do_motor(ficha).items() if campo in CAMPOS_DA_LAVOURA}
+    try:
+        painel = _chamar_o_motor("lavoura_hoje", entrada)
+    except ContaIndisponivel:
+        return {"disponivel": False, "aviso": AVISO_SEM_LAVOURA}
+    if not isinstance(painel, dict) or painel.get("disponivel") is False or not isinstance(painel.get("itens"), list):
+        aviso = painel.get("aviso") if isinstance(painel, dict) and isinstance(painel.get("aviso"), str) else None
+        return {"disponivel": False, "aviso": (aviso or AVISO_SEM_LAVOURA)[:300]}
+    local = painel.get("local") if isinstance(painel.get("local"), dict) else {}
+    itens = [item for item in painel["itens"] if isinstance(item, dict)]
+    for com_numeros in (True, False):               # passou do teto: saem os números soltos (as frases já os dizem)
+        enxuto = {"disponivel": True, "lugar": local.get("nome") or ficha.get("cidade_id"),
+                  "data_do_dado": painel.get("ultimo_dia_com_dado"),
+                  "situacao": painel.get("situacao_nome") or painel.get("situacao"), "frase": painel.get("frase"),
+                  "itens": [_item_do_painel(item, com_numeros) for item in itens]}
+        if len(json.dumps(enxuto, ensure_ascii=False)) <= TETO_DO_PAINEL:
+            break
+    return enxuto
+
+
 def definicoes():
     """O que a IA lê de cada ferramenta: o nome, para que serve e o que ela pode pedir."""
     safra = {"type": "string", "description": 'Uma safra, como "2015-16". Também vale "pior_ano" (a pior safra da '
@@ -213,10 +260,9 @@ def definicoes():
     return [
         {"nome": "clima_do_lugar",
          "descricao": "O que os satélites da NASA registraram no lugar da ficha: de onde vêm a chuva e a "
-                      "temperatura, de que dia a que dia, qual foi o pior ano, qual é o ano normal e o calor. Com "
-                      "hoje=true, traz também como está a água da lavoura hoje, perto do ano normal e do pior ano.",
-         "parametros": {"type": "object", "additionalProperties": False, "properties": {
-             "hoje": {"type": "boolean", "description": "true para saber como a lavoura está hoje."}}}},
+                      "temperatura, de que dia a que dia, qual foi o pior ano, qual é o ano normal e o calor. Serve "
+                      "também quando o lugar do produtor não está guardado: é o clima do lugar guardado mais próximo.",
+         "parametros": {"type": "object", "additionalProperties": False, "properties": {}}},
         {"nome": "ensaio_da_rotacao",
          "descricao": "Replanta a rotação de hoje do produtor e as alternativas no ano normal e no pior ano da "
                       "região. Devolve a comparação: de cada rotação, a água que faltou, os dias de calor forte, os "
@@ -232,6 +278,12 @@ def definicoes():
                       "registro daquela safra: o que foi plantado, a falta de água, os dias de calor forte e os "
                       "dias sem planta viva.",
          "parametros": {"type": "object", "additionalProperties": False, "properties": {"safra": safra}}},
+        {"nome": "lavoura_hoje",
+         "descricao": "Como a lavoura do produtor está agora, durante a safra: o resumo e os seis indicadores do "
+                      "painel (a fase da cultura, a água na terra, o calor, o verde do satélite, a terra coberta e o "
+                      "aviso de sede), cada um com a frase, a situação (tranquilo, atenção ou alerta) e os números. "
+                      "Use para \"como está a lavoura?\" e \"como está hoje?\".",
+         "parametros": {"type": "object", "additionalProperties": False, "properties": {}}},
     ]
 
 
@@ -248,6 +300,8 @@ def chamar(nome, ficha, argumentos):
             return ensaio_da_rotacao(ficha, safra)
         if nome == "verde_do_satelite":
             return verde_do_satelite(ficha, safra)
+        if nome == "lavoura_hoje":
+            return lavoura_hoje(ficha)
     except FichaRecusada as erro:
         if safra is not None and "safra" in str(erro):      # a safra pedida não serve: a IA lê e pede outra
             return {"erro": str(erro)}

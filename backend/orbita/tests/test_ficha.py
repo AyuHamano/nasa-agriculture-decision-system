@@ -107,7 +107,7 @@ class AFicha(unittest.TestCase):
         definicao = ficha.definicao(self.listas)
         campos = definicao["parametros"]["properties"]
         self.assertEqual(definicao["nome"], "anotar_na_ficha")
-        self.assertEqual(set(campos), set(ficha.CAMPOS))
+        self.assertEqual(set(campos), set(ficha.CAMPOS) | set(ficha.DITOS))
         self.assertEqual(campos["cidade_id"]["enum"], ["rio_verde", "jatai", "silvania"])
         self.assertEqual(campos["rotacao_atual"]["enum"], list(self.listas["rotacoes"]))
         self.assertEqual(campos["terra"]["enum"], ["pouca", "media", "muita"])
@@ -116,7 +116,7 @@ class AFicha(unittest.TestCase):
 
     def test_a_ficha_publica_diz_o_que_falta(self):
         publica = ficha.publica(self.anotar({"cidade_id": "jatai"})[0])
-        self.assertEqual(list(publica), list(ficha.CAMPOS) + ["confirmada", "falta"])
+        self.assertEqual(list(publica), list(ficha.CAMPOS) + list(ficha.DITOS) + ["confirmada", "falta"])
         self.assertEqual(publica["falta"], ["rotacao_atual", "terra", "preocupacao"])
 
 

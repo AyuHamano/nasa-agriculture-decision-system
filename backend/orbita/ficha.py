@@ -15,11 +15,21 @@ motor (`ferramentas.listas()`), não se escrevem aqui. O produtor confirma a fic
 Os campos (os nomes são os da entrada do motor): `cidade_id`, `rotacao_atual` (a lista das culturas), `terra`,
 `plantio_da_soja` (opcional, AAAA-MM-DD) e `preocupacao`. Mudar um valor desfaz a confirmação: a ficha nova tem de
 ser confirmada de novo. Nenhum dado pessoal é pedido (nome, telefone, CPF, endereço).
+
+Os dois campos "ditos" (`DITOS`, opcionais, texto curto): `lugar_dito` e `rotacao_dita`. Guardam o que o produtor
+disse FORA das listas ("Cristalina", "sorgo e milho"). A conta continua fechada: `cidade_id` fica com o lugar
+guardado mais próximo e `rotacao_atual` com a rotação guardada mais parecida (se a IA não escolher, o programa
+escolhe a que tem mais culturas em comum com o que foi dito; no empate, a primeira do cardápio). O resumo da ficha
+mostra os dois, e a resposta diz que a parte de fora da conta é conhecimento geral.
 """
 import datetime
 import re
+import unicodedata
 
 CAMPOS = ("cidade_id", "rotacao_atual", "terra", "plantio_da_soja", "preocupacao")
+DITOS = ("lugar_dito", "rotacao_dita")               # o que o produtor disse fora das listas (texto curto, livre)
+TAMANHO_DO_DITO = 60
+FORA_DO_DITO = re.compile(r"[^A-Za-zÀ-ÖØ-öø-ÿ ,-]")  # no "dito" só ficam letra, espaço, vírgula e hífen
 OBRIGATORIOS = ("cidade_id", "rotacao_atual", "terra", "preocupacao")
 DATA = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 PRIMEIRO_ANO = 2000
@@ -36,7 +46,32 @@ CONFIRMAR = 'Está certo? Responda "sim" para eu fazer a conta, ou diga o que co
 
 def nova():
     return {"cidade_id": None, "rotacao_atual": None, "terra": None, "plantio_da_soja": None, "preocupacao": None,
-            "confirmada": False}
+            "lugar_dito": None, "rotacao_dita": None, "confirmada": False}
+
+
+def _sem_acento(texto):
+    return "".join(letra for letra in unicodedata.normalize("NFD", str(texto).lower())
+                   if unicodedata.category(letra) != "Mn")
+
+
+def ler_dito(valor):
+    """O texto "dito" limpo: só letra, espaço, vírgula e hífen, sem algarismo, até 60 letras. Vazio = None."""
+    if not isinstance(valor, str):
+        return None
+    limpo = " ".join(FORA_DO_DITO.sub(" ", valor).split())[:TAMANHO_DO_DITO].strip(" ,-")
+    return limpo or None
+
+
+def rotacao_parecida(dito, listas):
+    """As culturas da rotação guardada mais parecida com o que foi dito: a que tem mais culturas em comum; no
+    empate, a primeira do cardápio."""
+    palavras = set(re.findall(r"[a-z]+", _sem_acento(dito)))
+    melhor, pontos = None, -1
+    for item in listas["rotacoes"].values():
+        comuns = sum(1 for cultura in item["culturas"] if _sem_acento(cultura) in palavras)
+        if comuns > pontos:
+            melhor, pontos = item, comuns
+    return list(melhor["culturas"]) if melhor else None
 
 
 def _opcoes(nomes):
@@ -94,16 +129,37 @@ def anotar(ficha, campos, listas, hoje=None):
         return dict(ficha), {}, {"ficha": "os campos têm de vir num objeto, com o nome de cada campo"}
     aceitos, recusados = {}, {}
     for campo, valor in campos.items():
-        if campo not in CAMPOS:
-            recusados[str(campo)[:40]] = "esse campo não existe na ficha; os campos: " + _opcoes(CAMPOS)
+        if campo in DITOS:
+            dito = ler_dito(valor)
+            if dito:
+                aceitos[campo] = dito
+        elif campo not in CAMPOS:
+            recusados[str(campo)[:40]] = "esse campo não existe na ficha; os campos: " + _opcoes(CAMPOS + DITOS)
         elif valor is not None and valor != "" and valor != []:
             certo, motivo = _ler(campo, valor, listas, hoje)
             if certo is None:
                 recusados[campo] = motivo
             else:
                 aceitos[campo] = certo
+    # O "dito" e o campo fechado andam juntos: o lugar e a rotação da lista apagam o "dito" de antes; a rotação dita
+    # sem a parecida ganha a parecida por regra; o lugar dito sem o mais próximo deixa a cidade por perguntar.
+    if aceitos.get("lugar_dito") and _sem_acento(aceitos["lugar_dito"]) in {
+            _sem_acento(nome).split(" (")[0] for nome in listas["cidades"].values()} | set(listas["cidades"]):
+        del aceitos["lugar_dito"]                    # disse um lugar que está guardado: não é "dito"
+    junto = {}                                       # o que muda junto, sem a IA ter mandado
+    if "cidade_id" in aceitos and "lugar_dito" not in aceitos:
+        if ficha.get("cidade_id") or not ficha.get("lugar_dito"):   # respondeu "qual fica mais perto": o dito fica
+            junto["lugar_dito"] = None
+    elif "lugar_dito" in aceitos and "cidade_id" not in aceitos and aceitos["lugar_dito"] != ficha.get("lugar_dito"):
+        junto["cidade_id"] = None
+    if "rotacao_atual" in aceitos and "rotacao_dita" not in aceitos:
+        junto["rotacao_dita"] = None
+    elif "rotacao_dita" in aceitos and "rotacao_atual" not in aceitos:
+        aceitos["rotacao_atual"] = rotacao_parecida(aceitos["rotacao_dita"], listas)
+        recusados.pop("rotacao_atual", None)
     nova_ficha = dict(ficha)
-    if any(ficha.get(campo) != valor for campo, valor in aceitos.items()):
+    if any(ficha.get(campo) != valor for campo, valor in dict(junto, **aceitos).items()):
+        nova_ficha.update(junto)
         nova_ficha.update(aceitos)
         nova_ficha["confirmada"] = False
     return nova_ficha, aceitos, recusados
@@ -118,6 +174,8 @@ def conferir(ficha, listas, hoje=None):
         valor = ficha.get(campo)
         if valor is not None:
             limpa[campo] = _ler(campo, valor, listas, hoje)[0]
+    for campo in DITOS:
+        limpa[campo] = ler_dito(ficha.get(campo))
     limpa["confirmada"] = ficha.get("confirmada") is True and completa(limpa)
     return limpa
 
@@ -137,8 +195,9 @@ def confirmar(ficha):
 
 
 def publica(ficha):
-    """A ficha como sai na resposta da rota: os 5 campos, `confirmada` e `falta` (o que ainda não foi dito)."""
-    return dict({campo: ficha.get(campo) for campo in CAMPOS}, confirmada=ficha.get("confirmada") is True,
+    """A ficha como sai na resposta da rota: os 5 campos, os 2 "ditos", `confirmada` e `falta` (o que ainda não
+    foi dito)."""
+    return dict({campo: ficha.get(campo) for campo in CAMPOS + DITOS}, confirmada=ficha.get("confirmada") is True,
                 falta=falta(ficha))
 
 
@@ -153,6 +212,22 @@ def nome_da_rotacao(ficha, listas):
     return None
 
 
+def lugar_em_palavras(ficha, listas):
+    """O lugar como o produtor disse; se não está guardado, com o lugar guardado de onde vem o clima."""
+    nome = nome_do_lugar(ficha, listas)
+    if ficha.get("lugar_dito"):
+        return f"{ficha['lugar_dito']} (uso o clima de {nome}, o lugar guardado mais próximo)"
+    return nome
+
+
+def rotacao_em_palavras(ficha, listas):
+    """A rotação como o produtor disse; se a conta não tem, com a rotação guardada mais parecida."""
+    nome = nome_da_rotacao(ficha, listas)
+    if ficha.get("rotacao_dita"):
+        return f"{ficha['rotacao_dita']} (a conta compara com a rotação guardada mais parecida: {nome})"
+    return nome
+
+
 def _data_por_extenso(iso):
     dia = datetime.date.fromisoformat(iso)
     return f"{dia.day:02d}/{dia.month:02d}/{dia.year}"
@@ -162,8 +237,8 @@ def resumo(ficha, listas):
     """A ficha em texto, para o produtor conferir. Frases prontas: só o que está na ficha."""
     plantio = ficha.get("plantio_da_soja")
     linhas = ["Confira a sua ficha:",
-              f"• Lugar: {nome_do_lugar(ficha, listas)}",
-              f"• O que planta hoje: {nome_da_rotacao(ficha, listas)}",
+              f"• Lugar: {lugar_em_palavras(ficha, listas)}",
+              f"• O que planta hoje: {rotacao_em_palavras(ficha, listas)}",
               f"• Terra: {NOMES_DAS_TERRAS.get(ficha['terra'], ficha['terra'])}"
               + (f" ({TERRAS_EM_PALAVRAS[ficha['terra']]})" if ficha["terra"] in TERRAS_EM_PALAVRAS else ""),
               "• Plantio da soja: " + (_data_por_extenso(plantio) if plantio else "pelo calendário da região"),
@@ -175,7 +250,9 @@ def resumo(ficha, listas):
 def pergunta_do_que_falta(ficha, listas):
     """A pergunta pronta do que ainda falta na ficha, com as opções de cada campo."""
     perguntas = {
-        "cidade_id": "Onde fica a lavoura: " + _uma_ou_outra(listas["cidades"].values()) + "?",
+        "cidade_id": (f"Não tenho os dados de {ficha['lugar_dito']} guardados. Qual destes fica mais perto da sua "
+                      "lavoura: " if ficha.get("lugar_dito") else "Onde fica a lavoura: ")
+                     + _uma_ou_outra(listas["cidades"].values()) + "?",
         "rotacao_atual": "O que você planta hoje? As opções: "
                          + "; ".join(item["nome"] for item in listas["rotacoes"].values()) + ".",
         "terra": "Quanta água a sua terra segura: " + _uma_ou_outra(
@@ -188,7 +265,10 @@ def pergunta_do_que_falta(ficha, listas):
 
 def definicao(listas):
     """O que a IA lê da ficha: a ferramenta `anotar_na_ficha`, com as listas fechadas de cada campo."""
-    cidades = "; ".join(f"{ident} = {nome}" for ident, nome in listas["cidades"].items())
+    onde = listas.get("onde") or {}
+    cidades = "; ".join(f"{ident} = {nome}" + (f" (latitude {onde[ident][0]}, longitude {onde[ident][1]})"
+                                                if ident in onde else "")
+                        for ident, nome in listas["cidades"].items())
     cardapio = "; ".join(f'{ident} = {item["nome"]}' for ident, item in listas["rotacoes"].items())
     terras = "; ".join(f"{t} = {TERRAS_EM_PALAVRAS.get(t, t)}" for t in listas["terras"])
     preocupacoes = "; ".join(f"{p} = {PREOCUPACOES_EM_PALAVRAS.get(p, p)}" for p in listas["preocupacoes"])
@@ -196,10 +276,22 @@ def definicao(listas):
         "nome": "anotar_na_ficha",
         "descricao": "Anota na ficha do produtor o que ele disse. Só mande o campo que ele disse nesta conversa; "
                      "não invente nem complete por conta. O programa confere cada valor contra a lista e devolve "
-                     "o que entrou, o que foi recusado e o que ainda falta.",
+                     "o que entrou, o que foi recusado e o que ainda falta. Se ele disser um lugar ou uma rotação "
+                     "que não está nas listas, não recuse: mande lugar_dito com cidade_id (o lugar guardado mais "
+                     "próximo) e rotacao_dita com rotacao_atual (a rotação guardada mais parecida).",
         "parametros": {"type": "object", "additionalProperties": False, "properties": {
             "cidade_id": {"type": "string", "enum": list(listas["cidades"]),
-                          "description": "Onde fica a lavoura. " + cidades},
+                          "description": "Onde fica a lavoura. Se o lugar dele não está na lista, escolha o mais "
+                                         "próximo pela latitude e longitude, e mande também lugar_dito. " + cidades},
+            "lugar_dito": {"type": "string",
+                           "description": "Só quando o lugar que ele disse NÃO está na lista: o nome do lugar, como "
+                                          "ele disse (por exemplo, Cristalina). Mande junto cidade_id com o lugar "
+                                          "guardado mais próximo."},
+            "rotacao_dita": {"type": "string",
+                             "description": "Só quando o que ele planta NÃO está na lista: as culturas, como ele "
+                                            "disse, sem número (por exemplo, sorgo e milho; feijão depois da soja). "
+                                            "Mande junto rotacao_atual com a rotação da lista mais parecida (a que "
+                                            "tem mais culturas em comum com a dele)."},
             "rotacao_atual": {"type": "string", "enum": list(listas["rotacoes"]),
                               "description": "O que ele planta hoje, no ano inteiro. " + cardapio},
             "terra": {"type": "string", "enum": list(listas["terras"]),

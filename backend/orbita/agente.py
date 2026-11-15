@@ -24,10 +24,15 @@ escreve a explicação. O que o PROGRAMA garante, sem depender do pedido à IA:
   prontas, feitas só com as frases do motor (`texto_de` diz qual dos dois foi). Uma troca de sentido também é
   barrada: "a terra fica coberta 30 dias", quando 30 é o número de dias SEM planta viva.
 - A marca `apoio` sai das ferramentas que a IA consultou de fato: `conta` (o ensaio, o replay, o registro, o
-  "como está hoje"), `dados_do_lugar` (só o clima ou o verde do satélite) ou `conhecimento_geral` (nenhuma; aí o
+  painel da lavoura hoje), `dados_do_lugar` (só o clima ou o verde do satélite) ou `conhecimento_geral` (nenhuma; aí o
   programa põe o aviso na frente do texto). Antes de a ficha ser confirmada, `apoio` e `comparacao` são vazios.
 - O `momento`: `depois` (o verde do satélite ou o registro), `durante` (o replay de uma safra ou o "como está
   hoje") ou `antes` (o resto).
+
+- A indicação: com a ficha confirmada, a resposta nunca termina em recusa. O que o produtor disse fora das listas
+  fica nos campos "ditos" da ficha (`lugar_dito`, `rotacao_dita`); a conta roda com o lugar guardado mais próximo
+  e a rotação guardada mais parecida, e o programa garante que a resposta diz "conhecimento geral" para a parte de
+  fora (acrescenta a frase, se a IA não disse). As frases prontas também terminam numa indicação.
 
 O estado é pequeno e vira JSON: a ficha, o selo da confirmação, a pergunta que o produtor fez antes de fechar a
 ficha, o momento e as últimas falas (cortadas numa palavra inteira e conferidas de novo). Quem chama guarda e devolve na fala seguinte; cabe no limite do corpo da API.
@@ -55,7 +60,8 @@ MOMENTOS = ("antes", "durante", "depois")
 APOIOS = ("conta", "dados_do_lugar", "conhecimento_geral")
 QUANTOS_MARCOS = 10              # os marcos do replay que entram nas frases prontas (o motor chega a 9 numa safra)
 FRASE_MINIMA = 40                # um texto cortado só vale se sobrar pelo menos isto até a última frase inteira
-ARGUMENTOS = {"clima_do_lugar": ("hoje",), "ensaio_da_rotacao": ("safra",), "verde_do_satelite": ("safra",)}
+ARGUMENTOS = {"clima_do_lugar": ("hoje",), "ensaio_da_rotacao": ("safra",), "verde_do_satelite": ("safra",),
+              "lavoura_hoje": ()}
 _SEGREDO = secrets.token_bytes(32)   # sorteado quando o programa liga; fica só na memória (nunca em arquivo)
 
 AVISO = "Converse com o agrônomo antes de decidir."
@@ -74,6 +80,16 @@ FICHA_NAO_CONFIRMADA = ("A ficha ainda não foi confirmada pelo produtor: a cont
                         "diga nenhum número da conta.")
 SEM_CONTA = ("Sobre isso eu não tenho conta, e por isso não dou número. O que a conta mostra da sua rotação está na "
              "comparação aqui embaixo. Para esse assunto, converse com o agrônomo.")
+SEM_CONTA_COM_A_ROTACAO = ("Para esse assunto eu não tenho conta. O que a conta mostra da sua rotação ({nome}): "
+                           "{evidencia} O que a conta indica: {beneficio}")
+ROTACAO_PARECIDA = ("Você planta {dito}: a conta que eu tenho é a da rotação guardada mais parecida, {nome}. "
+                    "{evidencia}")
+LUGAR_PROXIMO = "O clima é o de {lugar}, o lugar guardado mais próximo de {dito}."
+NOTA_DA_ROTACAO_DITA = ("O que eu disse de {dito} fora desses números é conhecimento geral: a conta é a da rotação "
+                        "guardada mais parecida, {nome}.")
+NOTA_DO_LUGAR_DITO = ("Sobre {dito}, o que não está nesses números é conhecimento geral: o clima da conta é o de "
+                      "{lugar}, o lugar guardado mais próximo.")
+O_QUE_A_CONTA_INDICA = "O que a conta indica em cada caminho:"
 SEM_NUMERO = "Fiz a conta. O resultado de cada rotação está na comparação aqui embaixo."
 FALA_LONGA = "(Resposta longa: o resultado de cada rotação está na comparação.)"
 TAMBEM_COMPAREI = ("Também comparei {quantas} rotações, contando a sua de hoje: a evidência, o benefício, o risco e o "
@@ -114,19 +130,25 @@ usar um termo técnico, explique na mesma frase.
 Como a conversa anda:
 1. Primeiro a ficha: o lugar da lavoura, o que ele planta hoje, o tipo de terra, o que mais preocupa e, se ele \
 disser, o dia do plantio da soja. Tudo o que ele disser sobre isso você anota com a ferramenta anotar_na_ficha. Só \
-existem os valores das listas da ferramenta: se ele disser algo fora da lista, diga quais são as opções. Não anote \
-o que ele não disse.
+existem os valores das listas da ferramenta. Se ele disser um lugar ou uma rotação que não está nas listas, não \
+recuse nem liste as opções: anote lugar_dito (o lugar que ele disse) junto com cidade_id (o lugar guardado mais \
+próximo, pela latitude e longitude) e rotacao_dita (o que ele disse que planta) junto com rotacao_atual (a rotação \
+guardada mais parecida). Não anote o que ele não disse.
 2. O programa mostra a ficha e o produtor confirma. Quem lê o "sim" é o programa, não você.
-3. Com a ficha confirmada, você responde às perguntas dele consultando as ferramentas da conta: clima_do_lugar, \
-ensaio_da_rotacao e verde_do_satelite.
+3. Com a ficha confirmada, você responde às perguntas dele consultando as ferramentas da conta: lavoura_hoje, \
+ensaio_da_rotacao, clima_do_lugar e verde_do_satelite.
 
 Qual ferramenta para qual pergunta:
 - Antes de plantar ("o que eu planto agora?", "vale trocar?", "milho ou sorgo?"): ensaio_da_rotacao. Se o \
 produtor disse o dia em que plantou a soja, comece pelo calendário que a conta usou: quando a soja sai e quando a \
 segunda safra entra na terra.
-- Durante a safra ("como está a lavoura?", "como foi tal safra, dia a dia?"): clima_do_lugar com hoje=true, ou \
-ensaio_da_rotacao com a safra (vale "pior_ano"). No replay de uma safra, conte os marcos na ordem, cada um com a \
-data; o dia a dia inteiro a tela mostra.
+- Durante a safra, "como está a lavoura?" ou "como está hoje?": lavoura_hoje. A resposta traz, curta e em \
+palavras de produtor, os seis indicadores: a fase da cultura, a água, o calor, o verde do satélite, a terra \
+coberta e o aviso de sede. Os seis aparecem sempre, também os que estão tranquilos: uma frase curta para cada \
+um, com um número só, começando pelos que pedem atenção. Nessa resposta, a indicação é sobre a lavoura de \
+agora: o que acompanhar nos próximos dias (o que pede atenção), sem falar de trocar de rotação.
+- "Como foi tal safra, dia a dia?": ensaio_da_rotacao com a safra (vale "pior_ano"). No replay de uma safra, conte \
+os marcos na ordem, cada um com a data; o dia a dia inteiro a tela mostra.
 - Depois da colheita ("o que a terra mostrou?", "quantos dias ficou sem planta?"): verde_do_satelite, com a safra \
 se ele falar de uma.
 - O argumento safra só entra quando o produtor pergunta por uma safra ("como foi a pior safra?", "e na safra \
@@ -145,8 +167,18 @@ tirar da terra, e ainda há água na terra. O outro, quando existe, é o dia em 
 Nunca escreva que "a água acabou" no dia em que a sede começou.
 - O número de "dias sem planta viva" é o tempo em que a terra fica descoberta: quanto menos dias, mais coberta \
 ela fica. Nunca escreva que a terra fica "coberta" esse número de dias.
-- Você não escolhe a rotação pelo produtor. Você mostra o que a conta diz de cada rotação (a evidência, o \
-benefício, o risco e o que falta saber) e ajuda a comparar. A decisão é dele, com o agrônomo.
+- Toda resposta com a ficha confirmada termina numa indicação: o que a conta mostra de melhor em cada caminho \
+para o que mais preocupa o produtor, com os números lado a lado (as frases de benefício da comparação já dizem \
+quem ficou na frente). Comece a última frase por "A indicação:". A decisão continua dele, com o agrônomo.
+- Você nunca termina em recusa nem só em "não tenho". Se o produtor fala de uma cultura ou sequência que a conta \
+não tem (feijão, algodão, "sorgo e milho", "e se eu puser feijão?"), consulte ensaio_da_rotacao e responda com os \
+números da rotação guardada mais parecida, dizendo qual é; depois diga o que você sabe da cultura de fora numa \
+frase curta, sem número, começando por "Sobre o feijão, por conhecimento geral:" (com o nome da cultura). Não \
+estenda a conta para a sequência nova: os números são só os da rotação guardada.
+- Se o lugar dele não está guardado, a conta usa o clima do lugar guardado mais próximo: consulte clima_do_lugar \
+junto com ensaio_da_rotacao e diga uma vez de que lugar é o clima.
+- Avisos: no máximo uma linha de risco e uma de "o que falta saber" por rotação. Não repita aviso, não explique \
+limite da conta por extenso e não trate a data do dado como defeito.
 - Pergunta sobre o que a conta não mede (adubo e nutrientes, pragas e doenças, preço e mercado, máquinas, \
 crédito): não chame ferramenta; responda em poucas frases como conhecimento geral, sem número nenhum. O programa \
 já escreve, na frente da sua resposta, o aviso de que é conhecimento geral e não saiu da conta: comece direto pelo \
@@ -155,17 +187,14 @@ assunto, sem repetir esse aviso.
 satélite viu.
 - Ao comparar, ponha os dois números lado a lado. Não diga a diferença entre eles, nem "o dobro", nem "metade", nem \
 de qual dos dois um terceiro número está mais perto.
-- Escreva as datas no jeito brasileiro, dia/mês/ano, como 14/03/2016. Só fale do dia de hoje quando o \
-produtor perguntar como a lavoura está hoje. Nessa resposta, nunca escreva só "hoje" ou "tantos dias antes de \
-hoje": escreva a data do dia da consulta e a data do último dia com dado, as duas, como a ferramenta dá. Nas \
-outras respostas, não diga que dia é hoje: não escreva "hoje é" nem a data do dia da consulta.
-- O estado da lavoura (o que está na terra, a água na terra, a sede) vale no último dia com dado, nunca no dia \
-da consulta. Diga o estado com a data do último dia com dado e com o verbo no passado. Se o último dia com dado é \
-11/11/2026 e a consulta é de 15/11/2026, escreva "em 11/11/2026 a soja estava na terra", não "em 15/11/2026 a \
-soja está na terra". A data da consulta só serve para dizer quantos dias o dado tem de atraso.
-- No "como está hoje" a conta dá dois valores da água na terra, um com cada chuva (a medida por satélite e a \
-estimada por modelo de computador). Diga os dois valores, cada um com a sua chuva, e pare aí. Não escreva "valor \
-real", não diga que o valor "deve estar entre" os dois, nem qual dos dois está mais certo: a conta só dá os dois.
+- Escreva as datas no jeito brasileiro, dia/mês/ano, como 14/03/2016. Não diga que dia é hoje: não escreva \
+"hoje é" nem a data do dia da consulta.
+- No "como está a lavoura", diga a data do dado uma vez só, discreta, no começo ("em 14/11/2026"), com o verbo no \
+passado ("a soja estava em crescimento"). Não escreva "atraso", "aproximada", "ainda não chegou" nem "último dia \
+com dado": a data basta. Os prazos contam a partir da data do dado: escreva como a conta escreve ("em 7 dias, em \
+21/11/2026"), nunca "daqui a".
+- Diga "o pior ano" e "o ano normal", como a conta diz. Não escreva "a safra mais seca" nem "o ano mais seco": o \
+pior ano é o da pior colheita da região.
 - Em resposta de conhecimento geral, não escreva data nenhuma, nem a de hoje.
 - Escreva cada número igual ao da conta, com a mesma casa depois da vírgula: se a conta diz 252,0 mm, escreva \
 252,0 mm (não 252 mm); se diz 96 dias, escreva 96 dias.
@@ -178,8 +207,8 @@ de textura média".
 - A falta de água de cada rotação, na comparação, é das culturas do ano inteiro (a soja mais a segunda safra), \
 não só do milho ou do sorgo: diga "na rotação com milho faltaram", não "o milho deixou faltando". O que o satélite \
 viu da terra vale para a rotação de hoje da região, não para uma cultura.
-- Não diga que uma rotação é "a que mais sofre", "a melhor" ou "a pior" de todas: as rotações com capim saem em \
-faixa, e a ordem entre elas pode mudar. Ponha os números de cada uma lado a lado e deixe o produtor ver.
+- Não diga que uma rotação é "a melhor" ou "a pior" de todas: diga em quê cada uma ficou na frente, como as \
+frases de benefício dizem, com os números de cada uma lado a lado.
 - Escreva só em português, com as letras do português.
 - No marco da água no fundo, a frase da conta diz o que aconteceu: a água acabou, ficou perto do fundo sem acabar, \
 ou a terra já estava seca no dia do plantio. Conte como a frase conta; não diga que a água acabou nos outros dois \
@@ -187,7 +216,9 @@ casos.
 - Não peça nome, telefone, CPF nem endereço. Não prometa lucro nem produtividade.
 - Embaixo da sua resposta o programa mostra a comparação das rotações lado a lado e o aviso de conversar com o \
 agrônomo. Não repita a tabela inteira: explique o que ela mostra para a pergunta dele.
-- Escreva texto corrido, sem markdown (sem asterisco, sem cerquilha, sem tabela), com até uns 700 caracteres."""
+- Escreva texto corrido, sem markdown (sem asterisco, sem cerquilha, sem tabela). Resposta curta, que caiba numa \
+tela de celular: até uns 600 caracteres. Não escreva "Converse com o agrônomo antes de decidir": o programa já \
+mostra essa frase embaixo."""
 
 
 def _cortar(texto, teto):
@@ -225,11 +256,11 @@ def _guardar(resposta, conta, permitidos):
 def _selo(fch):
     """O selo da ficha confirmada: a prova de que foi este programa que leu o "sim" do produtor para esta ficha.
 
-    É um HMAC-SHA256 dos 5 campos da ficha com o segredo da memória. Quem chama guarda e devolve o selo junto com o
+    É um HMAC-SHA256 dos 5 campos da ficha e dos 2 "ditos" com o segredo da memória. Quem chama guarda e devolve o selo junto com o
     estado; sem o segredo, não dá para fazer o selo de outra ficha. Se o programa reiniciar, o segredo muda e o
     produtor confirma a ficha de novo.
     """
-    marca = json.dumps([fch.get(campo) for campo in ficha.CAMPOS], ensure_ascii=False, separators=(",", ":"))
+    marca = json.dumps([fch.get(campo) for campo in ficha.CAMPOS + ficha.DITOS], ensure_ascii=False, separators=(",", ":"))
     return hmac.new(_SEGREDO, marca.encode("utf-8"), hashlib.sha256).hexdigest()
 
 
@@ -302,6 +333,15 @@ def _instrucoes(fch, hoje):
         ponto = ("A ficha ainda não está completa. Anote o que o produtor disser e peça o que falta, numa frase só. "
                  "As ferramentas da conta só funcionam depois que ele confirmar a ficha; até lá, não diga nenhum "
                  "número da conta.")
+    if fch.get("rotacao_dita") and fch.get("rotacao_atual"):
+        ponto += (f" O produtor planta «{fch['rotacao_dita']}», que a conta não tem. A conta compara com a rotação "
+                  "guardada mais parecida (a que está marcada como a de hoje na comparação). Na resposta, diga que "
+                  "rotação parecida é essa, dê a indicação com os números dela e, numa frase curta e sem número, o "
+                  "que você sabe da cultura de fora, começando por \"Sobre ..., por conhecimento geral:\".")
+    if fch.get("lugar_dito") and fch.get("cidade_id"):
+        ponto += (f" A lavoura fica em «{fch['lugar_dito']}», que não está guardado. O clima da conta é o do lugar "
+                  "guardado mais próximo (o cidade_id da ficha): consulte clima_do_lugar e ensaio_da_rotacao nesta fala "
+                  "e diga uma vez de que lugar é o clima.")
     return (f"{REGRAS}\n\nHoje é {hoje.isoformat()}.\nA ficha agora: "
             f"{json.dumps(ficha.publica(fch), ensure_ascii=False)}\n{ponto}")
 
@@ -519,9 +559,52 @@ def _tem(consulta, chave):
     return isinstance(bloco, dict) and bloco.get("disponivel") is not False
 
 
+def _painel(consulta):
+    """A consulta trouxe o painel da lavoura hoje (a ferramenta lavoura_hoje, com o motor respondendo)."""
+    return consulta["ferramenta"] == "lavoura_hoje" and consulta["resultado"].get("disponivel") is not False
+
+
+def _primeira_frase(texto):
+    """A primeira frase de um texto do motor (a linha curta de cada item do painel)."""
+    return re.split(r"(?<=[.!?])\s+(?=[A-ZÀ-Ý])", texto.strip(), maxsplit=1)[0]
+
+
+def _de_hoje(comparacao):
+    return next((item for item in comparacao or () if item.get("de_hoje") is True), None)
+
+
+def _frases_dos_ditos(fch, comparacao, listas):
+    """A indicação pronta dos campos "ditos": qual rotação parecida (com a evidência dela) e de que lugar é o clima."""
+    partes, de_hoje = [], _de_hoje(comparacao)
+    if fch.get("rotacao_dita") and de_hoje and isinstance(de_hoje.get("evidencia"), str):
+        partes.append(ROTACAO_PARECIDA.format(dito=fch["rotacao_dita"], nome=de_hoje["nome"],
+                                              evidencia=de_hoje["evidencia"]))
+    if fch.get("lugar_dito"):
+        partes.append(LUGAR_PROXIMO.format(lugar=ficha.nome_do_lugar(fch, listas), dito=fch["lugar_dito"]))
+    return partes
+
+
+def _notas_dos_ditos(fch, comparacao, listas):
+    """A frase curta que o programa acrescenta quando há campo "dito" e o texto não diz "conhecimento geral"."""
+    de_hoje = _de_hoje(comparacao)
+    if fch.get("rotacao_dita") and de_hoje:
+        return NOTA_DA_ROTACAO_DITA.format(dito=fch["rotacao_dita"], nome=de_hoje["nome"])
+    if fch.get("lugar_dito"):
+        return NOTA_DO_LUGAR_DITO.format(dito=fch["lugar_dito"], lugar=ficha.nome_do_lugar(fch, listas))
+    return None
+
+
+def _indicacao_pronta(comparacao):
+    """A indicação sem IA: o benefício que a conta escreveu de cada caminho (as frases do motor, sem mexer)."""
+    linhas = [f"• {item['nome']}: {item['beneficio']}" for item in comparacao
+              if isinstance(item.get("nome"), str) and isinstance(item.get("beneficio"), str)]
+    return "\n".join([O_QUE_A_CONTA_INDICA] + linhas) if linhas else TAMBEM_COMPAREI.format(quantas=len(comparacao))
+
+
 def _apoio(consultas):
     """Em que a resposta se apoia, pelo que a IA consultou de fato."""
-    if any(c["ferramenta"] == "ensaio_da_rotacao" or _tem(c, "registro") or _tem(c, "hoje") for c in consultas):
+    if any(c["ferramenta"] == "ensaio_da_rotacao" or _tem(c, "registro") or _tem(c, "hoje") or _painel(c)
+           for c in consultas):
         return "conta"
     return "dados_do_lugar" if consultas else "conhecimento_geral"
 
@@ -529,7 +612,7 @@ def _apoio(consultas):
 def _momento(consultas):
     if any(_tem(c, "registro") for c in consultas):
         return "depois"
-    if any(_tem(c, "replay") or _tem(c, "hoje") for c in consultas):
+    if any(_tem(c, "replay") or _tem(c, "hoje") or _painel(c) for c in consultas):
         return "durante"
     return "depois" if any(c["ferramenta"] == "verde_do_satelite" for c in consultas) else "antes"
 
@@ -554,17 +637,28 @@ def _frases_da_comparacao(comparacao, lugar):
     linhas = [f"Fiz a conta para {lugar} e comparei {len(comparacao)} rotações, contando a sua de hoje:"]
     linhas += [f"• {item['nome']}{' (a de hoje)' if item.get('de_hoje') is True else ''}: {item['evidencia']}"
                for item in comparacao]
-    return "\n".join(linhas + ["O benefício, o risco e o que falta saber de cada uma estão na comparação aqui embaixo."])
+    return "\n".join(linhas)
 
 
-def _frases_prontas(consultas, comparacao, lugar):
-    """A resposta sem IA: só as frases que o motor escreveu, na ordem do que foi consultado."""
+def _frases_prontas(consultas, comparacao, lugar, ditos=()):
+    """A resposta sem IA: só as frases que o motor escreveu, na ordem do que foi consultado. Termina sempre numa
+    indicação: o benefício de cada caminho, como a conta escreveu. `ditos`: as frases dos campos "ditos" da ficha."""
     if not consultas:
-        return SEM_CONTA
-    partes = []
+        de_hoje = _de_hoje(comparacao)
+        sem_conta = (SEM_CONTA_COM_A_ROTACAO.format(nome=de_hoje["nome"], evidencia=de_hoje["evidencia"],
+                                                    beneficio=de_hoje["beneficio"])
+                     if de_hoje and all(isinstance(de_hoje.get(c), str) for c in ("nome", "evidencia", "beneficio"))
+                     else SEM_CONTA)
+        return "\n\n".join(dict.fromkeys(list(ditos) + [sem_conta]))
+    partes = list(ditos)
     for consulta in consultas:
         resultado = consulta["resultado"]
-        if consulta["ferramenta"] == "clima_do_lugar":
+        if _painel(consulta):
+            itens = [i for i in resultado.get("itens") or [] if isinstance(i, dict) and isinstance(i.get("frase"), str)]
+            partes.append("\n".join(_frases_de(resultado)[:1] + [f"• {_primeira_frase(i['frase'])}" for i in itens]))
+        elif consulta["ferramenta"] == "lavoura_hoje":
+            partes += [resultado["aviso"]] if isinstance(resultado.get("aviso"), str) else []
+        elif consulta["ferramenta"] == "clima_do_lugar":
             anos = resultado.get("regra_dos_anos") if isinstance(resultado.get("regra_dos_anos"), dict) else {}
             if anos.get("pior_ano") and anos.get("ano_normal"):
                 partes.append(f"Em {lugar}, pelo que os satélites registraram, a pior safra foi a de "
@@ -585,9 +679,9 @@ def _frases_prontas(consultas, comparacao, lugar):
             if marcos:
                 partes.append(f"A safra {replay.get('safra')} em {lugar}, dia a dia:\n" + "\n".join(
                     f"• {_data_do_marco(m.get('data'))}: {m['frase']}" for m in marcos[:QUANTOS_MARCOS]))
-    if not partes:                                    # a fala foi só sobre a comparação: a evidência de cada uma
-        return _frases_da_comparacao(comparacao, lugar)
-    return "\n\n".join(dict.fromkeys(partes + [TAMBEM_COMPAREI.format(quantas=len(comparacao))]))
+    if partes == list(ditos):                         # a fala foi só sobre a comparação: a evidência de cada uma
+        partes.append(_frases_da_comparacao(comparacao, lugar))
+    return "\n\n".join(dict.fromkeys(partes + [_indicacao_pronta(comparacao)]))
 
 
 def _conta_recusada(estado, texto, erro, hoje):
@@ -672,9 +766,12 @@ def _responder(estado, texto, pergunta, modelo, listas, hoje, pronto=None):
     apoio = _apoio(consultas.feitas)
     if texto_da_ia:
         final = texto_da_ia if apoio != "conhecimento_geral" else AVISO_DE_CONHECIMENTO_GERAL + "\n\n" + texto_da_ia
+        nota = _notas_dos_ditos(fch, comparacao, listas)
+        if nota and "conhecimento geral" not in final.lower():     # a garantia do programa: a parte de fora da conta
+            final += "\n\n" + nota                                # é dita como conhecimento geral
         sobras_da_ia = []
     else:
-        final = _frases_prontas(consultas.feitas, comparacao, lugar)
+        final = _frases_prontas(consultas.feitas, comparacao, lugar, _frases_dos_ditos(fch, comparacao, listas))
     return _sair(dict(estado, pergunta=None), texto, final, hoje, comparacao=comparacao, apoio=apoio,
                  momento=_momento(consultas.feitas), texto_de="ia" if texto_da_ia else "frases_prontas",
                  passou=not sobras_da_ia, sobras=sobras_da_ia, tentativas=tentativas, consultas=consultas.feitas,
@@ -705,7 +802,7 @@ def passo(estado, texto, modelo, hoje=None):
     if fala in conversa.DE_NOVO:
         estado = _novo()
     fch = estado["ficha"]
-    vazia = not any(fch.get(campo) for campo in ficha.CAMPOS)
+    vazia = not any(fch.get(campo) for campo in ficha.CAMPOS + ficha.DITOS)
     if vazia and (not fala or fala in OLA or fala in conversa.DE_NOVO):
         return _sair(estado, texto, SAUDACAO + "\n\n" + ficha.pergunta_do_que_falta(fch, listas), hoje)
     if not fala and fch["confirmada"]:                # nem a fala vazia sai sem a comparação

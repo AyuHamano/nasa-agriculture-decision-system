@@ -2,7 +2,7 @@
 # Órbita Rural · o agente (a IA que conversa com o produtor)
 
 **O que é.** O agente é a IA que conversa com o produtor rural. Ele colhe os dados da lavoura numa ficha fechada,
-consulta o motor (o programa que faz a conta com os dados da NASA) por 3 ferramentas e explica o resultado em
+consulta o motor (o programa que faz a conta com os dados da NASA) por 4 ferramentas e explica o resultado em
 português simples. **A IA não cria número:** cada número do texto dela é conferido contra a conta antes de aparecer.
 E ela não escolhe a rotação pelo produtor: mostra a comparação e manda conferir com o agrônomo.
 
@@ -36,7 +36,7 @@ Nenhum dado pessoal é pedido (nome, telefone, CPF, endereço), e a API continua
 |---|---|
 | `ficha.py` | a ficha fechada: o lugar, o que planta hoje, o tipo de terra, a data do plantio da soja (opcional) e o que mais preocupa |
 | `modelo.py` | o encaixe da IA: o modelo de mentira (para os testes) e o de verdade (OpenRouter), no mesmo formato |
-| `ferramentas.py` | as 3 ferramentas: `clima_do_lugar`, `ensaio_da_rotacao` e `verde_do_satelite`; cada uma chama uma função do motor |
+| `ferramentas.py` | as 4 ferramentas: `clima_do_lugar`, `ensaio_da_rotacao`, `verde_do_satelite` e `lavoura_hoje`; cada uma chama uma função do motor |
 | `agente.py` | o passo da conversa: `agente.passo(estado, texto, modelo)`; é aqui que moram as garantias |
 | `api.py` | a rota nova `POST /agente` (as rotas de antes continuam iguais) |
 | `exportar_conversas.py` | grava as conversas de exemplo que a tela lê quando a API não está ligada |
@@ -108,57 +108,71 @@ confirmação da ficha vai junto com um selo (`estado.selo`), feito com um segre
 só na memória dela. Estado com "confirmada" e sem o selo certo volta a "não confirmada", e a ficha é mostrada de novo.
 A consequência: se a API for desligada e ligada de novo, o produtor confirma a ficha outra vez (um "sim").
 
-## As 3 ferramentas
+## As 4 ferramentas
 
 | a ferramenta | o que a IA pode pedir | a função do motor |
 |---|---|---|
-| `clima_do_lugar` | o que os satélites registraram no lugar; com `hoje: true`, como está a água da lavoura hoje | `motor.clima_do_lugar`, `motor.como_esta_hoje` |
+| `lavoura_hoje` | o painel da lavoura agora ("como está a minha lavoura?"): o resumo e os seis indicadores (a fase da cultura, a água, o calor, o verde do satélite, a terra coberta e o aviso de sede), cada um com a frase, a situação e os números; sem argumento | `motor.lavoura_hoje` |
+| `clima_do_lugar` | o que os satélites registraram no lugar (serve também quando o lugar do produtor não está guardado: é o clima do lugar guardado mais próximo) | `motor.clima_do_lugar` |
 | `ensaio_da_rotacao` | a comparação das rotações no ano normal e no pior ano, e o calendário que a conta usou (com a data de plantio do produtor, se ele disse); com `safra`, o replay daquela safra, dia a dia | `motor.responder`, `motor.replay_da_safra` |
 | `verde_do_satelite` | os dias sem planta viva pelo calendário e pelo satélite (NDVI); com `safra`, o registro daquela safra | `motor.verde_do_satelite`, `motor.registro_da_safra` |
 
-`safra` aceita `"2015-16"`, `"pior_ano"` ou `"ano_normal"`, e `hoje` só aceita `true`; qualquer outro argumento que
-a IA mandar é jogado fora. A ficha é a quarta coisa que a IA pode chamar
-(`anotar_na_ficha`), e não é da conta. Se o motor ainda não tiver o "como está hoje" ou o registro, a ferramenta
-devolve um aviso no lugar, e a IA diz que isso é o próximo passo.
+`safra` aceita `"2015-16"`, `"pior_ano"` ou `"ano_normal"`; qualquer outro argumento que a IA mandar é jogado fora.
+A ficha é a quinta coisa que a IA pode chamar (`anotar_na_ficha`), e não é da conta. O painel vai à IA enxuto (até 6
+mil caracteres): sem as regras de cada situação, as fontes, os detalhes técnicos, a data da consulta e o atraso do
+dado; fica a data do dado, que a IA diz uma vez ("em 14/11/2026"). Os números do painel entram na conferência como os
+das outras ferramentas: número que não está nele é barrado. Se o motor não tiver o painel ou o registro, a ferramenta
+devolve `{"disponivel": false, "aviso": ...}`. Nas frases prontas, o painel sai com o resumo e uma linha por item.
+
+## O que o produtor disse fora das listas, e a indicação (2026-11-15)
+
+A conta continua fechada (3 lugares, 3 rotações), mas a conversa não termina mais em recusa. A ficha ganhou dois
+campos livres e opcionais, `lugar_dito` e `rotacao_dita`: o texto curto do que o produtor disse fora das listas
+("Cristalina", "sorgo e milho"; só letra, espaço, vírgula e hífen, até 60 letras, sem algarismo). Junto com eles vão
+`cidade_id` = o lugar guardado mais próximo (a IA escolhe pela latitude e longitude que a ferramenta mostra; se ela
+não mandar, o programa pergunta "Qual destes fica mais perto da sua lavoura?") e `rotacao_atual` = a rotação guardada
+mais parecida (se a IA não mandar, o programa escolhe a que tem mais culturas em comum; no empate, a primeira do
+cardápio). O resumo da ficha mostra os dois ("Cristalina (uso o clima de Silvânia (GO), o lugar guardado mais
+próximo)"), os dois entram no selo, e mudar um deles pede o "sim" de novo. A conta do motor não é estendida para a
+sequência nova: os números são os da rotação guardada, e a resposta diz qual é.
+
+Com a ficha confirmada, toda resposta termina numa indicação ("A indicação: ..."): o que a conta mostra de melhor em
+cada caminho para o que mais preocupa o produtor, com os números lado a lado; a decisão continua dele, com o
+agrônomo. O que a IA sabe da cultura de fora entra numa frase curta, sem número, marcada como conhecimento geral. O
+programa garante: se há campo "dito" e o texto não diz "conhecimento geral", ele acrescenta a frase; e as frases
+prontas também trazem a rotação parecida, a evidência dela, o lugar do clima e o benefício de cada caminho.
 
 ## As conversas guardadas
 
     python3 -m orbita.exportar_conversas <pasta>            # com a chave no ambiente: a IA de verdade escreve
     python3 -m orbita.exportar_conversas <pasta> --sem-ia   # sem chave: as frases prontas
 
-Grava `conversas.js` (`window.ORBITA_CONVERSAS = {...};`, o que a tela lê) e `conversas.json` (o mesmo objeto). São 4
-conversas, todas de Rio Verde (o caso provado: a safra 2015-16 é a pior colheita do IBGE e, na conta, tem mais falta
-de água que o ano normal; em Jataí o "pior ano" tem menos falta que o normal): `antes-plantei-tarde` (plantei a soja
-em 10 de novembro: milho ou sorgo? e a braquiária?), `replay-2015-16` (o momento "durante": primeiro o "como está
-hoje", logo depois da ficha, e depois a pior safra, dia a dia, com os dias e os marcos em `replay`),
-`depois-o-que-a-terra-mostrou` (o que o satélite viu e o registro da safra 2015-16) e `sem-conta-pragas-e-adubo` (sai
-com o aviso de conhecimento geral). Cada conversa diz em `texto_de` se o texto é da IA ou de frases prontas. Cada
-texto é conferido de novo contra a conta ao gravar; se sobrar número, nada é gravado. Com a IA, cada conversa é
-tentada até 3 vezes e fica a melhor: sem fala barrada, sem replay que o produtor não pediu, sem duas respostas com o
-mesmo começo, sem "antes de hoje" sem a data ao lado, sem "hoje é tal dia" fora da pergunta do "como está hoje", sem
-palavra da conta sem explicação e sem falar em "valor real" (a conta só dá os valores que calculou). Rodar de novo
-sempre que o motor mudar.
+Grava `conversas.js` (`window.ORBITA_CONVERSAS = {...};`, o que a tela lê) e `conversas.json` (o mesmo objeto). São 6
+conversas, na ordem: `antes-plantei-tarde` (Rio Verde, soja plantada em 10 de novembro: milho ou sorgo? e a
+braquiária?), `replay-2015-16` (o momento "durante": primeiro "como está a minha lavoura?", com o painel dos seis
+indicadores, e depois a pior safra, dia a dia, com os dias e os marcos em `replay`), `depois-o-que-a-terra-mostrou`
+(o que o satélite viu e o registro da safra 2015-16), `sem-conta-pragas-e-adubo` (sai com o aviso de conhecimento
+geral), `fora-da-lista-sorgo-e-milho` ("planto sorgo e milho em Jataí, o que você indica?") e
+`fora-da-lista-cristalina-feijao` ("sou de Cristalina e planto feijão depois da soja"). Cada conversa diz em
+`texto_de` se o texto é da IA ou de frases prontas. Cada texto é conferido de novo contra a conta ao gravar; se sobrar
+número, nada é gravado. Com a IA, cada conversa é tentada até 3 vezes e fica a melhor: sem fala barrada, sem replay
+que o produtor não pediu, sem duas respostas com o mesmo começo, sem "hoje é tal dia", sem palavra da conta sem
+explicação, terminando numa indicação e sem fala de mais de 900 caracteres. Rodar de novo sempre que o motor mudar.
 
-**As que estão guardadas** (`conversas-guardadas/`): gravadas de novo em 2026-11-15, 03h33 a 03h36, com o Claude
-Haiku 5.5 e o motor completo, depois de três regras novas no pedido à IA (o estado da lavoura é dito na data do último
-dia com dado, nunca na data da consulta; a conta dá os dois valores da água, um com cada chuva, e ninguém diz onde
-está "o valor real"; resposta de conhecimento geral não leva data) e da recusa de "valor real" na gravação. São 12
-falas do agente: 8 com o texto da IA e 4 com frases prontas (a ficha para conferir); nenhuma barrada pela conferência.
-Foram 3 gravações seguidas, lidas uma a uma contra a conta. Em nenhuma das três apareceu "hoje é tal dia" fora do
-"como está hoje", "valor real" ou o estado da lavoura dito na data da consulta: nas três, o "como está hoje" diz que
-em 11/11/2026 a soja estava na terra e dá os dois valores da água (63,0 mm e 34,8 mm), cada um com a sua chuva. O que
-a leitura achou de novo: a primeira e a terceira escreveram "36 pontos medidos" onde a conta diz 36 medidas (os pontos
-são 6); a segunda escreveu que a braquiária "cobre a terra por menos tempo, 30 dias" (são 30 dias sem planta viva: o
-sentido trocado, que a trava dos dias de terra coberta não pegou nessa forma) e "limite de 33 °C" onde a conta
-escreve 33,0 °C; a terceira escreveu que a sede do milho veio "após 60 dias de sede" (os 60 dias começaram naquele
-dia). O que ficou guardado: as conversas `antes-plantei-tarde`, `replay-2015-16` e `sem-conta-pragas-e-adubo` da
-primeira gravação e a `depois-o-que-a-terra-mostrou` da segunda, trocada inteira pelo `id` nos dois arquivos, sem
-mexer em texto nenhum. O teste `AsConversasQueEstaoNoRepositorio` confere tudo de novo a cada rodada.
-
-As ressalvas do que ficou (nada é número errado, e nada foi editado à mão): no "como está hoje" a IA escreveu o atraso
-por extenso ("quatro dias antes"; a conta diz 4); na `depois-o-que-a-terra-mostrou` ela chamou de "sem planta verde"
-os 122 dias do calendário (a conta diz "sem planta"); e na resposta de pragas e adubo ela repetiu, com outras palavras,
-o aviso de conhecimento geral que o programa já escreve na frente.
+**As que estão guardadas** (`conversas-guardadas/`): gravadas de novo em 2026-11-15, 09h07 a 09h10, com o Claude
+Haiku 5.5 e o motor da rodada do alinhamento (o painel da lavoura, as frases curtas, a indicação). São 6 conversas e
+16 falas do agente: 10 com o texto da IA e 6 com frases prontas (a ficha para conferir); nenhuma barrada pela
+conferência dos números; todas as respostas com a conta terminam em "A indicação:", e as falas da IA têm de 565 a 770
+caracteres. Foram 2 gravações seguidas, lidas uma a uma contra a conta. Ficaram as conversas da segunda (feita depois
+de três acertos no pedido à IA: os prazos contam da data do dado, sem "daqui a"; "o pior ano", não "a safra mais
+seca"; lugar que não está guardado pede a consulta do clima do lugar mais próximo) e a `sem-conta-pragas-e-adubo` da
+primeira, trocada inteira pelo `id` nos dois arquivos, sem mexer em texto nenhum: na segunda a IA consultou a conta
+também nessa resposta, e ela saiu com o apoio `conta` no lugar de `conhecimento_geral`, que o teste das guardadas
+exige em pelo menos uma fala. O que a leitura achou e ficou: na conversa do painel a IA escreveu "a soja não está com
+sede agora" (o dado é de 14/11/2026, dito no começo da resposta); na `fora-da-lista-sorgo-e-milho` a rotação parecida
+foi a soja → milho safrinha → pousio, escolhida pelo programa no empate (na primeira gravação a IA tinha escolhido a
+do sorgo); e na `fora-da-lista-cristalina-feijao` a ficha guardou o dito como "soja e feijão depois da soja". A cópia
+que a tela lê (`frontend/`) não foi trocada aqui: é da parte da tela.
 
 ## O uso de verdade (2026-11-15)
 
@@ -178,6 +192,8 @@ o aviso de conhecimento geral que o programa já escreve na frente.
   As 3 gravações de 2026-11-15, 03h14 a 03h18, custaram mais 0,05 dólar (61 pedidos).
   As 3 gravações de 2026-11-15, 03h33 a 03h36, custaram mais 0,05 dólar (60 pedidos; o uso da chave, medido no
   OpenRouter, foi de 0,3207 para 0,3735 dólar, de um limite de 5).
+  A rodada do alinhamento, em 2026-11-15, 08h48 a 09h10: 5 gravações (3 ensaios para afinar o pedido e 2 de prova),
+  0,19 dólar pela soma do que o programa mediu em cada uma (0,0455 + 0,0371 + 0,0282 + 0,0335 + 0,0420).
 
 ## O uso de IA, declarado
 

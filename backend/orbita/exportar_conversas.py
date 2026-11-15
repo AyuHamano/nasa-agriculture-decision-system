@@ -13,9 +13,11 @@ Cada conversa: {"id", "momento" (antes, durante ou depois), "titulo", "texto_de"
 "replay" (os dias e os marcos de uma safra, ou null), "passos": [{"de": "produtor", "texto": ...},
 {"de": "agente", "saida": a resposta da rota POST /agente}]}. O formato está no mapa do projeto, seção 7.5.
 
-As conversas: antes de plantar (plantei a soja tarde: milho ou sorgo?), durante (o replay da pior safra, dia a
-dia, e "como está hoje"), depois (o que a terra mostrou; o registro de uma safra) e uma pergunta sem conta (pragas
-e adubo), que sai com o aviso de conhecimento geral.
+As 6 conversas: antes de plantar (plantei a soja tarde: milho ou sorgo?), durante ("como está a minha lavoura?",
+com o painel dos seis indicadores, e o replay da pior safra, dia a dia), depois (o que a terra mostrou; o registro
+de uma safra), uma pergunta sem conta (pragas e adubo), que sai com o aviso de conhecimento geral, e as duas de
+fora das listas: "planto sorgo e milho em Jataí" e "sou de Cristalina e planto feijão depois da soja" (a conta da
+rotação guardada mais parecida, o clima do lugar guardado mais próximo e o conhecimento geral, marcado).
 
 Os cuidados: cada texto do agente é conferido de novo contra a conta ao gravar (`agente.conferir_saida`); se
 sobrar número, nada é gravado. A chave da IA não entra em arquivo nenhum (e é procurada no que vai ser gravado).
@@ -57,7 +59,7 @@ CONVERSAS = (
      "falas": (
          # O "como está hoje" vem logo depois da ficha (é a pergunta do momento); o replay da pior safra vem depois.
          (FICHA_DE_RIO_VERDE + " Como está a minha lavoura hoje?", [chamada("anotar_na_ficha", **RIO_VERDE)]),
-         ("sim", [chamada("clima_do_lugar", hoje=True)]),
+         ("sim", [chamada("lavoura_hoje")]),
          ("E como foi a pior safra aqui, dia a dia?", [chamada("ensaio_da_rotacao", safra="pior_ano")]))},
     {"id": "depois-o-que-a-terra-mostrou", "momento": "depois", "titulo": "Depois da colheita: o que a terra mostrou?",
      "falas": (
@@ -69,6 +71,22 @@ CONVERSAS = (
          (FICHA_DE_RIO_VERDE, [chamada("anotar_na_ficha", **RIO_VERDE)]),
          ("sim", [ENSAIO]),
          ("Quais pragas atacam mais o milho safrinha? E quanto de adubo eu ponho?", []))},
+    # As duas de fora das listas (2026-11-15): a rotação e o lugar que a conta não tem não ficam sem indicação.
+    {"id": "fora-da-lista-sorgo-e-milho", "momento": "antes", "titulo": "Planto sorgo e milho em Jataí: o que você indica?",
+     "falas": (
+         ("Planto sorgo e milho em Jataí. A terra é de textura média e o que mais me preocupa é a falta de água. O "
+          "que você indica?",
+          [chamada("anotar_na_ficha", cidade_id="jatai", rotacao_dita="sorgo e milho", rotacao_atual="soja_sorgo_pousio",
+                   terra="media", preocupacao="agua")]),
+         ("sim", [ENSAIO]))},
+    {"id": "fora-da-lista-cristalina-feijao", "momento": "antes", "titulo": "Sou de Cristalina e planto feijão depois da soja",
+     "falas": (
+         ("Sou de Cristalina e planto feijão depois da soja. A terra é de textura média e o que mais me preocupa é a "
+          "falta de água. O que você indica?",
+          [chamada("anotar_na_ficha", cidade_id="silvania", lugar_dito="Cristalina",
+                   rotacao_dita="feijão depois da soja", rotacao_atual="soja_milho_pousio", terra="media",
+                   preocupacao="agua")]),
+         ("sim", [ENSAIO, chamada("clima_do_lugar")]))},
 )
 
 
@@ -109,11 +127,11 @@ def _barradas(gravada):
 
 
 COMECO = 60                                         # as letras do começo de uma resposta que não podem se repetir
-HOJE_SOLTO = re.compile(r"\b(?:antes de hoje|dias? atrás|até hoje)\b", re.IGNORECASE)
 HOJE_E = re.compile(r"\bhoje é \d", re.IGNORECASE)
 DATA_ESCRITA = re.compile(r"\b\d{1,2}/\d{1,2}/\d{4}\b")
 PALAVRAS_DA_CONTA = ("mediana", "zona das raízes", "faixa da hipótese", "chuva de modelo", "franco-arenosa")
-VALOR_REAL = re.compile(r"\bvalor(?:es)? rea(?:l|is)\b", re.IGNORECASE)
+TAMANHO_DA_FALA = 900                               # nenhuma fala do agente passa disto (cabe na tela do celular)
+INDICACAO = re.compile(r"\bindica(?:ção|\b)", re.IGNORECASE)   # "A indicação: ..." ou "O que a conta indica ..."
 
 
 def _respostas(gravada):
@@ -132,18 +150,10 @@ def comecos_repetidos(gravada):
     return repetidos
 
 
-def hoje_sem_data(gravada):
-    """Quantas frases dizem "antes de hoje" (ou "dias atrás") sem uma data escrita ao lado: guardada, a frase
-    envelhece, e só a data diz de que dia ela fala."""
-    frases = [frase for texto in _respostas(gravada) for frase in re.split(r"(?<=[.!?])\s+|\n", texto)]
-    return sum(1 for frase in frases if HOJE_SOLTO.search(frase) and not DATA_ESCRITA.search(frase))
-
-
 def hoje_fora_de_hora(gravada):
-    """Quantas respostas dizem que dia é hoje ("Hoje é 15/11/2026") sem a pergunta ter sido a do "como está hoje"."""
+    """Quantas respostas dizem que dia é hoje ("Hoje é 15/11/2026"): a data do dado basta, dita uma vez."""
     saidas = [p["saida"] for p in gravada["passos"] if p["de"] == "agente"]
-    return sum(1 for s in saidas if HOJE_E.search(s["resposta"])
-               and not any(isinstance((c.get("resultado") or {}).get("hoje"), dict) for c in s.get("consultas") or ()))
+    return sum(1 for s in saidas if HOJE_E.search(s["resposta"]))
 
 
 def palavras_da_conta(gravada):
@@ -151,19 +161,25 @@ def palavras_da_conta(gravada):
     return sum(1 for texto in _respostas(gravada) if any(palavra in texto.lower() for palavra in PALAVRAS_DA_CONTA))
 
 
-def valor_real(gravada):
-    """Quantas respostas falam do "valor real" (onde ele está, entre o quê): a conta só dá os valores que calculou."""
-    return sum(1 for texto in _respostas(gravada) if VALOR_REAL.search(texto))
+def sem_indicacao(gravada):
+    """1 se a conversa não termina numa indicação (a última resposta, com a comparação, diz o que a conta indica)."""
+    ultima = [p["saida"] for p in gravada["passos"] if p["de"] == "agente"][-1]
+    return 0 if ultima.get("comparacao") and INDICACAO.search(ultima["resposta"]) else 1
+
+
+def falas_longas(gravada):
+    """Quantas falas do agente passam do tamanho de uma tela de celular (TAMANHO_DA_FALA)."""
+    return sum(1 for texto in _respostas(gravada) if len(texto) > TAMANHO_DA_FALA)
 
 
 def _falhas(conversa, gravada):
     """O que desabona uma conversa gravada com a IA: cada fala barrada pela conferência (ali saíram as frases
     prontas), um replay que a conversa não pediu (só a conversa do replay leva os dias de uma safra), duas respostas
-    com o mesmo começo, um "antes de hoje" sem a data ao lado, um "hoje é tal dia" numa resposta que não é a do
-    "como está hoje", uma palavra da conta sem explicação e uma resposta que fala do "valor real"."""
+    com o mesmo começo, um "hoje é tal dia", uma palavra da conta sem explicação, a conversa que não termina numa
+    indicação e a fala que passa de 900 caracteres."""
     replay_a_mais = 0 if conversa["id"].startswith("replay-") or not gravada["replay"] else 1
-    return (_barradas(gravada) + replay_a_mais + comecos_repetidos(gravada) + hoje_sem_data(gravada)
-            + hoje_fora_de_hora(gravada) + palavras_da_conta(gravada) + valor_real(gravada))
+    return (_barradas(gravada) + replay_a_mais + comecos_repetidos(gravada) + hoje_fora_de_hora(gravada)
+            + palavras_da_conta(gravada) + sem_indicacao(gravada) + falas_longas(gravada))
 
 
 def _com_a_ia(conversa, ia, hoje):

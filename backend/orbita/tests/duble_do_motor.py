@@ -60,16 +60,18 @@ class Duble:
     ROTACOES = ROTACOES
     ROTACAO_DE_HOJE = ["soja", "milho", "pousio"]
 
-    def __init__(self, rotacoes=3, com_hoje=True, com_registro=True, recusar=None):
+    def __init__(self, rotacoes=3, com_hoje=True, com_registro=True, recusar=None, com_lavoura=True):
         self.chamadas, self.quantas, self.recusar = [], rotacoes, recusar
         if not com_hoje:
             self.como_esta_hoje = None
         if not com_registro:
             self.registro_da_safra = None
+        if not com_lavoura:
+            self.lavoura_hoje = None
 
     def __getattribute__(self, nome):                       # função desligada no dublê = o motor não tem a função
         valor = object.__getattribute__(self, nome)
-        if valor is None and nome in ("como_esta_hoje", "registro_da_safra"):
+        if valor is None and nome in ("como_esta_hoje", "registro_da_safra", "lavoura_hoje"):
             raise AttributeError(nome)
         return valor
 
@@ -125,3 +127,40 @@ class Duble:
         self.chamadas.append("registro_da_safra")
         return {"plantado": ["soja", "milho"], "falta_de_agua_mm": 232.9, "dias_de_calor_forte": 17,
                 "dias_sem_planta_viva": 122, "frase": f"Na safra {safra} faltaram 232,9 mm de água."}
+
+    def lavoura_hoje(self, entrada):
+        """O painel de mentira, no formato de `motor.lavoura_hoje`: o resumo e os 6 itens (com o que não vai à IA)."""
+        self.chamadas.append("lavoura_hoje")
+        self._conferir(entrada)
+        if "preocupacao" in entrada:
+            raise ValueError("Entrada fora do formato: a lavoura hoje não aceita a preocupação.")
+        lugar = self.CIDADES[entrada["cidade_id"]]["nome"]
+        longo = "Uma explicação longa que não vai à IA, com o número 4321. " * 3
+
+        def item(ident, titulo, situacao, frase, **numeros):
+            return dict({"id": ident, "titulo": titulo, "situacao": situacao, "situacao_nome": situacao,
+                         "frase": frase + " A segunda frase do item fica na tela.", "regra_da_situacao": longo,
+                         "detalhe_tecnico": longo, "aviso_tecnico": longo, "ultimo_dado": {"data": "2026-11-14"}},
+                        **numeros)
+
+        return {"disponivel": True, "local": dict(self.CIDADES[entrada["cidade_id"]], id=entrada["cidade_id"]),
+                "hoje": "2026-11-15", "ultimo_dia_com_dado": "2026-11-14", "ultimo_dia_com_dado_de": longo,
+                "atraso_dias": 1, "situacao": "atencao", "situacao_nome": "atenção",
+                "frase": f"Em {lugar}, em 14/11/2026, a soja tinha 30 dias e estava em crescimento, sem sede, com "
+                         "66,0 mm de água ao alcance da planta. Pedem atenção: o calor e o aviso de sede.",
+                "itens": [
+                    item("fase", "A fase da cultura", "tranquilo", "Na terra está a soja, plantada em 15/10/2026.",
+                         cultura="soja", dias_desde_o_plantio=30, plantio="2026-10-15"),
+                    item("agua", "A água", "tranquilo", "Em 14/11/2026, a conta dava 66,0 mm de água ao alcance da "
+                         "planta.", agua_na_terra_mm=66.0, por_safra=[{"safra": "2015-16", "mm": 63.4}]),
+                    item("calor", "O calor", "atencao", "Do plantio até 12/11/2026, a soja teve 2 dias de calor forte.",
+                         dias_de_calor_forte_desde_o_plantio=2, limite_c=40.0, fonte_do_limite="https://exemplo/" + "x" * 60),
+                    item("verde", "O verde do satélite", "tranquilo", "O verde deu 0,41, numa medida que vai de 0 a 1.",
+                         verde=0.4085),
+                    item("terra_coberta", "A terra coberta", "tranquilo", "Em 14/11/2026 a terra estava com planta "
+                         "viva: 31 dias seguidos.", dias_seguidos=31),
+                    item("aviso_de_sede", "O aviso de sede", "atencao", "Se não chover nada depois de 14/11/2026, a "
+                         "soja começa a passar sede em 7 dias, em 21/11/2026.", dias_ate_a_sede=7,
+                         data_da_sede="2026-11-21", dia_da_consulta="2026-11-15"),
+                ],
+                "regras": {"fase": longo}, "aviso": longo}
