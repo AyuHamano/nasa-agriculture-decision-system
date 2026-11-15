@@ -40,6 +40,17 @@ class Perguntar(unittest.TestCase):
             self.assertEqual(codigo, 0)
             self.assertIn(chave, json.loads(saida), argumentos)
 
+    def test_as_notas_de_1_a_5_sairam_do_comando(self):
+        # decisão do dono, 2026-11-15: --agua, --solo, --renda e --erosao deixaram de existir
+        for opcao in ("--agua", "--solo", "--renda", "--erosao"):
+            codigo, saida, erros = rodar([opcao, "5"])
+            self.assertEqual((codigo, saida), (2, ""), opcao)
+            self.assertIn("Comando fora do formato", erros)
+            self.assertNotIn("--agua 5", erros.split("Exemplo:")[-1])      # o exemplo do erro já não traz as notas
+        codigo, saida, erros = rodar(["--terra", "media", "--json"])
+        self.assertEqual(codigo, 0, erros)
+        self.assertIsNone(json.loads(saida)["entrada"].get("prioridades"))
+
     def test_entrada_errada_devolve_a_frase_em_portugues_sem_erro_cru(self):
         for argumentos in (["--cidade", "sorriso"], ["--rotacao", "soja,algodao"], ["--plantio", "20/11/2026"],
                            ["--preocupacao", "preco"], ["--replay", "1990-91"], ["--terra", "barro", "--hoje"],

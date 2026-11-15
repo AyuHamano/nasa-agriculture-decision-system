@@ -5,9 +5,10 @@ Uso:
     from orbita import mensagem, motor
     texto = mensagem.texto(motor.responder(entrada))
 
-O texto traz, nesta ordem: a pergunta, a resposta, o resultado nas prioridades de maior nota, um número de prova de
-cada medida mostrada (com a fonte dita em palavras), o risco em uma frase e "valide com o agrônomo". Não tem tabela nem
-markdown e cabe em uns 900 caracteres.
+O texto traz, nesta ordem: a pergunta, a resposta, o resultado no que mais preocupa (ou no que foi medido), um número
+de prova de cada medida mostrada (com a fonte dita em palavras), o risco em uma linha e "Converse com o agrônomo antes
+de decidir." no fim. Não tem tabela nem markdown e cabe em uns 900 caracteres. As notas de 1 a 5 saíram (decisão do
+dono, 2026-11-15): o texto não mostra nota nem ordena por nota, mesmo que a resposta ainda traga uma.
 
 Não há IA aqui: são frases prontas, preenchidas só com o que está na resposta do motor. Todo número do texto está na
 resposta (o teste confere com `orbita.conferencia.conferir_texto`).
@@ -18,7 +19,7 @@ um campo esperado faltar (ou vier de outro tipo), o texto sai sem aquele trecho,
 import math
 
 LIMITE = 900                    # o tamanho que o texto não passa com as respostas de hoje (o teste confere)
-QUANTAS_PRIORIDADES = 2         # quantas prioridades, da maior nota para a menor, entram no texto
+QUANTAS_PRIORIDADES = 2         # quantas prioridades, na ordem em que o motor mandou, entram no texto
 QUEM = {"atual": "a rotação de hoje se saiu melhor", "alternativa": "a alternativa se saiu melhor",
         "empate": "empate", "não medido": "não medido (a conta não tem preço, custo nem produtividade)"}
 # O veredito da água pela faixa (os ajustes de 2026-11-14): se a prioridade trouxer `veredito_pela_faixa`, é ele que
@@ -28,7 +29,7 @@ PELA_FAIXA = {"alternativa_melhor": "a alternativa se saiu melhor", "alternativa
               "depende_da_hipotese": "depende da hipótese"}
 RISCO_DA_BRAQUIARIA = ("O risco: a braquiária também bebe água depois do milho, e a terra pode chegar mais seca ao "
                        "plantio da soja.")
-FECHO = "Isto é uma conta, não uma recomendação: valide com o agrônomo antes de decidir."
+FECHO = "Converse com o agrônomo antes de decidir."
 
 
 def _pega(coisa, *caminho):
@@ -65,24 +66,19 @@ def _pergunta(r):
 
 
 def _prioridades(r, quantas):
-    """As prioridades de maior nota: [(o id, a linha)]. A que vier sem nome ou sem resultado fica de fora."""
+    """As primeiras prioridades, na ordem do motor: [(o id, a linha)]. A sem nome ou sem resultado fica de fora."""
     lista = _pega(r, "prioridades")
     validas = []
     for p in lista if isinstance(lista, list) else []:
         nome, quem = _frase(_pega(p, "nome")), _frase(_pega(p, "melhor"))
         if nome and quem in QUEM:
             pela_faixa = PELA_FAIXA.get(_frase(_pega(p, "veredito_pela_faixa")))
-            validas.append((_inteiro(_pega(p, "nota")), _frase(_pega(p, "id")), nome, pela_faixa or QUEM[quem]))
-    validas.sort(key=lambda p: -p[0] if p[0] is not None else 1)       # a maior nota primeiro; o empate fica como veio
-    return [(ident, f"{nome}{'' if nota is None else f' (nota {nota})'}: {quem}.")
-            for nota, ident, nome, quem in validas[:max(quantas, 0)]]
+            validas.append((_frase(_pega(p, "id")), nome, pela_faixa or QUEM[quem]))
+    return [(ident, f"{nome}: {quem}.") for ident, nome, quem in validas[:max(quantas, 0)]]
 
 
 def _titulo_das_prioridades(r):
-    """Com as notas, "Nas suas maiores notas"; sem elas (as notas saíram), o que mais preocupa ou o que foi medido."""
-    lista = _pega(r, "prioridades")
-    if isinstance(lista, list) and any(_inteiro(_pega(p, "nota")) is not None for p in lista):
-        return "Nas suas maiores notas:"
+    """O que mais preocupa, se o produtor disse; senão, o que foi medido. (As notas de 1 a 5 saíram.)"""
     return "No que mais preocupa:" if _frase(_pega(r, "preocupacao")) else "No que foi medido:"
 
 

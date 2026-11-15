@@ -27,7 +27,6 @@ De dentro de `backend/`:
     python3 -m orbita.perguntar --terra media                                                 # a resposta em português
     python3 -m orbita.perguntar --terra media --plantio 2026-11-20 --preocupacao agua --json  # a estrutura
     python3 -m orbita.perguntar --cidade jatai --rotacao soja,sorgo --plantio 2026-11-20      # outra cidade, a rotação de hoje
-    python3 -m orbita.perguntar --agua 5 --solo 4 --renda 2 --erosao 3 --terra media          # com as notas, como antes
     python3 -m orbita.perguntar --cidade silvania --lugar      # os fatos do clima do lugar
     python3 -m orbita.perguntar --verde                        # o que o satélite viu da terra
     python3 -m orbita.perguntar --replay 2015-16               # a safra dia a dia: os marcos
@@ -42,7 +41,8 @@ De dentro de `backend/`:
 - `--terra`: `pouca`, `media` ou `muita` (quanta água a terra segura; o padrão é `media`).
 - `--plantio`: a data do plantio da soja, ano-mês-dia, de 1 de setembro a 31 de dezembro. O calendário inteiro anda
   junto. `--preocupacao agua|calor|terra`: o que mais preocupa; só muda a ordem e o destaque.
-- As notas (1 a 5) são opcionais: ou vêm as 4, ou nenhuma. Só mudam a ordem e o destaque; nenhum número muda.
+- As notas de 1 a 5 saíram (decisão do dono, 2026-11-15): o comando não aceita mais `--agua`, `--solo`, `--renda` e `--erosao`; a conversa (`/conversa`) não pergunta nota; o texto curto não mostra nota; o `exportar` não manda nota (`--sem-notas` continua aceita, sem efeito); e a API aceita `prioridades` no corpo, mas não repassa ao motor.
+- A tela usa quatro rotas da API direto, sem IA e sem chave: `POST /recomendacao`, `POST /lavoura-hoje`, `POST /replay` (a safra dia a dia) e `POST /registro` (o registro da safra). A IA (`POST /agente`) fica só para a pergunta livre. Os exemplos estão no `API.md`.
 - `--lugar`, `--verde`, `--replay`, `--hoje` e `--registro` são as outras portas do motor, uma de cada vez. Saem em
   frases prontas, ou na estrutura inteira com `--json`.
 - `--chuva imerg|chirps|era5|power`: a fonte da chuva. O padrão é `imerg` (o satélite de chuva da NASA). Em Jataí e
@@ -51,7 +51,7 @@ De dentro de `backend/`:
 - Entrada errada: sai uma frase em português dizendo o que usar, e o comando termina com o código 2.
 - A entrada em JSON: `{"cidade_id": "jatai", "rotacao_atual": ["soja", "sorgo"], "terra": "media",
   "plantio_da_soja": "2026-11-20", "preocupacao": "agua"}`. Só `cidade_id` e `rotacao_atual` são obrigatórios;
-  `prioridades` (as notas), `chuva` e `regra` são opcionais. Em Python: `from orbita import motor;
+  `chuva` e `regra` são opcionais (as notas de 1 a 5, `prioridades`, saíram em 2026-11-15). Em Python: `from orbita import motor;
   motor.responder(entrada)`.
 - **A conversa com a IA** (o agente) precisa de uma chave do OpenRouter, só no ambiente do terminal, nunca em
   arquivo: `export OPENROUTER_API_KEY=...` e depois `python3 -m orbita.api` (a rota `POST /agente`) ou
@@ -83,7 +83,7 @@ De dentro de `backend/`:
 - **O registro** (`motor.registro_da_safra`). A safra contada depois da colheita: a água, o calor, a terra coberta,
   os marcos e a posição dela entre as 10 safras do estudo.
 - **O agente** (a rota `POST /agente`). A IA conversa com o produtor, preenche uma ficha fechada (a cidade, a rotação
-  de hoje, a terra, a data do plantio, a preocupação) e consulta o motor por 3 ferramentas. A conta só roda depois do
+  de hoje, a terra, a data do plantio, a preocupação) e consulta o motor por 4 ferramentas (a quarta, desde 2026-11-15, é o painel da lavoura hoje). A conta só roda depois do
   "sim" do produtor, e essa confirmação leva um selo que só a API sabe fazer. Toda resposta com a ficha confirmada
   traz a comparação das 3 rotações, e cada número do texto da IA é conferido contra a conta antes de aparecer.
 - **As rotas de antes** (`POST /mensagem` e `POST /conversa`) continuam valendo, com o alcance de antes. A
@@ -226,7 +226,7 @@ registro da safra) · `explicacao.py` (o texto) · `mensagem.py` (o texto curto)
 texto) · `ndvi.py` · `perguntar.py` e `validar.py` (os comandos) · `api.py` (as rotas) · `conversa.py` (a conversa em
 passos, sem IA) · `agente.py`, `ficha.py`, `ferramentas.py` e `modelo.py` (o agente) · `exportar.py` e
 `exportar_conversas.py` (os arquivos que a tela lê) · `conversas-guardadas/` (as conversas de exemplo) · `tests/`
-(491 testes, com os da API e os do agente; a rota `POST /lavoura-hoje` e o comando `--lavoura-hoje`, a lavoura hoje em seis itens, estão no `API.md` e no `LEIA-ME-motor.md`, seção 10).
+(522 testes, com os da API e os do agente; a rota `POST /lavoura-hoje` e o comando `--lavoura-hoje`, a lavoura hoje em seis itens, estão no `API.md` e no `LEIA-ME-motor.md`, seção 10).
 
 Os outros manuais desta pasta: `API.md` (as rotas e os campos, um a um), `LEIA-ME-motor.md` (o que o motor ganhou em
 2026-11-15, as fontes novas e os limites) e `LEIA-ME-agente.md` (o agente e as garantias).

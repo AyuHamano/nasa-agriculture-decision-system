@@ -12,8 +12,10 @@ from orbita import api, ferramentas, mensagem, motor
 from orbita.modelo import ErroDoModelo, ModeloDeMentira, chamada, fala
 from orbita.tests.duble_do_motor import Duble
 
-ENTRADA = {"cidade_id": "rio_verde", "rotacao_atual": ["soja", "milho", "pousio"],
-           "prioridades": {"agua": 5, "solo": 4, "renda": 2, "erosao": 3}, "terra": "media"}
+# As notas de 1 a 5 saíram das rotas (decisão do dono, 2026-11-15): a pergunta de sempre vai sem `prioridades`.
+ENTRADA = {"cidade_id": "rio_verde", "rotacao_atual": ["soja", "milho", "pousio"], "terra": "media"}
+COM_NOTAS = dict(ENTRADA, prioridades={"agua": 5, "solo": 4, "renda": 2, "erosao": 3})   # quem ainda manda as notas
+DA_SAFRA = {"cidade_id": "rio_verde", "safra": "2015-16"}       # o corpo do /replay e do /registro, só o obrigatório
 RESPOSTA = json.loads(json.dumps(motor.responder(ENTRADA)))     # como ela chega depois de virar JSON
 JSON = {"Content-Type": "application/json"}
 
@@ -26,6 +28,11 @@ def ate_o_fim(fio):
         if not pedaco:
             return b"".join(pedacos).decode("utf-8")
         pedacos.append(pedaco)
+
+
+def sem_a_hora(registro):
+    """O registro da safra sem `registrado_em` (a hora da chamada, que muda de uma chamada para a outra)."""
+    return {campo: valor for campo, valor in registro.items() if campo != "registrado_em"}
 
 
 def erro_de(funcao, *argumentos):
@@ -52,7 +59,6 @@ class AsFuncoes(unittest.TestCase):
                  (api.rota_recomendacao, {}, "cidade_id"),
                  (api.rota_recomendacao, dict(ENTRADA, cidade_id=["rio_verde"]), "cidade_id"),
                  (api.rota_recomendacao, dict(ENTRADA, terra=["media"]), "terra"),
-                 (api.rota_mensagem, dict(ENTRADA, prioridades={"agua": 9}), "1 a 5"),
                  (api.rota_conversa, {"estado": None}, "texto"),
                  (api.rota_conversa, {"estado": None, "texto": 5}, "texto"),
                  (api.rota_conversa, {"estado": "solo", "texto": "4"}, "estado"),
@@ -61,6 +67,17 @@ class AsFuncoes(unittest.TestCase):
             erro = erro_de(funcao, corpo)
             self.assertEqual(erro.codigo, 400, corpo)
             self.assertIn(pedaco, erro.mensagem)
+
+    def test_as_notas_de_1_a_5_sairam_quem_ainda_manda_nao_quebra_e_a_resposta_nao_devolve_nota(self):
+        # decisão do dono, 2026-11-15 ("tira isso"): o corpo pode trazer `prioridades`, a API não repassa ao motor
+        for notas in (COM_NOTAS["prioridades"], {"agua": 9}, "muitas", None):
+            self.assertEqual(api.rota_recomendacao(dict(ENTRADA, prioridades=notas)), motor.responder(ENTRADA))
+            self.assertEqual(api.rota_mensagem(dict(ENTRADA, prioridades=notas)), api.rota_mensagem(dict(ENTRADA)))
+        resposta = api.rota_recomendacao(dict(COM_NOTAS))
+        self.assertIsNone(resposta["entrada"].get("prioridades"))
+        self.assertEqual([p.get("nota") for p in resposta["prioridades"]], [None] * len(resposta["prioridades"]))
+        self.assertNotIn("nota", api.rota_mensagem(dict(COM_NOTAS))["texto"].lower())
+        self.assertNotIn("prioridades", api.EXEMPLO)
 
     def test_nada_de_fora_escolhe_arquivo(self):
         # a fonte da chuva e a regra dos anos (que escolhem o arquivo lido) não entram pela API
@@ -79,6 +96,98 @@ class AsFuncoes(unittest.TestCase):
         self.assertEqual((api.ler_opcoes([]).endereco, api.ler_opcoes([]).porta), ("127.0.0.1", 8000))
         opcoes = api.ler_opcoes(["--porta", "8123", "--endereco", "0.0.0.0"])
         self.assertEqual((opcoes.endereco, opcoes.porta), ("0.0.0.0", 8123))
+
+
+class AsRotasDaSafra(unittest.TestCase):
+    """POST /replay e POST /registro: contas do motor, sem IA, para a tela."""
+
+    def test_replay_e_o_que_o_motor_devolve_com_os_padroes(self):
+        # sem rotacao_atual e sem terra valem soja -> milho -> pousio e a terra media
+        saida = api.rota_replay(dict(DA_SAFRA))
+        self.assertEqual(saida, motor.replay_da_safra(ENTRADA, "2015-16"))
+        self.assertEqual((saida["safra"], saida["terra"]), ("2015-16", "media"))
+        self.assertGreater(len(saida["dias"]), 300)
+        self.assertTrue(saida["marcos"])
+
+    def test_registro_e_o_que_o_motor_devolve_com_os_padroes(self):
+        saida = api.rota_registro(dict(DA_SAFRA))
+        self.assertEqual(sem_a_hora(saida), sem_a_hora(motor.registro_da_safra(ENTRADA, "2015-16")))
+        self.assertIn("o_que_foi_plantado", saida)
+        self.assertIn("registrado_em", saida)
+
+    def test_a_rotacao_a_terra_e_o_plantio_vao_ao_motor(self):
+        corpo = dict(DA_SAFRA, rotacao_atual=["soja", "sorgo"], terra="pouca", plantio="2015-11-20")
+        entrada = {"cidade_id": "rio_verde", "rotacao_atual": ["soja", "sorgo"], "terra": "pouca",
+                   "plantio_da_soja": "2015-11-20"}
+        self.assertEqual(api.rota_replay(dict(corpo)), motor.replay_da_safra(entrada, "2015-16"))
+        self.assertEqual(sem_a_hora(api.rota_registro(dict(corpo))),
+                         sem_a_hora(motor.registro_da_safra(entrada, "2015-16")))
+        # `plantio_da_soja` (o nome da /lavoura-hoje) é sinônimo de `plantio`
+        sinonimo = dict(DA_SAFRA, rotacao_atual=["soja", "sorgo"], terra="pouca", plantio_da_soja="2015-11-20")
+        self.assertEqual(api.rota_replay(sinonimo), api.rota_replay(dict(corpo)))
+        self.assertEqual(api.rota_replay(dict(corpo))["plantio_da_soja_informado"], "2015-11-20")
+
+    def test_a_safra_aceita_pior_ano_e_ano_normal(self):
+        anos = motor.clima_do_lugar("rio_verde")["regra_dos_anos"]
+        for nome in ("pior_ano", "ano_normal"):
+            for rota in (api.rota_replay, api.rota_registro):
+                self.assertEqual(rota(dict(DA_SAFRA, safra=nome))["safra"], anos[nome], nome)
+
+    def test_entrada_errada_e_400_em_portugues(self):
+        casos = (({"cidade_id": "rio_verde"}, "safra"), ({"safra": "2015-16"}, "cidade_id"),
+                 (dict(DA_SAFRA, safra="1990-91"), "safra"), (dict(DA_SAFRA, safra="2015"), "safra"),
+                 (dict(DA_SAFRA, safra=2015), "safra"), (dict(DA_SAFRA, cidade_id="sorriso"), "cidade_id"),
+                 (dict(DA_SAFRA, cidade_id=["rio_verde"]), "cidade_id"), (dict(DA_SAFRA, terra="barro"), "terra"),
+                 (dict(DA_SAFRA, rotacao_atual=["soja", "algodao"]), "rotacao_atual"),
+                 (dict(DA_SAFRA, plantio="20/11/2015"), "plantio"), (dict(DA_SAFRA, plantio=5), "plantio"),
+                 (dict(DA_SAFRA, plantio="2015-11-20", plantio_da_soja="2015-10-20"), "plantio"),
+                 (dict(DA_SAFRA, chuva="power"), "chuva"), (dict(DA_SAFRA, prioridades={"agua": 5}), "prioridades"),
+                 (dict(DA_SAFRA, safra="pior_ano", cidade_id="sorriso"), "cidade_id"))
+        for rota in (api.rota_replay, api.rota_registro):
+            for corpo, pedaco in casos:
+                erro = erro_de(rota, dict(corpo))
+                self.assertEqual(erro.codigo, 400, corpo)
+                self.assertIn(pedaco, erro.mensagem, corpo)
+
+    def test_as_rotas_novas_estao_em_todos_os_lugares(self):
+        for caminho, acao in (("/replay", api.rota_replay), ("/registro", api.rota_registro)):
+            self.assertEqual(api.ROTAS[caminho], "POST")
+            self.assertIs(api.ACOES[caminho], acao)
+            self.assertIn(f"POST {caminho}", api.TODAS_AS_ROTAS)
+            self.assertIn(caminho, api.ERROS_DO_SERVIDOR[501])
+            self.assertIn(f"POST {caminho}", api.rota_saude()["rotas"])
+            self.assertIn(f"POST {caminho}", api.__doc__)
+
+
+class SemChaveDeIa(unittest.TestCase):
+    """As quatro rotas que a tela usa direto respondem sem a chave da IA, nas três cidades do motor."""
+
+    def test_recomendacao_lavoura_hoje_replay_e_registro_respondem_200_sem_chave_nas_tres_cidades(self):
+        ambiente = {nome: valor for nome, valor in os.environ.items() if nome != "OPENROUTER_API_KEY"}
+        with mock.patch.dict(os.environ, ambiente, clear=True):
+            servidor = api.criar_servidor("127.0.0.1", 0, silencioso=True)
+            fio = threading.Thread(target=servidor.serve_forever, daemon=True)
+            fio.start()
+            try:
+                self.assertEqual(len(motor.CIDADES), 3)
+                for cidade in motor.CIDADES:
+                    pergunta = {"cidade_id": cidade, "rotacao_atual": ["soja", "milho", "pousio"], "terra": "media"}
+                    for caminho, corpo in (("/recomendacao", pergunta), ("/lavoura-hoje", pergunta),
+                                           ("/replay", {"cidade_id": cidade, "safra": "2015-16"}),
+                                           ("/registro", {"cidade_id": cidade, "safra": "2015-16"})):
+                        ligacao = http.client.HTTPConnection("127.0.0.1", servidor.server_address[1], timeout=30)
+                        try:
+                            ligacao.request("POST", caminho, body=json.dumps(corpo).encode("utf-8"), headers=JSON)
+                            resposta = ligacao.getresponse()
+                            saida = json.loads(resposta.read().decode("utf-8"))
+                        finally:
+                            ligacao.close()
+                        self.assertEqual(resposta.status, 200, (cidade, caminho, saida))
+                        self.assertNotIn("erro", saida, (cidade, caminho))
+            finally:
+                servidor.shutdown()
+                servidor.server_close()
+                fio.join(5)
 
 
 class PorHttp(unittest.TestCase):
@@ -120,6 +229,23 @@ class PorHttp(unittest.TestCase):
         self.assertEqual(codigo, 200)
         self.assertIs(corpo["ok"], True)
         self.assertIn("/conversa", json.dumps(corpo))
+        for rota in ("POST /replay", "POST /registro"):
+            self.assertIn(rota, corpo["rotas"])
+
+    def test_replay_e_registro_por_http(self):
+        codigo, _, corpo = self.pedir("POST", "/replay", DA_SAFRA)
+        self.assertEqual(codigo, 200)
+        self.assertEqual(corpo, json.loads(json.dumps(motor.replay_da_safra(ENTRADA, "2015-16"))))
+        codigo, _, corpo = self.pedir("POST", "/registro", DA_SAFRA)
+        self.assertEqual(codigo, 200)
+        self.assertEqual(sem_a_hora(corpo),
+                         sem_a_hora(json.loads(json.dumps(motor.registro_da_safra(ENTRADA, "2015-16")))))
+        for caminho in ("/replay", "/registro"):
+            codigo, _, corpo = self.pedir("POST", caminho, dict(DA_SAFRA, safra="1990-91"))
+            self.assertEqual((codigo, set(corpo)), (400, {"erro"}))
+            self.assertIn("safra", corpo["erro"])
+            codigo, _, corpo = self.pedir("POST", caminho, dict(DA_SAFRA, arquivo="x"))
+            self.assertEqual((codigo, "arquivo" in corpo["erro"]), (400, True))
 
     def test_recomendacao_por_http_e_a_resposta_inteira_do_motor(self):
         codigo, _, corpo = self.pedir("POST", "/recomendacao", ENTRADA)
@@ -134,7 +260,7 @@ class PorHttp(unittest.TestCase):
 
     def test_a_conversa_inteira_por_http(self):
         estado = None
-        for fala in ("oi", "terra boa", "2", "5", "4", "2", "3"):
+        for fala in ("oi", "terra boa", "2"):        # a conversa já não pergunta as notas (decisão do dono, 2026-11-15)
             codigo, _, corpo = self.pedir("POST", "/conversa", {"estado": estado, "texto": fala})
             self.assertEqual(codigo, 200)
             self.assertEqual(set(corpo), {"estado", "resposta"})
@@ -167,6 +293,7 @@ class PorHttp(unittest.TestCase):
     def test_metodo_errado_e_405_e_diz_o_certo(self):
         for metodo, caminho, certo in (("GET", "/recomendacao", "POST"), ("GET", "/mensagem", "POST"),
                                        ("GET", "/conversa", "POST"), ("POST", "/saude", "GET"),
+                                       ("GET", "/replay", "POST"), ("GET", "/registro", "POST"),
                                        ("PUT", "/recomendacao", "POST"), ("DELETE", "/saude", "GET")):
             codigo, resposta, saida = self.pedir(metodo, caminho, ENTRADA if metodo in ("POST", "PUT") else None)
             self.assertEqual(codigo, 405, caminho)

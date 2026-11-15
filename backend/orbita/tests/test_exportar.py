@@ -44,14 +44,14 @@ class Exportar(unittest.TestCase):
         self.assertIn("respostas.js", self.saida)
         self.assertIn("respostas.json", self.saida)
 
-    def test_o_js_tem_o_cabecalho_e_a_resposta_inteira_de_cada_terra_com_as_notas_iguais_a_3(self):
+    def test_o_js_tem_o_cabecalho_e_a_resposta_inteira_de_cada_terra_sem_as_notas(self):
+        # mudou em 2026-11-15 (decisão do dono: as notas de 1 a 5 saíram): antes a pergunta ia com as notas iguais a 3
         self.assertTrue(self.js.startswith("/* Gerado com IA (Claude) */"))
         self.assertEqual(self.js.count(COMECO), 1)
         respostas = self.do_js()
         self.assertEqual(list(respostas), ["pouca", "media", "muita"])
         for terra in respostas:
-            entrada = {"cidade_id": "rio_verde", "rotacao_atual": ["soja", "milho", "pousio"],
-                       "prioridades": {"agua": 3, "solo": 3, "renda": 3, "erosao": 3}, "terra": terra}
+            entrada = {"cidade_id": "rio_verde", "rotacao_atual": ["soja", "milho", "pousio"], "terra": terra}
             self.assertEqual(respostas[terra], json.loads(json.dumps(motor.responder(entrada))))
 
     def test_o_json_e_igual_e_leva_a_hora_e_os_parametros_usados(self):
@@ -61,7 +61,9 @@ class Exportar(unittest.TestCase):
         self.assertLess(abs((datetime.datetime.now(datetime.timezone.utc) - gerado).total_seconds()), 600)
         self.assertIn(self.dados["gerado_em"], self.js)                      # a mesma hora nos dois
         usados = self.dados["parametros_usados"]
-        self.assertEqual(usados["prioridades"], {"agua": 3, "solo": 3, "renda": 3, "erosao": 3})
+        self.assertNotIn("prioridades", usados)                              # as notas saíram (2026-11-15)
+        self.assertNotIn("prioridades", exportar.PERGUNTA)
+        self.assertEqual(exportar.ler_argumentos(["x", "--sem-notas"]), exportar.ler_argumentos(["x"]))  # sem efeito
         self.assertEqual(usados["terras"], ["pouca", "media", "muita"])
         self.assertEqual((usados["cidade_id"], usados["rotacao_atual"]), ("rio_verde", ["soja", "milho", "pousio"]))
         self.assertEqual((usados["chuva"], usados["regra"]), ("imerg", "rendimento"))   # o que o motor usou de fato
@@ -104,7 +106,7 @@ class ExportarComOpcoes(unittest.TestCase):
             self.assertEqual(resposta["rotacao_de_hoje"]["id"], "soja_sorgo_pousio")
             self.assertEqual(resposta["calendario"]["plantio_da_soja_informado"], "2026-11-20")
             self.assertEqual(resposta["entrada"]["terra"], terra)
-            self.assertIsNone(resposta["entrada"]["prioridades"])
+            self.assertIsNone(resposta["entrada"].get("prioridades"))
             self.assertEqual(len(resposta["comparacao_das_rotacoes"]), 3)
         self.assertNotIn("prioridades", dados["parametros_usados"])
         self.assertEqual(dados["parametros_usados"]["cidade_id"], "jatai")

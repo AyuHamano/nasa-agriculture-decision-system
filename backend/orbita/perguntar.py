@@ -4,9 +4,9 @@
 De dentro de backend/:
     python3 -m orbita.perguntar --terra media                                      (em português)
     python3 -m orbita.perguntar --terra media --plantio 2026-11-20 --preocupacao agua --json   (a estrutura)
-    python3 -m orbita.perguntar --agua 5 --solo 4 --renda 2 --erosao 3 --terra media          (com as notas, como antes)
-As notas de 1 a 5 são opcionais (ou vêm as 4, ou nenhuma). --plantio é a data do plantio da soja (ano-mês-dia) e
---preocupacao é o que mais preocupa (agua, calor ou terra): só muda a ordem e o destaque.
+As notas de 1 a 5 (--agua, --solo, --renda, --erosao) saíram por decisão do dono (2026-11-15): o comando não as aceita
+mais. --plantio é a data do plantio da soja (ano-mês-dia) e --preocupacao é o que mais preocupa (agua, calor ou
+terra): só muda a ordem e o destaque.
 --cidade rio_verde|jatai|silvania e --rotacao soja,milho,pousio | soja,milho,braquiaria | soja,sorgo (a de hoje).
 As outras portas do motor, uma de cada vez (saem em JSON, ou a frase pronta sem --json):
     python3 -m orbita.perguntar --cidade jatai --lugar                       (os fatos do clima do lugar)
@@ -27,14 +27,12 @@ from orbita import conferencia, explicacao, motor
 
 class _Argumentos(argparse.ArgumentParser):
     def error(self, message):
-        raise ValueError(f"Comando fora do formato ({message}). Exemplo: python3 -m orbita.perguntar --agua 5 "
-                         "--solo 4 --renda 2 --erosao 3 --terra media")
+        raise ValueError(f"Comando fora do formato ({message}). Exemplo: python3 -m orbita.perguntar --terra media "
+                         "--preocupacao agua")
 
 
 def main(argv=None):
     leitor = _Argumentos(prog="python3 -m orbita.perguntar", description="Pergunta ao motor do Órbita Rural.")
-    for nome in ("agua", "solo", "renda", "erosao"):
-        leitor.add_argument(f"--{nome}", type=int, help=f"a nota da prioridade {nome}, de 1 a 5")
     leitor.add_argument("--terra", default="media", help="quanta água a terra segura: pouca, media ou muita")
     leitor.add_argument("--cidade", default="rio_verde", help="rio_verde, jatai ou silvania")
     leitor.add_argument("--rotacao", default="soja,milho,pousio", help="a rotação de hoje, com vírgulas: soja,sorgo")
@@ -52,9 +50,8 @@ def main(argv=None):
     leitor.add_argument("--json", action="store_true", help="mostra a estrutura inteira em vez do texto")
     try:
         a = leitor.parse_args(argv)
-        notas = {nome: getattr(a, nome) for nome in ("agua", "solo", "renda", "erosao") if getattr(a, nome) is not None}
         entrada = {"cidade_id": a.cidade, "rotacao_atual": [x.strip() for x in a.rotacao.split(",") if x.strip()],
-                   "prioridades": notas or None, "terra": a.terra, "chuva": a.chuva,
+                   "terra": a.terra, "chuva": a.chuva,
                    "regra": a.regra, "plantio_da_soja": a.plantio, "preocupacao": a.preocupacao}
         outra = None
         if a.lugar:

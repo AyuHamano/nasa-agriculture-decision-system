@@ -6,12 +6,13 @@ import unittest
 from orbita import conferencia, mensagem, motor
 
 BASE = {"cidade_id": "rio_verde", "rotacao_atual": ["soja", "milho", "pousio"]}
-VARIAS_NOTAS = ({"agua": 5, "solo": 4, "renda": 2, "erosao": 3}, {"agua": 3, "solo": 3, "renda": 3, "erosao": 3},
-                {"agua": 1, "solo": 2, "renda": 5, "erosao": 4}, {"agua": 2, "solo": 5, "renda": 1, "erosao": 5})
-RESPOSTAS = [motor.responder(dict(BASE, prioridades=notas, terra=terra))
-             for terra in ("pouca", "media", "muita") for notas in VARIAS_NOTAS]
-RESPOSTA = RESPOSTAS[4]                    # terra média, água 5, solo 4, renda 2, erosão 3
-RENDA_NA_FRENTE = RESPOSTAS[6]             # terra média, renda 5, erosão 4
+# As notas de 1 a 5 saíram (decisão do dono, 2026-11-15): as respostas do teste vêm sem `prioridades`, e o que muda
+# de uma para outra é o que mais preocupa o produtor (ou nada).
+PREOCUPACOES = (None, "agua", "calor", "terra")
+RESPOSTAS = [motor.responder(dict(BASE, terra=terra, **({"preocupacao": p} if p else {})))
+             for terra in ("pouca", "media", "muita") for p in PREOCUPACOES]
+RESPOSTA = RESPOSTAS[4]                    # terra média, sem dizer o que mais preocupa
+COM_PREOCUPACAO = RESPOSTAS[7]             # terra média, o que mais preocupa é a terra
 TROCAS = (None, "x", 7, 2.5, True, [], {}, ["x"], {"x": 1}, float("nan"))
 
 
@@ -45,27 +46,37 @@ class OTexto(unittest.TestCase):
         self.assertIn("satélite", texto)                       # a fonte dita em palavras
         self.assertIn("NASA", texto)
         self.assertNotIn("http", texto)
-        self.assertEqual(texto.count("O risco:"), 1)
-        self.assertIn("valide com o agrônomo", texto)
+        self.assertEqual(texto.count("O risco:"), 1)           # uma linha de risco, sem aviso repetido
+        self.assertTrue(texto.endswith("Converse com o agrônomo antes de decidir."))
+        self.assertEqual(texto.count("agrônomo antes de decidir"), 1)
 
-    def test_mostra_as_prioridades_de_maior_nota(self):
-        texto = mensagem.texto(RESPOSTA)
-        for p in RESPOSTA["prioridades"][:2]:                  # o resultado vem da conta, não do teste
-            quem = mensagem.PELA_FAIXA.get(p.get("veredito_pela_faixa")) or mensagem.QUEM[p["melhor"]]
-            self.assertIn(f"{p['nome']} (nota {p['nota']}): {quem}.", texto)
-        self.assertEqual([p["id"] for p in RESPOSTA["prioridades"][:2]], ["agua", "solo"])
-        self.assertNotIn("Erosão (nota", texto)
-        self.assertNotIn("Renda (nota", texto)
-        self.assertLess(texto.index("Água (nota 5)"), texto.index("Solo (nota 4)"))
-        self.assertIn(f"{RESPOSTA['comparacao']['solo_e_erosao']['dias_sem_planta_viva_hoje']} dias", texto)
+    def test_nao_trata_a_data_do_dado_como_defeito(self):
+        for resposta in RESPOSTAS:
+            texto = mensagem.texto(resposta).lower()
+            for pedaco in ("aproximada", "com atraso", "ainda não entrou"):
+                self.assertNotIn(pedaco, texto)
 
-    def test_com_a_renda_na_frente_diz_que_nao_foi_medida_e_prova_a_outra(self):
-        texto = mensagem.texto(RENDA_NA_FRENTE)
-        self.assertIn("Renda (nota 5): não medido", texto)
-        self.assertIn("Erosão (nota 4)", texto)
-        self.assertNotIn("Água (nota", texto)
-        self.assertIn("dias por ano sem planta viva", texto)
-        self.assertNotIn("mm de água", texto)                  # a água não está entre as duas maiores notas
+    def test_mostra_as_duas_primeiras_medidas_sem_nota(self):
+        # mudou em 2026-11-15 (decisão do dono: as notas de 1 a 5 saíram): antes era "Água (nota 5): ...", sob o
+        # título "Nas suas maiores notas"; agora vale a ordem do motor, sem nota
+        for resposta, titulo in ((RESPOSTA, "No que foi medido:"), (COM_PREOCUPACAO, "No que mais preocupa:")):
+            texto = mensagem.texto(resposta)
+            self.assertIn(titulo, texto)
+            self.assertNotIn("nota", texto.lower())
+            for p in resposta["prioridades"][:2]:              # o resultado vem da conta, não do teste
+                quem = mensagem.PELA_FAIXA.get(p.get("veredito_pela_faixa")) or mensagem.QUEM[p["melhor"]]
+                self.assertIn(f"{p['nome']}: {quem}.", texto)
+            for p in resposta["prioridades"][2:]:
+                self.assertNotIn(f"{p['nome']}:", texto)
+            ids = [p["id"] for p in resposta["prioridades"][:2]]
+            self.assertEqual("mm de água" in texto, "agua" in ids)
+            self.assertEqual("dias por ano sem planta viva" in texto, "solo" in ids or "erosao" in ids)
+
+    def test_resposta_antiga_que_ainda_traz_nota_da_o_mesmo_texto_sem_nota_e_na_mesma_ordem(self):
+        antiga = copy.deepcopy(RESPOSTA)
+        for nota, p in enumerate(antiga["prioridades"], start=1):
+            p["nota"] = nota                                   # a última teria a maior nota: a ordem não muda
+        self.assertEqual(mensagem.texto(antiga), mensagem.texto(RESPOSTA))
 
     def test_cabe_numa_mensagem_e_nao_tem_tabela_nem_markdown(self):
         for resposta in RESPOSTAS:
@@ -94,7 +105,7 @@ class CampoQueFalta(unittest.TestCase):
             del dono[lugar]
             texto = mensagem.texto(resposta)
             dono.insert(lugar, guardado) if isinstance(dono, list) else dono.__setitem__(lugar, guardado)
-            self.assertIn("valide com o agrônomo", texto)
+            self.assertIn("Converse com o agrônomo", texto)
             if texto not in vistos:                            # tirar um campo nunca põe número novo no texto
                 vistos.add(texto)
                 self.assertEqual(conferencia.conferir_texto(texto, RESPOSTA), [])
@@ -109,7 +120,7 @@ class CampoQueFalta(unittest.TestCase):
                 dono[lugar] = troca
                 texto = mensagem.texto(resposta)
                 self.assertIsInstance(texto, str)
-                self.assertIn("valide com o agrônomo", texto)
+                self.assertIn("Converse com o agrônomo", texto)
                 self.assertNotIn("nan", texto)
                 self.assertNotIn("None", texto)
             dono[lugar] = guardado
@@ -117,8 +128,8 @@ class CampoQueFalta(unittest.TestCase):
     def test_cada_trecho_some_com_o_campo_dele(self):
         sem = lambda *campos: mensagem.texto({k: v for k, v in RESPOSTA.items() if k not in campos})  # noqa: E731
         self.assertNotIn("Resposta:", sem("veredito"))
-        self.assertNotIn("(nota", sem("prioridades"))
-        self.assertIn("A prova:", sem("prioridades"))          # sem as notas, a prova ainda vai
+        self.assertNotIn("No que foi medido:", sem("prioridades"))
+        self.assertIn("A prova:", sem("prioridades"))          # sem as prioridades, a prova ainda vai
         self.assertNotIn("A prova:", sem("rotacoes", "comparacao"))
         self.assertNotIn("O risco:", sem("rotacoes"))
         self.assertIn("Pergunta: " + RESPOSTA["pergunta"], sem("rotacoes"))
@@ -128,7 +139,7 @@ class CampoQueFalta(unittest.TestCase):
     def test_resposta_vazia_ou_que_nao_e_dicionario_da_so_o_aviso(self):
         for coisa in ({}, None, "soja", 3, []):
             texto = mensagem.texto(coisa)
-            self.assertIn("valide com o agrônomo", texto)
+            self.assertIn("Converse com o agrônomo", texto)
             self.assertNotIn("Pergunta:", texto)
 
     def test_campo_novo_na_resposta_nao_muda_o_texto(self):

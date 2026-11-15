@@ -7,6 +7,15 @@ e Silvânia) e compara três rotações. Não é recomendação agronômica: val
 padrão. As rotas da conta não usam chave, login nem serviço pago; só a rota `/agente` (a conversa com a IA) precisa de
 uma chave, que fica no ambiente de quem liga a API.
 
+**A tela usa quatro rotas direto, sem IA:** `POST /recomendacao`, `POST /lavoura-hoje`, `POST /replay` e
+`POST /registro`. São contas do motor: respondem sem a chave no ambiente, nas três cidades (conferido em 2026-11-15,
+com a API ligada sem a `OPENROUTER_API_KEY`: as 12 respostas vieram com 200). A IA (`POST /agente`) fica só para a
+pergunta livre.
+
+**As notas de 1 a 5 saíram** (decisão do dono, 2026-11-15). As rotas de antes continuam respondendo, sem pedir nem
+devolver nota: o `/conversa` não pergunta mais as 4 notas; o `/recomendacao` e o `/mensagem` ainda aceitam o campo
+`prioridades` (quem já manda não quebra), mas a API não repassa o campo ao motor.
+
 **Nenhum WhatsApp está ligado.** A API só devolve texto para quem chamou. Ela não manda mensagem a ninguém, não pede
 nem guarda nome ou telefone, e não grava o corpo dos pedidos (o registro no terminal tem só o método, a rota e o código).
 
@@ -42,9 +51,12 @@ podem chegar devagar.
 | `POST /conversa` | `{"estado": ..., "texto": ...}` | `{"estado": ..., "resposta": ...}` (a conversa em passos, sem IA) |
 | `POST /agente` | `{"estado": ..., "texto": ...}` | `{"estado": ..., "resposta": ..., "comparacao": [...], ...}` (a conversa com a IA) |
 | `POST /lavoura-hoje` | `{"cidade_id", "rotacao_atual", "terra", "plantio_da_soja"}` | a lavoura hoje: a situação, a frase do topo e os seis itens (a fase, a água, o calor, o verde, a terra coberta e o aviso de sede) |
+| `POST /replay` | `{"cidade_id", "safra"}` e, se houver, `rotacao_atual`, `terra`, `plantio` | a safra dia a dia: os dias e os marcos (`motor.replay_da_safra`; uns 76 KB) |
+| `POST /registro` | o mesmo corpo do `/replay` | o registro da safra, depois da colheita (`motor.registro_da_safra`; uns 5 KB) |
 
-O replay de uma safra, o "como está hoje" e o registro da safra **não têm rota própria**. Eles chegam por três
-caminhos: pela rota `/agente` (a IA consulta e a resposta traz em `consultas` e em `replay`), pelo comando
+O replay e o registro da safra têm rota própria desde 2026-11-15 (`/replay` e `/registro`, sem IA). O "como está
+hoje" sozinho **não tem rota própria** (a `/lavoura-hoje` traz a água de hoje entre os seis itens). Os três também
+chegam pela rota `/agente` (a IA consulta e a resposta traz em `consultas` e em `replay`), pelo comando
 `python3 -m orbita.perguntar` e pelo arquivo que o `exportar --tudo` grava para a tela. Os campos estão mais abaixo.
 
 **A pergunta** (o corpo do `/recomendacao` e do `/mensagem`):
@@ -59,10 +71,10 @@ caminhos: pela rota `/agente` (a IA consulta e a resposta traz em `consultas` e 
 | `terra` | quanta água a terra segura | `pouca`, `media` ou `muita`; sem ela, vale `media`. Arenosa é `pouca`, textura média é `media`, argilosa é `muita` |
 | `plantio_da_soja` | a data do plantio da soja (opcional) | ano-mês-dia, de 1 de setembro a 31 de dezembro (`"2026-11-20"`). O calendário inteiro anda junto com essa data |
 | `preocupacao` | o que mais preocupa (opcional) | `agua`, `calor` ou `terra`. Só muda a ordem e o destaque; nenhum número muda |
-| `prioridades` | as notas de 1 a 5, como antes (opcional) | `{"agua": 5, "solo": 4, "renda": 2, "erosao": 3}`: ou vêm as 4, ou nenhuma. Sem elas, a lista sai com `nota: null` |
+| `prioridades` | as notas de 1 a 5: **saíram** (2026-11-15) | o campo ainda é aceito, venha o que vier nele, mas a API não o repassa ao motor; a resposta sai com `entrada.prioridades: null` e sem nota. Não mande |
 
 A API aceita só esses 6 campos. A fonte da chuva e a regra dos anos, que o comando `perguntar` deixa trocar, não
-entram por aqui (vale o padrão do motor). O pedido de antes, só com Rio Verde e as notas, continua valendo igual.
+entram por aqui (vale o padrão do motor). O pedido de antes, com as notas, continua respondendo: as notas só não contam mais.
 
 **As regras de todo pedido:** o corpo é JSON em UTF-8, com o cabeçalho `Content-Type: application/json` e no máximo
 16.384 bytes. As respostas levam `Access-Control-Allow-Origin` (o site pode ler pelo navegador). Antes de um `POST`, o
@@ -92,7 +104,7 @@ Nos exemplos, os textos longos estão cortados com "...".
 
     curl -s http://127.0.0.1:8000/saude
 
-    {"ok": true, "servico": "Órbita Rural · a API do motor (provisória)", "aviso": "Vale para Rio Verde (GO), Jataí (GO) e Silvânia (GO). Não é recomendação agronômica: valide com o agrônomo.", "rotas": ["GET /saude", "POST /recomendacao", "POST /mensagem", "POST /conversa", "POST /agente"], "limite_do_corpo_bytes": 16384, "ia_do_agente": {"ligada": true, "modelo": "anthropic/claude-haiku-5.5"}}
+    {"ok": true, "servico": "Órbita Rural · a API do motor (provisória)", "aviso": "Vale para Rio Verde (GO), Jataí (GO) e Silvânia (GO). Não é recomendação agronômica: valide com o agrônomo.", "rotas": ["GET /saude", "POST /recomendacao", "POST /mensagem", "POST /conversa", "POST /agente", "POST /lavoura-hoje", "POST /replay", "POST /registro"], "limite_do_corpo_bytes": 16384, "ia_do_agente": {"ligada": true, "modelo": "anthropic/claude-haiku-5.5"}}
 
 Sem a chave no ambiente, `ia_do_agente` sai `{"ligada": false, "modelo": null}`. A chave nunca aparece.
 
@@ -149,22 +161,18 @@ de soja-milho-pousio por soja-milho-braquiária, na cidade pedida, mesmo quando 
 
     curl -s -X POST http://127.0.0.1:8000/conversa -H 'Content-Type: application/json' -d '{"estado": {"etapa": "terra"}, "texto": "2"}'
 
-    {"estado": {"etapa": "agua", "terra": "media", "notas": {}}, "resposta": "De 1 a 5, quanto pesa para você a água ...?"}
-
-    curl -s -X POST http://127.0.0.1:8000/conversa -H 'Content-Type: application/json' \
-      -d '{"estado": {"etapa": "erosao", "terra": "media", "notas": {"agua": 5, "solo": 4, "renda": 2}}, "texto": "3"}'
-
     {"estado": {"etapa": "fim"}, "resposta": "Órbita Rural · Rio Verde (GO)\nPergunta: ... (o mesmo texto do /mensagem) ...\n\n..."}
 
-Esta rota é a de antes e não mudou: vale só para Rio Verde, com as duas rotações de antes e as notas. A ordem da
-conversa: a saudação (o que a ferramenta faz e o aviso de que vale só para Rio Verde) → a terra (1 pouca, 2 média,
-3 muita) → as notas de 1 a 5 para água, solo, renda e erosão (uma pergunta por vez) → o resultado. Resposta fora do
-esperado: a pergunta volta, com um exemplo, e o estado não anda. "de novo", em qualquer ponto, recomeça. Também vale
-escrever por extenso ("média", "nota 4", "cinco"). As três cidades e as três rotações estão na rota `/agente`.
+Vale só para Rio Verde, com as duas rotações de antes. A ordem da conversa: a saudação (o que a ferramenta faz e o
+aviso de que vale só para Rio Verde) → a terra (1 pouca, 2 média, 3 muita) → o resultado. **As 4 notas de 1 a 5
+saíram** (decisão do dono, 2026-11-15): a conversa tem 1 pergunta só. Estado antigo, de quem estava no meio das notas
+(`{"etapa": "agua", ...}`), não quebra: a conversa recomeça pela saudação. Resposta fora do esperado: a pergunta
+volta, com um exemplo, e o estado não anda. "de novo", em qualquer ponto, recomeça. Também vale escrever por extenso
+("média"). As três cidades e as três rotações estão na rota `/agente`.
 
 ### POST /agente (a conversa com a IA)
 O molde é o do `/conversa`: a API não guarda nada; quem chama guarda o `estado` e devolve na fala seguinte. O manual
-inteiro do agente (as garantias, as 3 ferramentas, as conversas guardadas) é o `LEIA-ME-agente.md`.
+inteiro do agente (as garantias, as 4 ferramentas, as conversas guardadas) é o `LEIA-ME-agente.md`.
 
 **O pedido:** `{"estado": null no começo (ou o que a chamada anterior devolveu, sem mexer), "texto": "a fala do
 produtor"}`. Só esses dois campos. O corpo tem o limite de sempre (16.384 bytes); o estado nunca passa de uns 9.500
@@ -177,7 +185,7 @@ bytes.
 | `estado` | o que guardar e devolver na fala seguinte: `v` (a versão), `ficha`, `selo` (o selo da confirmação), `pergunta` (a pergunta feita antes de a ficha fechar), `momento` e `falas` (as últimas 6 falas, cortadas numa palavra inteira) |
 | `resposta` | o texto do agente, já conferido |
 | `momento` | `antes` (o que plantar), `durante` (como está a lavoura) ou `depois` (o que a terra mostrou) |
-| `ficha` | `cidade_id`, `rotacao_atual` (a lista das culturas), `terra`, `plantio_da_soja`, `preocupacao`, `confirmada` e `falta` (os campos que ainda não foram ditos) |
+| `ficha` | `cidade_id`, `rotacao_atual` (a lista das culturas), `terra`, `plantio_da_soja`, `preocupacao`, `confirmada` e `falta` (os campos que ainda não foram ditos); e, desde 2026-11-15, `lugar_dito` e `rotacao_dita`: o que o produtor disse fora das listas ("Cristalina", "sorgo e milho"), `null` quando não há. Com eles, a conta roda com o lugar guardado mais próximo (`cidade_id`) e com a rotação guardada mais parecida (`rotacao_atual`), e a resposta diz quais são |
 | `comparacao` | a lista de 3 rotações ou mais, como o motor mandou (`comparacao_das_rotacoes`); `null` enquanto a ficha não foi confirmada |
 | `apoio` | de onde o texto se apoia: `conta`, `dados_do_lugar` ou `conhecimento_geral` (aí o texto sai com o aviso na frente); `null` enquanto a ficha não foi confirmada |
 | `conferencia` | `{"passou": ..., "sobras": [...], "tentativas": ...}`: o resultado da conferência dos números do texto da IA. `passou: false` quer dizer que o texto dela foi barrado e a `resposta` são as frases prontas; `sobras` lista os números barrados |
@@ -309,6 +317,76 @@ A resposta (`motor.lavoura_hoje`; os números mudam com o dado guardado, e aqui 
 - As regras de cada situação, a janela de 7 dias e os 30 dias estão no `LEIA-ME-motor.md`, seção 10. Na linha de
   comando: `python3 -m orbita.perguntar --lavoura-hoje --cidade jatai --plantio 2026-10-20` (com `--json`, a estrutura).
 
+### POST /replay (a safra dia a dia, sem IA)
+O corpo: `cidade_id` e `safra` (obrigatórios) e, se houver, `rotacao_atual`, `terra` e `plantio`.
+
+| campo | o que é | os valores |
+|---|---|---|
+| `cidade_id` | a cidade (obrigatório) | `rio_verde`, `jatai` ou `silvania` |
+| `safra` | a safra (obrigatório) | `"2015-16"` (de 2015-16 a 2025-26), ou `"pior_ano"`, ou `"ano_normal"` (os dois nomes se resolvem pela regra dos anos do lugar: em Rio Verde, 2015-16 e 2019-20) |
+| `rotacao_atual` | o que o produtor planta | como na pergunta de cima. O motor exige a rotação; **sem o campo, a API usa soja → milho → pousio** |
+| `terra` | quanta água a terra segura | `pouca`, `media` ou `muita`; sem ela, vale `media` (o padrão do motor) |
+| `plantio` | a data do plantio da soja (opcional) | ano-mês-dia (`"2015-10-20"`); vai ao motor como `plantio_da_soja`. O nome `plantio_da_soja` (o da `/lavoura-hoje`) também é aceito, como sinônimo; os dois com datas diferentes dão 400 |
+
+Campo a mais (também `prioridades`, `chuva`, `regra`) dá 400. Erro de entrada do motor dá 400 em português.
+
+    curl -s -X POST http://127.0.0.1:8791/replay -H 'Content-Type: application/json' \
+      -d '{"cidade_id": "rio_verde", "safra": "2015-16"}'
+
+A resposta (76.325 bytes neste pedido, rodado em 2026-11-15 sem a chave da IA; código 200), cortada:
+
+    {"safra": "2015-16", "cidade_id": "rio_verde", "local": {...}, "rotacao": {...}, "terra": "media",
+     "plantio_da_soja_informado": null, "primeiro_dia": "2015-09-01", "ultimo_dia": "2016-08-31", "completa": true,
+     "dias": [{"data": "2015-09-01", "cultura": "sem_planta", "chuva_mm": 0.0, "agua_na_terra_mm": 20.8,
+               "pedido_mm": 4.1, "bebido_mm": 0.1, "falta_mm": 0.0, "com_sede": false, "tmax_c": 36.6,
+               "calor_forte": false}, ... (366 dias)],
+     "marcos": [{"data": "2015-10-15", "tipo": "plantio", "cultura": "soja", "frase": "Plantio: entra a soja.",
+                 "principal": false},
+                {"data": "2015-10-18", "tipo": "agua_acabou", "cultura": "soja", "dias_seguidos": 6,
+                 "agua_na_terra_mm": 23.3, "frase": "Neste dia começou a sede mais longa da soja: a água fácil de
+                 tirar da terra acabou, e foram 6 dias seguidos de sede.", "principal": false}, ... (8 marcos)],
+     "resumo": {"soja": {"falta_mm": 5.3, ...}, "milho": {"falta_mm": 220.6, "falta_relativa_pct": 49.6,
+                "dias_de_sede": 60, "dias_de_calor_forte": 19, ...},
+                "total": {"falta_mm": 225.9, "dias_de_sede": 73, "dias_de_calor_forte": 19, "chuva_mm": 1466.5}},
+     "limites_de_calor_c": {...}, "avisos": [...]}
+
+Os campos estão em "O replay (`motor.replay_da_safra`)", mais abaixo. Nas outras cidades, o mesmo pedido: Jataí
+75.734 bytes, Silvânia 76.271 bytes.
+
+### POST /registro (o registro da safra, sem IA)
+O mesmo corpo do `/replay`, com os mesmos padrões e os mesmos erros.
+
+    curl -s -X POST http://127.0.0.1:8791/registro -H 'Content-Type: application/json' \
+      -d '{"cidade_id": "rio_verde", "safra": "2015-16"}'
+
+A resposta (4.941 bytes neste pedido, rodado em 2026-11-15 sem a chave da IA; código 200), cortada:
+
+    {"safra": "2015-16", "local": {...}, "rotacao": {...}, "terra": "media", "plantio_da_soja_informado": null,
+     "periodo": {...},
+     "o_que_foi_plantado": [{"cultura": "soja", "entra": "2015-10-15", "sai": "2016-02-06", "dias": 115},
+                            {"cultura": "milho", "entra": "2016-02-10", "sai": "2016-06-13", "dias": 125}],
+     "agua": {"falta_mm": 225.9, "dias_de_sede": 73, "chuva_da_safra_mm": 1466.5, "por_cultura": {...}},
+     "calor": {...}, "terra_coberta": {...}, "entre_as_safras_guardadas": {...}, "marcos": [... (8 marcos)],
+     "registrado_em": "2026-11-15T08:54:58-03:00",
+     "frase": "Safra 2015-16 em Rio Verde (GO), com soja e milho de 2ª safra: faltaram 225,9 mm de água para as
+               culturas, com 73 dias de sede e 19 dias de calor forte na fase crítica. ...", "aviso": "..."}
+
+`registrado_em` é a hora da chamada (muda a cada pedido). Os campos estão em "O registro da safra", mais abaixo. Nas
+outras cidades, o mesmo pedido: Jataí 4.308 bytes, Silvânia 5.028 bytes.
+
+### As quatro rotas da tela sem a chave da IA (a conferência de 2026-11-15)
+A API foi ligada com `env -u OPENROUTER_API_KEY python3 -m orbita.api --porta 8791` e cada rota foi pedida com
+`curl` para as três cidades (rotação soja → milho → pousio, terra média, safra 2015-16). Todas responderam 200:
+
+| cidade | `/recomendacao` | `/lavoura-hoje` | `/replay` | `/registro` |
+|---|---|---|---|---|
+| Rio Verde | 101.893 bytes | 15.467 bytes | 76.325 bytes | 4.941 bytes |
+| Jataí | 103.582 bytes | 16.072 bytes | 75.734 bytes | 4.308 bytes |
+| Silvânia | 102.151 bytes | 16.114 bytes | 76.271 bytes | 5.028 bytes |
+
+No mesmo servidor, o `GET /saude` disse `"ia_do_agente": {"ligada": false, "modelo": null}` e o `POST /agente`
+respondeu 503 (falta a chave). O teste `SemChaveDeIa`, no `tests/test_api.py`, repete esta conferência.
+
 ### Um erro, como exemplo
 
     curl -s -X POST http://127.0.0.1:8000/recomendacao -H 'Content-Type: application/json' \
@@ -396,7 +474,8 @@ Cidade sem arquivo guardado continua saindo com `sem_medida`.
 
 ## As outras portas do motor (sem rota própria)
 Em Python: `from orbita import motor`. Pelo terminal: `python3 -m orbita.perguntar` (os comandos estão no
-`README.md`). Pela rota `/agente`: as 3 ferramentas da IA chamam estas mesmas funções. A `entrada` é a pergunta de cima.
+`README.md`). Pela rota `/agente`: as 4 ferramentas da IA chamam estas mesmas funções (e a `motor.lavoura_hoje`). A `entrada` é a pergunta de cima.
+Desde 2026-11-15 o replay e o registro têm também rota própria (`POST /replay` e `POST /registro`, acima).
 
 | a função | o que devolve | o comando |
 |---|---|---|
@@ -493,7 +572,7 @@ molde:
 4. No `/conversa`, quando o `estado` volta `{"etapa": "fim"}`, a conta foi entregue. No `/agente` a conversa não tem
    fim marcado: o produtor pode seguir perguntando. Nas duas, "de novo" recomeça.
 
-No `/conversa` o `estado` é pequeno (menos de 120 caracteres) e só tem a etapa, a terra e as notas já dadas; o que a
+No `/conversa` o `estado` é pequeno (menos de 120 caracteres) e só tem a etapa (as notas saíram); o que a
 pessoa escreveu não volta no estado nem na resposta. No `/agente` o `estado` leva a ficha, o selo e as últimas 6
 falas (cortadas), e por isso é maior. Se o estado guardado se perder ou chegar estragado, a conversa recomeça do
 começo. Se a API responder com erro (qualquer código que não seja 200), o serviço mantém o estado que tinha e pede
@@ -514,10 +593,10 @@ O site não faz conta: lê arquivos com as respostas guardadas. Para gravar:
     python3 -m orbita.exportar_conversas <pasta> --sem-ia   # as mesmas conversas, com as frases prontas
 
 O `exportar` grava `<pasta>/respostas.js`, com `window.ORBITA_RESPOSTAS = {"pouca": {...}, "media": {...}, "muita":
-{...}};` (a resposta inteira do motor para cada tipo de terra, já com os campos novos; sem opções, com todas as notas
-iguais a 3, e o site reordena pelas notas da tela), e `<pasta>/respostas.json`, com `gerado_em` (a hora),
+{...}};` (a resposta inteira do motor para cada tipo de terra, já com os campos novos; a pergunta vai sempre sem as notas
+de 1 a 5, que saíram em 2026-11-15), e `<pasta>/respostas.json`, com `gerado_em` (a hora),
 `gerado_por`, `parametros_usados` e `respostas`. As opções: `--cidade`, `--rotacao`, `--plantio`, `--preocupacao`,
-`--sem-notas` (a pergunta sem as notas de 1 a 5) e `--tudo`. Com `--tudo`, grava também `motor.js` e `motor.json`:
+`--sem-notas` (continua aceita, sem efeito: a pergunta já vai sem as notas) e `--tudo`. Com `--tudo`, grava também `motor.js` e `motor.json`:
 `window.ORBITA_MOTOR = {lugares, respostas, replay, hoje, registro}` (o clima e a resposta de cada cidade, e o replay,
 o "como está hoje" e o registro guardados), para a tela mostrar sem servidor. O `exportar_conversas` grava `conversas.js` (`window.ORBITA_CONVERSAS = {...};`) e `conversas.json`: são 4
 conversas, que a tela usa quando a rota `/agente` não está ligada. Rodar de novo sempre que o motor mudar.

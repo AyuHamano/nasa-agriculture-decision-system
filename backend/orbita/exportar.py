@@ -9,8 +9,8 @@ Grava na pasta (cria, se não existir):
     respostas.json   {"gerado_em": a hora, "gerado_por": o comando, "parametros_usados": {...}, "respostas": o mesmo
                      objeto do respostas.js}
 
-Todas as notas vão iguais a 3: as notas não mudam nenhum número, só a ordem da explicação, e essa ordem o site refaz
-com as notas da tela. O site não faz conta: só mostra o que está nestes arquivos. Rodar de novo quando o motor mudar.
+A pergunta vai sem as notas de 1 a 5 (elas saíram por decisão do dono, 2026-11-15; antes iam todas iguais a 3).
+O site não faz conta: só mostra o que está nestes arquivos. Rodar de novo quando o motor mudar.
 
 Desde 2026-11-15 cada resposta traz também `comparacao_das_rotacoes` (as 3 rotações), `calor` e `terra_coberta`. As
 opções, todas opcionais (sem elas, sai como sempre):
@@ -18,7 +18,7 @@ opções, todas opcionais (sem elas, sai como sempre):
     --rotacao soja,sorgo      a rotação de hoje do produtor (uma do cardápio)
     --plantio 2026-11-20      a data do plantio da soja
     --preocupacao calor       o que mais preocupa (agua, calor ou terra)
-    --sem-notas               pergunta sem as notas de 1 a 5 (as notas saíram da tela nova)
+    --sem-notas               continua aceita, sem efeito: a pergunta já vai sempre sem as notas de 1 a 5
     --tudo                    grava também motor.js e motor.json: window.ORBITA_MOTOR = {"lugares": o clima de cada
                               cidade, "respostas": a resposta de cada cidade (terra média, sem notas), "replay": a
                               safra 2015-16 dia a dia, "hoje": o retrato do último dia com dado, "registro": o
@@ -34,8 +34,7 @@ from pathlib import Path
 from orbita import motor
 
 TERRAS = ("pouca", "media", "muita")
-PERGUNTA = {"cidade_id": "rio_verde", "rotacao_atual": ["soja", "milho", "pousio"],
-            "prioridades": {"agua": 3, "solo": 3, "renda": 3, "erosao": 3}}
+PERGUNTA = {"cidade_id": "rio_verde", "rotacao_atual": ["soja", "milho", "pousio"]}     # sem as notas de 1 a 5
 COMANDO = "python3 -m orbita.exportar <pasta>"
 SAFRA_DO_REPLAY = "2015-16"         # a safra da pior colheita em Rio Verde: a prova de que a conta acerta
 
@@ -78,11 +77,13 @@ def exportar_tudo(pasta, pergunta, agora):
 def exportar(pasta, pergunta=None, tudo=False):
     """Pergunta ao motor uma vez por tipo de terra e grava os dois arquivos. Devolve os caminhos gravados.
 
-    `pergunta`: a pergunta sem a terra (sem ela, a de sempre: Rio Verde, soja-milho-pousio, notas iguais a 3).
+    `pergunta`: a pergunta sem a terra (sem ela, a de sempre: Rio Verde, soja-milho-pousio). As notas de 1 a 5
+    saíram: se a pergunta ainda trouxer `prioridades`, o campo não vai ao motor.
     `tudo`: grava também motor.js e motor.json (ver o cabeçalho).
     """
     pasta = Path(pasta)
-    pergunta = dict(PERGUNTA if pergunta is None else pergunta)
+    pergunta = {campo: valor for campo, valor in (PERGUNTA if pergunta is None else pergunta).items()
+                if campo != "prioridades"}
     respostas = {terra: motor.responder(dict(pergunta, terra=terra)) for terra in TERRAS}
     agora = datetime.datetime.now().astimezone().isoformat(timespec="seconds")
     entrada = respostas["media"].get("entrada", {})                   # o que o motor usou de fato
@@ -121,8 +122,7 @@ def ler_argumentos(argumentos):
             else:
                 pergunta[OPCOES[argumento]] = valor
             i += 2
-        elif argumento == "--sem-notas":
-            pergunta.pop("prioridades", None)
+        elif argumento == "--sem-notas":              # sem efeito: as notas já não vão (2026-11-15)
             i += 1
         elif argumento == "--tudo":
             tudo, i = True, i + 1

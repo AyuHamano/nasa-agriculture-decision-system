@@ -8,11 +8,17 @@ De dentro de backend/:
 
 As rotas (o `API.md` desta pasta traz um exemplo de cada uma):
     GET  /saude          -> {"ok": true, ...}
-    POST /recomendacao   -> a resposta inteira do motor          (corpo: cidade_id, rotacao_atual, prioridades, terra)
+    POST /recomendacao   -> a resposta inteira do motor          (corpo: cidade_id, rotacao_atual, terra)
     POST /mensagem       -> {"texto": o texto curto}             (o mesmo corpo)
     POST /conversa       -> {"estado": ..., "resposta": ...}     (corpo: {"estado": ..., "texto": ...})
     POST /agente         -> {"estado": ..., "resposta": ..., "comparacao": [...], ...}   (o mesmo corpo do /conversa)
     POST /lavoura-hoje   -> a lavoura hoje, em seis itens        (corpo: cidade_id, rotacao_atual, terra, plantio_da_soja)
+    POST /replay         -> a safra dia a dia e os marcos        (corpo: cidade_id, safra; e rotacao_atual, terra, plantio)
+    POST /registro       -> o registro da safra, depois da colheita   (o mesmo corpo do /replay)
+
+A tela usa quatro rotas direto, sem IA: /recomendacao, /lavoura-hoje, /replay e /registro. A IA fica só para a
+pergunta livre (/agente). As notas de 1 a 5 saíram (decisão do dono, 2026-11-15): quem ainda manda `prioridades` no
+/recomendacao e no /mensagem não quebra, mas a API não repassa o campo ao motor, e a resposta não traz nota.
 
 A rota /agente é a conversa com a IA (`agente.py`; o manual é o `LEIA-ME-agente.md`). Ela precisa da chave da IA
 numa variável de ambiente (`OPENROUTER_API_KEY`); sem a chave, ou se a IA não responder, a rota devolve 503 e quem
@@ -39,24 +45,29 @@ DESCARTE_MAXIMO = 1024 * 1024             # até quanto de um corpo recusado é 
 ESPERA = 15                               # segundos sem chegar nada: a ligação é fechada
 PRAZO_DO_CORPO = 10                       # segundos para o corpo inteiro chegar (mandar aos poucos não adianta)
 ROTAS = {"/saude": "GET", "/recomendacao": "POST", "/mensagem": "POST", "/conversa": "POST", "/agente": "POST",
-         "/lavoura-hoje": "POST"}
+         "/lavoura-hoje": "POST", "/replay": "POST", "/registro": "POST"}
 CAMPOS_DA_LAVOURA = ("cidade_id", "rotacao_atual", "terra", "plantio_da_soja")      # os campos da /lavoura-hoje
 CAMPOS_DA_PERGUNTA = ("cidade_id", "rotacao_atual", "prioridades", "terra", "plantio_da_soja", "preocupacao")
+CAMPOS_QUE_NAO_VAO_AO_MOTOR = ("prioridades",)       # as notas de 1 a 5 saíram (2026-11-15): aceitas e deixadas de lado
+CAMPOS_DA_SAFRA = ("cidade_id", "safra", "rotacao_atual", "terra", "plantio", "plantio_da_soja")   # /replay e /registro
+ANOS_POR_NOME = ("pior_ano", "ano_normal")           # a safra pelo nome: resolve-se pela regra dos anos do lugar
+TEXTOS_DA_SAFRA = {"cidade_id": "rio_verde", "safra": "2015-16", "terra": "media", "plantio": "2015-10-20",
+                   "plantio_da_soja": "2015-10-20"}
+EXEMPLO_DA_SAFRA = '{"cidade_id": "rio_verde", "safra": "2015-16"}'
 TEXTOS_DA_PERGUNTA = {"cidade_id": "rio_verde", "terra": "media", "plantio_da_soja": "2026-11-05",
                       "preocupacao": "agua"}                     # os campos que são texto, com um exemplo de cada
 CAMPOS_DA_CONVERSA = ("estado", "texto")
-TODAS_AS_ROTAS = ("GET /saude, POST /recomendacao, POST /mensagem, POST /conversa, POST /agente e "
-                  "POST /lavoura-hoje")
+TODAS_AS_ROTAS = ("GET /saude, POST /recomendacao, POST /mensagem, POST /conversa, POST /agente, "
+                  "POST /lavoura-hoje, POST /replay e POST /registro")
 EXEMPLO_DA_CONVERSA = '{"estado": null, "texto": "oi"}'
-EXEMPLO = ('{"cidade_id": "rio_verde", "rotacao_atual": ["soja", "milho", "pousio"], "prioridades": {"agua": 5, '
-           '"solo": 4, "renda": 2, "erosao": 3}, "terra": "media"}')
+EXEMPLO = '{"cidade_id": "rio_verde", "rotacao_atual": ["soja", "milho", "pousio"], "terra": "media"}'
 ERROS_DO_SERVIDOR = {
     400: "O pedido não está no formato do HTTP.",
     408: "O pedido demorou demais para chegar.",
     414: "O endereço do pedido é grande demais.",
     431: "Os cabeçalhos do pedido são grandes demais.",
-    501: "Método não aceito. Use GET em /saude e POST em /recomendacao, /mensagem, /conversa, /agente e "
-         "/lavoura-hoje.",
+    501: "Método não aceito. Use GET em /saude e POST em /recomendacao, /mensagem, /conversa, /agente, "
+         "/lavoura-hoje, /replay e /registro.",
     505: "Versão do HTTP não aceita.",
 }
 
@@ -93,14 +104,19 @@ def _so_estes_campos(corpo, campos):
 
 
 def _perguntar_ao_motor(corpo):
-    """Monta a entrada só com os campos da pergunta e chama a função pública do motor."""
+    """Monta a entrada só com os campos da pergunta e chama a função pública do motor.
+
+    As notas de 1 a 5 (`prioridades`) saíram por decisão do dono (2026-11-15): o campo ainda é aceito, para quem já
+    manda não quebrar, mas não vai ao motor, venha o que vier nele.
+    """
     _so_estes_campos(corpo, CAMPOS_DA_PERGUNTA)
     for campo, exemplo in TEXTOS_DA_PERGUNTA.items():
         if corpo.get(campo) is not None and not isinstance(corpo[campo], str):
             raise ErroDaApi(400, f'Entrada fora do formato: {campo} tem de ser um texto entre aspas, como '
                                  f'"{exemplo}".')
     try:
-        return motor.responder({campo: corpo[campo] for campo in CAMPOS_DA_PERGUNTA if campo in corpo})
+        return motor.responder({campo: corpo[campo] for campo in CAMPOS_DA_PERGUNTA
+                                if campo in corpo and campo not in CAMPOS_QUE_NAO_VAO_AO_MOTOR})
     except ValueError as erro:
         if str(erro).startswith("Entrada fora do formato"):       # o erro de entrada do motor, já em português
             raise ErroDaApi(400, str(erro)) from None
@@ -197,8 +213,57 @@ def rota_lavoura_hoje(corpo):
         raise
 
 
+def _conta_da_safra(nome_da_conta, corpo):
+    """O corpo do /replay e do /registro vira (a entrada do motor, a safra), e a conta do motor responde.
+
+    `cidade_id` e `safra` são obrigatórios. Sem `rotacao_atual`, vale soja -> milho -> pousio (o motor exige a
+    rotação); sem `terra`, vale "media" (o padrão do motor). `plantio` é a data do plantio da soja e vai ao motor como
+    `plantio_da_soja` (o nome que a /lavoura-hoje usa, aceito aqui como sinônimo). A safra é como "2015-16", ou
+    "pior_ano" / "ano_normal", que se resolvem pela regra dos anos do lugar (`motor.clima_do_lugar`).
+    """
+    _so_estes_campos(corpo, CAMPOS_DA_SAFRA)
+    for campo, exemplo in TEXTOS_DA_SAFRA.items():
+        if corpo.get(campo) is not None and not isinstance(corpo[campo], str):
+            raise ErroDaApi(400, f'Entrada fora do formato: {campo} tem de ser um texto entre aspas, como '
+                                 f'"{exemplo}".')
+    safra = corpo.get("safra")
+    if not safra:
+        raise ErroDaApi(400, 'Entrada fora do formato: falta a safra (como "2015-16", ou "pior_ano", ou '
+                             f'"ano_normal"). Exemplo: {EXEMPLO_DA_SAFRA}')
+    plantio, sinonimo = corpo.get("plantio"), corpo.get("plantio_da_soja")
+    if plantio and sinonimo and plantio != sinonimo:
+        raise ErroDaApi(400, "Entrada fora do formato: plantio e plantio_da_soja são o mesmo campo (a data do "
+                             "plantio da soja); mande um só.")
+    rotacao = corpo.get("rotacao_atual")
+    entrada = {"cidade_id": corpo.get("cidade_id"),
+               "rotacao_atual": list(motor.ROTACAO_DE_HOJE) if rotacao is None else rotacao}
+    if corpo.get("terra") is not None:
+        entrada["terra"] = corpo["terra"]
+    if plantio or sinonimo:
+        entrada["plantio_da_soja"] = plantio or sinonimo
+    try:
+        if safra in ANOS_POR_NOME:
+            safra = motor.clima_do_lugar(entrada["cidade_id"])["regra_dos_anos"][safra]
+        return getattr(motor, nome_da_conta)(entrada, safra)
+    except ValueError as erro:
+        if str(erro).startswith("Entrada fora do formato"):       # o erro de entrada do motor, já em português
+            raise ErroDaApi(400, str(erro)) from None
+        raise
+
+
+def rota_replay(corpo):
+    """A safra dia a dia (`motor.replay_da_safra`): os dias e os marcos, para a tela passar como um filme. Sem IA."""
+    return _conta_da_safra("replay_da_safra", corpo)
+
+
+def rota_registro(corpo):
+    """O registro da safra, depois da colheita (`motor.registro_da_safra`). Sem IA."""
+    return _conta_da_safra("registro_da_safra", corpo)
+
+
 ACOES = {"/recomendacao": rota_recomendacao, "/mensagem": rota_mensagem, "/conversa": rota_conversa,
-         "/agente": rota_agente, "/lavoura-hoje": rota_lavoura_hoje}
+         "/agente": rota_agente, "/lavoura-hoje": rota_lavoura_hoje, "/replay": rota_replay,
+         "/registro": rota_registro}
 
 
 class Porta(BaseHTTPRequestHandler):
@@ -379,10 +444,11 @@ def main(argv=None):
     endereco, porta = servidor.server_address[:2]
     print(f"Órbita Rural · a API está ligada em http://{endereco}:{porta} (Ctrl+C desliga).", flush=True)
     print("Rotas: GET /saude · POST /recomendacao · POST /mensagem · POST /conversa · POST /agente · "
-          "POST /lavoura-hoje. Nenhum WhatsApp está ligado.", flush=True)
+          "POST /lavoura-hoje · POST /replay · POST /registro. Nenhum WhatsApp está ligado.", flush=True)
     ia = _ia_do_agente()
     print(f"A IA do agente: ligada (modelo {ia['modelo']})." if ia["ligada"] else
-          "A IA do agente: sem chave no ambiente (OPENROUTER_API_KEY); a rota /agente responde 503.", flush=True)
+          "A IA do agente: sem chave no ambiente (OPENROUTER_API_KEY); a rota /agente responde 503, e as outras "
+          "rotas respondem sem IA.", flush=True)
     if endereco not in ("127.0.0.1", "::1", "localhost"):
         print("Atenção: fora do 127.0.0.1 a API fica aberta para a rede, e não há senha nem limite de pedidos.",
               file=sys.stderr, flush=True)
