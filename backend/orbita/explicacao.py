@@ -60,6 +60,10 @@ def _prioridade(p, r):
     hoje, alternativa = r["rotacoes"]["atual"], r["rotacoes"]["alternativa"]
     seco = r["comparacao"]["pior_ano"]
     rotulo = "No pior ano" if r["regra_dos_anos"]["regra"] == "rendimento" else "No ano mais seco"
+    normal = r["comparacao"]["ano_normal"]
+    if rotulo == "No pior ano" and pior_contra_normal(hoje["safras"][seco]["total"]["falta_mm"],
+                                                      hoje["safras"][normal]["total"]["falta_mm"]) != "maior":
+        rotulo = "No ano da pior colheita da região"    # a conta não deu nele mais falta de água que no ano normal
     nota = "" if p.get("nota") is None else f" (nota {p['nota']})"
     linhas = [f"{p['nome']}{nota}: {_quem(p)}."]
     if p["id"] == "agua":
@@ -165,6 +169,34 @@ def _e(partes):
     return partes[0] if len(partes) == 1 else ", ".join(partes[:-1]) + " e " + partes[-1]
 
 
+def _pontas(valor):
+    return (valor["de"], valor["ate"]) if isinstance(valor, dict) else (valor, valor)
+
+
+def pior_contra_normal(pior, normal):
+    """A falta de água do pior ano contra a do ano normal, pelo que a conta mostra (números ou faixas {"de", "ate"}).
+
+    O pior ano é escolhido pela colheita da região (ou pela chuva), não pela falta de água da conta: a falta dele
+    pode sair "maior", "menor" ou "igual" à do ano normal; nas faixas, "cruza" quando uma ponta fica acima e a outra
+    abaixo.
+    """
+    (p1, p2), (n1, n2) = _pontas(pior), _pontas(normal)
+    if (p1, p2) == (n1, n2):
+        return "igual"
+    if p1 >= n1 and p2 >= n2:
+        return "maior"
+    if p1 <= n1 and p2 <= n2:
+        return "menor"
+    return "cruza"
+
+
+def _criterio_do_pior_ano(r):
+    """Como o pior ano foi escolhido, em palavras: (o que ele é, o nome dele para o começo das frases)."""
+    if (r.get("regra_dos_anos") or {}).get("regra") == "chuva":
+        return "o de menor chuva de fevereiro a junho", "do ano de menor chuva"
+    return "o da pior colheita da região", "do ano da pior colheita da região"
+
+
 NOMES_DAS_CULTURAS = {"soja": "soja", "milho": "milho", "sorgo": "sorgo"}
 RISCOS_PROPRIOS = {
     "soja_milho_braquiaria": "A braquiária bebe água junto com o milho e depois dele: a terra pode chegar mais seca "
@@ -208,9 +240,25 @@ def frases_da_rotacao(item, itens, r):
     """
     pior, normal = r["comparacao"]["pior_ano"], r["comparacao"]["ano_normal"]
     agua, terra = item["agua"], item["terra_coberta"]
-    evidencia = (f"Em {r['local']['nome']}, no pior ano (safra {pior}) faltaram {_mm(agua['falta_no_pior_ano_mm'])} "
-                 f"mm de água para as culturas, com {_dias(agua['dias_de_sede_no_pior_ano'])} dias de sede; no ano "
-                 f"normal (safra {normal}), {_mm(agua['falta_no_ano_normal_mm'])} mm. {_frase_do_calor(item)} Pelo "
+    # O pior ano é o da pior colheita, não o de maior falta de água: quando a conta dá nele menos falta (ou a mesma)
+    # que no ano normal, a frase diz isso com todas as letras, em vez de soar ao contrário.
+    contra = pior_contra_normal(agua["falta_no_pior_ano_mm"], agua["falta_no_ano_normal_mm"])
+    criterio, do_pior_ano = _criterio_do_pior_ano(r)
+    if contra == "maior":
+        do_pior_ano = "do pior ano"
+        comeco = (f"Em {r['local']['nome']}, no pior ano (safra {pior}) faltaram {_mm(agua['falta_no_pior_ano_mm'])} "
+                  f"mm de água para as culturas, com {_dias(agua['dias_de_sede_no_pior_ano'])} dias de sede; no ano "
+                  f"normal (safra {normal}), {_mm(agua['falta_no_ano_normal_mm'])} mm.")
+    else:
+        (p1, p2), (n1, n2) = _pontas(agua["falta_no_pior_ano_mm"]), _pontas(agua["falta_no_ano_normal_mm"])
+        teve = f"no ano normal (safra {normal}), que teve {_mm(agua['falta_no_ano_normal_mm'])} mm"
+        ao_lado = {"menor": ("menos que " if p1 < n1 and p2 < n2 else "não mais que ") + teve,
+                   "igual": f"a mesma falta do ano normal (safra {normal})",
+                   "cruza": "numa faixa que cruza a do ano normal: " + teve}[contra]
+        comeco = (f"Em {r['local']['nome']}, o pior ano é {criterio} (safra {pior}), não o de maior falta de água na "
+                  f"conta: nele faltaram {_mm(agua['falta_no_pior_ano_mm'])} mm de água para as culturas, com "
+                  f"{_dias(agua['dias_de_sede_no_pior_ano'])} dias de sede, {ao_lado}.")
+    evidencia = (f"{comeco} {_frase_do_calor(item)} Pelo "
                  f"calendário, a terra fica {terra['dias_sem_planta_viva']} dias seguidos sem planta viva antes do "
                  f"plantio da soja ({terra['dias_sem_planta_viva_no_ano']} dias no ano, contando o intervalo entre "
                  "a soja e a 2ª safra).")
@@ -220,6 +268,7 @@ def frases_da_rotacao(item, itens, r):
     outras = {o["id"]: o for o in itens if o["id"] != item["id"]}
     frente, atras, depende = [], [], []
     for perna, rotulo, unidade, curta in PERNAS:
+        rotulo = rotulo.replace("do pior ano", do_pior_ano)
         ganhou = [o for i, o in outras.items() if item["contra_as_outras"][i][perna] == "melhor"]
         perdeu = [o for i, o in outras.items() if item["contra_as_outras"][i][perna] == "pior"]
         aberto = [o for i, o in outras.items() if item["contra_as_outras"][i][perna] == "depende"]
@@ -312,6 +361,11 @@ def texto(r):
     rotulo_do_pior = "Pior ano" if regra["regra"] == "rendimento" else "Ano mais seco"
     t += _palha_e_disputa(r)
     t += _ano("Ano normal", normal, r) + _ano(rotulo_do_pior, seco, r)
+    contra = pior_contra_normal(hoje["safras"][seco]["total"]["falta_mm"], hoje["safras"][normal]["total"]["falta_mm"])
+    if contra != "maior":
+        t.append(f"Atenção: o pior ano é {_criterio_do_pior_ano(r)[0]}, não o de maior falta de água na conta: na "
+                 f"rotação de hoje, a falta de água da safra {seco} foi "
+                 f"{'menor que a' if contra == 'menor' else 'igual à'} da safra {normal}.")
     if "aviso_do_ano_mais_seco" in regra:
         t.append(f"Atenção ao ano mais seco: {regra['aviso_do_ano_mais_seco']}. Em 2025 a NASA POWER soma "
                  f"{n(regra['chuva_de_2025_mm'])} mm no ano. Por isso, a segunda safra mais seca vai ao lado:")

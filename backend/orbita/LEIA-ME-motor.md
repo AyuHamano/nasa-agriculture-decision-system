@@ -50,7 +50,8 @@ rotação que o produtor faz hoje (qualquer uma do cardápio) aparece em `rotaca
 ### Cada rotação na comparação
 ```json
 {"id": "soja_sorgo_pousio", "nome": "soja → sorgo safrinha → pousio (terra parada)", "de_hoje": true,
- "agua": {"falta_no_ano_normal_mm": 0, "falta_no_pior_ano_mm": 0, "dias_de_sede_no_pior_ano": 0, "em_faixa": false},
+ "agua": {"falta_no_ano_normal_mm": 0, "falta_no_pior_ano_mm": 0, "dias_de_sede_no_pior_ano": 0, "em_faixa": false,
+          "pior_ano_contra_o_normal": "maior"},
  "calor": {"dias_de_calor_forte_no_pior_ano": 0, "limite_c": 35.0, "etiqueta": "publicado", "por_cultura": {}},
  "terra_coberta": {"dias_sem_planta_viva": 122, "dias_sem_planta_viva_no_ano": 125, "pelo_satelite": null},
  "contra_as_outras": {"soja_milho_pousio": {"agua": "melhor", "calor": "empate", "terra_coberta": "empate"}},
@@ -58,6 +59,11 @@ rotação que o produtor faz hoje (qualquer uma do cardápio) aparece em `rotaca
 ```
 - Na rotação com capim, os números da água saem em faixa (`{"de": ..., "ate": ...}`), porque não se sabe quanto o capim
   disputa água com o milho. `em_faixa` diz qual é o caso.
+- `agua.pior_ano_contra_o_normal` (`maior`, `menor`, `igual` ou, nas faixas, `cruza`): o pior ano é o da pior colheita
+  da região (IBGE), não o de maior falta de água na conta. Quando a conta dá nele menos falta que no ano normal
+  (Jataí; Rio Verde com o plantio em 20 de novembro), as frases dizem isso: "o pior ano é o da pior colheita da região
+  (safra 2015-16), não o de maior falta de água na conta: nele faltaram ..., menos que no ano normal ...". O texto
+  inteiro (`explicacao.texto`) e o curto (`mensagem.texto`) acompanham.
 - `calor.limite_c` é o limite da cultura da 2ª safra (a que muda entre as rotações); o detalhe está em `por_cultura`.
 - `terra_coberta.dias_sem_planta_viva` é o número de sempre: os dias seguidos sem planta viva antes do plantio da soja
   (122 com pousio, 30 com capim), o que se compara com o satélite. `dias_sem_planta_viva_no_ano` é o ano inteiro,

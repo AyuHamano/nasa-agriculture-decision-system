@@ -29,8 +29,12 @@ class Comparacao(unittest.TestCase):
 
     def test_cada_item_tem_o_formato_combinado(self):
         for item in RESPOSTA["comparacao_das_rotacoes"] + COM_SORGO["comparacao_das_rotacoes"]:
+            # Ganhou um campo em 2026-11-15, pelos acertos: como a falta do pior ano ficou contra a do ano normal (o
+            # pior ano é o da pior colheita, não o de maior falta de água na conta).
             self.assertEqual(set(item["agua"]) - {"em_faixa"},
-                             {"falta_no_ano_normal_mm", "falta_no_pior_ano_mm", "dias_de_sede_no_pior_ano"})
+                             {"falta_no_ano_normal_mm", "falta_no_pior_ano_mm", "dias_de_sede_no_pior_ano",
+                              "pior_ano_contra_o_normal"})
+            self.assertIn(item["agua"]["pior_ano_contra_o_normal"], ("maior", "menor", "igual", "cruza"))
             for chave in ("dias_de_calor_forte_no_pior_ano", "limite_c", "etiqueta"):
                 self.assertIn(chave, item["calor"])
             self.assertIn(item["calor"]["etiqueta"], ("publicado", "hipótese"))

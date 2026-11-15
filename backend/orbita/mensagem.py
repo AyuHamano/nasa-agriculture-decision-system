@@ -100,6 +100,12 @@ def _prova_da_agua(r):
     if not (pior and hoje and alternativa):
         return None
     quando = "no ano mais seco" if _pega(r, "regra_dos_anos", "regra") == "chuva" else "no pior ano"
+    # O pior ano é o da pior colheita, não o de maior falta de água: se a conta deu nele menos falta (ou a mesma)
+    # que no ano normal, o texto chama o ano pelo que ele é.
+    do_pior = _pega(r, "rotacoes", "atual", "safras", pior, "total", "falta_mm")
+    do_normal = _pega(r, "rotacoes", "atual", "safras", _frase(_pega(r, "comparacao", "ano_normal")), "total", "falta_mm")
+    if quando == "no pior ano" and _numero(do_pior) and _numero(do_normal) and do_pior <= do_normal:
+        quando = "no ano da pior colheita da região"
     menor = _numero(_pega(r, "rotacoes", "alternativa", "faixa", pior, "falta_total_mm", "menor"))
     maior = _numero(_pega(r, "rotacoes", "alternativa", "faixa", pior, "falta_total_mm", "maior"))
     if menor and maior and menor != maior:      # a alternativa em faixa, pela disputa do capim com o milho

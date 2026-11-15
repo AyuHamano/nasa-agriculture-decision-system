@@ -517,6 +517,10 @@ def _comparacao_das_rotacoes(entrada, rot, calendario, bloco_do_calor, verde, pi
             agua = {"falta_no_ano_normal_mm": bloco["safras"][normal]["total"]["falta_mm"],
                     "falta_no_pior_ano_mm": bloco["safras"][pior]["total"]["falta_mm"],
                     "dias_de_sede_no_pior_ano": bloco["safras"][pior]["total"]["dias_de_sede"], "em_faixa": False}
+        # O pior ano sai da colheita (ou da chuva), não da falta de água: aqui vai como a falta dele ficou contra a
+        # do ano normal na conta ("maior", "menor", "igual" ou, nas faixas, "cruza").
+        agua["pior_ano_contra_o_normal"] = explicacao.pior_contra_normal(agua["falta_no_pior_ano_mm"],
+                                                                         agua["falta_no_ano_normal_mm"])
         culturas = [c for c in ("soja", rotacao["segunda"]) if c in bloco_do_calor["por_cultura"]]
         segunda = bloco_do_calor["por_cultura"].get(rotacao["segunda"])
         do_calor = {
