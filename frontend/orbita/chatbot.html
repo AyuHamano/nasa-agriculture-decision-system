@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#163828">
+  <meta name="description" content="Simulação de atendimento do chatbot Órbita Rural para produtores.">
+  <title>Conversa com o Órbita Rural</title>
+  <link rel="icon" type="image/png" href="marca/orbita-transp.png?v=1">
+  <link rel="stylesheet" href="chatbot.css?v=7">
+  <script src="js/textos.js" defer></script>
+  <script src="js/dados.js" defer></script>
+  <script src="chatbot.js?v=7" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#mensagens">Ir para a conversa</a>
+
+  <main class="stage">
+    <section class="phone" aria-label="Simulação do atendimento pelo WhatsApp">
+      <header class="chat-header">
+        <a class="back-link" href="index.html" aria-label="Voltar ao Órbita Rural">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+        </a>
+        <span class="avatar" aria-hidden="true">
+          <img src="marca/simbolo-verde.png" alt="">
+        </span>
+        <div class="contact">
+          <strong>Órbita Rural</strong>
+          <span id="presenca">online · assistente virtual</span>
+        </div>
+        <div class="header-actions" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M15 10l4.5-3v10L15 14M4 6h11v12H4z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M7 3h3l1.4 4-2 1.5a15 15 0 006.1 6.1l1.5-2 4 1.4v3c0 2-1.7 4-4 4C9.3 20.5 3.5 14.7 3 7c0-2.3 2-4 4-4z"/></svg>
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+        </div>
+      </header>
+
+      <div class="demo-notice" role="note">
+        <span></span>
+        Simulação web — não envia mensagens para o WhatsApp
+      </div>
+
+      <div class="chat-wallpaper">
+        <div class="messages" id="mensagens" role="log" aria-live="polite" aria-relevant="additions">
+          <div class="brand-card" aria-label="Órbita Rural, Inteligência do espaço. Decisões para a terra.">
+            <img src="marca/logo-verde-sem-lema.png" alt="Órbita Rural">
+            <p>Inteligência do espaço.<br>Decisões para a terra.</p>
+          </div>
+
+          <p class="day-chip" id="dataDaConversa">Hoje</p>
+
+          <article class="message bot">
+            <p>Olá! Eu sou o assistente do <strong>Órbita Rural</strong>. 🌱</p>
+            <p>Posso ajudar a organizar informações da sua lavoura, comparar rotações e explicar dados de chuva, calor e cobertura da terra.</p>
+            <small><span class="message-time">agora</span></small>
+          </article>
+
+          <article class="message bot">
+            <p>Para começarmos, escolha uma opção ou escreva a sua pergunta.</p>
+            <small><span class="message-time">agora</span></small>
+          </article>
+
+          <div class="quick-replies" id="respostasRapidas" aria-label="Respostas rápidas"></div>
+        </div>
+      </div>
+
+      <form class="composer" id="formulario">
+        <div class="input-shell">
+          <button type="button" class="composer-icon" aria-label="Emojis" disabled>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8.5 14.5s1.2 2 3.5 2 3.5-2 3.5-2M9 9h.01M15 9h.01"/></svg>
+          </button>
+          <label class="sr-only" for="mensagem">Mensagem do produtor</label>
+          <textarea id="mensagem" name="mensagem" rows="1" maxlength="900" autocomplete="off" enterkeyhint="send" placeholder="Mensagem"></textarea>
+          <button type="button" class="composer-icon attachment" aria-label="Anexar arquivo" disabled>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 11.5l-8 8a5 5 0 01-7-7l9-9a3.5 3.5 0 015 5l-9 9a2 2 0 01-3-3l8-8"/></svg>
+          </button>
+        </div>
+        <button class="send-button" type="submit" id="enviar" aria-label="Enviar mensagem">
+          <svg class="send-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20l18-8L3 4l1.8 6.2L14 12l-9.2 1.8z"/></svg>
+        </button>
+      </form>
+    </section>
+
+    <aside class="presentation-card">
+      <span class="eyebrow">DEMONSTRAÇÃO INTERATIVA</span>
+      <h1>A orientação da lavoura em uma conversa simples.</h1>
+      <p>O produtor escreve como fala. O Órbita Rural organiza a pergunta e responde com apoio dos dados da lavoura.</p>
+      <ul>
+        <li><span>01</span> Pergunte sobre a lavoura</li>
+        <li><span>02</span> Complete a ficha do produtor</li>
+        <li><span>03</span> Compare caminhos antes de decidir</li>
+      </ul>
+      <p class="safety">Ferramenta de apoio. Confirme decisões com um profissional de agronomia.</p>
+    </aside>
+  </main>
+</body>
+</html>

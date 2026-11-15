@@ -19,6 +19,9 @@ colher). A tela **não faz conta**: mostra o que o motor e o agente (em `backend
 
 ## O que tem na tela
 
+- **A tela de boas-vindas.** Quem ainda não tem lavoura guardada vê primeiro o logo, o lema, um texto curto (em
+  `js/textos.js`, chave `welcome.text`) e o botão "Iniciar", que abre a conversa abaixo. Quem já tem lavoura guardada não a
+  vê: o aplicativo abre direto em "Minha lavoura hoje".
 - **A entrada: o assistente monta a ficha.** Ele pergunta onde fica a lavoura (Rio Verde, Jataí ou Silvânia), o que o
   produtor planta (soja e depois milho, milho com capim ou sorgo), em que mês planta a soja (de setembro a dezembro,
   no dia 15, ou "Escolher o dia") e como é a terra (arenosa, média ou argilosa). Cada pergunta tem botões; os toques

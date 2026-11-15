@@ -314,6 +314,7 @@ button, summary, .botao { transition: background-color .15s ease-out, border-col
 .rp-controles input[type="range"]::-moz-range-progress { height: 8px; border-radius: 4px; background: #fff; }
 .rp-controles input[type="range"]::-moz-range-thumb { width: 30px; height: 30px; border-radius: 50%; border: 0; background: #fff; box-shadow: 0 2px 6px rgba(0, 0, 0, .45); }
 .rp-controles #rpVelocidade { margin-left: auto; }
+.rp-tocar-topo { justify-self: start; margin-bottom: 2px; }
 .rp-sem { color: #CFE3D0; }
 @media (min-width: 900px) {
   .replay { grid-template-columns: 290px minmax(0, 1fr); gap: 18px 36px; }
@@ -324,7 +325,10 @@ button, summary, .botao { transition: background-color .15s ease-out, border-col
   .rp-frase { min-height: 11.75rem; }
   .rp-pulso { font-size: clamp(2.2rem, 3.4vw, 3.4rem); display: flex; flex-wrap: wrap; gap: 0 .4em; }
 }
-@media (max-width: 899px) { .rp-frase { min-height: 16rem; } }
+@media (max-width: 899px) {
+  .rp-tocar-topo { min-height: 50px; padding-inline: 18px; }
+  .rp-frase { min-height: 16rem; }
+}
 .palco:fullscreen { display: grid; align-content: center; overflow: auto; margin: 0; padding: 3vh 0; }
 
 /* ---------- a leitura do agrônomo ---------- */

@@ -31,6 +31,23 @@
   function anoDoPlantio() { var h = new Date(); return h.getMonth() < 7 ? h.getFullYear() - 1 : h.getFullYear(); }
   function doisDigitos(n) { return (n < 10 ? "0" : "") + n; }
 
+  /* ---------- welcome screen: logo, a short text and a start button, shown before the assistant chat ---------- */
+  // Hides the app shell (tabs, farm button, "Perguntar" button, cached-data note) and sets the body class of the screen being opened.
+  function leaveApp(bodyClass) {
+    app.tela = ""; app.vez += 1; fecharTudo();
+    document.body.className = bodyClass;
+    $("nave").hidden = true; $("botaoLavoura").hidden = true; $("perguntar").hidden = true; $("reserva").hidden = true;
+  }
+  function openWelcome() {
+    leaveApp("on-welcome");
+    $("conteudo").innerHTML = '<section class="o-welcome" aria-labelledby="welcomeTitle">' +
+      '<h1 class="o-welcome-logo" id="welcomeTitle"><img src="marca/logo-verde-sem-lema.png" width="546" height="220" alt="Órbita Rural"></h1>' +
+      '<p class="o-welcome-tagline">' + esc(t("rodape.lema")) + "</p>" +
+      '<p class="o-welcome-text">' + esc(t("welcome.text")) + "</p>" +
+      '<button type="button" class="o-bt" data-acao="start">' + esc(t("welcome.button")) + "</button></section>";
+    window.scrollTo(0, 0);
+  }
+
   /* ---------- a entrada: o assistente pergunta, o produtor toca ou escreve ---------- */
   function opcoes(campo) {
     if (campo === "cidade_id") return Object.keys(T.CIDADES).map(function (k) { return { v: k, n: T.CIDADES[k] }; });
@@ -116,9 +133,7 @@
   }
   function abrirEntrada() {
     en = { l: {}, falas: [], campo: "", ocupado: false, estado: null, fichaDaIA: null, outroDia: false };
-    app.tela = ""; app.vez += 1; fecharTudo();
-    document.body.className = "na-entrada";
-    $("nave").hidden = true; $("botaoLavoura").hidden = true; $("perguntar").hidden = true; $("reserva").hidden = true;
+    leaveApp("na-entrada");
     falar("assistente", "Olá! Sou o assistente do Órbita Rural. Acompanho a sua lavoura com os dados dos satélites da NASA.");
     en.campo = faltando(); falar("assistente", PERGUNTAS[en.campo]);
     desenharEntrada(false); window.scrollTo(0, 0);
@@ -188,8 +203,9 @@
     if (tela) irPara(tela); else rota();
   }
   function guardarColheita(form) {
-    var x = app.registro, l = app.lavoura, valores = {}, algum = false;
-    Array.prototype.forEach.call(form.querySelectorAll("input[name]"), function (c) { var n = Number(String(c.value).replace(",", ".")); if (c.value !== "" && isFinite(n) && n > 0) { valores[c.name] = n; algum = true; } });
+    var x = app.registro, l = app.lavoura, valores = {}, algum = false, acimaDoLimite = false;
+    Array.prototype.forEach.call(form.querySelectorAll("input[name]"), function (c) { var n = Number(String(c.value).replace(",", ".")); if (c.value !== "" && isFinite(n) && n > 9999) acimaDoLimite = true; else if (c.value !== "" && isFinite(n) && n > 0) { valores[c.name] = n; algum = true; } });
+    if (acimaDoLimite) { form.querySelector(".o-recado").textContent = "O limite é 9999 sacas por hectare."; return; }
     if (!algum) { form.querySelector(".o-recado").textContent = "Escreva quanto colheu, em sacas por hectare."; return; }
     var h = new Date(), todas = ler(CHAVE_SAFRAS) || {};
     valores.em = h.getFullYear() + "-" + doisDigitos(h.getMonth() + 1) + "-" + doisDigitos(h.getDate());
@@ -233,15 +249,73 @@
     return { v: 1, ficha: ficha,
              selo: null, pergunta: pergunta, momento: MOMENTO[app.tela] || "durante", falas: [] };
   }
+  function horaDaConversa() { return new Intl.DateTimeFormat("pt-BR", { hour: "2-digit", minute: "2-digit" }).format(new Date()); }
+  function htmlDaFala(f) {
+    var produtor = f.de === "produtor", rodape = '<span class="o-fala-rodape"><time>' + esc(f.hora || horaDaConversa()) + "</time>" + (produtor ? '<span class="o-fala-lida" aria-label="Entregue e lida">✓✓</span>' : "") + "</span>";
+    return '<li class="o-fala ' + esc(f.de) + '"><span class="o-fala-texto">' + esc(f.texto) + "</span>" + (f.apoio ? '<small class="o-apoio">' + esc(f.apoio) + "</small>" : "") + (f.usou ? '<small class="o-usou">' + esc(f.usou) + "</small>" : "") + rodape + "</li>";
+  }
+  function respostaGuardada(texto) {
+    var s = norm(texto), aviso = "Converse com um profissional de agronomia antes de decidir.";
+    function pronta(resposta, origem) { return { simulada: true, resposta: resposta, apoio: origem || "Demonstração com os dados guardados do Órbita Rural." }; }
+    if (/^(oi|ola|bom dia|boa tarde|boa noite)\b/.test(s)) return Promise.resolve(pronta("Olá! Sou o assistente do Órbita Rural. Posso explicar como está a água, o calor e a cobertura da terra, comparar rotações ou resumir uma safra. O que você quer saber?"));
+    if (/ajuda|o que voce faz|o que posso perguntar/.test(s)) return Promise.resolve(pronta("Você pode perguntar, por exemplo:\n\n• Como está a água da minha lavoura?\n• Houve calor forte?\n• Vale trocar o milho pelo sorgo?\n• O que a última safra mostrou?"));
+
+    if (/ultima safra|safra mostrou|registro|colheita|depois de colher/.test(s)) {
+      return busca("registro", app.safra).then(function (r) {
+        var d = r.dados || {};
+        return pronta((d.frase || "O registro desta safra não está disponível agora.") + (d.aviso ? "\n\n" + d.aviso : ""), r.reserva ? "Resposta com o registro guardado desta lavoura." : "Resposta tirada da conta atual da lavoura.");
+      });
+    }
+
+    if (/trocar|comparar|rotac|plantar|milho|sorgo|braquiaria|capim|ano ruim/.test(s)) {
+      return busca("ensaio").then(function (r) {
+        var d = r.dados || {}, lista = Array.isArray(d.comparacao_das_rotacoes) ? d.comparacao_das_rotacoes : [];
+        if (!lista.length) return pronta("A comparação das rotações não está disponível agora.");
+        var local = T.CIDADES[app.lavoura.cidade_id] || "a sua região";
+        var partes = lista.map(function (c) {
+          var nome = c.apelido || c.nome || c.id, marca = c.de_hoje ? "Sua rotação" : "Alternativa";
+          var beneficio = c.beneficio || c.evidencia || "Veja os números no ensaio.";
+          var risco = c.risco_curto || c.risco || "O manejo precisa ser conferido em campo.";
+          return marca + " — " + nome + ": " + beneficio + " Risco: " + risco;
+        });
+        return pronta("Comparação simulada para " + local + ":\n\n" + partes.join("\n\n") + "\n\n" + (d.aviso || aviso), r.reserva ? "Resposta com o ensaio guardado desta lavoura." : "Resposta tirada da conta atual da lavoura.");
+      });
+    }
+
+    return busca("painel").then(function (r) {
+      var d = r.dados || {}, itens = Array.isArray(d.itens) ? d.itens : [], id = "";
+      if (/calor|temperatura/.test(s)) id = "calor";
+      else if (/verde|satelite|imagem/.test(s)) id = "verde";
+      else if (/cobertura|terra sem|erosao|planta viva/.test(s)) id = "terra_coberta";
+      else if (/sede|sem chuva|vai faltar/.test(s)) id = "aviso_de_sede";
+      else if (/fase|plantio|cultura/.test(s)) id = "fase";
+      else if (/agua|chuva|seca|lavoura|semana|hoje/.test(s)) id = "agua";
+      var item = itens.filter(function (x) { return x.id === id; })[0];
+      var resposta = item && item.frase ? item.frase : d.frase;
+      if (!resposta) resposta = "Posso responder sobre água, calor, cobertura da terra, comparação de rotações e registro da safra. Escreva uma dessas perguntas para testar.";
+      return pronta(resposta + "\n\n" + (d.aviso || aviso), r.reserva ? "Resposta com os dados guardados desta lavoura." : "Resposta tirada da conta atual da lavoura.");
+    }).catch(function () {
+      return pronta("Estou no modo de demonstração. Posso conversar sobre água, calor, cobertura da terra, rotações e histórico da safra. Tente perguntar: “Como está a água da minha lavoura?”.");
+    });
+  }
   function desenharGaveta() {
-    var falas = ag.falas.length ? ag.falas : [{ de: "assistente", texto: "Pergunte o que quiser sobre a sua lavoura. Eu respondo com a conta e com os dados da NASA do lugar." }];
-    $("chatDoAssistente").innerHTML = falas.map(function (f) { return '<li class="o-fala ' + f.de + '">' + esc(f.texto) + (f.apoio ? '<small class="o-apoio">' + esc(f.apoio) + "</small>" : "") + (f.usou ? '<small class="o-usou">' + esc(f.usou) + "</small>" : "") + "</li>"; }).join("") +
+    var falas = ag.falas.length ? ag.falas : [{ de: "assistente", texto: "Olá! Sou o assistente do Órbita Rural. Pergunte sobre a sua lavoura, a água, o calor ou as rotações. Eu respondo com a conta disponível e os dados guardados.", hora: horaDaConversa() }];
+    $("chatDoAssistente").innerHTML = falas.map(htmlDaFala).join("") +
       (ag.ocupado ? '<li class="o-fala assistente o-pensando" aria-label="O assistente está escrevendo"><i></i><i></i><i></i></li>' : "");
     $("sugestoes").innerHTML = ag.falas.length ? "" : (SUGESTOES[app.tela] || SUGESTOES.hoje).map(function (s) { return '<button type="button" class="o-opcao" data-acao="sugestao" data-texto="' + esc(s) + '">' + esc(s) + "</button>"; }).join("");
+    $("presencaDoAssistente").textContent = ag.ocupado ? "digitando…" : D.api && D.ia ? "online · conectado à API" : "online · demonstração local";
+    $("modoDoAssistente").textContent = D.api && D.ia ? "Conectado ao motor do Órbita Rural" : "Modo demonstração · dados guardados";
+    $("campoDoAssistente").disabled = ag.ocupado; $("formDoAssistente").querySelector("button[type=submit]").disabled = ag.ocupado;
     var rolo = $("roloDoAssistente"); rolo.scrollTop = rolo.scrollHeight;
   }
-  function abrirGaveta() { $("gaveta").hidden = false; document.body.classList.add("com-folha"); desenharGaveta(); $("fecharGaveta").focus(); }
+  function abrirGaveta() { $("gaveta").hidden = false; document.body.classList.add("com-folha"); desenharGaveta(); $("campoDoAssistente").focus(); }
   function fecharGaveta() { $("gaveta").hidden = true; document.body.classList.remove("com-folha"); $("perguntar").focus(); }
+  function abrirChatbot() {
+    var destino = "chatbot.html", api = "";
+    try { api = new URLSearchParams(window.location.search).get("api") || ""; } catch (erro) { api = ""; }
+    if (/^https?:\/\//.test(api)) destino += "?api=" + encodeURIComponent(api);
+    window.location.assign(destino);
+  }
   function oQueAContaUsou(f) {      // a ficha da conversa ficou diferente da guardada: uma linha diz o que a conta usou
     var l = app.lavoura, p = [];
     var rot = typeof f.rotacao_atual === "string" ? f.rotacao_atual : Object.keys(D.culturas).filter(function (k) { return String(D.culturas[k]) === String(f.rotacao_atual); })[0];
@@ -253,7 +327,7 @@
   }
   function perguntar(texto) {
     texto = String(texto || "").trim(); if (!texto || ag.ocupado) return;
-    ag.falas.push({ de: "produtor", texto: texto }); ag.ocupado = true; desenharGaveta();
+    ag.falas.push({ de: "produtor", texto: texto, hora: horaDaConversa() }); ag.ocupado = true; desenharGaveta();
     function mandar(corpo, jaConfirmou) {
       return D.post("/agente", corpo, 120000).then(function (s) {
         var confirmada = !!(s.ficha && s.ficha.confirmada);
@@ -265,13 +339,15 @@
       });
     }
     app.pronto.then(function () {
-      if (!D.api || !D.ia) throw new Error("sem_ia");
+      if (!D.api || !D.ia) return respostaGuardada(texto);
       return mandar(ag.estado && ag.confirmada ? { estado: ag.estado, texto: texto } : { estado: estadoDaFicha(texto), texto: "sim" }, false);
     }).then(function (s) {
-      ag.falas.push({ de: "assistente", texto: s.resposta || "", apoio: APOIO[s.apoio] || "", usou: s.apoio === "conta" && ag.confirmada ? oQueAContaUsou(s.ficha) : "" });
+      ag.falas.push({ de: "assistente", texto: s.resposta || "", apoio: s.simulada ? s.apoio : APOIO[s.apoio] || "", usou: !s.simulada && s.apoio === "conta" && ag.confirmada ? oQueAContaUsou(s.ficha) : "", hora: horaDaConversa() });
     }, function (e) {
-      ag.falas.push({ de: "assistente", texto: e && e.message === "sem_ia" ? SEM_ASSISTENTE : e && e.codigo === 400 && e.frase ? e.frase : "O assistente não respondeu agora. Tente de novo daqui a pouco. O painel, o ensaio e o registro seguem funcionando." });
-    }).then(function () { ag.ocupado = false; desenharGaveta(); });
+      return respostaGuardada(texto).then(function (s) {
+        ag.falas.push({ de: "assistente", texto: s.resposta, apoio: "A API não respondeu; " + s.apoio.toLowerCase(), hora: horaDaConversa() });
+      });
+    }).then(function () { ag.ocupado = false; desenharGaveta(); $("campoDoAssistente").focus(); });
   }
 
   /* ---------- a leitura do agrônomo (o link do rodapé) ---------- */
@@ -321,6 +397,7 @@
 
   /* ---------- os toques ---------- */
   var ACOES = {
+    "start": abrirEntrada,
     "opcao": function (b) { escolher(b.getAttribute("data-campo"), b.getAttribute("data-valor"), b.getAttribute("data-nome")); },
     "outro-dia": function () { en.outroDia = true; desenharEntrada(true); var c = $("diaDoPlantio"); if (c) c.focus(); },
     "usar-dia": function () { var c = $("diaDoPlantio"), v = c ? c.value : ""; if (/^\d{4}-(09|10|11|12)-\d{2}$/.test(v)) escolher("plantio_da_soja", v, T.dataPorExtenso(v)); },
@@ -328,7 +405,8 @@
     "confirmar-lavoura": confirmarLavoura,
     "ano-ruim": abrirAnoRuim, "fechar-folha": fecharFolha,
     "abrir-lavoura": abrirLavoura, "fechar-janela": function () { $("janela").hidden = true; $("botaoLavoura").focus(); }, "trocar-lavoura": trocarDeLavoura,
-    "perguntar": abrirGaveta, "fechar-gaveta": fecharGaveta, "sugestao": function (b) { perguntar(b.getAttribute("data-texto")); },
+    "perguntar": abrirChatbot, "fechar-gaveta": fecharGaveta, "sugestao": function (b) { perguntar(b.getAttribute("data-texto")); },
+    "limpar-chat": function () { ag = { estado: null, confirmada: false, falas: [], ocupado: false }; desenharGaveta(); $("campoDoAssistente").focus(); },
     "tentar": function () { mostrar(app.tela || "hoje"); },
     "terra-do-agronomo": function (b) { app.terraDoAgronomo = b.getAttribute("data-terra"); desenharAgronomo(); },
     "baixar": baixarResposta, "voltar-produtor": function () { irPara("hoje"); }
@@ -356,9 +434,12 @@
   /* ---------- o começo ---------- */
   function comecar() {
     try {
+      var linkDoChat = $("perguntar"), apiDoEndereco = "";
+      try { apiDoEndereco = new URLSearchParams(window.location.search).get("api") || ""; } catch (erro) { apiDoEndereco = ""; }
+      if (linkDoChat && /^https?:\/\//.test(apiDoEndereco)) linkDoChat.href = "chatbot.html?v=5&api=" + encodeURIComponent(apiDoEndereco);
       app.pronto = D.saude();
       app.lavoura = ler(CHAVE); if (!valida(app.lavoura)) app.lavoura = null;
-      if (app.lavoura) abrirApp(""); else abrirEntrada();
+      if (app.lavoura) abrirApp(""); else openWelcome();
     } finally { document.documentElement.classList.remove("montando"); }
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", comecar); else comecar();
