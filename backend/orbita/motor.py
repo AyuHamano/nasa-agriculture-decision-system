@@ -574,6 +574,195 @@ def verde_do_satelite(cidade_id, dias_pelo_calendario=None, par=None):
                 aviso=comparacao["aviso"] + " " + bruto["frases"][-1], fonte=bruto["fonte"])
 
 
+def _serie(entrada):
+    """Os dias do clima da cidade da entrada, com a chuva da fonte pedida, e os avisos."""
+    return clima.ler_serie_com_aviso(entrada["chuva"], cidade_id=entrada["cidade_id"], lugar=_lugar(entrada))
+
+
+def _regra_dos_anos(entrada, dias):
+    """A chuva da janela de cada safra e a regra dos anos (o pior ano e o ano normal) da cidade da entrada."""
+    chuvas = {s: balanco.chuva_da_janela(dias, int(s[:4]) + 1) for s in balanco.SAFRAS_DO_ESTUDO}
+    if entrada["regra"] == "rendimento":
+        return chuvas, escolher_pelo_rendimento(ler_rendimento_do_milho(_arquivo_do_ibge(entrada)), chuvas,
+                                                _lugar(entrada))
+    regra = escolher_anos(chuvas)
+    regra["segunda_mais_seca"] = sorted(chuvas, key=chuvas.get)[1]
+    if entrada["chuva"] == "power" and regra["pior_ano"] == "2024-25":
+        regra["chuva_de_2025_mm"] = r1(sum(d.chuva for d in dias if d.data.year == 2025))
+        regra["aviso_do_ano_mais_seco"] = (
+            "a janela desta safra (fevereiro a junho de 2025) cai no ano em que a chuva de modelo da NASA POWER "
+            "é suspeita de baixa; confira nas outras fontes (python3 -m orbita.validar)")
+    return chuvas, regra
+
+
+def _clima(entrada, dias, avisos):
+    """O bloco `clima` da resposta: de onde vêm a chuva e a temperatura, o período e os avisos."""
+    pastas = clima.pastas_da_cidade(entrada["cidade_id"])
+    temperatura = clima.origem_da_serie(pastas["nasa_power"])
+    return {"chuva": {"id": entrada["chuva"], "fonte": clima.ORIGENS_DA_CHUVA[entrada["chuva"]],
+                      "origem": f"{pastas['texto']} (LEIA-ME.md)" if entrada["chuva"] == "power"
+                                else f"{pastas['texto_da_chuva']}{entrada['chuva']}.csv (o endereço e a hora "
+                                     "da consulta estão em fonte.json, na mesma pasta)"},
+            "temperatura": {"fonte": clima.ORIGEM_DA_TEMPERATURA, "consulta": temperatura["consulta"],
+                            "baixado_em": temperatura["baixado_em"]},
+            "primeiro_dia": dias[0].data.isoformat(), "ultimo_dia": dias[-1].data.isoformat(),
+            "avisos": list(avisos),
+            "conta": "FAO-56: ETo de Hargreaves (eq. 52), Kc por fase, balanço diário da água (cap. 8)"}
+
+
+def clima_do_lugar(cidade_id, par=None):
+    """Os fatos do clima do lugar, tirados dos dados da NASA guardados: para o agente (a ferramenta "o clima do lugar").
+
+    Devolve o lugar, de onde vêm a chuva e a temperatura, a regra dos anos (o pior ano e o ano normal), a chuva de
+    cada safra e o calor (os dias de calor forte na fase crítica, no calendário de costume). Não roda a conta da água.
+    """
+    entrada = validar_entrada({"cidade_id": cidade_id, "rotacao_atual": list(ROTACAO_DE_HOJE)})
+    par = par or parametros.carregar()
+    dias, avisos = _serie(entrada)
+    chuvas, regra = _regra_dos_anos(entrada, dias)
+    pior, normal = regra["pior_ano"], regra["ano_normal"]
+    cal = rotacoes.calendario(par)
+    safras = balanco.SAFRAS_DO_ESTUDO + (SAFRA_A_PARTE,)
+    bloco_do_calor = calor.bloco(dias, cal, par, safras, pior, normal, {
+        rotacao["id"]: ["soja", rotacao["segunda"]] for rotacao in rotacoes.ROTACOES.values()})
+    chuva_da_safra = {s: r1(sum(d.chuva for d in dias if balanco.nome_da_safra(d.data) == s))
+                      for s in balanco.SAFRAS_DO_ESTUDO}
+    nome = CIDADES[entrada["cidade_id"]]["nome"]
+    criterio = ("a pior colheita do milho de 2ª safra no IBGE" if regra["regra"] == "rendimento"
+                else "a menor chuva de fevereiro a junho")
+    frase = (f"Em {nome}, nas {len(chuvas)} safras guardadas, o pior ano foi a safra {pior} ({criterio}) e o ano "
+             f"normal, a safra {normal}. Na janela da 2ª safra (fevereiro a junho) choveu {_n(chuvas[pior])} mm no "
+             f"pior ano e {_n(chuvas[normal])} mm no ano normal.")
+    return {"local": dict(CIDADES[entrada["cidade_id"]], id=entrada["cidade_id"]),
+            "clima": _clima(entrada, dias, avisos), "regra_dos_anos": regra,
+            "chuva_da_safra_mm": chuva_da_safra, "calor": bloco_do_calor, "frase": frase,
+            "aviso": "São fatos do clima guardado da NASA para o ponto da cidade, não da fazenda. Converse com o "
+                     "agrônomo antes de decidir."}
+
+
+def _n(numero):
+    """Número em português, com uma casa e vírgula (o mesmo arredondamento da resposta)."""
+    return f"{r1(numero):.1f}".replace(".", ",")
+
+
+def _maior_sequencia(marcas):
+    """A maior sequência de dias seguidos marcados: (o índice do primeiro dia, o tamanho). Sem nenhum: (None, 0)."""
+    melhor, tamanho, inicio = None, 0, None
+    for i, marca in enumerate(list(marcas) + [False]):
+        if marca and inicio is None:
+            inicio = i
+        elif not marca and inicio is not None:
+            if i - inicio > tamanho:
+                melhor, tamanho = inicio, i - inicio
+            inicio = None
+    return melhor, tamanho
+
+
+NOMES_NO_REPLAY = {"soja": "a soja", "milho": "o milho de 2ª safra", "sorgo": "o sorgo de 2ª safra"}
+
+
+def conferir_safra(safra):
+    """Confere o nome da safra ("2015-16"): tem de ser uma das guardadas. Fora disso, erro em português."""
+    safras = balanco.SAFRAS_DO_ESTUDO + (SAFRA_A_PARTE,)
+    if safra not in safras:
+        raise ValueError(f'Entrada fora do formato: safra "{safra}" não está guardada: use uma de {safras[0]} a '
+                         f"{safras[-1]}, como 2015-16.")
+    return safra
+
+
+def simular_a_rotacao_de_hoje(entrada, par, dias, cal=None):
+    """A conta da água, dia a dia, da rotação que o produtor faz hoje (a da entrada). Devolve (registros, a rotação).
+
+    Na rotação com capim vale a hipótese do meio da disputa do capim com o milho (a mesma dos campos de sempre).
+    """
+    rotacao = rotacoes.CARDAPIO[entrada["rotacao_id"]]
+    cal = cal or rotacoes.calendario(par, entrada["plantio_da_soja"])
+    disputa = parametros.valor(par, "disputa_com_o_milho", CENARIO_DOS_CAMPOS_ANTIGOS) if rotacao["com_braquiaria"] else 0.0
+    return balanco.simular(dias, rotacao["com_braquiaria"], par, entrada["terra"], disputa=disputa, cal=cal,
+                           segunda=rotacao["segunda"]), rotacao
+
+
+def replay_da_safra(entrada, safra="2015-16", par=None):
+    """A safra dia a dia, na rotação de hoje do produtor: os dias e os marcos, para a tela passar como um filme.
+
+    Cada dia: a data, o que está na terra, a chuva, a água na terra, o que a planta pediu, bebeu e o que faltou, se
+    passou sede, a temperatura máxima e se foi dia de calor forte. Cada marco: a data, o tipo (plantio, agua_acabou,
+    calor_forte ou colheita) e uma frase pronta. As datas dos marcos saem da conta.
+    """
+    entrada = validar_entrada(entrada)
+    conferir_safra(safra)
+    par = par or parametros.carregar()
+    dias, avisos = _serie(entrada)
+    cal = rotacoes.calendario(par, entrada["plantio_da_soja"])
+    registros, rotacao = simular_a_rotacao_de_hoje(entrada, par, dias, cal)
+    maximas = {dia.data: dia.tmax for dia in dias}
+    limites = calor.limites(par)
+    da_safra = [r for r in registros if balanco.nome_da_safra(r.data) == safra]
+    linhas, marcos = [], []
+    for r in da_safra:
+        cultura = r.tipo in rotacoes.CULTURAS
+        quente = bool(cultura and r.tipo in limites and calor.na_fase_critica(cal, r.tipo, r.data)
+                      and maximas[r.data] > limites[r.tipo]["limite_c"])
+        linhas.append({"data": r.data.isoformat(), "cultura": r.tipo, "chuva_mm": r1(r.chuva),
+                       "agua_na_terra_mm": r1(r.agua_na_terra), "pedido_mm": r1(r.pedido), "bebido_mm": r1(r.bebido),
+                       "falta_mm": r1(r.pedido - r.bebido) if cultura else 0.0,
+                       "com_sede": bool(cultura and r.ks < 1.0), "tmax_c": r1(maximas[r.data]),
+                       "calor_forte": quente})
+    resumo = {}
+    for tipo in ("soja", rotacao["segunda"]):
+        indices = [i for i, r in enumerate(da_safra) if r.tipo == tipo]
+        if not indices:
+            continue
+        nome, primeiro, ultimo = NOMES_NO_REPLAY[tipo], indices[0], indices[-1]
+        falta = sum(da_safra[i].pedido - da_safra[i].bebido for i in indices)
+        sede = [da_safra[i].ks < 1.0 for i in indices]
+        quentes = [i for i in indices if linhas[i]["calor_forte"]]
+        resumo[tipo] = {"falta_mm": r1(falta), "dias": len(indices), "dias_de_sede": sum(sede),
+                        "dias_de_calor_forte": len(quentes)}
+        marcos.append({"data": linhas[primeiro]["data"], "tipo": "plantio", "cultura": tipo,
+                       "frase": f"Plantio: entra {nome}."})
+        comeco, tamanho = _maior_sequencia(sede)
+        if tamanho:
+            dia = linhas[indices[comeco]]
+            resumo[tipo]["maior_sequencia_de_sede_dias"] = tamanho
+            marcos.append({"data": dia["data"], "tipo": "agua_acabou", "cultura": tipo, "dias_seguidos": tamanho,
+                           "agua_na_terra_mm": dia["agua_na_terra_mm"],
+                           "frase": f"Neste dia a água fácil de tirar da terra acabou para {nome}: começaram "
+                                    f"{tamanho} dias seguidos de sede."})
+        if quentes:
+            dia = linhas[quentes[0]]
+            marcos.append({"data": dia["data"], "tipo": "calor_forte", "cultura": tipo, "tmax_c": dia["tmax_c"],
+                           "limite_c": limites[tipo]["limite_c"], "dias_na_safra": len(quentes),
+                           "frase": f"Primeiro dia de calor forte na fase crítica d{nome}: máxima de "
+                                    f"{_n(dia['tmax_c'])} °C, acima do limite de "
+                                    f"{explicacao._grau(limites[tipo]['limite_c'])} °C. Foram {len(quentes)} dias de "
+                                    "calor forte nesta safra."})
+        marcos.append({"data": linhas[ultimo]["data"], "tipo": "colheita", "cultura": tipo,
+                       "falta_mm": resumo[tipo]["falta_mm"], "dias_de_sede": resumo[tipo]["dias_de_sede"],
+                       "frase": f"Fim do ciclo: sai {nome}. Nesta safra faltaram {_n(falta)} mm de água para a "
+                                f"cultura, com {sum(sede)} dias de sede."})
+    principal = max((m for m in marcos if m["tipo"] == "agua_acabou"), key=lambda m: m["dias_seguidos"], default=None)
+    for marco in marcos:
+        marco["principal"] = marco is principal
+    marcos.sort(key=lambda m: (m["data"], ("plantio", "agua_acabou", "calor_forte", "colheita").index(m["tipo"])))
+    resumo["total"] = {"falta_mm": r1(sum(r.pedido - r.bebido for r in da_safra if r.tipo in rotacoes.CULTURAS)),
+                       "dias_de_sede": sum(1 for r in da_safra if r.tipo in rotacoes.CULTURAS and r.ks < 1.0),
+                       "dias_de_calor_forte": sum(1 for linha in linhas if linha["calor_forte"]),
+                       "chuva_mm": r1(sum(r.chuva for r in da_safra))}
+    nota = ("Na rotação com capim, o filme mostra a hipótese do meio da disputa do capim com o milho."
+            if rotacao["com_braquiaria"] else None)
+    return {"safra": safra, "cidade_id": entrada["cidade_id"], "local": dict(CIDADES[entrada["cidade_id"]],
+                                                                             id=entrada["cidade_id"]),
+            "rotacao": {"id": rotacao["id"], "nome": rotacao["nome"]}, "terra": entrada["terra"],
+            "plantio_da_soja_informado": entrada["plantio_da_soja"],
+            "primeiro_dia": linhas[0]["data"] if linhas else None, "ultimo_dia": linhas[-1]["data"] if linhas else None,
+            "completa": len(linhas) >= 365, "dias": linhas, "marcos": marcos, "resumo": resumo,
+            "limites_de_calor_c": {c: limites[c]["limite_c"] for c in ("soja", rotacao["segunda"]) if c in limites},
+            "avisos": list(avisos) + ([nota] if nota else []) + [
+                "A água fácil de tirar acabar não é a terra secar de todo: é o ponto em que a planta começa a passar "
+                "sede (o freio da sede do FAO-56).", calor.AVISO]}
+
+
 def _plantio_informado(entrada, cal):
     """O que a data de plantio do produtor fez no calendário (sem data, o calendário de costume, que é fixo)."""
     if entrada["plantio_da_soja"] is None:
@@ -600,17 +789,7 @@ def responder(entrada, par=None, dias=None, rendimentos=None):
                                                  lugar=_lugar(entrada))
     cidade = CIDADES[entrada["cidade_id"]]
     pastas = clima.pastas_da_cidade(entrada["cidade_id"])
-    chuvas = {s: balanco.chuva_da_janela(dias, int(s[:4]) + 1) for s in balanco.SAFRAS_DO_ESTUDO}
-    if entrada["regra"] == "rendimento":
-        regra = escolher_pelo_rendimento(ler_rendimento_do_milho(_arquivo_do_ibge(entrada)), chuvas, _lugar(entrada))
-    else:
-        regra = escolher_anos(chuvas)
-        regra["segunda_mais_seca"] = sorted(chuvas, key=chuvas.get)[1]
-        if entrada["chuva"] == "power" and regra["pior_ano"] == "2024-25":
-            regra["chuva_de_2025_mm"] = r1(sum(d.chuva for d in dias if d.data.year == 2025))
-            regra["aviso_do_ano_mais_seco"] = (
-                "a janela desta safra (fevereiro a junho de 2025) cai no ano em que a chuva de modelo da NASA POWER "
-                "é suspeita de baixa; confira nas outras fontes (python3 -m orbita.validar)")
+    chuvas, regra = _regra_dos_anos(entrada, dias)
     criterio = parametros.valor(par, "regras", "sede_da_2a_safra_pct")
     calendario = rotacoes.resumo_do_calendario(par, entrada["plantio_da_soja"])
     cal = rotacoes.calendario(par, entrada["plantio_da_soja"])
@@ -740,7 +919,7 @@ def responder(entrada, par=None, dias=None, rendimentos=None):
         "pelo_satelite": verde,
         "aviso": "O satélite prova só a rotação de hoje da região (soja, milho e pousio): é o que está no chão nos "
                  "pontos medidos. Nas outras rotações, os dias sem planta viva vêm só do calendário."}
-    temperatura = clima.origem_da_serie(pastas["nasa_power"])
+    temperatura = clima.origem_da_serie(pastas["nasa_power"])    # a hora da temperatura, para os textos de antes
     if entrada["chuva"] == "power":
         aviso_a_parte = ("a conferir: a chuva de 2025 na NASA POWER é suspeita de baixa; esta safra fica fora das 10 "
                          "e fora da regra dos anos")
@@ -752,15 +931,7 @@ def responder(entrada, par=None, dias=None, rendimentos=None):
         "pergunta": "Com o clima que a NASA registrou na minha região, vale trocar a minha rotação de hoje por outra?",
         "entrada": entrada,
         "local": dict(cidade, id=entrada["cidade_id"]),
-        "clima": {"chuva": {"id": entrada["chuva"], "fonte": clima.ORIGENS_DA_CHUVA[entrada["chuva"]],
-                            "origem": f"{pastas['texto']} (LEIA-ME.md)" if entrada["chuva"] == "power"
-                                      else f"{pastas['texto_da_chuva']}{entrada['chuva']}.csv (o endereço e a hora "
-                                           "da consulta estão em fonte.json, na mesma pasta)"},
-                  "temperatura": {"fonte": clima.ORIGEM_DA_TEMPERATURA, "consulta": temperatura["consulta"],
-                                  "baixado_em": temperatura["baixado_em"]},
-                  "primeiro_dia": dias[0].data.isoformat(), "ultimo_dia": dias[-1].data.isoformat(),
-                  "avisos": list(avisos),
-                  "conta": "FAO-56: ETo de Hargreaves (eq. 52), Kc por fase, balanço diário da água (cap. 8)"},
+        "clima": _clima(entrada, dias, avisos),
         "terra": {"opcao": entrada["terra"], "classe": parametros.valor(par, "terra", entrada["terra"], "classe"),
                   "agua_por_metro_mm": r1(agua["agua_mm_por_m"]),
                   "raizes_m": {tipo: raiz for tipo, raiz in agua["raizes_m"].items()},
