@@ -6,8 +6,8 @@ O site só desenha: não faz conta nenhuma. Tudo o que ele mostra está nesses a
 neles sai do motor (backend/orbita, importado daqui) ou dos arquivos de dados dele (data/orbita/).
 Rodar de novo sempre que o motor ou os dados mudarem (Python 3, só a biblioteca padrão):
 
-    python3 -B frontend/dados/gerar-dados.py                      (com a pasta backend/ ao lado de frontend/)
-    python3 -B frontend/dados/gerar-dados.py --backend <pasta>    (com o motor em outro lugar)
+    python3 -B frontend/orbita/dados/gerar-dados.py                      (com a pasta backend/ na raiz do repositório)
+    python3 -B frontend/orbita/dados/gerar-dados.py --backend <pasta>    (com o motor em outro lugar)
 
 O -B é para o Python não criar __pycache__ dentro do repositório (o programa também desliga isso sozinho).
 
@@ -36,7 +36,7 @@ from pathlib import Path
 sys.dont_write_bytecode = True  # nada de __pycache__ dentro do repositório, mesmo sem o -B
 
 AQUI = Path(__file__).resolve().parent
-GERADO_POR = "frontend/dados/gerar-dados.py"
+GERADO_POR = "frontend/orbita/dados/gerar-dados.py"
 MESES = ("jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez")
 ANO_DO_DESENHO = 2021  # o ano da terra vai de 1/set/2021 a 31/ago/2022, os mesmos anos que o motor usa no resumo
 #                        do calendário (rotacoes.resumo_do_calendario); 2022 não é bissexto: 365 dias
@@ -336,10 +336,10 @@ def texto_do_js(variavel, dados, o_que_e, agora, comando):
 def main():
     leitor = argparse.ArgumentParser(description="Gera dados/respostas.js, dados/complementos.js e "
                                                  "dados/validacao.js a partir do motor do Órbita Rural.")
-    leitor.add_argument("--backend", default=None, help="a pasta backend/ do motor (padrão: a que fica ao lado "
-                                                        "de frontend/)")
+    leitor.add_argument("--backend", default=None, help="a pasta backend/ do motor (padrão: a da raiz do "
+                                                        "repositório)")
     pedido = leitor.parse_args().backend
-    backend = Path(pedido).expanduser().resolve() if pedido else Path(__file__).resolve().parents[2] / "backend"
+    backend = Path(pedido).expanduser().resolve() if pedido else Path(__file__).resolve().parents[3] / "backend"
     if not (backend / "orbita" / "motor.py").exists():
         print(f"Não achei o motor em {backend} (falta a pasta orbita/ com o motor.py). Nada foi gravado. "
               "Rode de novo com --backend <a pasta backend/ do repositório>.", file=sys.stderr)

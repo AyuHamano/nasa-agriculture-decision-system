@@ -1,6 +1,6 @@
-/* Base: o painel do ramo nat do time (nathancabrall). Ligação com o motor e telas de resultado geradas com IA (Claude) */
-/* A tela do resultado: as duas leituras (produtor e agrônomo). Recebe o que o adaptar() leu e devolve HTML.
-   Nenhuma conta de dado aqui: só ordenar, comparar para escolher a frase, formatar o número e pôr o desenho na escala. */
+/* Gerado com IA (Claude). A leitura do agrônomo partiu do painel de 2026-11-14 (ver o LEIA-ME.md). */
+/* A leitura do agrônomo: recebe o que o adaptar() leu da resposta do motor e devolve HTML.
+   Nenhuma conta de dado aqui: só ordenar, formatar o número e pôr o desenho na escala. */
 (function () {
   "use strict";
 
@@ -8,27 +8,8 @@
   function num(x, casas) { return typeof x !== "number" ? "—" : x.toLocaleString("pt-BR", { minimumFractionDigits: casas || 0, maximumFractionDigits: casas || 0 }); }
   function int(x) { return num(x, 0); }
   function um(x) { return num(x, 1); }
-  function icone(nome) { return '<span data-lucide="' + nome + '"></span>'; }
+  function icone(nome) { return window.ORBITA_ICONE ? window.ORBITA_ICONE(nome) : ""; }
   function e(lista) { lista = lista.slice(); return lista.length < 2 ? lista.join("") : lista.slice(0, -1).join(", ") + " e " + lista[lista.length - 1]; }
-  function iguais(a, b) { return int(a) === int(b); }
-  var ICONES = { agua: "droplets", solo: "sprout", erosao: "mountain", renda: "wallet" };
-  var ORDEM = ["agua", "solo", "erosao", "renda"];
-
-  function prioridadesNaOrdem(v, notas) {
-    return v.prioridades.map(function (p) { return { id: p.id, nome: p.nome, veredito: p.veredito, nota: notas && notas[p.id] != null ? notas[p.id] : p.nota }; })
-      .sort(function (a, b) { return (b.nota - a.nota) || (ORDEM.indexOf(a.id) - ORDEM.indexOf(b.id)); });
-  }
-
-  // "50%" ou "entre 48% e 50%": o que a cultura recebeu (ou, sem o complemento, o que faltou), como o motor deu.
-  function quanto(c, f) {
-    if (c.recebeuPct != null) {
-      if (c.recebeuFaixa && !iguais(c.recebeuFaixa.menor, c.recebeuFaixa.maior)) return { recebeu: true, faixa: c.recebeuFaixa, texto: t("resultado.agua.entre", { a: int(c.recebeuFaixa.menor), b: int(c.recebeuFaixa.maior) }) };
-      return { recebeu: true, faixa: null, valor: c.recebeuPct, texto: int(c.recebeuPct) + "%" };
-    }
-    if (f && !iguais(f.menor, f.maior)) return { recebeu: false, faixa: f, texto: t("resultado.agua.entre", { a: int(f.menor), b: int(f.maior) }) };
-    return { recebeu: false, faixa: null, valor: c.faltaPct, texto: int(c.faltaPct) + "%" };
-  }
-  function quantoDoMilho(l) { return quanto(l.milho, l.faixa ? l.faixa.milhoPct : null); }
 
   /* ---------- peças de desenho ---------- */
   function faixaDoAno(trechos, classe) {
@@ -56,151 +37,6 @@
     }
     return '<div class="year"><span class="gap"></span>' + meses(a, "year-months") + '<span class="gap"></span>' +
            linha("atual", "hoje", t("locais.hoje")) + linha("alternativa", "alt", t("locais.alternativa")) + "</div>";
-  }
-  function medidor(frase, q) {
-    var barra;
-    if (q.recebeu) barra = q.faixa ? '<b class="g-max" style="width:' + q.faixa.maior + '%"></b><i class="g-min" style="width:' + q.faixa.menor + '%"></i><em style="left:' + q.faixa.menor + '%"></em><em style="left:' + q.faixa.maior + '%"></em>'
-                                   : '<i class="g-min" style="width:' + q.valor + '%"></i>';
-    else barra = q.faixa ? '<b class="f-max" style="width:' + q.faixa.maior + '%"></b><u class="f-min" style="width:' + q.faixa.menor + '%"></u>' : '<u class="f-min" style="width:' + q.valor + '%"></u>';
-    return '<div class="gauge"><p>' + frase + '</p><div class="gauge-bar' + (q.recebeu ? "" : " falta") + '">' + barra + "</div></div>";
-  }
-  function bloco(n, titulo, sub, corpo, extra, classe) {
-    return '<article class="panel block ' + (classe || "") + '"><header class="block-head"><span class="block-num">' + n + "</span><div><h2>" + esc(titulo) + "</h2><p>" + esc(sub) + "</p></div>" + (extra || "") + "</header>" + corpo + "</article>";
-  }
-  function leitura(html) { return '<p class="meaning">' + icone("lightbulb") + "<span>" + html + "</span></p>"; }
-
-  /* ---------- a leitura do produtor ---------- */
-  function fraseDaAgua(v) {
-    var s = v.porSafra[v.anos.pior]; if (!s) return "";
-    var h = quantoDoMilho(s.atual), a = quantoDoMilho(s.alternativa);
-    return t(h.recebeu ? "resultado.troca.agua" : "resultado.troca.aguaFalta", { alt: a.texto, hoje: h.texto });
-  }
-  function fraseDaPrioridade(v, id) {
-    if (id === "agua") return fraseDaAgua(v);
-    return t("resultado.troca." + id, { alt: int(v.semPlanta.alternativa.dias), hoje: int(v.semPlanta.atual.dias) });
-  }
-  function resposta(v, notas) {
-    var grupos = { alternativa: [], atual: [], depende: [], empate: [], nm: [] };
-    prioridadesNaOrdem(v, notas).forEach(function (p) { (grupos[p.veredito] || grupos.nm).push(p); });
-    var titulos = { alternativa: ["trending-up", "resultado.ganha"], atual: ["trending-down", "resultado.perde"], depende: ["scale", "resultado.depende"], empate: ["equal", "resultado.igual"], nm: ["circle-help", "resultado.naoMedido"] };
-    var colunas = Object.keys(grupos).filter(function (g) { return grupos[g].length; }).map(function (g) {
-      return '<div class="trade-col ' + g + '"><h3>' + icone(titulos[g][0]) + esc(t(titulos[g][1])) + "</h3>" +
-             grupos[g].map(function (p) { return "<p><b>" + esc(p.nome) + ":</b> " + fraseDaPrioridade(v, p.id) + "</p>"; }).join("") + "</div>";
-    }).join("");
-    return '<article class="answer"><span class="eyebrow">' + esc(t("resultado.resposta")) + "</span><h2>" + esc(v.veredito.frase) + '</h2><p class="ask">' +
-           esc(t("resultado.pergunta", { atual: v.nomes.atual, alternativa: v.nomes.alternativa })) + '</p><div class="trade">' + colunas + "</div></article>" +
-           '<div class="rot-legend"><div class="rot-line hoje"><b>' + esc(t("locais.hoje")) + "</b><span>" + esc(v.nomes.atual) + '</span></div><div class="rot-line alt"><b>' +
-           esc(t("locais.alternativa")) + "</b><span>" + esc(v.nomes.alternativa) + "</span></div></div>";
-  }
-  function anoDaTerra(v) {
-    if (!v.anoDaTerra) return bloco(2, t("resultado.ano.titulo"), t("resultado.ano.sub"), '<p class="note">' + esc(t("resultado.ano.semFaixa")) + "</p>");
-    var h = v.semPlanta.atual, a = v.semPlanta.alternativa;
-    return bloco(2, t("resultado.ano.titulo"), t("resultado.ano.sub"), linhasDoAno(v) + legendaDoAno(v.anoDaTerra) +
-      leitura(t("resultado.ano.leitura", { hoje: int(h.dias), hojeDe: h.de, hojeAte: h.ate, alt: int(a.dias), altDe: a.de, altAte: a.ate })));
-  }
-  function chuva(v, safra) {
-    var c = v.chuvaPorMes, a = v.anoDaTerra, dados = c && c.safras[safra];
-    if (!dados || !a || !c.maior) return '<p class="note">' + esc(t("resultado.agua.semChuva")) + "</p>";
-    var barras = dados.mm.map(function (mm, i) {
-      return '<div class="rain-col" style="flex:' + Number(a.diasPorMes[i] || 30) + ' 1 0"><b>' + int(mm) + '</b><i style="height:' + (100 * mm / c.maior) + '%"></i></div>';
-    }).join("");
-    return "<h3>" + esc(t("resultado.agua.chuva")) + '</h3><div class="rain-bars">' + barras + "</div>" + meses(a, "rain-months") + faixaDoAno(a.atual, "mini") +
-           '<p class="rain-foot">' + esc(t("resultado.agua.chuvaPe")) + "</p>";
-  }
-  function desenharAgua(v, qual) {
-    var safra = v.anos[qual], outro = qual === "pior" ? "normal" : "pior", s = v.porSafra[safra], o = v.porSafra[v.anos[outro]];
-    if (!s) return "";
-    function grupo(rot, classe, rotulo) {
-      var m = quantoDoMilho(s[rot]), j = quanto(s[rot].soja);
-      return '<div class="gauge-group ' + classe + '"><h4><i></i>' + esc(rotulo) + "</h4>" +
-             medidor(t(m.recebeu ? "resultado.agua.milho" : "resultado.agua.milhoFalta", { pct: m.texto }), m) +
-             medidor(t(j.recebeu ? "resultado.agua.soja" : "resultado.agua.sojaFalta", { pct: j.texto }), j) + "</div>";
-    }
-    var mh = quantoDoMilho(s.atual), ma = quantoDoMilho(s.alternativa), sh = quanto(s.atual.soja), sa = quanto(s.alternativa.soja), porque = [];
-    if (ma.faixa) porque.push(t("resultado.agua.porqueFaixa"));
-    else if (ma.texto === mh.texto) porque.push(t("resultado.agua.milhoIgual"));
-    if (sh.texto === sa.texto) porque.push(t("resultado.agua.sojaIgual"));
-    else if (sh.recebeu) porque.push(t(sa.valor < sh.valor ? "resultado.agua.sojaMenos" : "resultado.agua.sojaMais"));
-    var comparar = o && mh.recebeu ? '<p class="why">' + esc(t("resultado.agua.comparar", { rotulo: t(outro === "normal" ? "resultado.agua.noNormal" : "resultado.agua.noPior"), safra: o.safra, pct: quantoDoMilho(o.atual).texto })) + "</p>" : "";
-    return '<p class="year-context">' + t(qual === "pior" ? "resultado.agua.contextoPior" : "resultado.agua.contextoNormal", { safra: esc(safra), kg: int(s.rendimento), total: v.safras.length }) + "</p>" +
-           '<div class="water-grid"><div class="rain">' + chuva(v, safra) + '</div><div class="gauges"><h3>' + esc(t("resultado.agua.recebeu")) + "</h3>" +
-           grupo("atual", "hoje", t("locais.hoje")) + grupo("alternativa", "alt", t("locais.alternativa")) +
-           '<div class="gauge-key">' + (mh.recebeu ? '<span><i class="k-agua"></i>' + esc(t("resultado.agua.chaveRecebeu")) + "</span>" : "") + (ma.faixa ? '<span><i class="k-faixa"></i>' + esc(t("resultado.agua.chaveFaixa")) + "</span>" : "") +
-           '<span><i class="k-falta"></i>' + esc(t("resultado.agua.chaveFaltou")) + "</span></div>" + comparar + "</div></div>" +
-           leitura(porque.join(" "));
-  }
-  function dezSafras(v) {
-    var forte = v.sedeForte, total = v.safras.length;
-    function nivel(falta) { return falta < 20 ? 0 : falta < 30 ? 1 : falta < 40 ? 2 : falta < 50 ? 3 : 4; }
-    function linha(rot, classe, rotulo) {
-      var quais = forte && forte[rot] ? forte[rot].quais : [];
-      return '<span class="row-label ' + classe + '"><b>' + esc(rotulo) + "</b></span>" + v.safras.map(function (s) {
-        var l = v.porSafra[s][rot], q = quantoDoMilho(l), eForte = quais.indexOf(s) >= 0;
-        var texto = q.faixa ? int(q.faixa.menor) + "–" + int(q.faixa.maior) + "%" : q.texto;
-        return '<span class="mark lvl-' + nivel(l.milho.faltaPct) + (eForte ? " forte" : "") + '" title="' + esc(s) + '">' + esc(texto) + (eForte ? "<small>" + esc(t("resultado.safras.forte")) + "</small>" : "") + "</span>";
-      }).join("");
-    }
-    var cabeca = '<span class="head-gap"></span>' + v.safras.map(function (s) {
-      var marca = s === v.anos.pior ? '<em class="pior">' + esc(t("resultado.safras.pior")) + "</em>" : s === v.anos.normal ? "<em>" + esc(t("resultado.safras.normal")) + "</em>" : "";
-      return '<span class="season-name">' + marca + esc(s) + "</span>";
-    }).join("");
-    var colheita = '<span class="row-label harvest-label">' + esc(t("resultado.safras.colheita")) + "</span>" + v.safras.map(function (s) { return '<span class="harvest">' + int(v.porSafra[s].rendimento) + "</span>"; }).join("");
-    var recebeu = v.temRecebida, escala = t(recebeu ? "resultado.safras.escalaRecebeu" : "resultado.safras.escalaFaltou");
-    var rampa = '<div class="ramp"><b>' + esc(t("resultado.safras.escalaTitulo")) + "</b>" + escala.map(function (x, i) { return '<span><i class="lvl-' + i + '"></i>' + esc(x) + "</span>"; }).join("") + "</div>";
-    var texto = "";
-    if (forte && forte.atual) {
-      var a = forte.alternativa || { quantas: null, alarmes: [], quebrasAbaixo: [] };
-      var quantasAlt = a.faixa && a.faixa.menor !== a.faixa.maior ? t("resultado.safras.deAte", { a: a.faixa.menor, b: a.faixa.maior }) : String(a.quantas);
-      texto = t(forte.recebeuNivel != null ? "resultado.safras.leitura" : "resultado.safras.leituraFalta", { nivel: um(forte.recebeuNivel != null ? forte.recebeuNivel : forte.nivel), quebras: esc(e(forte.safrasDeQuebra)), hoje: forte.atual.quantas, alt: quantasAlt, total: total });
-      if (forte.atual.alarmes.length) texto += " " + t("resultado.safras.alarme", { safras: esc(e(forte.atual.alarmes)) });
-      if (forte.atual.quebrasAbaixo.length) texto += " " + t("resultado.safras.quebraSemSede", { safras: esc(e(forte.atual.quebrasAbaixo)) });
-    }
-    texto += (texto ? " " : "") + t("resultado.safras.colheitaNota");
-    return bloco(4, t("resultado.safras.titulo", { total: total }), t(recebeu ? "resultado.safras.sub" : "resultado.safras.subFalta", { primeira: v.safras[0], ultima: v.safras[total - 1] }),
-      '<div class="seasons">' + cabeca + linha("atual", "hoje", t("locais.hoje")) + linha("alternativa", "alt", t("locais.alternativa")) + colheita + "</div>" + rampa + leitura(texto));
-  }
-  function oQuePesa(v, notas) {
-    var s = v.porSafra[v.anos.pior], h = v.semPlanta.atual.dias, a = v.semPlanta.alternativa.dias;
-    var cartoes = prioridadesNaOrdem(v, notas).map(function (p) {
-      var grande, texto;
-      if (p.id === "agua" && s) {
-        var mh = quantoDoMilho(s.atual), ma = quantoDoMilho(s.alternativa);
-        grande = t("resultado.pesa.aguaGrande", { alt: ma.faixa ? int(ma.faixa.menor) + " a " + int(ma.faixa.maior) + "%" : ma.texto, hoje: mh.texto }) + "<small>" + esc(t(mh.recebeu ? "resultado.pesa.aguaPequeno" : "resultado.pesa.aguaPequenoFalta")) + "</small>";
-        texto = t(p.veredito === "depende" ? "resultado.pesa.aguaDepende" : "resultado.pesa.aguaTexto");
-      } else if (p.id === "renda" || p.veredito === "nm") { grande = esc(t("resultado.pesa.rendaGrande")); texto = t("resultado.pesa.rendaTexto"); }
-      else { grande = t("resultado.pesa.diasGrande", { alt: int(a), hoje: int(h) }) + "<small>" + esc(t("resultado.pesa.diasPequeno")) + "</small>"; texto = t("resultado.pesa." + (p.id === "erosao" ? "erosaoTexto" : "soloTexto")); }
-      return '<div class="prio-card"><header>' + icone(ICONES[p.id] || "circle") + "<strong>" + esc(p.nome) + "</strong><span>" + esc(t("resultado.pesa.nota", { nota: p.nota })) + '</span></header><span class="who ' + p.veredito + '">' +
-             esc(t("resultado.quem." + p.veredito)) + '</span><div class="big">' + grande + "</div><p>" + esc(texto) + "</p></div>";
-    }).join("");
-    return bloco(5, t("resultado.pesa.titulo"), t("resultado.pesa.sub"), '<div class="prio-grid">' + cartoes + "</div>");
-  }
-  function riscoEAgronomo(v) {
-    var itens = [t("resultado.risco.capim"), t("resultado.risco.renda"), t("resultado.risco.palha"), t("resultado.risco.hipoteses", { n: int(v.hipoteses) })];
-    return '<div class="duo">' + bloco(6, t("resultado.risco.titulo"), t("resultado.risco.sub"), '<ul class="plain-list">' + itens.map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ul>", "", "risk-card") +
-      bloco(icone("user-check"), t("resultado.agronomo.titulo"), t("resultado.agronomo.sub"), '<ul class="plain-list">' + t("resultado.agronomo.perguntas").map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") +
-      '</ul><button class="text-button" data-acao="aba-agronomo" style="margin-top:12px">' + esc(t("resultado.agronomo.ver")) + " →</button>", "", "agro-card") + "</div>";
-  }
-  function resumo(v, estado) {
-    var m = v.mensagemDoMotor, notas = estado.notas || {};
-    if (m && ORDEM.every(function (k) { return m.notas[k] === notas[k]; })) return m.texto;   // o texto curto do próprio motor (orbita.mensagem)
-    var s = v.porSafra[v.anos.pior], linhas = [
-      t("resultado.resumo.cabeca", { produto: NOME_DO_PRODUTO, propriedade: estado.propriedade ? estado.propriedade.nome : "", cidade: v.cidade }),
-      t("resultado.resumo.pergunta", { atual: v.nomes.atual, alternativa: v.nomes.alternativa }), "", t("resultado.resumo.resposta", { frase: v.veredito.frase }), "", t("resultado.resumo.prioridades")];
-    prioridadesNaOrdem(v, notas).forEach(function (p) { linhas.push(t("resultado.resumo.linha", { nome: p.nome, nota: p.nota, quem: t("resultado.quem." + p.veredito).toLowerCase() })); });
-    linhas.push("", t("resultado.resumo.dias", { hoje: int(v.semPlanta.atual.dias), alt: int(v.semPlanta.alternativa.dias) }));
-    if (s) { var mh = quantoDoMilho(s.atual), ma = quantoDoMilho(s.alternativa); linhas.push(t(mh.recebeu ? "resultado.resumo.agua" : "resultado.resumo.aguaFalta", { safra: s.safra, hoje: mh.texto, alt: ma.texto })); }
-    linhas.push("", t("resultado.resumo.fim"));
-    return linhas.join("\n");
-  }
-  function mensagem(v, estado) {
-    return bloco(7, t("resultado.mensagem.titulo"), t("resultado.mensagem.sub"), '<div class="message-card"><div class="bubble" id="resumoTexto">' + esc(estado.mensagem || resumo(v, estado)) +
-      '</div><button class="primary-action" data-acao="copiar">' + icone("copy") + esc(t("resultado.mensagem.copiar")) + "</button></div>");
-  }
-  function desenharProdutor(v, estado) {
-    var seletor = '<div class="segmented" role="group" aria-label="' + esc(t("resultado.agua.titulo")) + '"><button data-ano="normal" class="' + (estado.ano === "normal" ? "active" : "") + '">' + esc(t("resultado.agua.normal")) +
-                  '</button><button data-ano="pior" class="' + (estado.ano === "pior" ? "active" : "") + '">' + esc(t("resultado.agua.pior")) + "</button></div>";
-    return resposta(v, estado.notas) + anoDaTerra(v) + bloco(3, t("resultado.agua.titulo"), t("resultado.agua.sub"), '<div id="waterBody">' + desenharAgua(v, estado.ano) + "</div>", seletor) +
-           dezSafras(v) + oQuePesa(v, estado.notas) + riscoEAgronomo(v) + mensagem(v, estado);
   }
 
   /* ---------- a leitura do agrônomo ---------- */
@@ -320,19 +156,9 @@
     return painel(t("agro.limites.titulo"), t("agro.limites.sub"), '<ul class="plain-list">' + itens.map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ul><h3 class='sub' style='margin-top:16px'>" + esc(t("agro.fontes.titulo")) + "</h3>" + fontes);
   }
   function desenharAgronomo(v, val) {
-    return '<div class="result-bar" style="margin-bottom:12px"><p class="agro-intro" style="margin:0;flex:1">' + esc(t("agro.intro")) + '</p><button class="ghost-action" data-acao="baixar">' + icone("download") + esc(t("agro.baixar")) + "</button></div>" +
+    return '<div class="result-bar"><button class="ghost-action" data-acao="baixar">' + icone("download") + esc(t("agro.baixar")) + "</button></div>" +
            metodo(v) + faixaEPalha(v) + parametros(v) + calendario(v) + safraPorSafra(v) + validacao(v, val) + limites(v);
   }
 
-  /* A chuva de cada mês do ano normal e do pior ano, lado a lado (para a visão geral). */
-  function chuvaDupla(v) {
-    var c = v.chuvaPorMes, a = v.anoDaTerra, n = c && c.safras[v.anos.normal], p = c && c.safras[v.anos.pior];
-    if (!n || !p || !a || !c.maior) return "";
-    return '<div class="pair-legend"><span><i class="a"></i>' + esc(t("visao.chuvaNormal", { safra: v.anos.normal })) + '</span><span><i class="b"></i>' + esc(t("visao.chuvaPior", { safra: v.anos.pior })) + '</span></div><div class="rain-pair">' +
-      n.mm.map(function (mm, i) { return '<div style="flex:' + Number(a.diasPorMes[i] || 30) + ' 1 0" title="' + esc(a.meses[i] + ": " + um(mm) + " mm · " + um(p.mm[i]) + " mm") + '"><i class="a" style="height:' + (100 * mm / c.maior) + '%"></i><i class="b" style="height:' + (100 * p.mm[i] / c.maior) + '%"></i></div>'; }).join("") +
-      "</div>" + meses(a, "rain-months");
-  }
-
-  window.ORBITA_RESULTADO = { produtor: desenharProdutor, agua: desenharAgua, agronomo: desenharAgronomo, resumo: resumo, linhasDoAno: linhasDoAno, legendaDoAno: legendaDoAno, chuvaDupla: chuvaDupla,
-                              num: num, int: int, um: um, esc: esc, icone: icone };
+  window.ORBITA_RESULTADO = { agronomo: desenharAgronomo, num: num, int: int, um: um, esc: esc };
 })();

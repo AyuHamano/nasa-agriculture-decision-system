@@ -1,0 +1,5 @@
+# O que não vai ao repositório (só desta pasta)
+dados/conversas-molde.js
+__pycache__/
+*.pyc
+.DS_Store
