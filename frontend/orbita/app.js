@@ -10,7 +10,7 @@
   var CHAVE = "orbita.lavoura.v1", CHAVE_SAFRAS = "orbita.safras.v1";
   var TELAS = ["hoje", "ensaiar", "registrar", "agronomo"];
   var CAMPOS = ["cidade_id", "rotacao_id", "plantio_da_soja", "terra"];
-  var PERGUNTAS = { cidade_id: "Onde fica a sua lavoura?", rotacao_id: "O que você planta?", plantio_da_soja: "Em que mês você planta a soja?", terra: "Como é a sua terra?" };
+  var PERGUNTAS = { cidade_id: "Onde fica a sua lavoura?", rotacao_id: "Qual é o seu ciclo de plantio hoje?", plantio_da_soja: "Quando você plantou, ou vai plantar, a soja desta safra?", terra: "Como é a sua terra?" };
   var NOMES = { cidade_id: "Cidade", rotacao_id: "O que planta", plantio_da_soja: "Plantio da soja", terra: "A terra" };
   var MOMENTO = { hoje: "durante", ensaiar: "antes", registrar: "depois" };
   var SUGESTOES = {

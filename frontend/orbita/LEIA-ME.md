@@ -22,8 +22,8 @@ colher). A tela **não faz conta**: mostra o que o motor e o agente (em `backend
 - **A tela de boas-vindas.** Quem ainda não tem lavoura guardada vê primeiro o logo, o lema, um texto curto (em
   `js/textos.js`, chave `welcome.text`) e o botão "Iniciar", que abre a conversa abaixo. Quem já tem lavoura guardada não a
   vê: o aplicativo abre direto em "Minha lavoura hoje".
-- **A entrada: o assistente monta a ficha.** Ele pergunta onde fica a lavoura (Rio Verde, Jataí ou Silvânia), o que o
-  produtor planta (soja e depois milho, milho com capim ou sorgo), em que mês planta a soja (de setembro a dezembro,
+- **A entrada: o assistente monta a ficha.** Ele pergunta onde fica a lavoura (Rio Verde, Jataí ou Silvânia), qual é o
+  ciclo de plantio dele hoje (soja e depois milho, milho com capim ou sorgo), quando plantou, ou vai plantar, a soja desta safra (de setembro a dezembro,
   no dia 15, ou "Escolher o dia") e como é a terra (arenosa, média ou argilosa). Cada pergunta tem botões; os toques
   montam a ficha sem IA. Quem prefere escrever, escreve: o texto vai ao assistente (`POST /agente`), e o que ele
   anotar entra na ficha. Quando ele diz um lugar ou uma rotação fora da lista, a resposta traz `lugar_dito` e
@@ -34,10 +34,11 @@ colher). A tela **não faz conta**: mostra o que o motor e o agente (em `backend
   aplicativo abre direto em "Minha lavoura hoje". O botão com o nome da cidade, no topo, mostra a ficha e tem
   "Trocar de lavoura".
 - **Hoje · "Minha lavoura hoje"** (`POST /lavoura-hoje`): o quadro do topo com a situação (tranquilo, atenção ou
-  alerta), uma frase que diz o que pede atenção e a data do dado; e seis cartões, cada um com o número grande, a
+  alerta), uma frase que diz o que pede atenção e até que dia vai a chuva do satélite; e seis cartões, cada um com o número grande, a
   situação e uma frase curta: o aviso de sede, a água na terra (com o mesmo dia do ano normal e do ano ruim), a fase
   da cultura, o calor, o verde do satélite e a terra coberta. "Entender" abre a frase inteira do motor.
-- **Ensaiar** (`POST /recomendacao`): a resposta em uma frase, os 3 caminhos lado a lado com 3 medidas (a água que
+- **Ensaiar** (`POST /recomendacao`): a dica em uma frase (o caminho que fica na frente em mais das 3 medidas), a linha
+  que diz de que ano ruim a tabela fala, os 3 caminhos lado a lado com 3 medidas (a água que
   falta, o calor forte na fase crítica, os dias seguidos de terra sem planta viva; o melhor número de cada linha vem
   marcado; a falta de água do milho com capim, que o motor dá em faixa, aparece com o número do meio, o do cenário
   `meio` em `comparacao.agua.pela_faixa.por_cenario`, e a faixa inteira fica em "Ver a prova"), uma linha de risco
@@ -83,12 +84,15 @@ terra é da estação do INMET. O caminho de cada dado está em `data/orbita/`.
 ## Como a tela escreve
 
 - **Números:** os milímetros com uma casa ("66,0 mm"); os dias, inteiros; o verde do satélite, com duas casas.
-- **Datas:** dia e mês nos cartões (21/11) e a data inteira no "Dado de" (14/11/2026); na ficha, por extenso.
-- **Frases curtas:** a frase do topo do painel, a de cada cartão e a resposta do ensaio são montadas pela tela com os
-  campos da resposta (a situação de cada item, os números, e quem ficou `melhor` em `contra_as_outras`): nenhuma
+- **Datas:** dia e mês nos cartões (21/11) e a data inteira na linha do topo do Hoje e no "Dado de" do "Entender" (14/11/2026); na ficha, por extenso.
+- **Frases curtas:** a frase do topo do painel, a de cada cartão e a dica do ensaio são montadas pela tela com os
+  campos da resposta (a situação de cada item, os números, e quem ficou `melhor` em `contra_as_outras`: a dica conta em quantas das 3
+  medidas cada caminho tem o número em destaque na tabela): nenhuma
   conta, nenhum número novo. A frase inteira do motor está em "Entender" e em "Ver a prova". A linha de risco é a
   primeira frase do `risco` do motor.
-- **A data do dado** aparece só como "Dado de DD/MM/AAAA", discreto. O aviso é o curto do motor (`aviso`); o texto
+- **A data do dado** aparece na linha pequena do topo do Hoje ("Chuva do satélite até ontem, DD/MM/AAAA."; "ontem",
+  "hoje" e "há N dias" saem de `atraso_dias`, e só quando o `hoje` da resposta é o dia do aparelho), no cartão do
+  calor ("até DD/MM") e, dentro do "Entender" de cada cartão, como "Dado de DD/MM/AAAA". O aviso é o curto do motor (`aviso`); o texto
   técnico (`aviso_tecnico`, `detalhe_tecnico`, `risco_detalhe`, `falta_saber_detalhe`) não aparece para o produtor.
 - **Letras e dedos:** nenhuma letra abaixo de 13 px; botões com 44 px ou mais; nenhuma rolagem de lado.
 

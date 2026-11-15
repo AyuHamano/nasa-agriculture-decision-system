@@ -100,8 +100,8 @@
     },
     calor: function (it) {
       if (!it.cultura || typeof it.dias_de_calor_forte_desde_o_plantio !== "number") return { titulo: "Calor", num: "–", ex: primeiraFrase(it.frase) };
-      var d = nd(it.dias_de_calor_forte_desde_o_plantio), meio = ((it.nas_safras_guardadas || {}).desde_o_plantio || {}).valor_do_meio;
-      return { titulo: "Calor", num: d.num, un: d.un, ex: "Acima de " + num(it.limite_c, 0) + " °C desde o plantio." + (typeof meio === "number" ? " O normal é " + num(meio, 0) + "." : "") };
+      var d = nd(it.dias_de_calor_forte_desde_o_plantio), meio = ((it.nas_safras_guardadas || {}).desde_o_plantio || {}).valor_do_meio, ate = partes((it.ultimo_dado || {}).data);
+      return { titulo: "Calor", num: d.num, un: d.un, ex: "Acima de " + num(it.limite_c, 0) + " °C desde o plantio" + (ate ? " até " + ate[3] + "/" + ate[2] : "") + "." + (typeof meio === "number" ? " O normal é " + num(meio, 0) + "." : "") };
     },
     verde: function (it) {
       if (typeof it.verde !== "number") return { titulo: "Verde do satélite", num: "–", ex: primeiraFrase(it.frase) };
@@ -123,6 +123,14 @@
     if (atencao.length) f.push((atencao.length > 1 ? "Pedem atenção: " : "Pede atenção: ") + juntar(atencao) + ".");
     return f.length ? f.join(" ") : "Tudo tranquilo na lavoura.";
   }
+  // A linha pequena do topo: até que dia vai a chuva do satélite. "Ontem", "hoje" e "há N dias" saem de atraso_dias,
+  // e só quando o "hoje" da resposta é o dia deste aparelho (dado guardado, ou lido em outro dia, fica só com a data).
+  function ateQuando(p) {
+    var a = p.atraso_dias, d = dataBR(p.ultimo_dia_com_dado), h = new Date(), m = partes(p.hoje);
+    var doDia = !!m && Number(m[1]) === h.getFullYear() && Number(m[2]) === h.getMonth() + 1 && Number(m[3]) === h.getDate();
+    if (!doDia || typeof a !== "number" || a < 0) return "Chuva do satélite até " + d + ".";
+    return a > 1 ? "Chuva do satélite até " + d + ", há " + num(a, 0) + " dias." : "Chuva do satélite até " + (a === 1 ? "ontem" : "hoje") + ", " + d + ".";
+  }
   function painel(p, l) {
     var itens = Array.isArray(p && p.itens) ? p.itens : [], porId = {};
     itens.forEach(function (i) { porId[i.id] = i; });
@@ -139,40 +147,41 @@
     }).join("");
     return '<div class="o-tela"><header class="o-missao s-' + esc(p.situacao) + '"><p class="o-missao-onde">' + esc(ondeEOQue(l)) + "</p><h1>Minha lavoura hoje</h1>" +
       '<p class="o-missao-sit"><i></i>' + esc(p.situacao_nome || p.situacao) + '</p><p class="o-missao-frase">' + esc(fraseDoTopo(itens)) + (agora ? " <span>" + esc(agora) + "</span>" : "") + "</p>" +
-      '<p class="o-missao-data">Dado de ' + esc(dataBR(p.ultimo_dia_com_dado)) + "</p></header>" +
+      '<p class="o-missao-data">' + esc(ateQuando(p)) + "</p></header>" +
       '<div class="o-cartoes">' + cartoes + '</div><p class="o-agronomo">' + esc(p.aviso || AGRONOMO) + "</p></div>";
   }
 
   /* ---------- Ensaiar ---------- */
   function anoRuim(e) { var s = String(((e || {}).regra_dos_anos || {}).pior_ano || ""); return /^\d{4}-\d{2}$/.test(s) ? s.slice(0, 2) + s.slice(5) : s; }
-  function respostaDoEnsaio(lista, ano) {
-    var hoje = lista.filter(function (c) { return c.de_hoje; })[0] || lista[0], ganhos = [];
-    lista.forEach(function (o) {
-      if (o === hoje) return;
-      var c = (o.contra_as_outras || {})[hoje.id] || {}, g = [];
-      if (c.agua === "melhor") g.push("com menos falta de água");
-      if (c.calor === "melhor") g.push((o.calor || {}).dias_de_calor_forte_no_pior_ano === 0 ? "sem calor forte" : "com menos calor forte");
-      if (c.terra_coberta === "melhor") g.push("com menos dias de terra sem planta");
-      if (g.length) ganhos.push({ n: g.length, frase: (ROTACOES[o.id] ? ROTACOES[o.id].artigo : o.apelido) + " passa " + juntar(g) });
-    });
-    ganhos = ganhos.sort(function (x, y) { return y.n - x.n; }).map(function (x) { return x.frase; });      // primeiro quem ficou na frente em mais medidas
-    return "Num ano ruim como " + ano + ", " + (ganhos.length ? ganhos.join("; ") : "a sua rotação ficou na frente ou empatada nas três medidas") + ".";
-  }
   function ensaio(e, l) {
     var lista = Array.isArray(e && e.comparacao_das_rotacoes) ? e.comparacao_das_rotacoes : [];
     if (!lista.length) return '<div class="o-tela estreita"><header class="o-cab"><h1>Ensaiar</h1></header><p class="o-nota">O ensaio desta lavoura não está disponível agora.</p></div>';
     var cal = e.calendario || {}, ano = anoRuim(e), segunda = /sorgo/.test(l.rotacao_id) ? cal.sorgo : cal.milho;
     var MEDIDAS = [
-      { k: "agua", nome: "Água que falta", sub: "mm no ano ruim", v: function (c) { return faixa(doMeio(e, (c.agua || {}).falta_no_pior_ano_mm), 1); } },
-      { k: "calor", nome: "Calor forte", sub: "dias na fase crítica", v: function (c) { return faixa((c.calor || {}).dias_de_calor_forte_no_pior_ano, 0); } },
-      { k: "terra_coberta", nome: "Terra sem planta", sub: "dias seguidos", v: function (c) { return faixa((c.terra_coberta || {}).dias_sem_planta_viva, 0); } }
+      { k: "agua", nome: "Água que falta", sub: "mm na safra inteira", v: function (c) { return faixa(doMeio(e, (c.agua || {}).falta_no_pior_ano_mm), 1); } },
+      { k: "calor", nome: "Calor forte", sub: "dias quentes demais na floração", v: function (c) { return faixa((c.calor || {}).dias_de_calor_forte_no_pior_ano, 0); } },
+      { k: "terra_coberta", nome: "Terra sem planta", sub: "dias da colheita até a soja, todo ano", v: function (c) { return faixa((c.terra_coberta || {}).dias_sem_planta_viva, 0); } }
     ];
     function curto(c) { return ROTACOES[c.id] ? ROTACOES[c.id].curto : maiuscula(c.apelido); }
     function melhor(c, k) {
       var f = lista.filter(function (o) { return o !== c; }).map(function (o) { return ((c.contra_as_outras || {})[o.id] || {})[k]; });
       return f.length > 0 && f.every(function (x) { return x === "melhor" || x === "empate"; }) && f.some(function (x) { return x === "melhor"; });
     }
-    var tabela = '<div class="o-t3-caixa"><table class="o-t3"><thead><tr><th scope="col"><span class="so-leitor">A medida</span></th>' +
+    // A dica do topo: o caminho com mais números em destaque na tabela (o melhor de cada linha, por contra_as_outras).
+    // Não há conta nova: é a contagem do que a tabela já marca. Sem ninguém na frente em nada, a dica não aparece.
+    function dica() {
+      var n = lista.map(function (c) { return MEDIDAS.filter(function (m) { return melhor(c, m.k); }).length; }), mais = Math.max.apply(null, n);
+      var naFrente = lista.filter(function (c, i) { return n[i] === mais; });
+      function artigo(c) { return ROTACOES[c.id] ? ROTACOES[c.id].artigo : c.apelido; }
+      if (!mais) return "";
+      if (naFrente.length > 1) return "Dica: " + juntar(naFrente.map(artigo)) + " empatam; veja o que mais preocupa você.";
+      return "Dica: " + (naFrente[0].de_hoje ? "o seu ciclo" : artigo(naFrente[0])) + " fica na frente em " + mais + " das " + MEDIDAS.length + " medidas.";
+    }
+    // A linha de cima da tabela: o ano é o do botão "Ver um ano ruim"; a contagem é a das safras da colheita do IBGE
+    // que a resposta traz (sem elas, a linha sai sem o parêntese).
+    var safras = Object.keys((e.regra_dos_anos || {}).rendimento_por_safra_kg_ha || {}).length, aDica = dica();
+    var seRepetisse = ano ? '<p class="o-legenda">Se um ano ruim como ' + esc(ano) + " se repetisse na sua lavoura" + (safras ? " (a pior colheita da região em " + safras + " safras)" : "") + ":</p>" : "";
+    var tabela = seRepetisse + '<div class="o-t3-caixa"><table class="o-t3"><thead><tr><th scope="col"><span class="so-leitor">A medida</span></th>' +
       lista.map(function (c) { return '<th scope="col"' + (c.de_hoje ? ' class="sua"' : "") + ">" + (c.de_hoje ? "<small>A sua</small>" : "") + esc(curto(c)) + "</th>"; }).join("") + "</tr></thead><tbody>" +
       MEDIDAS.map(function (m) {
         return '<tr><th scope="row" class="k-' + m.k + '">' + esc(m.nome) + "<small>" + esc(m.sub) + "</small></th>" +
@@ -189,7 +198,7 @@
       }).join("") +
       "<h3>De onde vêm os números</h3><p>A chuva é a medida por satélite da NASA (GPM IMERG). A temperatura é a da NASA POWER. O verde da lavoura vem do satélite MODIS, da NASA. A conta da água segue o manual da FAO. O ano ruim (" + esc(String((e.regra_dos_anos || {}).pior_ano || "")) + ") e o ano normal (" + esc(String((e.regra_dos_anos || {}).ano_normal || "")) + ') são os da colheita do IBGE na cidade.</p><p><a href="#agronomo">Ver as contas completas, para o agrônomo</a></p></div></details>';
     return '<div class="o-tela estreita"><header class="o-cab"><h1>Ensaiar</h1><p>' + esc(CIDADES[l.cidade_id] || "") + (cal.soja && cal.soja.plantio ? ". Soja em " + esc(cal.soja.plantio) + (segunda && segunda.plantio ? ", a 2ª safra entra em " + esc(segunda.plantio) : "") : "") + ".</p></header>" +
-      '<p class="o-resp">' + esc(respostaDoEnsaio(lista, ano)) + "</p>" + tabela + riscos +
+      (aDica ? '<p class="o-resp">' + esc(aDica) + "</p>" : "") + tabela + riscos +
       '<p class="o-agronomo">' + esc(e.aviso || AGRONOMO) + "</p>" +
       '<div class="o-acoes">' + prova + '<button type="button" class="o-bt" data-acao="ano-ruim">' + ic("tocar") + "Ver um ano ruim: " + esc(ano) + "</button></div></div>";
   }
