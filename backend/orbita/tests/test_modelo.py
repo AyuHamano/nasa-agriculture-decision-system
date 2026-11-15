@@ -47,7 +47,8 @@ class OModeloDeMentira(unittest.TestCase):
         self.assertEqual(ia.pedidos[0], (MENSAGENS[:2], FERRAMENTAS))
 
     def test_acabou_a_lista_devolve_texto_vazio(self):
-        self.assertEqual(ModeloDeMentira().responder(MENSAGENS, []), {"texto": "", "chamadas": [], "uso": {}})
+        self.assertEqual(ModeloDeMentira().responder(MENSAGENS, []),
+                         {"texto": "", "chamadas": [], "uso": {}, "cortado": False})
 
     def test_a_resposta_pode_ser_uma_funcao_ou_um_erro(self):
         ia = ModeloDeMentira([lambda mensagens, ferramentas: fala(mensagens[-1]["texto"].upper()),
@@ -62,7 +63,7 @@ class OModeloDeVerdade(unittest.TestCase):
         fio = Fio(RESPOSTA)
         ia = ModeloOpenRouter(CHAVE, "anthropic/claude-haiku-5.5", enviar=fio)
         resposta = ia.responder(MENSAGENS, FERRAMENTAS)
-        self.assertEqual(resposta, {"texto": "Faltaram 232,9 mm.", "chamadas": [],
+        self.assertEqual(resposta, {"texto": "Faltaram 232,9 mm.", "chamadas": [], "cortado": False,
                                     "uso": {"entrada": 900, "saida": 40, "custo_usd": 0.00011}})
         endereco, corpo, cabecalhos, _ = fio.pedidos[0]
         self.assertEqual(endereco, modelo.ENDERECO)
@@ -96,6 +97,20 @@ class OModeloDeVerdade(unittest.TestCase):
         self.assertEqual(ia.uso["pedidos"], 2)
         self.assertEqual((ia.uso["entrada"], ia.uso["saida"]), (1000, 50))
         self.assertAlmostEqual(ia.uso["custo_usd"], 0.50011)
+
+    def test_texto_cortado_por_falta_de_espaco_e_pedido_de_novo_com_o_dobro(self):
+        cortada = {"choices": [{"finish_reason": "length", "message": {"content": "No pior ano faltaram 232"}}]}
+        inteira = dict(RESPOSTA, choices=[dict(RESPOSTA["choices"][0], finish_reason="stop")])
+        fio = Fio(cortada, inteira)
+        resposta = ModeloOpenRouter(CHAVE, enviar=fio).responder(MENSAGENS[:2], FERRAMENTAS)
+        self.assertEqual((resposta["texto"], resposta["cortado"]), ("Faltaram 232,9 mm.", False))
+        primeiro, segundo = fio.pedidos[0][1], fio.pedidos[1][1]
+        self.assertEqual(primeiro["max_tokens"], modelo.TAMANHO_DA_RESPOSTA)
+        self.assertEqual(segundo["max_tokens"], 2 * modelo.TAMANHO_DA_RESPOSTA)
+        self.assertEqual(primeiro["reasoning"], {"effort": "low"})         # a IA pensa pouco: sobra espaço para o texto
+        fio = Fio(cortada, cortada)                                        # cortou de novo: volta marcado, sem repetir
+        resposta = ModeloOpenRouter(CHAVE, enviar=fio).responder(MENSAGENS[:2], FERRAMENTAS)
+        self.assertEqual((resposta["cortado"], len(fio.pedidos)), (True, 2))
 
     def test_o_texto_em_pedacos_tambem_e_lido(self):
         em_pedacos = {"choices": [{"message": {"content": [{"type": "text", "text": "Faltaram "},

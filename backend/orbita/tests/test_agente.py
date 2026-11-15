@@ -331,6 +331,14 @@ class AResposta(ComODuble):
         estado, saida, modelo = self.passo(self.confirmada(), "apaga tudo", fala("", chamada("apagar_tudo")), fala("Não posso."))
         self.assertIn("não existe", modelo.pedidos[1][0][-1]["resultado"]["erro"])
 
+    def test_texto_cortado_no_meio_so_vale_ate_a_ultima_frase_inteira(self):
+        cortado = "No pior ano faltaram 232,9 mm de água com o milho. Com o sorgo, faltaram 187"
+        estado, saida, _ = self.passo(self.confirmada(), "vale o sorgo?", fala("", ENSAIO), fala(cortado, cortado=True))
+        self.assertEqual((saida["resposta"], saida["texto_de"]), ("No pior ano faltaram 232,9 mm de água com o milho.", "ia"))
+        estado, saida, _ = self.passo(self.confirmada(), "vale o sorgo?", fala("", ENSAIO), fala("Pela conta, o sorgo", cortado=True))
+        self.assertEqual(saida["texto_de"], "frases_prontas")              # sem uma frase inteira, saem as frases prontas
+        self.assertIn("comparei 3 rotações", saida["resposta"])
+
     def test_as_marcas_de_markdown_saem_do_texto(self):
         estado, saida, _ = self.passo(self.confirmada(), "vale o sorgo?", fala("", ENSAIO),
                                       fala("## Resultado\n**No pior ano** faltaram `232,9 mm`.\n- com o sorgo, 187,5 mm"))

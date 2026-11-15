@@ -4,7 +4,8 @@
 O agente só conhece uma chamada:
 
     resposta = modelo.responder(mensagens, ferramentas)
-    # resposta = {"texto": "...", "chamadas": [{"id": "...", "nome": "...", "argumentos": {...}}], "uso": {...}}
+    # resposta = {"texto": "...", "chamadas": [{"id": "...", "nome": "...", "argumentos": {...}}], "uso": {...},
+    #             "cortado": True se o texto parou no meio por falta de espaço}
 
 `mensagens` é a conversa, em ordem. Cada uma tem `de` (quem fala) e o resto:
     {"de": "sistema", "texto": ...}       as regras do agente
@@ -39,7 +40,9 @@ ESPERA = 45                     # segundos por pedido
 TENTATIVAS = 2                  # um pedido que falha por demora ou por erro do outro lado é repetido uma vez
 PAUSA = 1.5                     # segundos entre as tentativas
 TEMPERATURA = 0.2               # baixa: a IA explica a conta, não inventa
-TAMANHO_DA_RESPOSTA = 1200      # o máximo de fichas (tokens) que a IA escreve por pedido
+TAMANHO_DA_RESPOSTA = 4000      # o máximo de fichas (tokens) por pedido: o raciocínio da IA também gasta daqui
+RACIOCINIO = {"effort": "low"}  # quanto a IA pensa antes de escrever: pouco (medido: sem teto, ela gasta o espaço
+                                # todo pensando e o texto sai cortado no meio)
 REPETE = (408, 409, 425, 429, 500, 502, 503, 504, 520, 522, 524, 529)
 
 
@@ -56,9 +59,9 @@ def chamada(nome, identificador=None, **argumentos):
     return {"id": identificador or f"chamada_{nome}", "nome": nome, "argumentos": argumentos}
 
 
-def fala(texto="", *chamadas):
+def fala(texto="", *chamadas, cortado=False):
     """Uma resposta do modelo de mentira: um texto, ou pedidos de ferramenta."""
-    return {"texto": texto, "chamadas": list(chamadas), "uso": {}}
+    return {"texto": texto, "chamadas": list(chamadas), "uso": {}, "cortado": cortado}
 
 
 class ModeloDeMentira:
@@ -80,7 +83,7 @@ class ModeloDeMentira:
         if isinstance(resposta, Exception):
             raise resposta
         return {"texto": resposta.get("texto") or "", "chamadas": copy.deepcopy(resposta.get("chamadas") or []),
-                "uso": dict(resposta.get("uso") or {})}
+                "uso": dict(resposta.get("uso") or {}), "cortado": resposta.get("cortado") is True}
 
 
 def _para_o_fio(mensagens):
@@ -128,7 +131,8 @@ def _texto_do_conteudo(conteudo):
 def _ler_resposta(dado):
     """A resposta do OpenRouter no formato do encaixe. Resposta torta: `ErroDoModelo`."""
     try:
-        mensagem = dado["choices"][0]["message"]
+        escolha = dado["choices"][0]
+        mensagem = escolha["message"]
     except (KeyError, IndexError, TypeError):
         erro = dado.get("error") if isinstance(dado, dict) else None
         detalhe = str(erro.get("message"))[:200] if isinstance(erro, dict) else "resposta sem mensagem"
@@ -145,7 +149,8 @@ def _ler_resposta(dado):
     uso = dado.get("usage") if isinstance(dado.get("usage"), dict) else {}
     return {"texto": _texto_do_conteudo(mensagem.get("content")).strip(), "chamadas": chamadas,
             "uso": {"entrada": uso.get("prompt_tokens") or 0, "saida": uso.get("completion_tokens") or 0,
-                    "custo_usd": uso.get("cost") or 0.0}}
+                    "custo_usd": uso.get("cost") or 0.0},
+            "cortado": escolha.get("finish_reason") == "length"}       # parou por falta de espaço, no meio do texto
 
 
 def _enviar(endereco, corpo, cabecalhos, espera):
@@ -172,9 +177,15 @@ class ModeloOpenRouter:
 
     def responder(self, mensagens, ferramentas):
         corpo = {"model": self.nome, "messages": _para_o_fio(mensagens), "temperature": TEMPERATURA,
-                 "max_tokens": TAMANHO_DA_RESPOSTA}
+                 "max_tokens": TAMANHO_DA_RESPOSTA, "reasoning": dict(RACIOCINIO)}
         if ferramentas:
             corpo["tools"] = _ferramentas_no_fio(ferramentas)
+        resposta = self._pedir(corpo)
+        if resposta["cortado"]:                           # faltou espaço: pede de novo, uma vez, com o dobro
+            resposta = self._pedir(dict(corpo, max_tokens=2 * TAMANHO_DA_RESPOSTA))
+        return resposta
+
+    def _pedir(self, corpo):
         cabecalhos = {"Authorization": "Bearer " + self._chave, "Content-Type": "application/json",
                       "X-Title": "Orbita Rural"}
         for tentativa in range(1, TENTATIVAS + 1):

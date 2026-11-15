@@ -47,6 +47,7 @@ PEDIDOS = 7                      # pedidos à IA por fala, no máximo
 MOMENTOS = ("antes", "durante", "depois")
 APOIOS = ("conta", "dados_do_lugar", "conhecimento_geral")
 QUANTOS_MARCOS = 8
+FRASE_MINIMA = 40                # um texto cortado só vale se sobrar pelo menos isto até a última frase inteira
 
 AVISO = "Converse com o agrônomo antes de decidir."
 AVISO_DE_CONHECIMENTO_GERAL = "Isto é conhecimento geral: não saiu da conta com os dados da NASA."
@@ -137,6 +138,16 @@ def _sem_marcas(texto):
     texto = re.sub(r"(?m)^\s{0,3}#{1,6}\s*", "", texto)
     texto = re.sub(r"(?m)^\s*[-–]\s+", "• ", texto)
     return re.sub(r"\n{3,}", "\n\n", texto).strip()
+
+
+def _texto_da_ia(resposta):
+    """O texto que a IA escreveu, limpo. Se ele parou no meio por falta de espaço, vale só até a última frase
+    inteira; sem uma frase inteira, não vale nada (e saem as frases prontas)."""
+    texto = _sem_marcas(resposta.get("texto") or "")
+    if resposta.get("cortado") is True:
+        fim = max(texto.rfind(ponto) for ponto in (".", "!", "?"))
+        texto = texto[:fim + 1].strip() if fim >= FRASE_MINIMA else ""
+    return texto
 
 
 def _disse_sim(fala):
@@ -256,7 +267,7 @@ def _colher(estado, texto, modelo, listas, hoje):
         resposta = modelo.responder(mensagens, definicoes)
         pedidos += 1
         if not resposta["chamadas"]:
-            texto_da_ia = _sem_marcas(resposta["texto"])
+            texto_da_ia = _texto_da_ia(resposta)
             break
         mensagens.append({"de": "agente", "texto": resposta["texto"], "chamadas": resposta["chamadas"]})
         for pedido in resposta["chamadas"]:
@@ -448,7 +459,7 @@ def _responder(estado, texto, pergunta, modelo, listas, hoje):
                 break
             continue
         tentativas += 1
-        texto_da_ia = _sem_marcas(resposta["texto"])
+        texto_da_ia = _texto_da_ia(resposta)
         if not texto_da_ia:
             break
         if consultas.feitas:

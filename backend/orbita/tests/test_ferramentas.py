@@ -117,9 +117,11 @@ class OQueAIaLe(unittest.TestCase):
             self.assertFalse(definicao["parametros"]["additionalProperties"])
 
     def test_o_que_passa_do_teto_e_cortado_e_dito(self):
-        grande = {"pequeno": 1, "enorme": ["x" * 100] * 200, "medio": "y" * 50, "dias": [1, 2, 3]}
+        grande = {"pequeno": 1, "enorme": ["x" * 100] * 400, "medio": "y" * 50, "dias": [1, 2, 3]}
         lido = ferramentas.para_a_ia(grande)
         self.assertEqual(lido, {"pequeno": 1, "medio": "y" * 50, "cortado_por_tamanho": ["enorme"]})
+        com_a_comparacao = {"rotacoes": ["x" * 100] * 400, "outro": "y" * 50}        # a comparação nunca é cortada
+        self.assertEqual(ferramentas.para_a_ia(com_a_comparacao)["rotacoes"], com_a_comparacao["rotacoes"])
         self.assertEqual(ferramentas.para_a_ia({"a": [{"dias": [1], "b": 2}]}), {"a": [{"b": 2}]})
 
 
@@ -132,12 +134,12 @@ class ComOMotorDeVerdade(unittest.TestCase):
         self.assertEqual(listas["terras"], tuple(motor.TERRAS))
         self.assertIn(["soja", "milho", "pousio"], [r["culturas"] for r in listas["rotacoes"].values()])
 
-    @unittest.skipIf(hasattr(motor, "clima_do_lugar"), "o motor já tem as funções novas")
-    def test_sem_as_funcoes_novas_a_ferramenta_diz_que_a_conta_nao_esta_ligada(self):
+    def test_funcao_que_o_motor_ainda_nao_tem_vira_conta_que_nao_esta_ligada(self):
         for nome in ("clima_do_lugar", "verde_do_satelite"):
-            with self.assertRaises(ferramentas.ContaIndisponivel) as erro:
-                ferramentas.chamar(nome, dict(FICHA, cidade_id="rio_verde"), {})
-            self.assertIn(nome, str(erro.exception))
+            if not hasattr(motor, nome):                         # depois da junção das partes, o motor tem as duas
+                with self.assertRaises(ferramentas.ContaIndisponivel) as erro:
+                    ferramentas.chamar(nome, dict(FICHA, cidade_id="rio_verde"), {})
+                self.assertIn(nome, str(erro.exception))
 
     @unittest.skipUnless(hasattr(motor, "clima_do_lugar") and hasattr(motor, "verde_do_satelite"),
                          "o motor ainda não tem as funções novas (chegam na junção das partes)")

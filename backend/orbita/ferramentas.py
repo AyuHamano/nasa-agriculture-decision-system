@@ -31,7 +31,7 @@ MINIMO_DE_ROTACOES = 3                              # contando a de hoje (a cond
 FRASES_DA_ROTACAO = ("evidencia", "beneficio", "risco", "falta_saber")
 SAFRA = re.compile(r"^(?:19|20)\d{2}-\d{2}$")
 ANOS_POR_NOME = ("pior_ano", "ano_normal")
-TETO_PARA_A_IA = 9000                               # caracteres de JSON que uma consulta entrega à IA
+TETO_PARA_A_IA = 24000                              # caracteres de JSON que uma consulta entrega à IA
 PESADOS = ("dias", "parametros", "safras", "limites", "serie")     # o que não vai à IA (vai à tela, se for o caso)
 AVISO_SEM_HOJE = "O acompanhamento do dia de hoje ainda não está ligado: é o próximo passo."
 AVISO_SEM_REGISTRO = "O registro da safra ainda não está ligado: é o próximo passo."
@@ -138,8 +138,10 @@ def _enxugar(coisa, teto=TETO_PARA_A_IA):
         coisa = {chave: _enxugar(valor, teto) for chave, valor in coisa.items() if chave not in PESADOS}
         cortados = []
         while len(json.dumps(coisa, ensure_ascii=False)) > teto and len(coisa) > 1:
-            maior = max((c for c in coisa if c != "cortado_por_tamanho"),
-                        key=lambda c: len(json.dumps(coisa[c], ensure_ascii=False)))
+            maior = max((c for c in coisa if c not in ("cortado_por_tamanho", "rotacoes")),   # a comparação fica
+                        key=lambda c: len(json.dumps(coisa[c], ensure_ascii=False)), default=None)
+            if maior is None:
+                break
             del coisa[maior]
             cortados.append(maior)
             coisa["cortado_por_tamanho"] = cortados
