@@ -75,5 +75,53 @@ class APiorColheitaNaoEAMaiorFaltaDeAgua(unittest.TestCase):
         self.assertEqual(explicacao.pior_contra_normal({"de": 250.0, "ate": 270.0}, {"de": 255.0, "ate": 265.0}), "cruza")
 
 
+class ORegistroEAComparacaoUsamAMesmaRegra(unittest.TestCase):
+    """O registro dizia 126 dias sem planta viva e "11 safras"; a comparação, 125 dias e 10 safras. As causas: a
+    safra 2015-16 tem 366 dias (o ano bissexto) e o registro punha a safra mais recente, que a conta deixa à parte,
+    entre as do estudo."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.resposta = motor.responder(RIO_VERDE)
+        cls.registro = motor.registro_da_safra(RIO_VERDE, "2015-16")
+
+    def test_os_dias_sem_planta_viva_trazem_o_numero_da_comparacao_e_a_frase_diz_por_que_diferem(self):
+        terra = self.registro["terra_coberta"]
+        da_comparacao = _por_id(self.resposta)["soja_milho_pousio"]["terra_coberta"]["dias_sem_planta_viva_no_ano"]
+        self.assertEqual((terra["dias_sem_planta_viva"], terra["dias_da_safra"]), (126, 366))    # o campo de sempre
+        self.assertEqual(terra["dias_sem_planta_viva_no_ano"], da_comparacao)
+        self.assertEqual(da_comparacao, 125)
+        self.assertIn("A terra ficou 126 dias sem planta viva: na comparação das rotações são 125, contados num ano "
+                      "comum, e esta safra tem o dia a mais do ano bissexto.", self.registro["frase"])
+        comum = motor.registro_da_safra(RIO_VERDE, "2016-17")
+        self.assertEqual((comum["terra_coberta"]["dias_sem_planta_viva"], comum["terra_coberta"]["dias_da_safra"],
+                          comum["terra_coberta"]["dias_sem_planta_viva_no_ano"]), (125, 365, 125))
+        self.assertIn("A terra ficou 125 dias sem planta viva.", comum["frase"])
+        self.assertNotIn("bissexto", comum["frase"])
+
+    def test_a_posicao_sai_das_mesmas_10_safras_da_conta(self):
+        entre = self.registro["entre_as_safras_guardadas"]
+        self.assertEqual(list(entre["por_safra_pct"]), list(self.resposta["rotacoes"]["atual"]["safras"]))
+        self.assertEqual((entre["de"], entre["a_parte"]), (10, False))
+        self.assertEqual(entre["posicao"],
+                         1 + sum(1 for v in entre["por_safra_pct"].values() if v > entre["falta_da_2a_safra_pct"]))
+        self.assertIn("entre as 10 safras do estudo (as mesmas da comparação das rotações)", self.registro["frase"])
+        self.assertNotIn("11 safras", self.registro["frase"])
+        self.assertEqual(conferencia.conferir_texto(self.registro["frase"], self.registro), [])
+
+    def test_a_safra_mais_recente_fica_a_parte_como_na_conta_e_e_posta_ao_lado_das_10(self):
+        recente = motor.registro_da_safra(RIO_VERDE, motor.SAFRA_A_PARTE)
+        entre = recente["entre_as_safras_guardadas"]
+        self.assertEqual((entre["de"], entre["a_parte"]), (10, True))
+        self.assertNotIn(motor.SAFRA_A_PARTE, entre["por_safra_pct"])
+        self.assertEqual(entre["falta_da_2a_safra_pct"],
+                         self.resposta["safra_2025_26"]["atual"]["milho"]["falta_relativa_pct"])
+        self.assertEqual(entre["posicao"],
+                         1 + sum(1 for v in entre["por_safra_pct"].values() if v > entre["falta_da_2a_safra_pct"]))
+        self.assertIn("Esta safra fica à parte, como na conta", recente["frase"])
+        self.assertIn("ao lado das 10 safras do estudo", recente["frase"])
+        self.assertEqual(conferencia.conferir_texto(recente["frase"], recente), [])
+
+
 if __name__ == "__main__":
     unittest.main()

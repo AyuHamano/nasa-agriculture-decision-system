@@ -79,6 +79,17 @@ rotação que o produtor faz hoje (qualquer uma do cardápio) aparece em `rotaca
 - Cada marco: `data`, `tipo` (`plantio`, `agua_acabou`, `calor_forte` ou `colheita`), `cultura`, `frase` e `principal`
   (um só marco é o principal: o começo da maior sequência de dias de sede). As datas dos marcos saem da conta.
 
+### O registro: as mesmas regras da comparação (acerto de 2026-11-15)
+`motor.registro_da_safra(entrada, "2015-16")` conta a safra depois da colheita. Dois números dele discordavam da
+comparação das rotações, e agora cada um diz de onde vem:
+- `terra_coberta.dias_sem_planta_viva` são os dias sem planta viva contados nos dias da própria safra
+  (`dias_da_safra`); `dias_sem_planta_viva_no_ano` é o número da comparação, contado pelo calendário num ano comum.
+  Em safra de ano bissexto (2015-16, 2019-20 e 2023-24) a safra dá um dia a mais (126 contra 125, com pousio), e a
+  frase diz por quê.
+- `entre_as_safras_guardadas` compara com as 10 safras do estudo, as mesmas da conta (`de: 10`). A safra mais recente
+  (2025-26) fica à parte, como na conta: sai com `a_parte: true`, fora da lista e da mediana, e a `posicao` dela diz
+  onde ficaria ao lado das 10. Antes ela entrava na lista, e a frase falava em "11 safras".
+
 ## 2. Como rodar
 De dentro de `backend/`:
 ```bash

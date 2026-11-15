@@ -35,7 +35,9 @@ class Registro(unittest.TestCase):
 
     def test_a_posicao_entre_as_safras_sai_da_falta_da_segunda_safra(self):
         entre = REGISTRO["entre_as_safras_guardadas"]
-        self.assertEqual(entre["de"], 11)
+        # Eram 11 até 2026-11-15: o registro punha a safra mais recente (2025-26) entre as do estudo, e a conta a
+        # deixa à parte. Agora valem as mesmas 10 safras da comparação das rotações.
+        self.assertEqual(entre["de"], 10)
         maiores = sum(1 for valor in entre["por_safra_pct"].values() if valor > entre["falta_da_2a_safra_pct"])
         self.assertEqual(entre["posicao"], maiores + 1)
         self.assertLessEqual(entre["posicao"], 3)                 # a safra da pior colheita fica entre as de mais sede
