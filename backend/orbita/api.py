@@ -11,11 +11,16 @@ As rotas (o `API.md` desta pasta traz um exemplo de cada uma):
     POST /recomendacao   -> a resposta inteira do motor          (corpo: cidade_id, rotacao_atual, prioridades, terra)
     POST /mensagem       -> {"texto": o texto curto}             (o mesmo corpo)
     POST /conversa       -> {"estado": ..., "resposta": ...}     (corpo: {"estado": ..., "texto": ...})
+    POST /agente         -> {"estado": ..., "resposta": ..., "comparacao": [...], ...}   (o mesmo corpo do /conversa)
+
+A rota /agente é a conversa com a IA (`agente.py`; o manual é o `LEIA-ME-agente.md`). Ela precisa da chave da IA
+numa variável de ambiente (`OPENROUTER_API_KEY`); sem a chave, ou se a IA não responder, a rota devolve 503 e quem
+chama usa as conversas guardadas. As outras rotas não usam IA nem chave.
 
 Os cuidados: o corpo tem limite de tamanho e só entra JSON; os erros saem em português, com o código certo (400 para
 entrada errada, 404, 405, 408, 411, 413, 415); nada que vem de fora escolhe arquivo (a fonte da chuva e a regra dos anos,
 que o comando `perguntar` deixa trocar, não entram por aqui); nada é guardado, nem o corpo dos pedidos no registro.
-Nenhum WhatsApp está ligado: a rota /conversa só devolve texto para quem chamou.
+Nenhum WhatsApp está ligado: as rotas /conversa e /agente só devolvem texto para quem chamou.
 """
 import argparse
 import json
@@ -25,15 +30,20 @@ import time
 import traceback
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-from orbita import conversa, mensagem, motor
+from orbita import agente, conversa, ferramentas, mensagem, motor
+from orbita.modelo import ErroDoModelo, SemChave, do_ambiente
 
 LIMITE_DO_CORPO = 16 * 1024               # bytes: a pergunta e o estado da conversa cabem com muita folga
 DESCARTE_MAXIMO = 1024 * 1024             # até quanto de um corpo recusado é lido e jogado fora antes de responder
 ESPERA = 15                               # segundos sem chegar nada: a ligação é fechada
 PRAZO_DO_CORPO = 10                       # segundos para o corpo inteiro chegar (mandar aos poucos não adianta)
-ROTAS = {"/saude": "GET", "/recomendacao": "POST", "/mensagem": "POST", "/conversa": "POST"}
-CAMPOS_DA_PERGUNTA = ("cidade_id", "rotacao_atual", "prioridades", "terra")
+ROTAS = {"/saude": "GET", "/recomendacao": "POST", "/mensagem": "POST", "/conversa": "POST", "/agente": "POST"}
+CAMPOS_DA_PERGUNTA = ("cidade_id", "rotacao_atual", "prioridades", "terra", "plantio_da_soja", "preocupacao")
+TEXTOS_DA_PERGUNTA = {"cidade_id": "rio_verde", "terra": "media", "plantio_da_soja": "2026-11-05",
+                      "preocupacao": "agua"}                     # os campos que são texto, com um exemplo de cada
 CAMPOS_DA_CONVERSA = ("estado", "texto")
+TODAS_AS_ROTAS = "GET /saude, POST /recomendacao, POST /mensagem, POST /conversa e POST /agente"
+EXEMPLO_DA_CONVERSA = '{"estado": null, "texto": "oi"}'
 EXEMPLO = ('{"cidade_id": "rio_verde", "rotacao_atual": ["soja", "milho", "pousio"], "prioridades": {"agua": 5, '
            '"solo": 4, "renda": 2, "erosao": 3}, "terra": "media"}')
 ERROS_DO_SERVIDOR = {
@@ -41,7 +51,7 @@ ERROS_DO_SERVIDOR = {
     408: "O pedido demorou demais para chegar.",
     414: "O endereço do pedido é grande demais.",
     431: "Os cabeçalhos do pedido são grandes demais.",
-    501: "Método não aceito. Use GET em /saude e POST em /recomendacao, /mensagem e /conversa.",
+    501: "Método não aceito. Use GET em /saude e POST em /recomendacao, /mensagem, /conversa e /agente.",
     505: "Versão do HTTP não aceita.",
 }
 
@@ -78,12 +88,12 @@ def _so_estes_campos(corpo, campos):
 
 
 def _perguntar_ao_motor(corpo):
-    """Monta a entrada só com os 4 campos da pergunta e chama a função pública do motor."""
+    """Monta a entrada só com os campos da pergunta e chama a função pública do motor."""
     _so_estes_campos(corpo, CAMPOS_DA_PERGUNTA)
-    for campo in ("cidade_id", "terra"):
+    for campo, exemplo in TEXTOS_DA_PERGUNTA.items():
         if corpo.get(campo) is not None and not isinstance(corpo[campo], str):
             raise ErroDaApi(400, f'Entrada fora do formato: {campo} tem de ser um texto entre aspas, como '
-                                 f'"{"rio_verde" if campo == "cidade_id" else "media"}".')
+                                 f'"{exemplo}".')
     try:
         return motor.responder({campo: corpo[campo] for campo in CAMPOS_DA_PERGUNTA if campo in corpo})
     except ValueError as erro:
@@ -92,11 +102,29 @@ def _perguntar_ao_motor(corpo):
         raise                                                      # qualquer outro erro é de dentro: vira 500
 
 
-def rota_saude():
+def _onde_vale():
+    """As cidades que o motor tem, numa frase."""
+    nomes = [str(dados.get("nome") or ident) if isinstance(dados, dict) else str(ident)
+             for ident, dados in motor.CIDADES.items()]
+    if len(nomes) == 1:
+        return f"Vale só para {nomes[0]}."
+    return "Vale para " + ", ".join(nomes[:-1]) + " e " + nomes[-1] + "."
+
+
+def _ia_do_agente(modelo=None):
+    """Se a IA do agente está ligada (há chave no ambiente) e com que modelo. A chave nunca aparece."""
+    try:
+        modelo = modelo or do_ambiente()
+    except SemChave:
+        return {"ligada": False, "modelo": None}
+    return {"ligada": True, "modelo": getattr(modelo, "nome", None)}
+
+
+def rota_saude(modelo=None):
     return {"ok": True, "servico": "Órbita Rural · a API do motor (provisória)",
-            "aviso": "Vale só para Rio Verde (GO). Não é recomendação agronômica: valide com o agrônomo.",
+            "aviso": _onde_vale() + " Não é recomendação agronômica: valide com o agrônomo.",
             "rotas": [f"{metodo} {caminho}" for caminho, metodo in ROTAS.items()],
-            "limite_do_corpo_bytes": LIMITE_DO_CORPO}
+            "limite_do_corpo_bytes": LIMITE_DO_CORPO, "ia_do_agente": _ia_do_agente(modelo)}
 
 
 def rota_recomendacao(corpo):
@@ -109,21 +137,48 @@ def rota_mensagem(corpo):
     return {"texto": mensagem.texto(_perguntar_ao_motor(corpo))}
 
 
-def rota_conversa(corpo):
-    """Um passo da conversa: quem chama guarda o estado e devolve na fala seguinte."""
+def _estado_e_texto(corpo):
+    """O corpo de um passo de conversa, conferido: (o estado, o texto)."""
     _so_estes_campos(corpo, CAMPOS_DA_CONVERSA)
     if not isinstance(corpo.get("texto"), str):
-        raise ErroDaApi(400, 'Entrada fora do formato: falta o texto (a frase que a pessoa escreveu). Exemplo: '
-                             '{"estado": null, "texto": "oi"}')
+        raise ErroDaApi(400, "Entrada fora do formato: falta o texto (a frase que a pessoa escreveu). Exemplo: "
+                             + EXEMPLO_DA_CONVERSA)
     estado = corpo.get("estado")
     if estado is not None and not isinstance(estado, dict):
         raise ErroDaApi(400, "Entrada fora do formato: o estado tem de ser o que a chamada anterior devolveu, ou "
-                             'null no começo. Exemplo: {"estado": null, "texto": "oi"}')
-    estado, resposta = conversa.passo(estado, corpo["texto"])
+                             "null no começo. Exemplo: " + EXEMPLO_DA_CONVERSA)
+    return estado, corpo["texto"]
+
+
+def rota_conversa(corpo):
+    """Um passo da conversa: quem chama guarda o estado e devolve na fala seguinte."""
+    estado, texto = _estado_e_texto(corpo)
+    estado, resposta = conversa.passo(estado, texto)
     return {"estado": estado, "resposta": resposta}
 
 
-ACOES = {"/recomendacao": rota_recomendacao, "/mensagem": rota_mensagem, "/conversa": rota_conversa}
+def rota_agente(corpo, modelo=None):
+    """Um passo da conversa com a IA (`agente.passo`): quem chama guarda o estado e devolve na fala seguinte.
+
+    `modelo` é a IA; sem ele, vale o modelo de verdade, com a chave lida do ambiente na hora. Sem chave, IA que não
+    responde ou conta que o motor não tem: 503 (quem chama mantém o estado e usa as conversas guardadas).
+    """
+    estado, texto = _estado_e_texto(corpo)
+    try:
+        estado, saida = agente.passo(estado, texto, modelo or do_ambiente())
+    except SemChave:
+        raise ErroDaApi(503, "A IA do agente não está ligada neste servidor: falta a chave no ambiente "
+                             "(OPENROUTER_API_KEY). Use as conversas guardadas.") from None
+    except ErroDoModelo as erro:
+        raise ErroDaApi(503, f"{erro} Nada foi guardado: mantenha o estado e tente de novo, ou use as conversas "
+                             "guardadas.") from None
+    except ferramentas.ContaIndisponivel as erro:
+        raise ErroDaApi(503, f"A conta não está pronta para o agente. {erro}") from None
+    return agente.resposta_da_rota(estado, saida)
+
+
+ACOES = {"/recomendacao": rota_recomendacao, "/mensagem": rota_mensagem, "/conversa": rota_conversa,
+         "/agente": rota_agente}
 
 
 class Porta(BaseHTTPRequestHandler):
@@ -211,8 +266,7 @@ class Porta(BaseHTTPRequestHandler):
             try:
                 caminho = self.path.split("?", 1)[0].split("#", 1)[0]
                 if caminho not in ROTAS:
-                    raise ErroDaApi(404, "Essa rota não existe. As rotas: GET /saude, POST /recomendacao, "
-                                         "POST /mensagem e POST /conversa.")
+                    raise ErroDaApi(404, f"Essa rota não existe. As rotas: {TODAS_AS_ROTAS}.")
                 if self.command == "OPTIONS":                          # o navegador pede licença antes do POST
                     return self._enviar(204, None, (("Access-Control-Allow-Methods", f"{ROTAS[caminho]}, OPTIONS"),
                                                     ("Access-Control-Allow-Headers", "Content-Type"),
@@ -220,7 +274,12 @@ class Porta(BaseHTTPRequestHandler):
                 if self.command != ROTAS[caminho]:
                     raise ErroDaApi(405, f"A rota {caminho} só aceita {ROTAS[caminho]}.",
                                     (("Allow", f"{ROTAS[caminho]}, OPTIONS"),))
-                resposta = rota_saude() if caminho == "/saude" else ACOES[caminho](self._ler_corpo())
+                if caminho == "/saude":
+                    resposta = rota_saude(self.server.modelo)
+                elif caminho == "/agente":
+                    resposta = rota_agente(self._ler_corpo(), self.server.modelo)
+                else:
+                    resposta = ACOES[caminho](self._ler_corpo())
                 self._enviar(200, resposta)
             except ErroDaApi as erro:
                 if not self._corpo_lido:
@@ -261,14 +320,18 @@ class Porta(BaseHTTPRequestHandler):
 class Servidor(ThreadingHTTPServer):
     daemon_threads = True
 
-    def __init__(self, onde, origem="*", silencioso=False):
+    def __init__(self, onde, origem="*", silencioso=False, modelo=None):
         self.origem, self.silencioso, self.prazo_do_corpo = origem, silencioso, PRAZO_DO_CORPO
+        self.modelo = modelo                  # a IA do /agente; None = o modelo de verdade, com a chave do ambiente
         super().__init__(onde, Porta)
 
 
-def criar_servidor(endereco="127.0.0.1", porta=8000, origem="*", silencioso=False):
-    """O servidor pronto para `serve_forever()`. Porta 0 = uma porta livre (está em `server_address`)."""
-    return Servidor((endereco, porta), origem=origem, silencioso=silencioso)
+def criar_servidor(endereco="127.0.0.1", porta=8000, origem="*", silencioso=False, modelo=None):
+    """O servidor pronto para `serve_forever()`. Porta 0 = uma porta livre (está em `server_address`).
+
+    `modelo` troca a IA do /agente (serve aos testes, que usam o modelo de mentira).
+    """
+    return Servidor((endereco, porta), origem=origem, silencioso=silencioso, modelo=modelo)
 
 
 def ler_opcoes(argv=None):
@@ -295,8 +358,11 @@ def main(argv=None):
         return 1
     endereco, porta = servidor.server_address[:2]
     print(f"Órbita Rural · a API está ligada em http://{endereco}:{porta} (Ctrl+C desliga).", flush=True)
-    print("Rotas: GET /saude · POST /recomendacao · POST /mensagem · POST /conversa. Nenhum WhatsApp está ligado.",
-          flush=True)
+    print("Rotas: GET /saude · POST /recomendacao · POST /mensagem · POST /conversa · POST /agente. Nenhum WhatsApp "
+          "está ligado.", flush=True)
+    ia = _ia_do_agente()
+    print(f"A IA do agente: ligada (modelo {ia['modelo']})." if ia["ligada"] else
+          "A IA do agente: sem chave no ambiente (OPENROUTER_API_KEY); a rota /agente responde 503.", flush=True)
     if endereco not in ("127.0.0.1", "::1", "localhost"):
         print("Atenção: fora do 127.0.0.1 a API fica aberta para a rede, e não há senha nem limite de pedidos.",
               file=sys.stderr, flush=True)

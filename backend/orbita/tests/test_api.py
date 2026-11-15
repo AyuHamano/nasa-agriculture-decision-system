@@ -2,11 +2,15 @@
 """Testes da API: as funções direto e uma ida e volta de verdade por HTTP, numa porta livre do 127.0.0.1."""
 import http.client
 import json
+import os
 import socket
 import threading
 import unittest
+from unittest import mock
 
-from orbita import api, mensagem, motor
+from orbita import api, ferramentas, mensagem, motor
+from orbita.modelo import ErroDoModelo, ModeloDeMentira, chamada, fala
+from orbita.tests.duble_do_motor import Duble
 
 ENTRADA = {"cidade_id": "rio_verde", "rotacao_atual": ["soja", "milho", "pousio"],
            "prioridades": {"agua": 5, "solo": 4, "renda": 2, "erosao": 3}, "terra": "media"}
@@ -223,6 +227,161 @@ class PorHttp(unittest.TestCase):
             torto = ate_o_fim(fio)
         self.assertIn('"erro"', torto)
         self.assertNotIn("Error response", torto)
+
+
+# ------------------------------------------------------------------------------------ a rota POST /agente
+# O agente por dentro é testado em test_agente.py. Aqui, a rota: as funções direto e uma ida e volta por HTTP, com
+# o modelo de mentira (sem chave e sem internet) e o dublê do motor.
+
+ANOTA = chamada("anotar_na_ficha", cidade_id="jatai", rotacao_atual="soja_milho_pousio", terra="media",
+                preocupacao="agua")
+ENSAIO = chamada("ensaio_da_rotacao")
+BOA = "No pior ano faltaram 232,9 mm de água com o milho e 187,5 mm com o sorgo."
+GERAL = "Trocar de cultura ajuda a quebrar o ciclo de algumas pragas."
+ROTEIRO = (fala("", ANOTA), fala("", ENSAIO), fala(BOA), fala(GERAL))      # a conversa inteira, na ordem dos pedidos
+FALAS = ("oi", "Planto soja e milho em Jataí, terra média; tenho medo da seca. Vale o sorgo?", "sim",
+         "E as pragas?")
+CAMPOS_DA_SAIDA = {"estado", "resposta", "momento", "ficha", "comparacao", "apoio", "conferencia", "aviso",
+                   "texto_de", "consultas", "replay"}
+
+
+class ComODubleDoMotor(unittest.TestCase):
+    def setUp(self):
+        troca = mock.patch.object(ferramentas, "motor", Duble())
+        troca.start()
+        self.addCleanup(troca.stop)
+        sem_chave = mock.patch.dict(os.environ)                  # nenhum teste lê a chave de verdade
+        sem_chave.start()
+        self.addCleanup(sem_chave.stop)
+        os.environ.pop("OPENROUTER_API_KEY", None)
+        os.environ.pop("ORBITA_MODELO", None)
+
+
+class ARotaDoAgente(ComODubleDoMotor):
+    def test_a_conversa_inteira_pela_funcao_da_rota(self):
+        modelo, estado = ModeloDeMentira(ROTEIRO), None
+        saidas = []
+        for texto in FALAS:
+            saida = api.rota_agente({"estado": estado, "texto": texto}, modelo)
+            self.assertEqual(set(saida), CAMPOS_DA_SAIDA)
+            self.assertEqual(saida["aviso"], "Converse com o agrônomo antes de decidir.")
+            estado = saida["estado"]
+            saidas.append(saida)
+        oi, com_a_ficha, com_a_conta, sem_conta = saidas
+        self.assertEqual((oi["comparacao"], com_a_ficha["comparacao"]), (None, None))
+        self.assertFalse(com_a_ficha["ficha"]["confirmada"])
+        self.assertEqual((com_a_conta["resposta"], com_a_conta["apoio"], com_a_conta["texto_de"]), (BOA, "conta", "ia"))
+        self.assertEqual(len(com_a_conta["comparacao"]), 3)
+        self.assertEqual(com_a_conta["conferencia"], {"passou": True, "sobras": [], "tentativas": 1})
+        self.assertEqual(sem_conta["apoio"], "conhecimento_geral")
+        self.assertIn("conhecimento geral", sem_conta["resposta"])
+        self.assertEqual(len(sem_conta["comparacao"]), 3)
+        self.assertEqual(api.rota_agente({"texto": "oi"}, modelo)["resposta"], oi["resposta"])    # sem estado é o começo
+
+    def test_sem_chave_no_servidor_e_503(self):
+        erro = erro_de(api.rota_agente, {"estado": None, "texto": "Planto soja em Jataí."})
+        self.assertEqual(erro.codigo, 503)
+        self.assertIn("OPENROUTER_API_KEY", erro.mensagem)
+        self.assertIn("conversas guardadas", erro.mensagem)
+        self.assertEqual(api.rota_saude()["ia_do_agente"], {"ligada": False, "modelo": None})
+
+    def test_com_chave_no_ambiente_a_saude_diz_o_modelo_e_nao_a_chave(self):
+        os.environ["OPENROUTER_API_KEY"] = "sk-or-chave-de-mentira-0123456789"
+        saude = api.rota_saude()
+        self.assertEqual(saude["ia_do_agente"], {"ligada": True, "modelo": "anthropic/claude-haiku-5.5"})
+        self.assertNotIn("chave-de-mentira", json.dumps(saude))
+        self.assertIn("POST /agente", saude["rotas"])
+        for cidade in motor.CIDADES.values():                    # o aviso diz todas as cidades que o motor tem
+            self.assertIn(cidade["nome"], saude["aviso"])
+
+    def test_a_ia_que_nao_responde_e_a_conta_que_falta_sao_503(self):
+        caiu = ModeloDeMentira([ErroDoModelo("A IA não respondeu: a chave está sem saldo ou venceu (código 402).")])
+        erro = erro_de(api.rota_agente, {"estado": None, "texto": "Planto soja em Jataí."}, caiu)
+        self.assertEqual(erro.codigo, 503)
+        self.assertIn("venceu", erro.mensagem)
+        self.assertIn("mantenha o estado", erro.mensagem)
+        estado = api.rota_agente({"estado": None, "texto": FALAS[1]}, ModeloDeMentira(ROTEIRO))["estado"]
+        ferramentas.motor.quantas = 2                            # o motor só traz 2 rotações: o agente não responde
+        erro = erro_de(api.rota_agente, {"estado": estado, "texto": "sim"}, ModeloDeMentira(ROTEIRO[1:]))
+        self.assertEqual(erro.codigo, 503)
+        self.assertIn("2 rotações", erro.mensagem)
+
+    def test_entrada_errada_e_400_em_portugues(self):
+        modelo = ModeloDeMentira()
+        casos = (({"estado": None}, "texto"), ({"estado": None, "texto": 5}, "texto"),
+                 ({"estado": "ficha", "texto": "oi"}, "estado"), ({"estado": [], "texto": "oi"}, "estado"),
+                 ({"estado": None, "texto": "oi", "telefone": "64999990000"}, "telefone"),
+                 ({"estado": None, "texto": "oi", "modelo": "outro/modelo"}, "modelo"))
+        for corpo, pedaco in casos:
+            erro = erro_de(api.rota_agente, corpo, modelo)
+            self.assertEqual(erro.codigo, 400, corpo)
+            self.assertIn(pedaco, erro.mensagem)
+        self.assertEqual(modelo.pedidos, [])
+
+    def test_a_recomendacao_aceita_a_data_do_plantio_e_a_preocupacao(self):
+        for campo in ("plantio_da_soja", "preocupacao"):
+            self.assertIn(campo, api.CAMPOS_DA_PERGUNTA)
+            erro = erro_de(api.rota_recomendacao, dict(ENTRADA, **{campo: 5}))
+            self.assertEqual(erro.codigo, 400)
+            self.assertIn(campo, erro.mensagem)
+
+
+class OAgentePorHttp(ComODubleDoMotor):
+    def ligar(self, modelo):
+        servidor = api.criar_servidor("127.0.0.1", 0, silencioso=True, modelo=modelo)
+        fio = threading.Thread(target=servidor.serve_forever, daemon=True)
+        fio.start()
+        self.addCleanup(fio.join, 5)
+        self.addCleanup(servidor.server_close)
+        self.addCleanup(servidor.shutdown)
+        return servidor.server_address[1]
+
+    def pedir(self, porta, metodo, caminho, corpo=None):
+        ligacao = http.client.HTTPConnection("127.0.0.1", porta, timeout=10)
+        try:
+            dados = None if corpo is None else json.dumps(corpo).encode("utf-8")
+            ligacao.request(metodo, caminho, body=dados, headers=JSON if dados is not None else {})
+            resposta = ligacao.getresponse()
+            bruto = resposta.read()
+            return resposta.status, resposta, (json.loads(bruto.decode("utf-8")) if bruto else None)
+        finally:
+            ligacao.close()
+
+    def test_a_conversa_inteira_por_http_do_oi_ate_a_comparacao_e_uma_pergunta_sem_conta(self):
+        porta, estado = self.ligar(ModeloDeMentira(ROTEIRO)), None
+        for texto in FALAS:
+            codigo, resposta, corpo = self.pedir(porta, "POST", "/agente", {"estado": estado, "texto": texto})
+            self.assertEqual(codigo, 200, corpo)
+            self.assertEqual(resposta.getheader("Access-Control-Allow-Origin"), "*")
+            self.assertEqual(set(corpo), CAMPOS_DA_SAIDA)
+            estado = corpo["estado"]                             # quem chama guarda o estado; a API não guarda nada
+        self.assertTrue(corpo["ficha"]["confirmada"])
+        self.assertEqual((corpo["apoio"], len(corpo["comparacao"])), ("conhecimento_geral", 3))
+        self.assertEqual([f["de"] for f in estado["falas"]], ["produtor", "agente"] * 3)
+
+    def test_sem_chave_por_http_e_503_e_as_outras_rotas_continuam(self):
+        porta = self.ligar(None)
+        codigo, _, corpo = self.pedir(porta, "POST", "/agente", {"estado": None, "texto": "Planto soja em Jataí."})
+        self.assertEqual((codigo, set(corpo)), (503, {"erro"}))
+        self.assertIn("OPENROUTER_API_KEY", corpo["erro"])
+        codigo, _, corpo = self.pedir(porta, "POST", "/agente", {"estado": None, "texto": "oi"})
+        self.assertEqual(codigo, 503)                            # sem chave, nem a saudação: a tela usa as guardadas
+        codigo, _, corpo = self.pedir(porta, "GET", "/saude")
+        self.assertEqual((codigo, corpo["ia_do_agente"]["ligada"]), (200, False))
+        self.assertEqual(self.pedir(porta, "POST", "/conversa", {"estado": None, "texto": "oi"})[0], 200)
+
+    def test_os_cuidados_da_api_valem_para_a_rota_do_agente(self):
+        porta = self.ligar(ModeloDeMentira())
+        codigo, resposta, corpo = self.pedir(porta, "GET", "/agente")
+        self.assertEqual((codigo, "POST" in resposta.getheader("Allow")), (405, True))
+        codigo, resposta, _ = self.pedir(porta, "OPTIONS", "/agente")
+        self.assertEqual((codigo, "POST" in resposta.getheader("Access-Control-Allow-Methods")), (204, True))
+        codigo, _, corpo = self.pedir(porta, "POST", "/agente", {"estado": None, "texto": "a" * (api.LIMITE_DO_CORPO + 1)})
+        self.assertEqual(codigo, 413)
+        codigo, _, corpo = self.pedir(porta, "POST", "/agente", {"estado": None})
+        self.assertEqual((codigo, "texto" in corpo["erro"]), (400, True))
+        codigo, _, corpo = self.pedir(porta, "GET", "/nada")
+        self.assertEqual((codigo, "POST /agente" in corpo["erro"]), (404, True))
 
 
 if __name__ == "__main__":
