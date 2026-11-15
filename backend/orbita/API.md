@@ -394,6 +394,7 @@ Como está a água da lavoura no último dia com dado, ao lado do mesmo dia do a
 |---|---|
 | `disponivel`, `local`, `rotacao`, `terra`, `plantio_da_soja_informado` | de quem é a conta |
 | `hoje`, `ultimo_dia_com_dado`, `atraso_dias`, `safra` | o dia da pergunta, o último dia com dado e a distância entre os dois |
+| `ultimo_dia_com_dado_de` | de qual dado é a data de cima: da conta (o último dia com a temperatura da NASA POWER e a chuva rápida do satélite, as duas; é o dia do retrato). Em `chuva_recente.fonte` há outro `ultimo_dia_com_dado`, só da chuva rápida do satélite, que pode ir além (em 2026-11-15, em Rio Verde: 13/11/2026 contra 11/11/2026); ele também leva o seu `ultimo_dia_com_dado_de` |
 | `o_que_esta_na_terra`, `agua_na_terra_mm`, `agua_que_a_terra_segura_mm`, `agua_na_terra_pct`, `com_sede`, `chuva_desde_1_de_setembro_mm` | a conta com a chuva rápida do satélite |
 | `com_a_chuva_de_modelo` | os mesmos campos, com a chuva de modelo da NASA POWER |
 | `faixa_da_agua_na_terra_mm` | `{"de": ..., "ate": ...}`: a água na terra entre as duas chuvas |

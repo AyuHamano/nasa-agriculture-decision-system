@@ -168,6 +168,11 @@ Deu certo com ressalvas, que estão em `data/orbita/recente/LEIA-ME.md` (o que f
 - nos dias recentes ela discorda bastante da chuva de modelo (em Rio Verde, de 2026-09-15 a 2026-11-11: 411,0 mm
   contra 146,5 mm). Por isso `como_esta_hoje` devolve a conta com as duas e a faixa entre elas
   (`faixa_da_agua_na_terra_mm`), ao lado do mesmo dia do ano normal e do pior ano.
+- na resposta há duas datas com o nome `ultimo_dia_com_dado`, de dados diferentes, e cada uma leva ao lado o campo
+  `ultimo_dia_com_dado_de`, que diz de qual dado é. A de cima é a da conta: o último dia em que há a temperatura (NASA
+  POWER) e a chuva rápida do satélite, as duas (é o dia do retrato). A de `chuva_recente.fonte` é só da chuva rápida
+  do satélite, e pode ir além. Em Rio Verde, na consulta de 2026-11-15: 11/11/2026 (a temperatura guardada acaba
+  nesse dia) e 13/11/2026 (a chuva rápida). O teste é `tests/test_hoje.py`.
 
 ## 4. Os limites (o que a conta não faz)
 - A estação em terra só existe em Rio Verde. O verde do satélite existe nas três cidades (ver a seção 8), em pontos
@@ -198,7 +203,10 @@ Deu certo com ressalvas, que estão em `data/orbita/recente/LEIA-ME.md` (o que f
   por município.
 - Fases e ciclo do sorgo de 2ª safra medidos em Goiás, e a raiz do sorgo com número próprio.
 - Levar a rotação de hoje do produtor também para as chaves de sempre (hoje elas comparam sempre as duas de antes).
-- O `api.py` (a porta de internet) não foi tocado aqui: ligar os campos novos é da parte do agente.
+- O `api.py` (a porta de internet) já foi ligado pela parte do agente: tem as rotas `GET /saude`, `POST /recomendacao`,
+  `POST /mensagem`, `POST /conversa` e `POST /agente` (a conversa com a IA, que consulta o motor pelas ferramentas e é
+  a única rota que traz a comparação das 3 rotações, o replay, o "como está hoje" e o registro). O que falta: as rotas
+  de antes (`/mensagem` e `/conversa`) ainda falam só das duas rotações de antes, e a `/conversa` só de Rio Verde.
 
 ## 6. A revisão da outra IA (uma volta, 2026-11-15, 01h25)
 O GPT revisou o código novo e apontou 7 defeitos; os 7 foram consertados, cada um com o teste que falhava antes

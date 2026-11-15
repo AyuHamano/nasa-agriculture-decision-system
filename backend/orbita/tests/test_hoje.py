@@ -70,6 +70,21 @@ class Retrato(unittest.TestCase):
                          {RETRATO["agua_na_terra_mm"], RETRATO["com_a_chuva_de_modelo"]["agua_na_terra_mm"]})
         self.assertLessEqual(faixa["de"], faixa["ate"])
 
+    def test_cada_ultimo_dia_com_dado_diz_de_qual_dado_e(self):
+        # Na mesma resposta há duas datas com esse nome: a da conta (precisa da temperatura e da chuva) e a da chuva
+        # rápida do satélite sozinha, que pode ir além (em 2026-11-15: 11/11/2026 e 13/11/2026).
+        da_chuva = RETRATO["chuva_recente"]["fonte"]
+        self.assertEqual(RETRATO["ultimo_dia_com_dado_de"], hoje.DIA_DA_CONTA)
+        self.assertEqual(da_chuva["ultimo_dia_com_dado_de"], hoje.DIA_DA_CHUVA_RAPIDA)
+        self.assertIn("temperatura", hoje.DIA_DA_CONTA)
+        self.assertTrue(hoje.DIA_DA_CHUVA_RAPIDA.startswith("só da chuva rápida do satélite"))
+        self.assertGreaterEqual(da_chuva["ultimo_dia_com_dado"], RETRATO["ultimo_dia_com_dado"])
+        temperatura = clima.ler_serie(clima.pastas_da_cidade("rio_verde")["nasa_power"])
+        chuva, _ = hoje.ler_chuva_recente("rio_verde")
+        com_chuva = max(dia for dia, mm in chuva.items() if mm is not None and dia <= DIA_DO_TESTE)
+        self.assertEqual(da_chuva["ultimo_dia_com_dado"], com_chuva.isoformat())
+        self.assertEqual(RETRATO["ultimo_dia_com_dado"], min(com_chuva, temperatura[-1].data).isoformat())
+
     def test_a_frase_so_tem_numero_da_conta(self):
         self.assertEqual(conferencia.conferir_texto(RETRATO["frase"], RETRATO), [])
         self.assertIn("Rio Verde", RETRATO["frase"])

@@ -86,6 +86,11 @@ De dentro de `backend/`:
   de hoje, a terra, a data do plantio, a preocupação) e consulta o motor por 3 ferramentas. A conta só roda depois do
   "sim" do produtor, e essa confirmação leva um selo que só a API sabe fazer. Toda resposta com a ficha confirmada
   traz a comparação das 3 rotações, e cada número do texto da IA é conferido contra a conta antes de aparecer.
+- **As rotas de antes** (`POST /mensagem` e `POST /conversa`) continuam valendo, com o alcance de antes. A
+  `/conversa` (a conversa de frases prontas, sem IA) vale só para Rio Verde e só para as duas rotações de antes: soja,
+  milho e pousio contra soja e milho com braquiária. A `/mensagem` (o texto curto) aceita as três cidades, mas o texto
+  fala sempre dessas duas rotações de antes, mesmo que a entrada diga outra rotação de hoje. As 3 rotações, o sorgo,
+  o replay, o "como está hoje" e o registro saem pela `/recomendacao` e pela `/agente`.
 
 O campo a campo, com exemplos, está no `API.md`.
 

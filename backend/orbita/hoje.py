@@ -28,6 +28,13 @@ AVISO = ("A chuva dos dias recentes é aproximada: é a chuva medida por satéli
          "modelo de computador (a da NASA POWER), para dar o menor e o maior valor. A temperatura é a de um quadrado "
          "de uns 50 km. É um retrato para conversar com o agrônomo, não uma medida da lavoura.")
 
+# As duas datas que se chamam "último dia com dado" são de dados diferentes: cada uma diz de qual, ao lado.
+DIA_DA_CONTA = ("da conta: o último dia em que há a temperatura (a da NASA POWER) e a chuva rápida do satélite, as "
+                "duas, sem dia faltando no meio. É o dia do retrato: o que está na terra, a água e a sede valem "
+                "neste dia.")
+DIA_DA_CHUVA_RAPIDA = ("só da chuva rápida do satélite: o último dia com chuva no arquivo baixado. Pode passar do "
+                       "dia do retrato, que também precisa da temperatura.")
+
 
 def ler_chuva_recente(cidade_id, pasta=None):
     """A chuva recente guardada da cidade: (data -> mm ou None, a ficha da fonte). Sem arquivo: (None, None)."""
@@ -45,6 +52,8 @@ def ler_chuva_recente(cidade_id, pasta=None):
         bruto = json.loads((pasta / "fonte.json").read_text(encoding="utf-8"))
         fonte = {chave: bruto.get(chave) for chave in ("o_que_e", "conta", "ressalvas", "ponto", "tabela_de_cores",
                                                         "comecou_em_utc", "terminou_em_utc", "ultimo_dia_com_dado")}
+        if fonte.get("ultimo_dia_com_dado"):
+            fonte["ultimo_dia_com_dado_de"] = DIA_DA_CHUVA_RAPIDA
     return valores, fonte
 
 
@@ -189,7 +198,8 @@ def como_esta_hoje(entrada, par=None, hoje=None, pasta_da_chuva_recente=None):
         "disponivel": True, "local": dict(cidade, id=entrada["cidade_id"]),
         "rotacao": {"id": rotacao["id"], "nome": rotacao["nome"]}, "terra": entrada["terra"],
         "plantio_da_soja_informado": entrada["plantio_da_soja"],
-        "hoje": hoje.isoformat(), "ultimo_dia_com_dado": ultimo.isoformat(), "atraso_dias": (hoje - ultimo).days,
+        "hoje": hoje.isoformat(), "ultimo_dia_com_dado": ultimo.isoformat(), "ultimo_dia_com_dado_de": DIA_DA_CONTA,
+        "atraso_dias": (hoje - ultimo).days,
         "safra": balanco.nome_da_safra(ultimo),
         "o_que_esta_na_terra": agora["o_que_esta_na_terra"], "agua_na_terra_mm": agora["agua_na_terra_mm"],
         "agua_que_a_terra_segura_mm": agora["agua_que_a_terra_segura_mm"],
