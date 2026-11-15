@@ -16,7 +16,8 @@ pasta, e os dados estão em `dados/`.
   durante a safra ("Como está a minha lavoura?") e depois de colher ("O que a terra mostrou?").
 - **A conversa:** a fala do produtor e a resposta do agente. Cada resposta diz de onde saiu (da conta, dos dados da
   NASA do lugar, ou de conhecimento geral, quando a conta não mede o assunto). Resposta comprida mostra o começo e o
-  fecho, e o miolo abre em "Ler a resposta inteira".
+  fecho, e o miolo abre em "Ler a resposta inteira". A conversa corre com a página, no celular e no computador: não
+  há caixa que rola por dentro.
 - **A ficha:** o município, o tipo de solo, a rotação de hoje, a data do plantio e o que mais preocupa. O produtor
   confirma ou corrige antes de a conta rodar.
 - **As rotações lado a lado:** três ou mais, com a de hoje marcada. Cada uma com a água que falta (num ano normal e no
@@ -24,10 +25,14 @@ pasta, e os dados estão em `dados/`.
   saber. Onde a conta dá faixa, a tela mostra a faixa. No fim, "Converse com o agrônomo antes de decidir".
 - **A prova:** o replay da safra 2015-16, dia a dia: a chuva, a água na terra descendo, os dias de sede e de calor
   forte, e os marcos com a frase de cada um. Tem tocar, pausar, voltar, velocidade e tela cheia (para gravar o vídeo).
-  Na velocidade normal, a safra inteira passa em cerca de 30 segundos, com uma parada no dia em que a sede começa e outra no dia em que a água acaba
-  (os dois dias saem da conta do motor: os marcos `agua_acabou`, o começo da sede, e `agua_no_fundo`, a água no fundo).
+  Na velocidade normal, a safra inteira passa em cerca de 30 segundos. O ponto alto é o dia em que a água acaba (o marco
+  `agua_no_fundo` do motor; em 2015-16, 24/04/2016): é nele que ficam o destaque, as três frases grandes e a parada
+  longa. O dia em que a sede começa (o marco `agua_acabou`; 04/04/2016) vem antes, como o aviso: etiqueta clara, frase
+  menor e parada curta. No dia 24 a tela lembra quantos dias antes o aviso veio (a distância entre os dois marcos). Os
+  dois dias saem da conta do motor; numa safra em que a água não acaba, o começo da sede segue como o marco forte.
 - **A leitura do agrônomo** (a aba "Agrônomo"): como a conta foi feita, com que valores, de onde eles vêm, as
-  hipóteses e os limites. Dá para baixar a resposta completa do motor.
+  hipóteses e os limites. Dá para baixar a resposta completa do motor (o arquivo sai sem as antigas notas de
+  prioridade, que não existem mais no produto).
 
 ## Os dois modos
 
@@ -46,8 +51,8 @@ guardadas. Pedido recusado pelo agente (a frase vem em `{"erro": ...}`) aparece 
 | arquivo | quem grava | o que traz |
 |---|---|---|
 | `dados/conversas.js` | o agente: `python3 -m orbita.exportar_conversas <esta pasta>/dados` (de dentro de `backend/`) | as conversas guardadas e o replay da safra (os dias e os marcos) |
-| `dados/respostas.js` e `respostas.json` | o motor, por `python3 -B frontend/orbita/dados/gerar-dados.py` | a resposta inteira do motor para os três tipos de solo (a leitura do agrônomo) |
-| `dados/complementos.js` e `validacao.js` | o mesmo `gerar-dados.py` | o calendário do ano e a validação cruzada (o satélite contra a estação em terra e a colheita do IBGE) |
+| `dados/respostas.js` e `respostas.json` | o motor: `python3 -m orbita.exportar <esta pasta>/dados` (de dentro de `backend/`), como diz o cabeçalho do arquivo. O `gerar-dados.py` chama esse mesmo motor antes de gravar os outros dois | a resposta inteira do motor para os três tipos de solo (a leitura do agrônomo) |
+| `dados/complementos.js` e `validacao.js` | `python3 -B frontend/orbita/dados/gerar-dados.py` (da raiz do repositório) | o calendário do ano e a validação cruzada (o satélite contra a estação em terra e a colheita do IBGE) |
 
 Sem o `dados/conversas.js`, a tela abre, avisa que as conversas ainda não foram gravadas e mostra só a leitura do
 agrônomo. Nenhum número é escrito à mão nesta pasta. Depois de mudar o motor ou o agente, grave os dois de novo (os
@@ -56,6 +61,29 @@ dois comandos da tabela), para a tela mostrar a conta de agora.
 As fontes dos dados: a chuva é do satélite GPM IMERG, da NASA; a temperatura, da NASA POWER; o verde da lavoura, do
 satélite MODIS, da NASA; a conta da água segue o manual FAO-56; a colheita é do IBGE e a chuva medida em terra é da
 estação do INMET. O caminho de cada dado está em `data/orbita/`.
+
+## Como a tela escreve números, datas e palavras
+
+- **Números:** o que a tela formata sai de um jeito só, nas duas leituras: casa decimal só quando o valor tem ("252 mm",
+  "168,1 mm"). As frases que vêm prontas dos dados aparecem como vêm.
+- **Datas:** no formato do Brasil (11/11/2026); na ficha, por extenso.
+- **Palavras:** os textos fixos explicam a palavra técnica na primeira vez (rotação, mm, IA) ou usam a palavra simples
+  ("assistente" em vez de "agente", "a safra dia a dia" em vez de "replay").
+- **Letras e dedos:** nenhuma letra abaixo de 13 px; botões e a barra do dia da safra com 44 px ou mais de altura.
+
+## O acerto do desenho (2026-11-15)
+
+Feito depois da conferência no navegador (celular de 390 px e computador de 1440 px):
+
+- Aba "Agrônomo": o calendário do ano, no celular, põe cada linha em cima da faixa dela, na largura toda; o nome de
+  cada trecho só aparece onde cabe inteiro (o nome completo está na legenda); tabela mais larga do que a tela rola de
+  lado com o aviso "Arraste a tabela para o lado" e entra na ordem do teclado.
+- Conversa no computador: sem caixa que rola por dentro; a coluna ficou mais larga (até 440 px).
+- Resumo do celular: o número numa linha só, a unidade embaixo; as três colunas alinhadas.
+- Replay: a barra do dia com 48 px e o trecho já visto preenchido; o marco que ainda não chegou é só um contorno; o
+  destaque, o pulso e a parada longa no dia em que a água acaba, com o aviso de quantos dias antes a sede começou.
+- Acabamento: a seleção de texto, os controles e a barra de rolagem nas cores da marca; estado de botão apertado;
+  contraste das etiquetas e das faixas do calendário acima de 4,5 para 1.
 
 ## Os arquivos
 
