@@ -3,7 +3,7 @@
 
 O projeto se apresenta validado por duas vias: **os dados** (a conta foi conferida contra medida em terra e contra a colheita registrada) e **o uso** (um questionário para produtores). A primeira via está feita e descrita aqui, com os números e de onde cada um sai. A segunda está pronta para ir a campo e **ainda não tem respostas**.
 
-Como conferir de novo: de dentro de `backend/`, `python3 -m orbita.validar` (rodado em 2026-11-15 numa cópia do ramo `jose`, commit `fe578c6`; os números abaixo são os da saída).
+Como conferir de novo: de dentro de `backend/`, `python3 -m orbita.validar` (rodado em 2026-11-15 no ramo `jose`, commit `278c709`; os números abaixo são os da saída).
 
 ## 1. A chuva do satélite contra a estação em terra
 
@@ -73,7 +73,7 @@ De onde sai: `python3 -m orbita.perguntar --cidade <cidade> --verde`, `backend/o
 
 De onde sai: `data/orbita/recente/LEIA-ME.md`.
 
-**A consequência.** O "como está hoje" não dá um número só. Mostra a água na terra com a chuva do satélite e com a chuva de modelo, e a faixa entre as duas. Em Rio Verde, no último dia com dado em 2026-11-15 (o dia 2026-11-11), a faixa ia de 34,8 a 63,0 mm (`python3 -m orbita.perguntar --hoje`). **A faixa é larga, o período comparado é curto (50 dias) e a estação é uma só.**
+**A consequência.** O "como está hoje" não dá um número só. Mostra a água na terra com a chuva do satélite e com a chuva de modelo, e a faixa entre as duas. Em Rio Verde, no último dia com dado em 2026-11-15 (o dia 2026-11-11), a faixa ia de 34,8 a 63,0 mm (`python3 -m orbita.perguntar --hoje`). Esse dia é o da conta: o último com a temperatura da NASA POWER e a chuva rápida do satélite, as duas. A chuva rápida sozinha ia até 2026-11-13. Na resposta, cada `ultimo_dia_com_dado` leva ao lado o campo `ultimo_dia_com_dado_de`, que diz de qual dado é a data. **A faixa é larga, o período comparado é curto (50 dias) e a estação é uma só.**
 
 ## 5. A safra ruim, dia a dia
 
@@ -81,10 +81,10 @@ O replay da safra 2015-16 em Rio Verde (`python3 -m orbita.perguntar --replay 20
 
 ## 6. A conferência do próprio programa
 
-- 440 testes automáticos passam no ramo `jose` (`python3 -m unittest`, de dentro de `backend/`; rodado em 2026-11-15).
+- 458 testes automáticos passam no ramo `jose` (`python3 -m unittest`, de dentro de `backend/`; rodado em 2026-11-15).
 - A conta da evaporação foi testada com os Exemplos 8 e 20 do manual FAO-56 e ficou 6,6% acima da evaporação do FAO que o Open-Meteo entrega (`orbita.validar`, seção 3).
 - O código do motor e do agente foi revisado por outro modelo de IA; os defeitos achados foram consertados, cada um com teste (`backend/orbita/LEIA-ME-motor.md`, seção 6, e `LEIA-ME-agente.md`).
-- As 4 conversas guardadas (13 falas do agente) foram lidas uma a uma contra a conta.
+- As 4 conversas guardadas, todas de Rio Verde e gravadas de novo em 2026-11-15 (12 falas do agente, 8 com o texto da IA e 4 com frases prontas), foram lidas uma a uma contra a conta. As ressalvas do que ficou estão no `backend/orbita/LEIA-ME-agente.md`.
 
 ## 7. A validação pelo uso: o questionário
 

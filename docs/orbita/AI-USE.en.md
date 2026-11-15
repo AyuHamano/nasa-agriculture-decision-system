@@ -12,7 +12,7 @@ The NASA Space Apps Challenge asks teams to declare their use of artificial inte
 | the code of the engine, the agent and the screen (`backend/orbita/`, `frontend/orbita/`) and the tests | generated with AI (Claude, by Anthropic) at the team's request, with the team's decisions and checks. Each code file carries the header "Gerado com IA (Claude)" ("Generated with AI") |
 | the programs that download the data (`data/orbita/`) | generated with AI (Claude). The data itself is not AI output: it is a copy of what each source returned, stored with the query address and time |
 | the texts (the READMEs, these documents, the questionnaire, the submission text) | written with AI (Claude) and checked by the team |
-| the pitch slides | made with AI support |
+| the pitch slides (`docs/orbita/pitch/`) | made with AI support |
 | the video voice | AI-generated |
 | code review | another model (GPT) reviewed the engine and agent code at marked points; the defects found were fixed, each with a test (recorded in `README.md`, `LEIA-ME-motor.md` and `LEIA-ME-agente.md` under `backend/orbita/`) |
 
@@ -47,7 +47,7 @@ Where this is written and tested: `backend/orbita/LEIA-ME-agente.md` (the table 
 
 ## 4. What the safeguards do not catch
 
-The check looks at whether each number in the text exists in the calculation. It does not check what the number refers to, its sign, or numbers written out in words. A sentence that wrongly compares two correct numbers can pass. Two known meaning swaps are blocked by the program (the days of covered soil, and "the water ran out" said about the day the water stress only began). For that reason the 4 saved conversations (13 agent turns, 9 with AI text) were read one by one against the calculation before being stored.
+The check looks at whether each number in the text exists in the calculation. It does not check what the number refers to, its sign, or numbers written out in words. A sentence that wrongly compares two correct numbers can pass. Two known meaning swaps are blocked by the program (the days of covered soil, and "the water ran out" said about the day the water stress only began). For that reason the 4 saved conversations (all of Rio Verde, recorded again on 2026-11-15: 12 agent turns, 8 with AI text) were read one by one against the calculation before being stored.
 
 ## 5. Contest rules we follow
 

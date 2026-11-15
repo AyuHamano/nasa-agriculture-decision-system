@@ -12,7 +12,7 @@ O NASA Space Apps Challenge pede que o uso de inteligência artificial seja decl
 | o código do motor, do agente e da tela (`backend/orbita/`, `frontend/orbita/`) e os testes | gerado com IA (Claude, da Anthropic), a pedido do time, com as decisões e a conferência do time. Cada arquivo de código leva o cabeçalho "Gerado com IA (Claude)" |
 | os programas que baixam os dados (`data/orbita/`) | gerados com IA (Claude). Os dados em si não são de IA: são cópias do que cada fonte devolveu, com o endereço e a hora da consulta |
 | os textos (os LEIA-ME, estes documentos, o questionário, o texto da submissão) | escritos com IA (Claude) e conferidos pelo time |
-| os slides do pitch | feitos com apoio de IA |
+| os slides do pitch (`docs/orbita/pitch/`) | feitos com apoio de IA |
 | a voz do vídeo | gerada por IA |
 | a revisão do código | outro modelo (GPT) revisou o código do motor e do agente em pontos marcados; os defeitos achados foram consertados, cada um com um teste (o registro está no `README.md`, no `LEIA-ME-motor.md` e no `LEIA-ME-agente.md` de `backend/orbita/`) |
 
@@ -47,7 +47,7 @@ Onde está escrito e testado: `backend/orbita/LEIA-ME-agente.md` (a tabela "O qu
 
 ## 4. O que as travas não pegam
 
-A conferência olha se cada número do texto existe na conta. Ela não confere a que coisa o número se refere, nem o sinal, nem número escrito por extenso. Uma frase que compare errado dois números certos pode passar. Duas trocas de sentido conhecidas são barradas pelo programa (os dias de terra coberta e "a água acabou" dito do dia em que a sede só começou). Por isso as 4 conversas guardadas (13 falas do agente, 9 com o texto da IA) foram lidas uma a uma contra a conta antes de serem guardadas.
+A conferência olha se cada número do texto existe na conta. Ela não confere a que coisa o número se refere, nem o sinal, nem número escrito por extenso. Uma frase que compare errado dois números certos pode passar. Duas trocas de sentido conhecidas são barradas pelo programa (os dias de terra coberta e "a água acabou" dito do dia em que a sede só começou). Por isso as 4 conversas guardadas (todas de Rio Verde, gravadas de novo em 2026-11-15: 12 falas do agente, 8 com o texto da IA) foram lidas uma a uma contra a conta antes de serem guardadas.
 
 ## 5. As regras do concurso que seguimos
 

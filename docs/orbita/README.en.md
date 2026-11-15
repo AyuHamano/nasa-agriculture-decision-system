@@ -63,21 +63,22 @@ Addresses, periods and where each dataset is stored: [DADOS-E-FONTES.md](DADOS-E
 |---|---|---|
 | the engine | the program that runs the calculation (no AI, no key, no internet at question time) | `backend/orbita/` (start with `README.md` and `LEIA-ME-motor.md`) |
 | the agent | the AI that talks with the farmer, with the safeguards that check the numbers | `backend/orbita/` (`LEIA-ME-agente.md`; the web API is described in `API.md`) |
-| the screen | what the farmer sees: the conversation, the form, the rotations side by side and the replay of the bad season | `frontend/orbita/` (`LEIA-ME.md`) |
+| the screen | what the farmer sees: the conversation, the form, the rotations side by side and the replay of the bad season. Millimetres always show one decimal place ("252,7 mm"), and in the replay the sentence "Neste dia a água acabou." ("On this day the water ran out.") only appears when the calculation's `agua_no_fundo` milestone comes with `situacao: "acabou"` | `frontend/orbita/` (`LEIA-ME.md`) |
 | the data | everything that was downloaded, with the address and time of each query | `data/orbita/` |
 | the documents | this file, the AI use statement, data and sources, validation and the questionnaire | `docs/orbita/` |
+| the pitch | the 7 slides as PDF and PPTX, in Portuguese and in English, and the 30-second video | `docs/orbita/pitch/` (`LEIA-ME.md`) |
 
 The Órbita Rural work lives only in these four folders. The rest of the repository belongs to the other team members and was not changed.
 
 ## 6. How to run
 
-Only Python 3 is needed (standard library). The commands below were run on 2026-11-15 on a copy of branch `jose` (commit `fe578c6`), and all of them worked, except where noted.
+Only Python 3 is needed (standard library). The commands below were run on 2026-11-15 on branch `jose` (commit `278c709`), and all of them worked.
 
 **The tests**, from inside `backend/`:
 
     python3 -m unittest
 
-Result on that copy: 440 tests, no failures, in about 40 seconds.
+Result: 458 tests, no failures, in about 45 seconds.
 
 **A question to the engine**, from inside `backend/` (the output is in Portuguese):
 
@@ -88,25 +89,27 @@ Result on that copy: 440 tests, no failures, in about 40 seconds.
     python3 -m orbita.perguntar --registro 2015-16                                         # the record of the season
     python3 -m orbita.validar                                                              # the proofs of section 7
 
-The cities: `rio_verde`, `jatai`, `silvania`. With `--json`, each command returns the full structure.
+The cities: `rio_verde`, `jatai`, `silvania`. With `--json`, each command returns the full structure. In `--hoje --json`, each `ultimo_dia_com_dado` (last day with data) has next to it the field `ultimo_dia_com_dado_de`, which says which data the date belongs to: the calculation's (the last day with both NASA POWER temperature and the fast satellite rainfall; 2026-11-11 in this check) and the one of the fast satellite rainfall alone (2026-11-13).
 
 **The API**, from inside `backend/`:
 
     python3 -m orbita.api                              # starts at http://127.0.0.1:8000 (this machine only)
     curl -s http://127.0.0.1:8000/saude                # lists the routes and says whether the AI is on
 
-Without an AI key the API starts all the same; only the route `POST /agente` answers 503 (checked). For the live agent, the OpenRouter key goes only in the terminal environment, never in a file: `export OPENROUTER_API_KEY=...` before starting the API. **Not checked here:** the live conversation with the AI, because this check was done without a key. `LEIA-ME-agente.md` records the real use done on 2026-11-15.
+The routes: `GET /saude`, `POST /recomendacao`, `POST /mensagem`, `POST /conversa` and `POST /agente`. `/conversa` (ready-made sentences, no AI) works only for Rio Verde and for the two earlier rotations (soybean, maize and fallow against soybean and maize with brachiaria). `/mensagem` accepts the three cities, but its text always talks about the two earlier rotations. The 3 rotations, the replay, "how it is today" and the season record come from `/recomendacao` and `/agente` (`backend/orbita/README.md`).
 
-**The screen with the saved answers:** double-click `frontend/orbita/index.html`. No server or internet needed.
+Without an AI key the API starts all the same; only the route `POST /agente` answers 503 (checked). For the live agent, the OpenRouter key goes only in the terminal environment, never in a file: `export OPENROUTER_API_KEY=...` before starting the API. Checked with the key on 2026-11-15: a 3-turn conversation through `POST /agente` (the Rio Verde form, the "sim" (yes) and "vale trocar o milho pelo sorgo?" (is it worth swapping maize for sorghum?)) ended with the comparison of 3 rotations, the AI text and the number check passed. The route format and the real use are in `LEIA-ME-agente.md`.
 
-**The live screen:** start the API (above, with the key) and open `frontend/orbita/index.html?api=http://127.0.0.1:8000`. If the API does not answer, the screen says so and goes back to the saved conversations. **Not checked here:** opening the screen in a browser; both modes are described and checked in the screen's `LEIA-ME.md`.
+**The screen with the saved answers:** double-click `frontend/orbita/index.html`. No server or internet needed. There are 4 conversations, all of Rio Verde. Checked on 2026-11-15 in a headless Chrome, at 1440 and at 390 px wide, with no console errors.
+
+**The live screen:** start the API (above, with the key) and open `frontend/orbita/index.html?api=http://127.0.0.1:8000`. If the API does not answer, the screen says so and goes back to the saved conversations. Checked on 2026-11-15 in a headless Chrome: the screen entered the "Assistente ao vivo" (live assistant) mode and a message sent from it received the API's answer. Both modes are described in the screen's `LEIA-ME.md`.
 
 **Regenerating what the screen reads** (after changing the engine or the agent):
 
     python3 -m orbita.exportar_conversas ../frontend/orbita/dados --sem-ia    # from inside backend/; no key, ready-made sentences
     python3 -B frontend/orbita/dados/gerar-dados.py                           # from the repository root
 
-Both were run in a test folder and worked (4 conversations, 13 agent turns). The first one replaces the saved conversations written by the AI with ready-made sentences: run it without `--sem-ia`, with the key, to keep the AI text.
+Both were run on a copy of the repository and worked (4 conversations, 12 agent turns). The saved conversations in the repository were recorded with the AI on 2026-11-15: 12 agent turns, 8 with AI text and 4 with ready-made sentences, with the caveats written in `LEIA-ME-agente.md`. The first command replaces the saved conversations written by the AI with ready-made sentences: run it without `--sem-ia`, with the key, to keep the AI text.
 
 ## 7. The proofs
 
@@ -136,7 +139,7 @@ NASA POWER model rainfall gave, on average, 86% of the station's rainfall in the
 ## 8. The limits, stated plainly
 
 - **No test on a real farm.** The calculation uses the climate of the city point, not of the farm. No farmer has used the tool through a season, and the validation questionnaire has no answers yet.
-- **What holds only for Rio Verde:** the comparison with the ground station (the only checked station is there) and the match with the 2 worst harvests. In Jataí the "strong thirst" level flags all 10 seasons and only one was a bad harvest in IBGE; in Silvânia no season fell below the cut, and the level comes out empty. Jataí's worst year by harvest had less water shortage in the calculation than the normal year, and the answer says so.
+- **What holds only for Rio Verde:** the comparison with the ground station (the only checked station is there), the match with the 2 worst harvests and the screen's 4 saved conversations. In Jataí the "strong thirst" level flags all 10 seasons and only one was a bad harvest in IBGE; in Silvânia no season fell below the cut, and the level comes out empty. Jataí's worst year by harvest had less water shortage in the calculation than the normal year, and the answer says so.
 - **The satellite's "12%" error holds for the long series** (8 seasons, February to June). It does not hold for recent rainfall.
 - **Recent rainfall comes as a wide range.** The fast path (2 days of delay) reads rainfall from the color of a NASA image. Over 50 days of September and October 2026, against the Rio Verde station, the satellite gave 32% to 38% more and the model rainfall 45% less. So "how it is today" shows the calculation with both rainfalls and the range between them.
 - **The satellite greenness points were chosen on the map.** We do not know whose they are or what was planted, and nobody checked them in the field. The years 2024 and 2025 were left out (images are missing in the service we queried). The satellite measures leaf greenness and does not see crop residue (straw).

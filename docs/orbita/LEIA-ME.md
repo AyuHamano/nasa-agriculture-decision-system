@@ -63,21 +63,22 @@ Os endereços, os períodos e onde cada dado está guardado: [DADOS-E-FONTES.md]
 |---|---|---|
 | o motor | o programa que faz a conta (sem IA, sem chave, sem internet na hora da pergunta) | `backend/orbita/` (comece por `README.md` e `LEIA-ME-motor.md`) |
 | o agente | a IA que conversa com o produtor, com as travas que conferem os números | `backend/orbita/` (`LEIA-ME-agente.md`; a porta de internet está descrita no `API.md`) |
-| a tela | o que o produtor vê: a conversa, a ficha, as rotações lado a lado e o replay da safra ruim | `frontend/orbita/` (`LEIA-ME.md`) |
+| a tela | o que o produtor vê: a conversa, a ficha, as rotações lado a lado e o replay da safra ruim. Os milímetros saem sempre com uma casa ("252,7 mm"), e no replay a frase "Neste dia a água acabou." só entra quando o marco `agua_no_fundo` da conta vem com `situacao: "acabou"` | `frontend/orbita/` (`LEIA-ME.md`) |
 | os dados | tudo o que foi baixado, com o endereço e a hora de cada consulta | `data/orbita/` |
 | os documentos | este arquivo, o uso de IA, os dados e as fontes, a validação e o questionário | `docs/orbita/` |
+| o pitch | os 7 slides em PDF e em PPTX, em português e em inglês, e o vídeo de 30 segundos | `docs/orbita/pitch/` (`LEIA-ME.md`) |
 
 O trabalho do Órbita Rural mora só nessas quatro pastas. O resto do repositório é dos outros integrantes do time e não foi alterado.
 
 ## 6. Como rodar
 
-Precisa só do Python 3 (biblioteca padrão). Os comandos abaixo foram rodados em 2026-11-15 numa cópia do ramo `jose` (commit `fe578c6`), e todos funcionaram, salvo onde está dito.
+Precisa só do Python 3 (biblioteca padrão). Os comandos abaixo foram rodados em 2026-11-15 no ramo `jose` (commit `278c709`), e todos funcionaram.
 
 **Os testes** (programas que conferem o programa), de dentro de `backend/`:
 
     python3 -m unittest
 
-Resultado nessa cópia: 440 testes, nenhuma falha, em cerca de 40 segundos.
+Resultado: 458 testes, nenhuma falha, em cerca de 45 segundos.
 
 **Uma pergunta ao motor**, de dentro de `backend/`:
 
@@ -88,25 +89,27 @@ Resultado nessa cópia: 440 testes, nenhuma falha, em cerca de 40 segundos.
     python3 -m orbita.perguntar --registro 2015-16                                         # o registro da safra
     python3 -m orbita.validar                                                              # as provas da seção 7
 
-As cidades: `rio_verde`, `jatai`, `silvania`. Com `--json`, cada comando devolve a estrutura inteira.
+As cidades: `rio_verde`, `jatai`, `silvania`. Com `--json`, cada comando devolve a estrutura inteira. No `--hoje --json`, cada `ultimo_dia_com_dado` leva ao lado o campo `ultimo_dia_com_dado_de`, que diz de qual dado é a data: a da conta (o último dia com a temperatura da NASA POWER e a chuva rápida do satélite, as duas; 2026-11-11 nesta conferência) e a só da chuva rápida do satélite (2026-11-13).
 
 **A API** (a porta por onde outro programa pergunta), de dentro de `backend/`:
 
     python3 -m orbita.api                              # liga em http://127.0.0.1:8000 (só esta máquina)
     curl -s http://127.0.0.1:8000/saude                # diz as rotas e se a IA está ligada
 
-Sem chave de IA a API liga do mesmo jeito; só a rota `POST /agente` responde 503 (conferido). Para o agente ao vivo, a chave do OpenRouter vai só no ambiente do terminal, nunca em arquivo: `export OPENROUTER_API_KEY=...` antes de ligar a API. **Não conferido aqui:** a conversa ao vivo com a IA, porque esta conferência foi feita sem chave. O `LEIA-ME-agente.md` registra o uso de verdade feito em 2026-11-15.
+As rotas: `GET /saude`, `POST /recomendacao`, `POST /mensagem`, `POST /conversa` e `POST /agente`. A `/conversa` (frases prontas, sem IA) vale só para Rio Verde e para as duas rotações de antes (soja, milho e pousio contra soja e milho com braquiária). A `/mensagem` aceita as três cidades, mas o texto dela fala sempre das duas rotações de antes. As 3 rotações, o replay, o "como está hoje" e o registro saem pela `/recomendacao` e pela `/agente` (`backend/orbita/README.md`).
 
-**A tela com as respostas guardadas:** abrir `frontend/orbita/index.html` com dois cliques. Não precisa de servidor nem de internet.
+Sem chave de IA a API liga do mesmo jeito; só a rota `POST /agente` responde 503 (conferido). Para o agente ao vivo, a chave do OpenRouter vai só no ambiente do terminal, nunca em arquivo: `export OPENROUTER_API_KEY=...` antes de ligar a API. Conferido com a chave em 2026-11-15: uma conversa de 3 falas pela `POST /agente` (a ficha de Rio Verde, o "sim" e "vale trocar o milho pelo sorgo?") terminou com a comparação de 3 rotações, o texto da IA e a conferência dos números aprovada. O formato da rota e o uso de verdade estão no `LEIA-ME-agente.md`.
 
-**A tela ao vivo:** ligar a API (acima, com a chave) e abrir `frontend/orbita/index.html?api=http://127.0.0.1:8000`. Se a API não responder, a tela avisa e volta para as conversas guardadas. **Não conferido aqui:** a abertura da tela no navegador; os dois modos estão descritos e conferidos no `LEIA-ME.md` da tela.
+**A tela com as respostas guardadas:** abrir `frontend/orbita/index.html` com dois cliques. Não precisa de servidor nem de internet. São 4 conversas, todas de Rio Verde. Conferido em 2026-11-15 num Chrome sem janela, em 1440 e em 390 px de largura, sem erro no console.
+
+**A tela ao vivo:** ligar a API (acima, com a chave) e abrir `frontend/orbita/index.html?api=http://127.0.0.1:8000`. Se a API não responder, a tela avisa e volta para as conversas guardadas. Conferido em 2026-11-15 num Chrome sem janela: a tela entrou no modo "Assistente ao vivo" e uma fala enviada por ela recebeu a resposta da API. Os dois modos estão descritos no `LEIA-ME.md` da tela.
 
 **Gravar de novo o que a tela lê** (depois de mudar o motor ou o agente):
 
     python3 -m orbita.exportar_conversas ../frontend/orbita/dados --sem-ia    # de dentro de backend/; sem chave, frases prontas
     python3 -B frontend/orbita/dados/gerar-dados.py                           # da raiz do repositório
 
-Os dois foram rodados numa pasta de teste e funcionaram (4 conversas, 13 falas do agente). O primeiro troca as conversas guardadas com o texto da IA por frases prontas: use sem `--sem-ia`, com a chave, para manter o texto da IA.
+Os dois foram rodados numa cópia do repositório e funcionaram (4 conversas, 12 falas do agente). As conversas que estão guardadas foram gravadas com a IA em 2026-11-15: 12 falas do agente, 8 com o texto da IA e 4 com frases prontas, com as ressalvas escritas no `LEIA-ME-agente.md`. O primeiro comando troca as conversas guardadas com o texto da IA por frases prontas: use sem `--sem-ia`, com a chave, para manter o texto da IA.
 
 ## 7. As provas
 
@@ -136,7 +139,7 @@ A chuva de modelo da NASA POWER deu, em média, 86% da chuva da estação nas 4 
 ## 8. Os limites, ditos com franqueza
 
 - **Nenhum teste em lavoura de verdade.** A conta usa o clima do ponto da cidade, não o da fazenda. Nenhum produtor usou a ferramenta numa safra, e o questionário de validação ainda não tem respostas.
-- **O que só vale para Rio Verde:** a comparação com a estação em terra (só há estação conferida lá) e o acerto das 2 piores colheitas. Em Jataí, o nível de "sede forte" marca as 10 safras e só uma foi colheita ruim no IBGE; em Silvânia, nenhuma safra ficou abaixo do corte, e o nível sai vazio. O pior ano de Jataí pela colheita teve menos falta de água na conta do que o ano normal, e a resposta diz isso.
+- **O que só vale para Rio Verde:** a comparação com a estação em terra (só há estação conferida lá), o acerto das 2 piores colheitas e as 4 conversas guardadas da tela. Em Jataí, o nível de "sede forte" marca as 10 safras e só uma foi colheita ruim no IBGE; em Silvânia, nenhuma safra ficou abaixo do corte, e o nível sai vazio. O pior ano de Jataí pela colheita teve menos falta de água na conta do que o ano normal, e a resposta diz isso.
 - **Os "12%" de erro do satélite valem para a série longa** (8 safras, de fevereiro a junho). Não valem para a chuva recente.
 - **A chuva recente sai em faixa larga.** O caminho rápido (2 dias de atraso) lê a chuva da cor de uma imagem da NASA. Em 50 dias de setembro e outubro de 2026, contra a estação de Rio Verde, o satélite deu de 32% a 38% a mais e a chuva de modelo, 45% a menos. Por isso o "como está hoje" mostra a conta com as duas chuvas e a faixa entre elas.
 - **Os pontos do verde do satélite foram escolhidos no mapa.** Não se sabe de quem são nem o que foi plantado, e ninguém conferiu em campo. Os anos de 2024 e 2025 ficaram de fora (faltam imagens no serviço consultado). O satélite mede o verde das folhas e não vê a palha.
