@@ -12,6 +12,7 @@ A disputa do capim com o milho (hipótese, em faixa): enquanto os dois crescem j
 (1 + fator) x o pedido do milho. Com o fator em zero, o capim não tira nada do milho.
 """
 import datetime
+import re
 
 from orbita import parametros
 
@@ -23,6 +24,29 @@ ROTACOES = {
     "alternativa": {"nome": "soja → milho com braquiária (capim)", "com_braquiaria": True},
 }
 DIAS_DO_MES = 365 / 12
+JANELA_DA_SOJA = ((9, 1), (12, 31))   # o plantio da soja que o produtor informa: de 1 de setembro a 31 de dezembro
+
+
+def ler_plantio_da_soja(texto):
+    """A data do plantio da soja que o produtor informou (AAAA-MM-DD), como data. Fora do formato: erro.
+
+    Só o mês e o dia entram no ensaio das safras guardadas (o mesmo dia em todos os anos); a janela vai de 1 de
+    setembro a 31 de dezembro, que é o começo da safra na conta (a safra vai de 1 de setembro a 31 de agosto).
+    """
+    if isinstance(texto, datetime.date):
+        data = texto
+    else:
+        try:    # só o formato ano-mês-dia com traços (o fromisoformat do Python também aceita 20261105)
+            if not isinstance(texto, str) or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", texto.strip()):
+                raise ValueError(texto)
+            data = datetime.date.fromisoformat(texto.strip())
+        except ValueError:
+            raise ValueError(f'plantio_da_soja "{texto}" fora do formato: use ano-mês-dia, como 2026-11-05 '
+                             "(5 de novembro de 2026)") from None
+    if not JANELA_DA_SOJA[0] <= (data.month, data.day) <= JANELA_DA_SOJA[1]:
+        raise ValueError(f'plantio_da_soja "{data.isoformat()}" fora da janela: o motor aceita o plantio da soja de '
+                         "1 de setembro a 31 de dezembro")
+    return data
 
 
 def fator_da_palha(cobertura, reducao):
@@ -62,10 +86,18 @@ def kc_da_fase(n, fases, kc_ini, kc_meio, kc_fim):
 class Calendario:
     """As datas e os coeficientes das culturas, lidos dos parâmetros e conferidos uma vez."""
 
-    def __init__(self, par):
+    def __init__(self, par, plantio_da_soja=None):
         def v(*caminho):
             return parametros.valor(par, *caminho)
-        self.soja_md = _mes_dia(v("culturas", "soja", "plantio_mes_dia"))
+        # A data do produtor (opcional): a soja entra no mês e dia dele, e o calendário inteiro anda o mesmo número
+        # de dias (a 2ª safra entra depois de a soja sair, com o mesmo intervalo do calendário de costume).
+        self.soja_md_de_costume = _mes_dia(v("culturas", "soja", "plantio_mes_dia"))
+        self.soja_md = self.soja_md_de_costume
+        if plantio_da_soja is not None:
+            informado = ler_plantio_da_soja(plantio_da_soja)
+            self.soja_md = (informado.month, informado.day)
+        self.deslocamento_dias = (datetime.date(2021, *self.soja_md)
+                                  - datetime.date(2021, *self.soja_md_de_costume)).days
         self.soja_fases = list(v("culturas", "soja", "fases_dias"))
         self.soja_kc = tuple(v("culturas", "soja", k) for k in ("kc_ini", "kc_meio", "kc_fim"))
         self.soja_p = v("culturas", "soja", "p")
@@ -107,7 +139,8 @@ class Calendario:
         return self.plantio_da_soja(ano_do_plantio) + datetime.timedelta(days=self.soja_ciclo)
 
     def plantio_do_milho(self, ano):
-        return datetime.date(ano, *self.milho_md)
+        """O plantio da 2ª safra "do ano": a data de costume mais os dias que o calendário andou."""
+        return datetime.date(ano, *self.milho_md) + datetime.timedelta(days=self.deslocamento_dias)
 
     def fim_do_milho(self, ano):
         """O primeiro dia sem milho vivo na terra (o fim do ciclo; a colheitadeira pode passar depois)."""
@@ -117,8 +150,8 @@ class Calendario:
         return self.plantio_da_soja(ano) - datetime.timedelta(days=self.dessecacao_dias)
 
 
-def calendario(par):
-    return Calendario(par)
+def calendario(par, plantio_da_soja=None):
+    return Calendario(par, plantio_da_soja)
 
 
 def cobertura_do_dia(data, com_braquiaria, cal, disputa=0.0):
@@ -133,18 +166,22 @@ def cobertura_do_dia(data, com_braquiaria, cal, disputa=0.0):
         if 0 <= n < cal.soja_ciclo:
             kc = kc_da_fase(n, cal.soja_fases, *cal.soja_kc)
             return ("soja", kc * palha if n < cal.soja_fases[0] else kc, cal.soja_p)
-    n = (data - cal.plantio_do_milho(data.year)).days
-    if 0 <= n < cal.milho_ciclo:
-        milho = ("milho", kc_da_fase(n, cal.milho_fases, *cal.milho_kc), cal.milho_p)
-        return milho + (disputa,) if com_braquiaria and disputa else milho
-    if com_braquiaria and cal.fim_do_milho(data.year) <= data < cal.dessecacao(data.year):
-        return (BRAQUIARIA, cal.braquiaria_kc, cal.braquiaria_p)
+    # Com a soja plantada cedo, a 2ª safra "do ano seguinte" pode entrar ainda em dezembro: olha os dois anos.
+    for ano in (data.year, data.year + 1):
+        n = (data - cal.plantio_do_milho(ano)).days
+        if 0 <= n < cal.milho_ciclo:
+            milho = ("milho", kc_da_fase(n, cal.milho_fases, *cal.milho_kc), cal.milho_p)
+            return milho + (disputa,) if com_braquiaria and disputa else milho
+    if com_braquiaria:
+        for ano in (data.year, data.year + 1):
+            if cal.fim_do_milho(ano) <= data < cal.dessecacao(ano):
+                return (BRAQUIARIA, cal.braquiaria_kc, cal.braquiaria_p)
     return (SEM_PLANTA, cal.solo_nu_kc * palha, None)
 
 
-def resumo_do_calendario(par):
+def resumo_do_calendario(par, plantio_da_soja=None):
     """As datas do calendário e os dias sem planta viva de cada rotação (num ano comum, de 365 dias)."""
-    cal = Calendario(par)
+    cal = Calendario(par, plantio_da_soja)
     plantio, fim_soja = cal.plantio_da_soja(2021), cal.fim_da_soja(2021)
     plantio_milho, fim_milho = cal.plantio_do_milho(2022), cal.fim_do_milho(2022)
     proxima_soja, dessecacao = cal.plantio_da_soja(2022), cal.dessecacao(2022)

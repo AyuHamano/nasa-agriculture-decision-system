@@ -100,11 +100,17 @@ def validar_entrada(entrada):
     if regra not in REGRAS:
         problemas.append(f'regra "{regra}" não existe: use rendimento (o pior ano pela colheita do IBGE) ou chuva '
                          "(o ano mais seco pela chuva de fevereiro a junho)")
+    plantio = entrada.get("plantio_da_soja") or None
+    if plantio is not None:
+        try:
+            plantio = rotacoes.ler_plantio_da_soja(plantio).isoformat()
+        except ValueError as erro:
+            problemas.append(str(erro))
     if problemas:
         raise ValueError("Entrada fora do formato: " + "; ".join(problemas) + ".")
     return {"cidade_id": cidade, "rotacao_atual": list(ROTACAO_DE_HOJE),
             "prioridades": {nome: notas[nome] for nome in ("agua", "solo", "renda", "erosao")}, "terra": terra,
-            "chuva": chuva, "regra": regra}
+            "chuva": chuva, "regra": regra, "plantio_da_soja": plantio}
 
 
 def ler_rendimento_do_milho(arquivo=ARQUIVO_DO_IBGE):
@@ -299,9 +305,9 @@ def _com_sede_forte(faltas_do_milho, nivel, quebras=()):
                 s for s in quebras if s in faltas_do_milho and s not in quais]}
 
 
-def _numeros_da_rotacao(dias, com_braquiaria, par, terra, chuvas, chuva_a_parte, criterio, disputa=0.0):
+def _numeros_da_rotacao(dias, com_braquiaria, par, terra, chuvas, chuva_a_parte, criterio, disputa=0.0, cal=None):
     """As 10 safras de uma rotação (num cenário de disputa), a safra mais recente à parte e a falta sem arredondar."""
-    registros = balanco.simular(dias, com_braquiaria, par, terra, disputa=disputa)
+    registros = balanco.simular(dias, com_braquiaria, par, terra, disputa=disputa, cal=cal)
     numeros = balanco.numeros_por_safra(registros)
     no_plantio = balanco.agua_no_plantio_da_soja(registros)
     tabela = {s: _safra(numeros[s], no_plantio.get(s), chuvas[s], com_braquiaria) for s in balanco.SAFRAS_DO_ESTUDO}
@@ -390,6 +396,18 @@ def _ndvi(par, dias_pelo_calendario):
             "frases": [comparacao["frase"], comparacao["nota"], ndvi.AVISO, ndvi.AVISO_DOS_PONTOS]}
 
 
+def _plantio_informado(entrada, cal):
+    """O que a data de plantio do produtor fez no calendário (sem data, o calendário de costume, que é fixo)."""
+    if entrada["plantio_da_soja"] is None:
+        return {"plantio_da_soja_informado": None, "deslocamento_dias": 0,
+                "nota_do_plantio": "Sem a data de plantio do produtor: vale o calendário de costume, com as mesmas "
+                                   "datas em todos os anos."}
+    return {"plantio_da_soja_informado": entrada["plantio_da_soja"], "deslocamento_dias": cal.deslocamento_dias,
+            "nota_do_plantio": "A soja entra no dia e mês que o produtor informou, em todas as safras do ensaio, e a "
+                               "2ª safra entra depois de a soja sair, com o mesmo intervalo do calendário de "
+                               "costume: o calendário inteiro anda junto com a data dele."}
+
+
 def responder(entrada, par=None, dias=None, rendimentos=None):
     """A resposta inteira do motor, pronta para virar JSON.
 
@@ -414,11 +432,11 @@ def responder(entrada, par=None, dias=None, rendimentos=None):
                 "a janela desta safra (fevereiro a junho de 2025) cai no ano em que a chuva de modelo da NASA POWER "
                 "é suspeita de baixa; confira nas outras fontes (python3 -m orbita.validar)")
     criterio = parametros.valor(par, "regras", "sede_da_2a_safra_pct")
-    calendario = rotacoes.resumo_do_calendario(par)
-    agua = balanco.agua_da_terra(par, entrada["terra"])
+    calendario = rotacoes.resumo_do_calendario(par, entrada["plantio_da_soja"])
+    cal = rotacoes.calendario(par, entrada["plantio_da_soja"])
+    agua = balanco.agua_da_terra(par, entrada["terra"], cal)
     chuva_a_parte = balanco.chuva_da_janela(dias, int(SAFRA_A_PARTE[:4]) + 1)
     sede_forte, nivel = _sede_forte(par, entrada, dias, dias_injetados, rendimentos)
-    cal = rotacoes.calendario(par)
     reducao = parametros.valor(par, "palha", "reducao_por_cobertura")
 
     def palha(com_braquiaria, de_que, chave):
@@ -431,7 +449,7 @@ def responder(entrada, par=None, dias=None, rendimentos=None):
 
     def numeros(com_braquiaria, disputa=0.0):
         bloco, parte, falta = _numeros_da_rotacao(dias, com_braquiaria, par, entrada["terra"], chuvas,
-                                                   chuva_a_parte, criterio, disputa)
+                                                   chuva_a_parte, criterio, disputa, cal)
         bloco["safras_com_sede_forte"] = _com_sede_forte(falta["milho_pct"], nivel, sede_forte["safras_de_quebra"])
         return bloco, parte, falta
 
@@ -537,7 +555,8 @@ def responder(entrada, par=None, dias=None, rendimentos=None):
                   "agua_por_metro_mm": r1(agua["agua_mm_por_m"]),
                   "raizes_m": {tipo: raiz for tipo, raiz in agua["raizes_m"].items()},
                   "agua_que_segura_mm": {tipo: r1(valor) for tipo, valor in agua["taw"].items()}},
-        "calendario": {k: calendario[k] for k in ("soja", "milho", "braquiaria", "entre_a_soja_e_o_milho_dias")},
+        "calendario": dict({k: calendario[k] for k in ("soja", "milho", "braquiaria", "entre_a_soja_e_o_milho_dias")},
+                           **_plantio_informado(entrada, cal)),
         "regra_dos_anos": regra,
         "rotacoes": rot,
         "comparacao": {"ano_normal": normal, "pior_ano": pior, "agua": comparacao_da_agua,

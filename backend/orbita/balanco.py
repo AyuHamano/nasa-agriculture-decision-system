@@ -88,16 +88,17 @@ def agua_da_terra(par, terra, cal=None):
             "agua_mm_por_m": por_metro, "raizes_m": dict(cal.raizes)}
 
 
-def simular(dias, com_braquiaria, par=None, terra="media", fracao_inicial=0.5, disputa=0.0):
+def simular(dias, com_braquiaria, par=None, terra="media", fracao_inicial=0.5, disputa=0.0, cal=None):
     """A simulação contínua de uma rotação em todos os dias da série.
 
     `disputa`: o fator a mais no pedido de água enquanto o milho e o capim crescem juntos (só na alternativa).
+    `cal`: o calendário já montado (com a data de plantio do produtor); sem ele, vale o de costume.
     """
     if disputa < 0 or (disputa and not com_braquiaria):
         raise ValueError("A disputa do capim com o milho é um fator de zero para cima e só vale na alternativa "
                          "(a rotação com braquiária).")
     par = par or parametros.carregar()
-    cal = rotacoes.calendario(par)
+    cal = cal or rotacoes.calendario(par)
     agua = agua_da_terra(par, terra, cal)
     return balanco_diario(dias, lambda data: rotacoes.cobertura_do_dia(data, com_braquiaria, cal, disputa),
                           agua["taw"], agua["tew"], agua["rew"],
