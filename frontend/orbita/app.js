@@ -71,12 +71,13 @@
   }
   function abrirConversa(c) {
     app.idDaConversa = c ? c.id : ""; app.corrigindo = false;
+    montarReplay(c && c.replay ? c.replay : null);      // o replay da conversa aberta, ou o guardado; nunca o que sobrou de outra conversa
     conversa.abrirGuardada(c, app.momento);
     if (!c) $("compositor").innerHTML = '<p class="proximo-passo">' + esc(t(todas().length ? "momentos.proximoTexto" : "modo.semConversas")) + "</p>";
   }
   function escolherMomento(m) {
     app.momento = m; app.corrigindo = false; marcarMomento();
-    if (aoVivo()) { app.idDaConversa = ""; conversa.abrirAoVivo(app.api, m); }
+    if (aoVivo()) { app.idDaConversa = ""; montarReplay(null); conversa.abrirAoVivo(app.api, m); }
     else abrirConversa(conversasDo(m)[0] || null);
   }
 

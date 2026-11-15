@@ -83,7 +83,7 @@
         '<div class="rp-controles"><button class="rp-botao principal" id="rpTocar" type="button"></button>' +
           '<button class="rp-botao" id="rpVoltar" type="button" aria-label="' + esc(t("replay.voltar")) + '" title="' + esc(t("replay.voltar")) + '">' + ic("voltar") + "</button>" +
           '<input type="range" id="rpLinha" min="0" max="' + (n - 1) + '" step="1" value="0" aria-label="' + esc(t("replay.linha")) + '">' +
-          '<button class="rp-botao texto" id="rpVelocidade" type="button" aria-label="' + esc(t("replay.velocidade")) + '">1×</button>' +
+          '<button class="rp-botao texto" id="rpVelocidade" type="button" aria-label="' + esc(t("replay.velocidade")) + ': 1×">1×</button>' +
           '<button class="rp-botao" id="rpCheia" type="button" aria-label="' + esc(t("replay.cheia")) + '" title="' + esc(t("replay.cheia")) + '">' + ic("cheia") + "</button></div>" +
       "</div></div>";
 
@@ -102,6 +102,7 @@
       if (pecas.tmax) pecas.tmax.textContent = fmt(d.tmax_c);
       pecas.nivel.style.height = Math.max(0, Math.min(100, 100 * (d.agua_na_terra_mm || 0) / maiorAgua)).toFixed(1) + "%";
       pecas.sede.classList.toggle("aceso", !!d.com_sede); pecas.calor.classList.toggle("aceso", !!d.calor_forte);
+      pecas.sede.setAttribute("aria-hidden", d.com_sede ? "false" : "true"); pecas.calor.setAttribute("aria-hidden", d.calor_forte ? "false" : "true");   // sinal apagado não é lido
       pecas.corte.setAttribute("width", i + 1);
       pecas.agulha.style.left = (100 * (i + 1) / n).toFixed(2) + "%";
       pecas.linha.value = i;
@@ -148,7 +149,7 @@
     pecas.tocar.addEventListener("click", function () { st.tocando ? parar() : tocar(); });
     $("rpVoltar").addEventListener("click", function () { parar(); st.comecou = false; irPara(0); });
     pecas.linha.addEventListener("input", function () { parar(); st.comecou = true; irPara(Number(pecas.linha.value)); });
-    pecas.velocidade.addEventListener("click", function () { st.velocidade = st.velocidade === 1 ? 2 : st.velocidade === 2 ? 0.5 : 1; pecas.velocidade.textContent = String(st.velocidade).replace(".", ",") + "×"; });
+    pecas.velocidade.addEventListener("click", function () { st.velocidade = st.velocidade === 1 ? 2 : st.velocidade === 2 ? 0.5 : 1; pecas.velocidade.textContent = String(st.velocidade).replace(".", ",") + "×"; pecas.velocidade.setAttribute("aria-label", t("replay.velocidade") + ": " + pecas.velocidade.textContent); });
     $("rpCheia").addEventListener("click", function () {
       if (document.fullscreenElement) document.exitFullscreen(); else if (el.requestFullscreen) el.requestFullscreen();
     });

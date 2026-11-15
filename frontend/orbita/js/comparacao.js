@@ -42,11 +42,13 @@
     return r && r.terra && r.terra.classe ? String(r.terra.classe).replace(/\s*\(.*\)\s*$/, "") : "";
   }
   function nomeDaCultura(c) { var n = t("ficha.culturas." + c); return n === "ficha.culturas." + c ? String(c) : n; }
+  // A rotação da ficha vem como lista de culturas (["soja", "milho", "pousio"]) ou como o id dela ("soja_milho_pousio").
+  function culturasDaRotacao(v) { return Array.isArray(v) ? v : typeof v === "string" && v ? v.split("_") : []; }
   function campoDaFicha(f, campo) {
     var v = f[campo], falta = '<em class="falta">' + esc(t("ficha.falta")) + "</em>";
     if (campo === "cidade_id") { if (!v) return falta; var n = t("ficha.cidades." + v); return esc(n === "ficha.cidades." + v ? v : n); }
     if (campo === "terra") { if (!v) return falta; var c = classeDaTerra(v), nome = t("ficha.terras." + v); return esc(nome === "ficha.terras." + v ? v : nome) + (c ? "<small>" + esc(c) + "</small>" : ""); }
-    if (campo === "rotacao_atual") { return lista(v).length ? sequencia(lista(v).map(nomeDaCultura).join(" → ")) : falta; }
+    if (campo === "rotacao_atual") { var cs = culturasDaRotacao(v); return cs.length ? sequencia(cs.map(nomeDaCultura).join(" → ")) : falta; }
     if (campo === "plantio_da_soja") { return v ? esc(dataPorExtenso(v) || v) : '<span class="leve">' + esc(t("ficha.semData")) + "</span>"; }
     if (campo === "preocupacao") { if (!v) return falta; var p = t("ficha.preocupacoes." + v); return esc(p === "ficha.preocupacoes." + v ? v : p); }
     return esc(v);
@@ -63,7 +65,7 @@
     f = obj(f); opcoes = opcoes || {};
     if (!Object.keys(f).length) return fichaVazia();
     // O agente diz o que ainda falta (ficha.falta); sem essa lista, valem os três campos da conta.
-    var completa = Array.isArray(f.falta) ? !f.falta.length : !!(f.cidade_id && f.terra && lista(f.rotacao_atual).length);
+    var completa = Array.isArray(f.falta) ? !f.falta.length : !!(f.cidade_id && f.terra && culturasDaRotacao(f.rotacao_atual).length);
     var linhas = CAMPOS.map(function (c) { return '<div class="campo-' + c + '"><dt>' + esc(t("ficha.campos." + c)) + "</dt><dd>" + campoDaFicha(f, c) + "</dd></div>"; }).join("");
     var pe = "";
     if (f.confirmada) pe = '<p class="selo">' + ic("certo") + esc(t("ficha.confirmada")) + "</p>";
@@ -83,7 +85,7 @@
     return '<form class="correcao" id="correcao"><h3>' + esc(t("ficha.corrigirTitulo")) + "</h3>" +
       "<label><span>" + esc(t("ficha.campos.cidade_id")) + '</span><select name="cidade_id">' + opcoesDe("ficha.cidades", f.cidade_id) + "</select></label>" +
       "<label><span>" + esc(t("ficha.campos.terra")) + '</span><select name="terra">' + opcoesDe("ficha.terras", f.terra) + "</select></label>" +
-      "<label><span>" + esc(t("ficha.campos.rotacao_atual")) + '</span><input name="rotacao" autocomplete="off" value="' + esc(lista(f.rotacao_atual).map(nomeDaCultura).join(", depois ")) + '"></label>' +
+      "<label><span>" + esc(t("ficha.campos.rotacao_atual")) + '</span><input name="rotacao" autocomplete="off" value="' + esc(culturasDaRotacao(f.rotacao_atual).map(nomeDaCultura).join(", depois ")) + '"></label>' +
       "<label><span>" + esc(t("ficha.campos.preocupacao")) + '</span><select name="preocupacao">' + opcoesDe("ficha.preocupacoes", f.preocupacao) + "</select></label>" +
       '<div class="acoes"><button class="botao cheio" type="submit">' + esc(t("ficha.corrigirEnviar")) + '</button><button class="botao" type="button" data-acao="cancelar-correcao">' + esc(t("ficha.cancelar")) + "</button></div></form>";
   }
