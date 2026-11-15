@@ -109,7 +109,6 @@
           '<button class="rp-botao" id="rpVoltar" type="button" aria-label="' + esc(t("replay.voltar")) + '" title="' + esc(t("replay.voltar")) + '">' + ic("voltar") + "</button>" +
           '<input type="range" id="rpLinha" min="0" max="' + (n - 1) + '" step="1" value="0" aria-label="' + esc(t("replay.linha")) + '">' +
           '<button class="rp-botao texto" id="rpVelocidade" type="button" aria-label="' + esc(t("replay.velocidade")) + ': 1×">1×</button>' +
-          '<button class="rp-botao" id="rpCheia" type="button" aria-label="' + esc(t("replay.cheia")) + '" title="' + esc(t("replay.cheia")) + '">' + ic("cheia") + "</button></div>" +
       "</div></div>";
 
     function $(id) { return el.querySelector("#" + id); }
@@ -208,9 +207,6 @@
     $("rpVoltar").addEventListener("click", function () { parar(); st.comecou = false; irPara(0); });
     pecas.linha.addEventListener("input", function () { parar(); st.comecou = true; irPara(Number(pecas.linha.value)); });
     pecas.velocidade.addEventListener("click", function () { st.velocidade = st.velocidade === 1 ? 2 : st.velocidade === 2 ? 0.5 : 1; pecas.velocidade.textContent = String(st.velocidade).replace(".", ",") + "×"; pecas.velocidade.setAttribute("aria-label", t("replay.velocidade") + ": " + pecas.velocidade.textContent); });
-    $("rpCheia").addEventListener("click", function () {
-      if (document.fullscreenElement) document.exitFullscreen(); else if (el.requestFullscreen) el.requestFullscreen();
-    });
     Array.prototype.forEach.call(bandeirasEl, function (b) { b.addEventListener("click", function () { parar(); st.comecou = true; irPara(marcos[Number(b.getAttribute("data-marco"))].i); }); });
 
     var relogioDaLargura = 0;
