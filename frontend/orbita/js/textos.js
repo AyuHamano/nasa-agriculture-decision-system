@@ -124,8 +124,8 @@ var TEXTOS = {
     replay: {
       sobre: "A prova",
       titulo: "A safra {safra}, dia a dia",
-      texto: "A safra refeita dia a dia, com a chuva que o satélite da NASA mediu em {cidade}.",
-      textoSemLugar: "A safra refeita dia a dia, com a chuva que o satélite da NASA mediu.",
+      texto: "Com a chuva que o satélite da NASA mediu em {cidade}.",
+      textoSemLugar: "Com a chuva que o satélite da NASA mediu.",
       rotacao: "Na terra: {nome}.",
       pulso: ["Neste dia a água acabou.", "O produtor não sabia.", "O satélite sabia."],
       pulsoSede: ["Neste dia a sede começou."],
