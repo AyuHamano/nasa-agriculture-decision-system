@@ -235,26 +235,40 @@
   }
   function desenharGaveta() {
     var falas = ag.falas.length ? ag.falas : [{ de: "assistente", texto: "Pergunte o que quiser sobre a sua lavoura. Eu respondo com a conta e com os dados da NASA do lugar." }];
-    $("chatDoAssistente").innerHTML = falas.map(function (f) { return '<li class="o-fala ' + f.de + '">' + esc(f.texto) + (f.apoio ? '<small class="o-apoio">' + esc(f.apoio) + "</small>" : "") + "</li>"; }).join("") +
+    $("chatDoAssistente").innerHTML = falas.map(function (f) { return '<li class="o-fala ' + f.de + '">' + esc(f.texto) + (f.apoio ? '<small class="o-apoio">' + esc(f.apoio) + "</small>" : "") + (f.usou ? '<small class="o-usou">' + esc(f.usou) + "</small>" : "") + "</li>"; }).join("") +
       (ag.ocupado ? '<li class="o-fala assistente o-pensando" aria-label="O assistente está escrevendo"><i></i><i></i><i></i></li>' : "");
     $("sugestoes").innerHTML = ag.falas.length ? "" : (SUGESTOES[app.tela] || SUGESTOES.hoje).map(function (s) { return '<button type="button" class="o-opcao" data-acao="sugestao" data-texto="' + esc(s) + '">' + esc(s) + "</button>"; }).join("");
     var rolo = $("roloDoAssistente"); rolo.scrollTop = rolo.scrollHeight;
   }
   function abrirGaveta() { $("gaveta").hidden = false; document.body.classList.add("com-folha"); desenharGaveta(); $("fecharGaveta").focus(); }
   function fecharGaveta() { $("gaveta").hidden = true; document.body.classList.remove("com-folha"); $("perguntar").focus(); }
+  function oQueAContaUsou(f) {      // a ficha da conversa ficou diferente da guardada: uma linha diz o que a conta usou
+    var l = app.lavoura, p = [];
+    var rot = typeof f.rotacao_atual === "string" ? f.rotacao_atual : Object.keys(D.culturas).filter(function (k) { return String(D.culturas[k]) === String(f.rotacao_atual); })[0];
+    if (T.ROTACOES[rot] && rot !== l.rotacao_id) p.push(T.ROTACOES[rot].nome.toLowerCase());
+    if (f.plantio_da_soja && f.plantio_da_soja !== l.plantio_da_soja) p.push("a soja plantada em " + T.dataCurta(f.plantio_da_soja));
+    if (T.TERRAS[f.terra] && f.terra !== l.terra) p.push("terra " + T.TERRAS[f.terra].nome.toLowerCase());
+    if (T.CIDADES[f.cidade_id] && f.cidade_id !== l.cidade_id) p.push("o clima de " + T.CIDADES[f.cidade_id]);
+    return p.length ? "Conta com " + p.join(", com ") + "." : "";
+  }
   function perguntar(texto) {
     texto = String(texto || "").trim(); if (!texto || ag.ocupado) return;
     ag.falas.push({ de: "produtor", texto: texto }); ag.ocupado = true; desenharGaveta();
-    function mandar(deNovo) {
-      var direto = !!(ag.estado && ag.confirmada) && !deNovo;
-      return D.post("/agente", direto ? { estado: ag.estado, texto: texto } : { estado: estadoDaFicha(texto), texto: "sim" }, 120000).then(function (s) {
+    function mandar(corpo, jaConfirmou) {
+      return D.post("/agente", corpo, 120000).then(function (s) {
         var confirmada = !!(s.ficha && s.ficha.confirmada);
-        if (!confirmada && direto) return mandar(true);      // o servidor religou e o selo de antes não vale: confirma de novo
-        ag.estado = s.estado || null; ag.confirmada = confirmada; return s;
+        // O produtor disse um fato da lavoura na pergunta e a ficha da conversa mudou (ou o servidor religou e o selo de
+        // antes não vale): a tela confirma sozinha, uma vez só, com a ficha que o servidor devolveu e a pergunta dele.
+        // A lavoura guardada no aparelho não muda; se ainda assim não confirmar, mostra o que veio e a conversa volta a ela.
+        if (!confirmada && !jaConfirmou && s.estado && s.ficha && !(s.ficha.falta || []).length) { s.estado.pergunta = texto; return mandar({ estado: s.estado, texto: "sim" }, true); }
+        ag.estado = confirmada ? s.estado : null; ag.confirmada = confirmada; return s;
       });
     }
-    app.pronto.then(function () { if (!D.api || !D.ia) throw new Error("sem_ia"); return mandar(false); }).then(function (s) {
-      ag.falas.push({ de: "assistente", texto: s.resposta || "", apoio: APOIO[s.apoio] || "" });
+    app.pronto.then(function () {
+      if (!D.api || !D.ia) throw new Error("sem_ia");
+      return mandar(ag.estado && ag.confirmada ? { estado: ag.estado, texto: texto } : { estado: estadoDaFicha(texto), texto: "sim" }, false);
+    }).then(function (s) {
+      ag.falas.push({ de: "assistente", texto: s.resposta || "", apoio: APOIO[s.apoio] || "", usou: s.apoio === "conta" && ag.confirmada ? oQueAContaUsou(s.ficha) : "" });
     }, function (e) {
       ag.falas.push({ de: "assistente", texto: e && e.message === "sem_ia" ? SEM_ASSISTENTE : e && e.codigo === 400 && e.frase ? e.frase : "O assistente não respondeu agora. Tente de novo daqui a pouco. O painel, o ensaio e o registro seguem funcionando." });
     }).then(function () { ag.ocupado = false; desenharGaveta(); });

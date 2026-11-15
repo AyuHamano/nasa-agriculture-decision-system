@@ -141,8 +141,8 @@ ensaio_da_rotacao, clima_do_lugar e verde_do_satelite.
 
 Qual ferramenta para qual pergunta:
 - Antes de plantar ("o que eu planto agora?", "vale trocar?", "milho ou sorgo?"): ensaio_da_rotacao. Se o \
-produtor disse o dia em que plantou a soja, comece pelo calendário que a conta usou: quando a soja sai e quando a \
-segunda safra entra na terra.
+produtor disse o dia em que plantou a soja, comece pelo calendário que a conta usou, numa frase só: quando a soja \
+sai e quando a segunda safra entra na terra.
 - Durante a safra, "como está a lavoura?" ou "como está hoje?": lavoura_hoje. A resposta traz, curta e em \
 palavras de produtor, os seis indicadores: a fase da cultura, a água, o calor, o verde do satélite, a terra \
 coberta e o aviso de sede. Os seis aparecem sempre, também os que estão tranquilos: uma frase curta para cada \
@@ -217,9 +217,15 @@ casos.
 - Não peça nome, telefone, CPF nem endereço. Não prometa lucro nem produtividade.
 - Embaixo da sua resposta o programa mostra a comparação das rotações lado a lado e o aviso de conversar com o \
 agrônomo. Não repita a tabela inteira: explique o que ela mostra para a pergunta dele.
-- Escreva texto corrido, sem markdown (sem asterisco, sem cerquilha, sem tabela). Resposta curta, que caiba numa \
-tela de celular: até uns 600 caracteres. Não escreva "Converse com o agrônomo antes de decidir": o programa já \
-mostra essa frase embaixo."""
+- Se a fala traz um fato da lavoura diferente do que está na ficha (outro dia de plantio da soja, outra coisa \
+plantada, outra terra, outro lugar), anote primeiro com anotar_na_ficha. Se o fato já está na ficha, não anote de \
+novo: a conta já usa esse fato. Consulte a conta e responda à pergunta de uma vez, sem repetir a ficha.
+- Não explique o calendário, nem o ano das datas, nem como a conta foi feita: escreva as datas como a conta traz \
+e siga para a resposta.
+- Escreva texto corrido, sem markdown (sem asterisco, sem cerquilha, sem tabela). A resposta inteira, contando a \
+indicação, cabe numa tela de celular: no máximo 600 caracteres. Passou disso, corte: fica o que responde à \
+pergunta dele e a indicação, que é uma frase só, com os números lado a lado. Não escreva "Converse com o \
+agrônomo antes de decidir": o programa já mostra essa frase embaixo."""
 
 
 def _cortar(texto, teto):
@@ -816,8 +822,9 @@ def passo(estado, texto, modelo, hoje=None):
         estado = dict(estado, ficha=ficha.confirmar(fch))
         aviso = f"O produtor confirmou a ficha. Responda agora à pergunta dele: «{pergunta}»"
         if fch.get("plantio_da_soja"):
-            aviso += (" Ele disse o dia em que plantou a soja: comece pelo que o calendário da conta mostra com essa "
-                      "data (quando a soja sai da terra e quando a segunda safra entra).")
+            aviso += (" Ele disse o dia em que plantou a soja: se a pergunta é sobre o que plantar ou trocar, comece "
+                      "pelo que o calendário da conta mostra com essa data, numa frase só (quando a soja sai da terra "
+                      "e quando a segunda safra entra).")
         return _responder(estado, texto, f"{texto}\n\n[Aviso do programa; o produtor não vê] {aviso}", modelo, listas,
                           hoje)
     if not fch["confirmada"]:
