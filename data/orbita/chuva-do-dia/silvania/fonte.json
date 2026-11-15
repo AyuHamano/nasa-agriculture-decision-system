@@ -1,0 +1,79 @@
+{
+ "o_que_e": "Chuva por dia, em mm, do satélite GPM IMERG V07 (NASA/JAXA), nas versões Early e Late, somada das meias horas no dia de Brasília. Sem login.",
+ "de_onde_vem": "Cópia dos arquivos da NASA (GES DISC e PPS) mantida pela dynamical.org num balde aberto da Amazon (s3://dynamical-nasa-imerg). Não é um servidor da NASA.",
+ "ficha_do_conjunto": "https://registry.opendata.aws/dynamical-nasa-imerg/",
+ "licenca": "CC BY 4.0",
+ "citacao": "NASA IMERG from dynamical.org",
+ "versao_do_dado": "GPM IMERG V07 (Early e Late, de meia em meia hora); conjunto da dynamical.org v0.1.0",
+ "enderecos": {
+  "early": "https://dynamical-nasa-imerg.s3.us-west-2.amazonaws.com/nasa-imerg-analysis-early/v0.1.0.icechunk",
+  "late": "https://dynamical-nasa-imerg.s3.us-west-2.amazonaws.com/nasa-imerg-analysis-late/v0.1.0.icechunk"
+ },
+ "como_le": "icechunk.http_storage(endereço) -> readonly_session('main') -> xarray.open_zarr; variável precipitation_surface, o quadrado mais perto do ponto (sel method='nearest')",
+ "conta": "chuva do dia (mm) = soma, nas 48 meias horas, da taxa (kg m-2 s-1 = mm por segundo) x 1800 segundos",
+ "regra_do_dia": "Dia de Brasília (UTC-3). O rótulo de cada meia hora é o início dela, em UTC. O dia D soma as 48 meias horas que começam de D 03:00 UTC a D+1 02:30 UTC. Dia com menos de 48 meias horas com dado fica em branco. O dia da consulta fica fora, por estar incompleto.",
+ "ponto": {
+  "nome": "Silvânia (GO)",
+  "latitude": -16.66,
+  "longitude": -48.61,
+  "centro_do_quadrado_lido": [
+   -16.650000000000006,
+   -48.650000000000006
+  ]
+ },
+ "primeiro_dia": "2026-08-17",
+ "ultimo_dia_com_dado": "2026-11-14",
+ "ultimo_dia_com_dado_late": "2026-11-13",
+ "dias_no_arquivo": 90,
+ "dias_em_branco": {
+  "early": 0,
+  "late": 1
+ },
+ "ultima_rodada_utc": "2026-11-15T11:09:29Z",
+ "consultas": [
+  {
+   "versao": "early",
+   "endereco": "https://dynamical-nasa-imerg.s3.us-west-2.amazonaws.com/nasa-imerg-analysis-early/v0.1.0.icechunk",
+   "hora_utc": "2026-11-15T11:07:43Z",
+   "snapshot": "R89ENFEMK6QZZBVZHXDG",
+   "pedido_de": "2026-08-17T03:00Z",
+   "meias_horas_lidas": 4326,
+   "meias_horas_vazias": 0,
+   "ultima_meia_hora_com_dado_inicio_utc": "2026-11-15T05:30Z",
+   "segundos": 0.7
+  },
+  {
+   "versao": "late",
+   "endereco": "https://dynamical-nasa-imerg.s3.us-west-2.amazonaws.com/nasa-imerg-analysis-late/v0.1.0.icechunk",
+   "hora_utc": "2026-11-15T11:07:50Z",
+   "snapshot": "B2KWNXAVFAER8AENSHQ0",
+   "pedido_de": "2026-08-17T03:00Z",
+   "meias_horas_lidas": 4306,
+   "meias_horas_vazias": 0,
+   "ultima_meia_hora_com_dado_inicio_utc": "2026-11-14T19:30Z",
+   "segundos": 0.9
+  },
+  {
+   "versao": "early",
+   "endereco": "https://dynamical-nasa-imerg.s3.us-west-2.amazonaws.com/nasa-imerg-analysis-early/v0.1.0.icechunk",
+   "hora_utc": "2026-11-15T11:09:29Z",
+   "snapshot": "R89ENFEMK6QZZBVZHXDG",
+   "pedido_de": "2026-11-12T03:00Z",
+   "meias_horas_lidas": 150,
+   "meias_horas_vazias": 0,
+   "ultima_meia_hora_com_dado_inicio_utc": "2026-11-15T05:30Z",
+   "segundos": 0.9
+  },
+  {
+   "versao": "late",
+   "endereco": "https://dynamical-nasa-imerg.s3.us-west-2.amazonaws.com/nasa-imerg-analysis-late/v0.1.0.icechunk",
+   "hora_utc": "2026-11-15T11:09:34Z",
+   "snapshot": "B2KWNXAVFAER8AENSHQ0",
+   "pedido_de": "2026-11-12T03:00Z",
+   "meias_horas_lidas": 130,
+   "meias_horas_vazias": 0,
+   "ultima_meia_hora_com_dado_inicio_utc": "2026-11-14T19:30Z",
+   "segundos": 0.5
+  }
+ ]
+}

@@ -1,0 +1,8 @@
+# As quatro bibliotecas do baixar_chuva_do_dia.py, nas versões usadas em 2026-11-15 (Python 3.12.3).
+# O leitor (ler.py) e o motor não precisam de nenhuma. Instalar num ambiente virtual fora do repositório:
+#   python3 -m venv ~/.cache/orbita-rural/venv-chuva-do-dia
+#   ~/.cache/orbita-rural/venv-chuva-do-dia/bin/pip install -r data/orbita/chuva-do-dia/requisitos.txt
+icechunk==2.3.1
+zarr==3.4.2
+xarray==2026.9.0
+numpy==2.5.4
