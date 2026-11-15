@@ -1,0 +1,4 @@
+# Gerado com IA (Claude)
+# O que não vai ao git dentro da pasta dos dados do Órbita Rural: o cache do Python dos programas de baixar.
+__pycache__/
+*.pyc
