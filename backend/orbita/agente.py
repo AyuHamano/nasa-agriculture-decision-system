@@ -86,6 +86,13 @@ AVISO_DA_TRAVA = ("A conferência barrou o seu texto por causa disto: {sobras}. 
 COBERTA_TANTOS_DIAS = re.compile(r"\bcobert[ao]s?\s+(?:só\s+|somente\s+|apenas\s+|por\s+|durante\s+|em\s+)*"
                                  r"(?:uns\s+|cerca\s+de\s+)?\d+\s+dias\b(?!\s+(?:por\s+ano\s+)?sem\b)", re.IGNORECASE)
 SENTIDO_TROCADO = " (a conta só tem os dias SEM planta viva: esse número não é de dias de terra coberta)"
+# A outra troca que o programa barra: no replay, o marco "agua_acabou" é o dia em que a sede começa (acabou só a água
+# fácil de tirar); a água acaba no marco "agua_no_fundo". "A água acabou em 04/04/2016" diz isso do dia errado.
+AGUA_ACABOU = re.compile(r"\bágua\b(?![^.!?\n•]*\bfácil)[^.!?\n•]{0,60}?\bacab(?:ou|a|aram|am)\b", re.IGNORECASE)
+DATA_NO_TEXTO = re.compile(r"(?<![\d/])(\d{1,2})/(\d{1,2})(?:/(\d{4}))?(?![\d/])")
+FIM_DE_FRASE = re.compile(r"[.!?\n•]")
+A_SEDE_COMECOU = (" (nesse dia a sede começou: acabou só a água fácil de tirar; a conta só diz que a água acabou no "
+                  "marco da água no fundo, se houver)")
 
 OLA = ("oi", "ola", "oie", "opa", "alo", "bom dia", "boa tarde", "boa noite", "e ai", "eai", "oi tudo bem",
        "ola tudo bem", "oi bom dia", "oi boa tarde", "oi boa noite", "comecar", "inicio")
@@ -130,6 +137,9 @@ ferramenta. Não tem o número? Diga sem número.
 - Diga cada rotação como ela é. No milho com braquiária, o capim é plantado junto com o milho e fica cobrindo a \
 terra depois da colheita dele: a braquiária não entra no lugar do milho. No sorgo, é o sorgo que entra no lugar do \
 milho, na segunda safra.
+- Nos marcos de uma safra há dois dias diferentes. Um é o dia em que a sede começa: acabou só a água fácil de \
+tirar da terra, e ainda há água na terra. O outro, quando existe, é o dia em que a água que a planta alcança acabou. \
+Nunca escreva que "a água acabou" no dia em que a sede começou.
 - O número de "dias sem planta viva" é o tempo em que a terra fica descoberta: quanto menos dias, mais coberta \
 ela fica. Nunca escreva que a terra fica "coberta" esse número de dias.
 - Você não escolhe a rotação pelo produtor. Você mostra o que a conta diz de cada rotação (a evidência, o \
@@ -271,9 +281,51 @@ def _conversa(estado, fch, hoje, fala_do_produtor):
             + [{"de": "produtor", "texto": fala_do_produtor}])
 
 
-def _sentido_trocado(texto):
-    """Os trechos em que um número de "dias sem planta viva" foi dito como dias de terra coberta (o contrário)."""
-    return [achado.group(0) + SENTIDO_TROCADO for achado in COBERTA_TANTOS_DIAS.finditer(texto or "")]
+def _datas_dos_marcos(coisa, tipo):
+    """As datas (dia, mês, ano) dos marcos de um tipo, em tudo o que as ferramentas devolveram nesta fala."""
+    datas = set()
+    if isinstance(coisa, dict):
+        for chave, valor in coisa.items():
+            if chave == "marcos" and isinstance(valor, list):
+                for marco in valor:
+                    if isinstance(marco, dict) and marco.get("tipo") == tipo:
+                        try:
+                            dia = datetime.date.fromisoformat(str(marco.get("data"))[:10])
+                        except ValueError:
+                            continue
+                        datas.add((dia.day, dia.month, dia.year))
+            else:
+                datas |= _datas_dos_marcos(valor, tipo)
+    elif isinstance(coisa, (list, tuple)):
+        for item in coisa:
+            datas |= _datas_dos_marcos(item, tipo)
+    return datas
+
+
+def _agua_acabou_no_dia_errado(texto, consultas):
+    """Os trechos que dizem "a água acabou" colados à data de um marco em que a sede só começou."""
+    resultados = [c.get("resultado") for c in consultas or () if isinstance(c, dict)]
+    comeco = _datas_dos_marcos(resultados, "agua_acabou") - _datas_dos_marcos(resultados, "agua_no_fundo")
+    achados = []
+    for achado in AGUA_ACABOU.finditer(texto) if comeco else ():
+        antes = [m.end() for m in FIM_DE_FRASE.finditer(texto, 0, achado.start())]
+        depois = FIM_DE_FRASE.search(texto, achado.end())
+        inicio, fim = (antes[-1] if antes else 0), (depois.start() if depois else len(texto))
+        datas = list(DATA_NO_TEXTO.finditer(texto, inicio, fim))
+        perto = [d for d in datas if d.end() <= achado.start()][-1:] or [d for d in datas if d.start() >= achado.end()][:1]
+        for data in perto:                               # a data mais perto: a última antes, ou a primeira depois
+            dia, mes, ano = int(data.group(1)), int(data.group(2)), data.group(3)
+            if any((dia, mes) == (d, m) and (ano is None or int(ano) == a) for d, m, a in comeco):
+                achados.append(f"{achado.group(0)} em {data.group(0)}" + A_SEDE_COMECOU)
+    return achados
+
+
+def _sentido_trocado(texto, consultas=()):
+    """Os trechos com o sentido trocado: um número de "dias sem planta viva" dito como dias de terra coberta (o
+    contrário), e "a água acabou" dito do dia em que a sede só começou (com os replays consultados nesta fala)."""
+    texto = texto or ""
+    return ([achado.group(0) + SENTIDO_TROCADO for achado in COBERTA_TANTOS_DIAS.finditer(texto)]
+            + _agua_acabou_no_dia_errado(texto, consultas))
 
 
 def _conta(fch, comparacao, consultas):
@@ -297,7 +349,8 @@ def conferir_saida(saida, hoje):
     """
     return conferencia.conferir_texto(saida["resposta"],
                                       _conta(saida["ficha"], saida["comparacao"], saida["consultas"]),
-                                      _permitidos(hoje, saida["comparacao"])) + _sentido_trocado(saida["resposta"])
+                                      _permitidos(hoje, saida["comparacao"])) + _sentido_trocado(saida["resposta"],
+                                                                                                saida["consultas"])
 
 
 def _sair(estado, texto, resposta, hoje, *, comparacao=None, apoio=None, momento=None,
@@ -308,7 +361,7 @@ def _sair(estado, texto, resposta, hoje, *, comparacao=None, apoio=None, momento
         raise RuntimeError("Erro de dentro do agente: com a ficha confirmada, toda resposta leva a comparação das "
                            "rotações.")
     conta, permitidos = _conta(ficha.publica(estado["ficha"]), comparacao, consultas), _permitidos(hoje, comparacao)
-    if conferencia.conferir_texto(resposta, conta, permitidos) or _sentido_trocado(resposta):
+    if conferencia.conferir_texto(resposta, conta, permitidos) or _sentido_trocado(resposta, consultas):
         resposta, texto_de, passou = (SEM_NUMERO if comparacao else NAO_ENTENDI), "frases_prontas", False
     momento = momento or estado["momento"]
     falas = estado["falas"] + [{"de": "produtor", "texto": _cortar(texto, TAMANHO_DA_FALA) or "…"},
@@ -557,7 +610,7 @@ def _responder(estado, texto, pergunta, modelo, listas, hoje, pronto=None):
             sobras = conferencia.conferir_texto(texto_da_ia, conta(), permitidos)
         else:                                         # sem consulta nesta fala, o texto não pode ter número nenhum
             sobras = conferencia.conferir_texto(texto_da_ia, {})
-        sobras = sobras + _sentido_trocado(texto_da_ia)
+        sobras = sobras + _sentido_trocado(texto_da_ia, consultas.feitas)
         if not sobras:
             break
         sobras_da_ia, falhou, texto_da_ia = sobras, texto_da_ia, ""

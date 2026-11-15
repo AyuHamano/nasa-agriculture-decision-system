@@ -44,7 +44,7 @@ COMPARACAO = [
 ]
 MARCOS = [
     {"data": "2015-10-20", "tipo": "plantio", "frase": "A soja foi plantada."},
-    {"data": "2016-03-14", "tipo": "agua_acabou", "frase": "Neste dia a água da terra acabou para o milho."},
+    {"data": "2016-03-14", "tipo": "agua_acabou", "frase": "Neste dia começou a sede mais longa do milho: a água fácil de tirar da terra acabou."},
     {"data": "2016-04-02", "tipo": "calor_forte", "frase": "Calor forte: a máxima passou de 35 °C."},
     {"data": "2016-06-18", "tipo": "colheita", "frase": "O milho saiu da terra."},
 ]

@@ -205,7 +205,7 @@ class AResposta(ComODuble):
                 "a IA fica muda": ("vale o sorgo?", [fala("", ENSAIO)]),
                 "a IA não consulta nada": ("e as pragas?", [fala("A rotação ajuda a quebrar o ciclo das pragas.")]),
                 "uma cortesia": ("obrigado", []),
-                "o replay": ("como foi a pior safra?", [fala("", REPLAY), fala("No dia 14/03/2016 a água acabou.")]),
+                "o replay": ("como foi a pior safra?", [fala("", REPLAY), fala("No dia 14/03/2016 a sede do milho começou.")]),
                 "o clima": ("qual foi o pior ano?", [fala("", CLIMA), fala("A pior safra foi a de 2015-16.")]),
                 "o verde": ("quanto a terra fica sem planta?", [fala("", VERDE), fala("São 122 dias pelo calendário.")])}
 
@@ -316,7 +316,7 @@ class AResposta(ComODuble):
 
     def test_o_replay_vai_a_tela_com_os_dias_e_a_ia_so_le_os_marcos(self):
         estado, saida, modelo = self.passo(self.confirmada(), "como foi a pior safra, dia a dia?", fala("", REPLAY),
-                                           fala("No dia 14/03/2016 a água da terra acabou para o milho."))
+                                           fala("No dia 14/03/2016 a água fácil de tirar da terra acabou para o milho."))
         self.assertEqual((saida["replay"]["safra"], saida["replay"]["cidade_id"]), ("2015-16", "jatai"))
         self.assertEqual(len(saida["replay"]["dias"]), 20)
         self.assertEqual(len(saida["replay"]["marcos"]), 4)
@@ -328,7 +328,7 @@ class AResposta(ComODuble):
 
     def test_as_frases_prontas_do_replay_do_clima_e_do_verde(self):
         estado, saida, _ = self.passo(self.confirmada(), "como foi?", fala("", REPLAY, CLIMA, VERDE))
-        for pedaco in ("A safra 2015-16 em Jataí (GO), dia a dia:", "• 14/03/2016: Neste dia a água da terra acabou",
+        for pedaco in ("A safra 2015-16 em Jataí (GO), dia a dia:", "• 14/03/2016: Neste dia começou a sede mais longa do milho",
                        "a pior safra foi a de 2015-16 e a safra normal, a de 2019-20", "O satélite viu 96 dias",
                        "não vê a palha", "Também comparei 3 rotações"):
             self.assertIn(pedaco, saida["resposta"])
@@ -533,6 +533,45 @@ class OsAchadosDaRevisao(ComODuble):
         # a garantia do achado 3, por construção: o programa não consegue montar essa saída
         with self.assertRaises(RuntimeError):
             agente._sair(self.confirmada(), "oi", "Não entendi.", HOJE)
+
+
+class AAguaSoAcabaNoDiaEmQueAContaDiz(ComODuble):
+    """Visto nas conversas gravadas (2026-11-15): a IA escreveu "a água acabou em 04/04/2016", o dia em que a sede
+    começou (o marco agua_acabou: acabou só a água fácil de tirar); a água acabou em 24/04 (o marco agua_no_fundo)."""
+
+    CONSULTAS = [{"ferramenta": "ensaio_da_rotacao", "argumentos": {"safra": "2015-16"}, "resultado": {"replay": {
+        "marcos": [{"data": "2016-04-04", "tipo": "agua_acabou", "cultura": "milho", "frase": "..."},
+                   {"data": "2016-04-24", "tipo": "agua_no_fundo", "cultura": "milho", "frase": "..."}]}}}]
+
+    def test_dizer_que_a_agua_acabou_no_dia_em_que_a_sede_comecou_e_barrado(self):
+        for errado in ("A água do milho acabou em 04/04/2016 e ele ficou 60 dias seguidos com sede.",
+                       "• 04/04/2016: a água acabou para o milho. Começaram 60 dias seguidos de sede.",
+                       "Em 04/04 a água acaba para o milho."):
+            self.assertEqual(len(agente._sentido_trocado(errado, self.CONSULTAS)), 1, errado)
+            self.assertEqual(agente._sentido_trocado(errado), [], errado)        # sem o replay consultado, não há dia
+        saida = {"resposta": "A água do milho acabou em 04/04/2016.", "ficha": {}, "comparacao": None,
+                 "consultas": self.CONSULTAS}
+        self.assertEqual(len(agente.conferir_saida(saida, HOJE)), 1)             # quem confere de novo também acha
+
+    def test_o_jeito_certo_de_dizer_passa(self):
+        for certo in ("• 04/04/2016: a água fácil acabou para o milho. Começou a sede mais longa, de 60 dias seguidos.",
+                      "Em 04/04/2016 a sede do milho começou, e em 24/04/2016 a água que a planta alcança acabou.",
+                      "• 24/04/2016: a água que a planta alcança acabou. Sobrou só um resto na terra.",
+                      "A água acabou no fim de abril."):
+            self.assertEqual(agente._sentido_trocado(certo, self.CONSULTAS), [], certo)
+
+    def test_no_passo_o_texto_com_o_dia_errado_nao_chega_a_tela(self):
+        # no motor de mentira dos testes, a sede do milho começa em 14/03/2016 (o marco agua_acabou)
+        estado, saida, modelo = self.passo(self.confirmada(), "como foi a pior safra?", fala("", REPLAY),
+                                           fala("A água acabou em 14/03/2016."),
+                                           fala("A água do milho acabou em 14/03/2016."))
+        self.assertEqual(saida["texto_de"], "frases_prontas")
+        self.assertEqual((saida["conferencia"]["passou"], saida["conferencia"]["tentativas"]), (False, 2))
+        self.assertNotIn("A água do milho acabou", saida["resposta"])
+        self.assertIn("a sede começou", modelo.pedidos[2][0][-1]["texto"])      # a 2ª tentativa leva o motivo
+        estado, saida, _ = self.passo(self.confirmada(), "como foi a pior safra?", fala("", REPLAY),
+                                      fala("Em 14/03/2016 a água fácil de tirar acabou, e a sede do milho começou."))
+        self.assertEqual((saida["texto_de"], saida["conferencia"]["passou"]), ("ia", True))
 
 
 class OsMarcosDoReplayNasFrasesProntas(unittest.TestCase):
