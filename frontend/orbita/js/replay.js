@@ -8,7 +8,7 @@
   var C = window.ORBITA_COMPARACAO, esc = C.esc, fmt = C.fmt;
   function ic(nome) { return window.ORBITA_ICONE ? window.ORBITA_ICONE(nome) : ""; }
   var MESES = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
-  var MS_POR_DIA = 55, PARADA_MS = 900, PARADA_FORTE_MS = 3600;      // um ano inteiro com os marcos cabe em uns 30 segundos
+  var MS_POR_DIA = 55, PARADA_MS = 900, PARADA_FORTE_MS = 3600, JANELA_DIAS = 25, JANELA_FORTE_DIAS = 45;      // um ano inteiro com os marcos cabe em uns 30 segundos
   var ativo = null;   // o replay montado agora (só um por vez)
 
   function partesDaData(iso) {
@@ -44,7 +44,7 @@
   function culturas(dias) {
     var saida = "", ultima = null, inicio = 0, n = dias.length;
     function trecho(nome, a, b) {      // trecho curto demais (uns dias entre uma cultura e outra) fica só com o risco, sem o nome
-      return '<span style="left:' + (100 * a / n).toFixed(2) + "%;width:" + (100 * (b - a) / n).toFixed(2) + '%">' + ((b - a) / n >= 0.06 ? esc(nomeDaCultura(nome)) : "") + "</span>";
+      return '<span style="left:' + (100 * a / n).toFixed(2) + "%;width:" + (100 * (b - a) / n).toFixed(2) + '%" data-nome="' + esc(nomeDaCultura(nome)) + '"></span>';
     }
     dias.forEach(function (d, i) { if (d.cultura !== ultima) { if (ultima !== null) saida += trecho(ultima, inicio, i); ultima = d.cultura; inicio = i; } });
     return saida + trecho(ultima, inicio, n);
@@ -112,6 +112,11 @@
         etiqueta.style.top = (andar * 24) + "px"; maior = Math.max(maior, andar);
       });
       grafico.style.setProperty("--andares", maior + 1);
+      // O nome de cada cultura embaixo do desenho: só onde cabe inteiro.
+      Array.prototype.forEach.call(el.querySelectorAll(".rp-culturas span"), function (s) {
+        s.textContent = s.getAttribute("data-nome") || "";
+        if (s.scrollWidth > s.clientWidth + 1) s.textContent = "";
+      });
     }
     var st = { i: 0, tocando: false, velocidade: 1, antes: 0, resto: 0, parada: 0, quadro: 0, comecou: false };
 
@@ -129,11 +134,13 @@
       pecas.agulha.style.left = (100 * (i + 1) / n).toFixed(2) + "%";
       pecas.linha.value = i;
       pecas.linha.setAttribute("aria-valuetext", p.dia + " de " + p.mes);
-      var ultimo = null;
-      marcos.forEach(function (m, k) { var passou = m.i <= i; bandeirasEl[k].classList.toggle("passou", passou); if (passou) ultimo = m; });
+      var ultimo = null, principal = null;
+      marcos.forEach(function (m, k) { var passou = m.i <= i; bandeirasEl[k].classList.toggle("passou", passou); if (passou) { ultimo = m; if (m.principal) principal = m; } });
+      // A frase de um marco fica uns dias na tela e sai (não diz "neste dia" meses depois); no último dia volta a do fim.
       // No marco principal entra o pulso da demonstração (três frases, sem número), com a frase da conta embaixo.
-      var pulso = !!(ultimo && ultimo.principal && st.comecou), acabou = !!(ultimo && ultimo.tipo === "agua_acabou");
-      var texto = st.comecou ? (ultimo ? ultimo.frase : "") : t("replay.comeco");
+      var recente = !!ultimo && (i - ultimo.i <= JANELA_DIAS || i === n - 1);
+      var pulso = st.comecou && !!principal && i - principal.i <= JANELA_FORTE_DIAS;
+      var texto = !st.comecou ? t("replay.comeco") : pulso ? (recente ? ultimo.frase : principal.frase) : recente ? ultimo.frase : "";
       var chave = (pulso ? "pulso|" : "") + texto;
       if (pecas.frase.getAttribute("data-texto") !== chave) {
         pecas.frase.setAttribute("data-texto", chave);
@@ -142,7 +149,7 @@
           : "<span>" + esc(texto) + "</span>";
       }
       pecas.frase.classList.toggle("forte", pulso);
-      quadro.classList.toggle("sem-agua", acabou);
+      quadro.classList.toggle("sem-agua", !!d.com_sede);
     }
     function botao() {
       pecas.tocar.innerHTML = ic(st.tocando ? "pausar" : "tocar") + "<span>" + esc(t(st.tocando ? "replay.pausar" : "replay.tocar")) + "</span>";

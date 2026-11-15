@@ -100,7 +100,7 @@ a { color: var(--agua); font-weight: 700; }
 .ficha-de-conversa[aria-pressed="true"] { border-color: var(--tinta); background: var(--tinta); color: #fff; }
 .texto-de { font-size: .8rem; color: var(--tinta-leve); margin-top: 8px; }
 
-.falas { display: flex; flex-direction: column; gap: 14px; min-height: 0; }
+.falas { position: relative; display: flex; flex-direction: column; gap: 14px; min-height: 0; }
 .falas.vazia { display: none; }
 .fala { display: grid; gap: 4px; max-width: 94%; min-width: 0; }
 .fala .quem { font-size: .8rem; font-weight: 700; color: var(--tinta-leve); }
@@ -110,6 +110,15 @@ a { color: var(--agua); font-weight: 700; }
 .fala.produtor .balao { background: var(--folha); color: #fff; border-bottom-right-radius: 4px; }
 .fala.agente { align-self: flex-start; }
 .fala.agente .balao { background: var(--folha-clara); border-bottom-left-radius: 4px; }
+.fala .balao ul { list-style: disc; padding-left: 1.15em; display: grid; gap: 8px; }
+.fala .balao li { padding-left: 2px; }
+.miolo { display: grid; gap: 8px; }
+.miolo summary { justify-self: start; min-height: 40px; display: inline-flex; align-items: center; cursor: pointer; font-weight: 700; font-size: .88rem; text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 4px; list-style: none; }
+.miolo summary::-webkit-details-marker { display: none; }
+.miolo summary::after { content: ""; width: .45em; height: .45em; margin-left: .6em; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: translateY(-.15em) rotate(45deg); }
+.miolo[open] summary::after { transform: translateY(.1em) rotate(-135deg); }
+.miolo[open] summary { margin-bottom: 8px; }
+.miolo > * + * { margin-top: 8px; }
 .aviso-agro { display: flex; gap: 6px; align-items: flex-start; font-size: .84rem; font-weight: 700; padding-top: 8px; border-top: 1px solid var(--linha); }
 .aviso-agro .ic { width: 17px; height: 17px; margin-top: 2px; }
 .pe { display: flex; flex-wrap: wrap; gap: 2px 12px; font-size: .8rem; font-weight: 600; color: var(--tinta-leve); }

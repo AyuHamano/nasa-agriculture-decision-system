@@ -8,11 +8,32 @@
 
   var C = window.ORBITA_COMPARACAO, esc = C.esc;
   function ic(nome) { return window.ORBITA_ICONE ? window.ORBITA_ICONE(nome) : ""; }
-  var ESPERA_MS = 650, LIMITE_MS = 60000;
+  var ESPERA_MS = 650, LIMITE_MS = 60000, LONGA = 620, VISTA = 380;
   var calmo = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  // O texto do agente em blocos: cada linha vira um parágrafo; linhas seguidas que começam com "•" viram uma lista.
+  function blocos(texto) {
+    var saida = [], itens = [], tamanho = 0;
+    function fechar() { if (itens.length) { saida.push({ html: "<ul>" + itens.map(function (i) { return "<li>" + esc(i) + "</li>"; }).join("") + "</ul>", n: tamanho, lista: true }); itens = []; tamanho = 0; } }
+    String(texto || "").split(/\n+/).map(function (l) { return l.trim(); }).filter(Boolean).forEach(function (l) {
+      var m = /^•\s*(.+)$/.exec(l);
+      if (m) { itens.push(m[1]); tamanho += m[1].length; } else { fechar(); saida.push({ html: "<p>" + esc(l) + "</p>", n: l.length, lista: false }); }
+    });
+    fechar();
+    return saida;
+  }
+  // Resposta comprida (as frases prontas da conta): o começo e o fecho ficam à vista, o miolo abre com um toque.
+  // Nada é cortado: o texto inteiro está na página.
   function paragrafos(texto) {
-    return String(texto || "").split(/\n+/).map(function (p) { return p.trim(); }).filter(Boolean).map(function (p) { return "<p>" + esc(p) + "</p>"; }).join("");
+    var b = blocos(texto), total = b.reduce(function (s, x) { return s + x.n; }, 0);
+    function junta(lista) { return lista.map(function (x) { return x.html; }).join(""); }
+    if (total <= LONGA || b.length < 3) return junta(b);
+    var cabeca = [b[0]], i = 1, soma = b[0].n;
+    while (i < b.length - 1 && !b[i].lista && soma + b[i].n <= VISTA) { cabeca.push(b[i]); soma += b[i].n; i += 1; }
+    var ultimo = b[b.length - 1], fecho = !ultimo.lista && ultimo.n <= 220 ? [ultimo] : [];
+    var miolo = b.slice(i, b.length - fecho.length);
+    if (!miolo.length) return junta(b);
+    return junta(cabeca) + '<details class="miolo"><summary>' + esc(t("conversa.lerTudo")) + "</summary>" + junta(miolo) + "</details>" + junta(fecho);
   }
 
   // ganchos: { aoResponder(saida, ehAUltima), aoCair(motivo), aoMudar() }
@@ -32,7 +53,7 @@
       var conf = s.conferencia && typeof s.conferencia.passou === "boolean" ? s.conferencia.passou : null;
       var pe = "";
       if (apoio) pe += '<span class="apoio a-' + esc(apoio) + '">' + ic(apoio === "conhecimento_geral" ? "alerta" : "satelite") + esc(t("conversa.apoio." + apoio)) + "</span>";
-      if (conf !== null && apoio !== "conhecimento_geral" && /\d/.test(String(s.resposta || ""))) pe += '<span class="conferido">' + ic("certo") + esc(t(conf ? "conversa.conferido" : "conversa.naoConferido")) + "</span>";
+      if (conf !== null && apoio && apoio !== "conhecimento_geral" && /\d/.test(String(s.resposta || ""))) pe += '<span class="conferido">' + ic("certo") + esc(t(conf ? "conversa.conferido" : "conversa.naoConferido")) + "</span>";
       var atalhos = "";
       if (ehAUltima) {
         if (s.comparacao && s.comparacao.length) atalhos += '<button class="atalho" data-acao="ir-comparacao">' + esc(t("conversa.verComparacao")) + ic("seta") + "</button>";
@@ -54,10 +75,16 @@
       if (st.esperando) html += '<li class="fala agente esperando"><span class="quem">' + esc(t("conversa.agente")) + '</span><div class="balao"><span class="pontos" role="status" aria-label="' + esc(t("conversa.escrevendo")) + '"><i></i><i></i><i></i></span></div></li>';
       elFalas.innerHTML = html;
       elFalas.classList.toggle("vazia", !st.falas.length && !st.esperando);
+    }
+    // Depois de desenhar as falas E o compositor (ele muda a altura da lista): a última fala fica à vista desde o começo dela.
+    function rolar() {
       var ultima = elFalas.lastElementChild;
-      if (ultima && st.falas.length) {
-        if (elFalas.scrollHeight > elFalas.clientHeight + 4) elFalas.scrollTop = elFalas.scrollHeight;       // no computador a lista rola por dentro
-        else if (st.falas.length > 1 && ultima.getBoundingClientRect().bottom > window.innerHeight) ultima.scrollIntoView({ block: "nearest", behavior: calmo ? "auto" : "smooth" });
+      if (!ultima || !st.falas.length) return;
+      if (elFalas.scrollHeight > elFalas.clientHeight + 4) {       // no computador a lista rola por dentro
+        var doAgente = ultima.classList.contains("agente") && !ultima.classList.contains("esperando");
+        elFalas.scrollTop = doAgente ? Math.min(ultima.offsetTop - 8, elFalas.scrollHeight - elFalas.clientHeight) : elFalas.scrollHeight;
+      } else if (st.falas.length > 1 && ultima.getBoundingClientRect().bottom > window.innerHeight) {
+        ultima.scrollIntoView({ block: "nearest", behavior: calmo ? "auto" : "smooth" });
       }
     }
     function desenharCompositor() {
@@ -74,7 +101,7 @@
       }
       elCompositor.innerHTML = html;
     }
-    function desenhar() { desenharFalas(); desenharCompositor(); if (ganchos.aoMudar) ganchos.aoMudar(); }
+    function desenhar() { desenharFalas(); desenharCompositor(); rolar(); if (ganchos.aoMudar) ganchos.aoMudar(); }
 
     /* ---------- o modo guardadas ---------- */
     function entrarAgente(vez) {

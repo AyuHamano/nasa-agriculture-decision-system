@@ -162,7 +162,7 @@ def agua_recebida_pct(resposta):
         saida[rotacao] = {}
         for safra, numeros in tabela.items():
             linha = {cultura: _r(100 - numeros[cultura]["falta_relativa_pct"]) if numeros[cultura]["dias"] else None
-                     for cultura in rotacoes.CULTURAS}
+                     for cultura in rotacoes.CULTURAS if cultura in numeros}  # só as culturas que a rotação tem
             faixa = _faixa_recebida(faixas.get(safra))
             if faixa:
                 linha["milho_faixa"] = faixa

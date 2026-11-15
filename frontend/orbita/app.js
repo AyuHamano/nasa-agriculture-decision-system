@@ -9,7 +9,7 @@
   function ic(nome) { return window.ORBITA_ICONE ? window.ORBITA_ICONE(nome) : ""; }
   function $(id) { return document.getElementById(id); }
   var MOMENTOS = ["antes", "durante", "depois"];
-  var app = { api: "", dados: null, molde: false, momento: "antes", idDaConversa: "", corrigindo: false, avisos: [], terraDoAgronomo: "", agronomoPronto: false };
+  var app = { api: "", dados: null, momento: "antes", idDaConversa: "", corrigindo: false, avisos: [], terraDoAgronomo: "", agronomoPronto: false };
   var conversa = null;
 
   /* ---------- de onde vêm as conversas ---------- */
@@ -98,7 +98,10 @@
     var c = conversaDoReplay(), el = $("prova");
     replay = replay || (c ? c.replay : null);
     if (!replay || !Array.isArray(replay.dias) || !replay.dias.length) { el.hidden = true; $("paraAProva").hidden = true; return; }
-    if (app.replayNaTela === replay) return;
+    // O mesmo replay pode chegar de novo dentro de uma resposta: se é o que já está na tela, fica como está (não volta ao começo).
+    var na = app.replayNaTela;
+    if (na && (na === replay || (na.safra === replay.safra && na.cidade_id === replay.cidade_id && na.terra === replay.terra && na.dias.length === replay.dias.length &&
+        (na.rotacao || {}).id === (replay.rotacao || {}).id))) return;
     app.replayNaTela = replay; el.hidden = false;
     $("paraAProva").hidden = false;
     $("paraAProva").firstElementChild.innerHTML = esc(t("momentos.prova", { safra: replay.safra || "" })) + ic("seta");
@@ -198,7 +201,6 @@
   }
   function comecar() {
     app.dados = window.ORBITA_CONVERSAS && Array.isArray(window.ORBITA_CONVERSAS.conversas) ? window.ORBITA_CONVERSAS : null;
-    app.molde = !!(app.dados && app.dados.molde);
     app.api = apiBase();
     conversa = window.ORBITA_CONVERSA.criar($("falas"), $("compositor"), {
       aoResponder: function (saida) {
@@ -214,17 +216,9 @@
       },
       aoMudar: function () { desenharMesa(); desenharOutras(); }
     });
-    if (app.molde) avisar(t("modo.molde"));
     if (!aoVivo() && !todas().length) avisar(t("modo.semConversas"));
     desenharModo(); desenharMomentos(); montarReplay(); escolherMomento("antes");
   }
-  function carregarEComecar() {
-    porOsTextos();
-    if (window.ORBITA_CONVERSAS) { comecar(); return; }
-    // Sem o arquivo de verdade (dados/conversas.js), tenta o de molde, que só existe na máquina de quem está montando a tela.
-    var s = document.createElement("script");
-    s.src = "dados/conversas-molde.js"; s.onload = comecar; s.onerror = comecar;
-    document.head.appendChild(s);
-  }
+  function carregarEComecar() { porOsTextos(); comecar(); }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", carregarEComecar); else carregarEComecar();
 })();

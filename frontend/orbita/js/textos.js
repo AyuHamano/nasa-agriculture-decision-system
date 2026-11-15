@@ -31,8 +31,7 @@ var TEXTOS = {
       semChave: "o servidor está sem a chave da IA",
       semResposta: "ele não respondeu",
       erro: "ele respondeu com erro",
-      semConversas: "As conversas guardadas ainda não foram gravadas nesta pasta. Veja no LEIA-ME.md como gravar, ou abra a tela com o agente ligado.",
-      molde: "Arquivo de molde: os números desta tela não são os de verdade. Não usar em imagem nem no pitch."
+      semConversas: "As conversas guardadas ainda não foram gravadas nesta pasta. Veja no LEIA-ME.md como gravar, ou abra a tela com o agente ligado."
     },
     conversa: {
       titulo: "A conversa",
@@ -57,7 +56,8 @@ var TEXTOS = {
       textoDe: { ia: "Texto escrito por IA; cada número foi conferido com a conta.", frases_prontas: "Texto de frases prontas, preenchidas com os números da conta." },
       verComparacao: "Ver a comparação",
       verFicha: "Ver a ficha",
-      verReplay: "Ver a safra dia a dia"
+      verReplay: "Ver a safra dia a dia",
+      lerTudo: "Ler a resposta inteira"
     },
     ficha: {
       titulo: "A sua ficha",
@@ -101,6 +101,8 @@ var TEXTOS = {
       faixaCurta: "{de} a {ate}",
       semMedida: "sem medida",
       limite: "acima de {c} °C",
+      limiteDaCultura: "{cultura}: acima de {c} °C na fase mais sensível",
+      limiteHipotese: "(limite por hipótese)",
       satelite: "O satélite viu {n} dias sem planta verde",
       frases: { evidencia: "A prova", beneficio: "O que ganha", risco: "O risco", falta_saber: "O que falta saber" },
       resumo: "Resumo",

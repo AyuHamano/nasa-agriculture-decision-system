@@ -127,7 +127,11 @@
   }
   function medida(r, m, maior, preocupacao, primeiraDoGrupo) {
     var grupo = obj(r[m.de]), v = valor(grupo[m.chave]), extra = "";
-    if (m.grupo === "calor" && typeof grupo.limite_c === "number") extra = "<small>" + esc(t("comparacao.limite", { c: fmt(grupo.limite_c) })) + "</small>";
+    if (m.grupo === "calor" && typeof grupo.limite_c === "number") {      // o limite é o da cultura mais sensível ao calor nesta rotação
+      var cultura = grupo.cultura_do_limite ? nomeDaCultura(grupo.cultura_do_limite) : "";
+      var hipotese = typeof grupo.etiqueta === "string" && /^hip/i.test(grupo.etiqueta);
+      extra = "<small>" + esc(t(cultura ? "comparacao.limiteDaCultura" : "comparacao.limite", { c: fmt(grupo.limite_c), cultura: cultura })) + (hipotese ? " " + esc(t("comparacao.limiteHipotese")) : "") + "</small>";
+    }
     if (m.grupo === "terra" && typeof grupo.pelo_satelite === "number") extra = '<small class="sat">' + ic("satelite") + esc(t("comparacao.satelite", { n: fmt(grupo.pelo_satelite) })) + "</small>";
     return '<div class="medida g-' + m.grupo + (m.grupo === preocupacao ? " preocupa" : "") + (primeiraDoGrupo ? " primeira" : "") + '">' +
       '<span class="rotulo">' + (primeiraDoGrupo ? ic(ICONES[m.grupo]) : "") + esc(t("comparacao.medidas." + m.chave)) + "</span>" +

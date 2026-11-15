@@ -15,7 +15,8 @@ pasta, e os dados estão em `dados/`.
 - **Os três momentos da lavoura**, cada um com a pergunta do produtor: antes de plantar ("O que eu planto agora?"),
   durante a safra ("Como está a minha lavoura?") e depois de colher ("O que a terra mostrou?").
 - **A conversa:** a fala do produtor e a resposta do agente. Cada resposta diz de onde saiu (da conta, dos dados da
-  NASA do lugar, ou de conhecimento geral, quando a conta não mede o assunto).
+  NASA do lugar, ou de conhecimento geral, quando a conta não mede o assunto). Resposta comprida mostra o começo e o
+  fecho, e o miolo abre em "Ler a resposta inteira".
 - **A ficha:** o município, o tipo de solo, a rotação de hoje, a data do plantio e o que mais preocupa. O produtor
   confirma ou corrige antes de a conta rodar.
 - **As rotações lado a lado:** três ou mais, com a de hoje marcada. Cada uma com a água que falta (num ano normal e no
@@ -23,6 +24,7 @@ pasta, e os dados estão em `dados/`.
   saber. Onde a conta dá faixa, a tela mostra a faixa. No fim, "Converse com o agrônomo antes de decidir".
 - **A prova:** o replay da safra 2015-16, dia a dia: a chuva, a água na terra descendo, os dias de sede e de calor
   forte, e os marcos com a frase de cada um. Tem tocar, pausar, voltar, velocidade e tela cheia (para gravar o vídeo).
+  Na velocidade normal, a safra inteira passa em cerca de 30 segundos, com uma parada no dia em que a água acaba.
 - **A leitura do agrônomo** (a aba "Agrônomo"): como a conta foi feita, com que valores, de onde eles vêm, as
   hipóteses e os limites. Dá para baixar a resposta completa do motor.
 
@@ -47,7 +49,8 @@ guardadas. Pedido recusado pelo agente (a frase vem em `{"erro": ...}`) aparece 
 | `dados/complementos.js` e `validacao.js` | o mesmo `gerar-dados.py` | o calendário do ano e a validação cruzada (o satélite contra a estação em terra e a colheita do IBGE) |
 
 Sem o `dados/conversas.js`, a tela abre, avisa que as conversas ainda não foram gravadas e mostra só a leitura do
-agrônomo. Nenhum número é escrito à mão nesta pasta.
+agrônomo. Nenhum número é escrito à mão nesta pasta. Depois de mudar o motor ou o agente, grave os dois de novo (os
+dois comandos da tabela), para a tela mostrar a conta de agora.
 
 As fontes dos dados: a chuva é do satélite GPM IMERG, da NASA; a temperatura, da NASA POWER; o verde da lavoura, do
 satélite MODIS, da NASA; a conta da água segue o manual FAO-56; a colheita é do IBGE e a chuva medida em terra é da
@@ -96,5 +99,6 @@ logo da NASA.
 ## O que ainda não tem
 
 - A tela é só em português.
-- A leitura do agrônomo mostra a conta guardada de Rio Verde (GO), com a rotação de hoje e a rotação com capim.
+- A leitura do agrônomo mostra a conta guardada de Rio Verde (GO), com a rotação de hoje e a rotação com capim; a
+  rotação com sorgo aparece só na comparação do produtor.
 - O painel da cooperativa (acompanhar vários produtores) é o próximo passo; aqui ele aparece só como um aviso no fim.
