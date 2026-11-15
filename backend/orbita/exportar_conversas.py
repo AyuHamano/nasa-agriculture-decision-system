@@ -113,6 +113,7 @@ HOJE_SOLTO = re.compile(r"\b(?:antes de hoje|dias? atrás|até hoje)\b", re.IGNO
 HOJE_E = re.compile(r"\bhoje é \d", re.IGNORECASE)
 DATA_ESCRITA = re.compile(r"\b\d{1,2}/\d{1,2}/\d{4}\b")
 PALAVRAS_DA_CONTA = ("mediana", "zona das raízes", "faixa da hipótese", "chuva de modelo", "franco-arenosa")
+VALOR_REAL = re.compile(r"\bvalor(?:es)? rea(?:l|is)\b", re.IGNORECASE)
 
 
 def _respostas(gravada):
@@ -150,14 +151,19 @@ def palavras_da_conta(gravada):
     return sum(1 for texto in _respostas(gravada) if any(palavra in texto.lower() for palavra in PALAVRAS_DA_CONTA))
 
 
+def valor_real(gravada):
+    """Quantas respostas falam do "valor real" (onde ele está, entre o quê): a conta só dá os valores que calculou."""
+    return sum(1 for texto in _respostas(gravada) if VALOR_REAL.search(texto))
+
+
 def _falhas(conversa, gravada):
     """O que desabona uma conversa gravada com a IA: cada fala barrada pela conferência (ali saíram as frases
     prontas), um replay que a conversa não pediu (só a conversa do replay leva os dias de uma safra), duas respostas
     com o mesmo começo, um "antes de hoje" sem a data ao lado, um "hoje é tal dia" numa resposta que não é a do
-    "como está hoje" e uma palavra da conta sem explicação."""
+    "como está hoje", uma palavra da conta sem explicação e uma resposta que fala do "valor real"."""
     replay_a_mais = 0 if conversa["id"].startswith("replay-") or not gravada["replay"] else 1
     return (_barradas(gravada) + replay_a_mais + comecos_repetidos(gravada) + hoje_sem_data(gravada)
-            + hoje_fora_de_hora(gravada) + palavras_da_conta(gravada))
+            + hoje_fora_de_hora(gravada) + palavras_da_conta(gravada) + valor_real(gravada))
 
 
 def _com_a_ia(conversa, ia, hoje):

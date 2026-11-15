@@ -92,6 +92,17 @@ class AsRegrasDaIA(unittest.TestCase):
                        'Não diga que uma rotação é "a que mais sofre"', "Escreva só em português"):
             self.assertIn(trecho, " ".join(agente.REGRAS.split()))
 
+    def test_o_pedido_a_ia_poe_o_estado_da_lavoura_no_ultimo_dia_com_dado_e_nao_fala_em_valor_real(self):
+        # Lido nas conversas guardadas de 2026-11-15: "Em 15/11/2026, a soja está na terra" (o dado era de 11/11/2026),
+        # "o valor real deve estar entre esses dois" e um "Hoje é 15/11/2026." solto numa resposta da comparação.
+        for trecho in ("vale no último dia com dado, nunca no dia da consulta",
+                       'escreva "em 11/11/2026 a soja estava na terra", não "em 15/11/2026 a soja está na terra"',
+                       "Diga os dois valores, cada um com a sua chuva", 'Não escreva "valor real"',
+                       'não diga que o valor "deve estar entre" os dois',
+                       'não escreva "hoje é" nem a data do dia da consulta',
+                       "Em resposta de conhecimento geral, não escreva data nenhuma"):
+            self.assertIn(trecho, " ".join(agente.REGRAS.split()))
+
 
 class LetraDeOutroAlfabeto(unittest.TestCase):
     def test_o_texto_com_letra_de_outro_alfabeto_e_barrado(self):
@@ -155,6 +166,13 @@ class ORoteiroDasConversas(unittest.TestCase):
         self.assertEqual(exportar_conversas.hoje_fora_de_hora(do_hoje), 0)
         self.assertEqual(exportar_conversas.palavras_da_conta(gravada("A mediana delas é 38,0%.")), 1)
         self.assertEqual(exportar_conversas.palavras_da_conta(gravada("O valor do meio delas é 38,0%.")), 0)
+        self.assertEqual(exportar_conversas.valor_real(gravada("Por isso, o valor real deve estar entre esses dois.")), 1)
+        self.assertEqual(exportar_conversas.valor_real(gravada("Com uma chuva, 63,0 mm; com a outra, 34,8 mm.")), 0)
+        conversa = {"id": "replay-2015-16"}
+        com_valor_real = dict(gravada("O valor real fica no meio."), replay={"dias": [1]})
+        for passo in com_valor_real["passos"]:
+            passo["saida"]["conferencia"] = {"passou": True}
+        self.assertEqual(exportar_conversas._falhas(conversa, com_valor_real), 1)
 
 
 if __name__ == "__main__":

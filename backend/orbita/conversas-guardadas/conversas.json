@@ -1,5 +1,5 @@
 {
- "gerado_em": "2026-11-15T03:18:59-03:00",
+ "gerado_em": "2026-11-15T03:33:36-03:00",
  "gerado_por": "python3 -m orbita.exportar_conversas <pasta> (Gerado com IA (Claude))",
  "modelo": "anthropic/claude-haiku-5.5",
  "uso_de_ia": "O texto do agente foi escrito por um modelo de linguagem e conferido contra a conta; os números vêm do motor.",
@@ -95,7 +95,7 @@
         "preocupacao": "agua",
         "confirmada": true
        },
-       "selo": "5f665e66de6b33accd7f847c3663f28eb56c4ebf7a0766323d656cedc8bdda08",
+       "selo": "bc910a984bb13ade6d0c93c669845327e628bc3a988d2b2fb77fd91790388142",
        "pergunta": null,
        "momento": "antes",
        "falas": [
@@ -113,11 +113,11 @@
         },
         {
          "de": "agente",
-         "texto": "Com a data que você deu (10/11), a soja sai da terra logo antes da segunda safra entrar, nas duas opções.\n\nNo pior ano (safra 2015-16), a rotação com milho teve 252,7 mm de falta de água para as culturas, com 92 dias de sede. A rotação com sorgo teve 220,3 mm, com 90 dias de sede. No ano normal (safra 2019-20), foram 230,2 mm com milho e 204,8 mm com sorgo.\n\nO calor forte na fase crítica no pior ano foi de 9 dias com milho e 0 dias com sorgo. Nas duas, a terra fica 122 dias seguidos sem planta viva.\n\nO sorgo aparece com menos falta de água, mas as fases dele vêm de uma tabela geral da FAO, o órgão da ONU para a agricultura, não de dados de Goiás. A conta não mede preço nem renda. A decisão é sua, com o agrônomo."
+         "texto": "Pelo calendário da conta, com o plantio da soja em 10/11, a soja sai da terra em 05/03. A segunda safra entra em 08/03, no mesmo intervalo de costume.\n\nNo pior ano (safra 2015-16), a rotação com milho teve 252,7 mm de água faltando e 9 dias de calor forte. Com sorgo, faltaram 220,3 mm e houve 0 dias de calor forte. No ano normal (safra 2019-20), o milho teve 230,2 mm de falta e o sorgo, 204,8 mm.\n\nNas duas rotações, a terra fica 122 dias seguidos sem planta viva antes do plantio da soja.\n\nA conta não mede preço, renda nem produtividade. Para decidir entre milho e sorgo, converse com o agrônomo."
         }
        ]
       },
-      "resposta": "Com a data que você deu (10/11), a soja sai da terra logo antes da segunda safra entrar, nas duas opções.\n\nNo pior ano (safra 2015-16), a rotação com milho teve 252,7 mm de falta de água para as culturas, com 92 dias de sede. A rotação com sorgo teve 220,3 mm, com 90 dias de sede. No ano normal (safra 2019-20), foram 230,2 mm com milho e 204,8 mm com sorgo.\n\nO calor forte na fase crítica no pior ano foi de 9 dias com milho e 0 dias com sorgo. Nas duas, a terra fica 122 dias seguidos sem planta viva.\n\nO sorgo aparece com menos falta de água, mas as fases dele vêm de uma tabela geral da FAO, o órgão da ONU para a agricultura, não de dados de Goiás. A conta não mede preço nem renda. A decisão é sua, com o agrônomo.",
+      "resposta": "Pelo calendário da conta, com o plantio da soja em 10/11, a soja sai da terra em 05/03. A segunda safra entra em 08/03, no mesmo intervalo de costume.\n\nNo pior ano (safra 2015-16), a rotação com milho teve 252,7 mm de água faltando e 9 dias de calor forte. Com sorgo, faltaram 220,3 mm e houve 0 dias de calor forte. No ano normal (safra 2019-20), o milho teve 230,2 mm de falta e o sorgo, 204,8 mm.\n\nNas duas rotações, a terra fica 122 dias seguidos sem planta viva antes do plantio da soja.\n\nA conta não mede preço, renda nem produtividade. Para decidir entre milho e sorgo, converse com o agrônomo.",
       "momento": "antes",
       "ficha": {
        "cidade_id": "rio_verde",
@@ -520,6 +520,210 @@
           }
          ]
         }
+       },
+       {
+        "ferramenta": "ensaio_da_rotacao",
+        "argumentos": {},
+        "resultado": {
+         "lugar": "Rio Verde (GO)",
+         "pior_ano": "2015-16",
+         "ano_normal": "2019-20",
+         "calendario": {
+          "soja": {
+           "plantio": "10/11",
+           "sai_da_terra": "05/03",
+           "ciclo_dias": 115
+          },
+          "milho": {
+           "plantio": "08/03",
+           "sai_da_terra": "11/07",
+           "ciclo_dias": 125
+          },
+          "sorgo": {
+           "plantio": "08/03",
+           "sai_da_terra": "11/07",
+           "ciclo_dias": 125
+          },
+          "braquiaria": {
+           "seca_em": "11/10",
+           "dias_antes_da_soja": 30
+          },
+          "entre_a_soja_e_o_milho_dias": 3,
+          "plantio_da_soja_informado": "2026-11-10",
+          "deslocamento_dias": 26,
+          "nota_do_plantio": "A soja entra no dia e mês que o produtor informou, em todas as safras do ensaio, e a 2ª safra entra depois de a soja sair, com o mesmo intervalo do calendário de costume: o calendário inteiro anda junto com a data dele."
+         },
+         "rotacoes": [
+          {
+           "id": "soja_milho_pousio",
+           "nome": "soja → milho safrinha → pousio (terra parada)",
+           "apelido": "soja, milho e pousio",
+           "de_hoje": true,
+           "agua": {
+            "falta_no_ano_normal_mm": 230.2,
+            "falta_no_pior_ano_mm": 252.7,
+            "dias_de_sede_no_pior_ano": 92,
+            "em_faixa": false,
+            "pior_ano_contra_o_normal": "maior"
+           },
+           "calor": {
+            "dias_de_calor_forte_no_pior_ano": 9,
+            "dias_de_calor_forte_no_ano_normal": 0,
+            "limite_c": 33.0,
+            "cultura_do_limite": "milho",
+            "etiqueta": "publicado",
+            "por_cultura": {
+             "soja": {
+              "limite_c": 40.0,
+              "etiqueta": "publicado",
+              "maxima_da_fase_c": 31.8
+             },
+             "milho": {
+              "limite_c": 33.0,
+              "etiqueta": "publicado",
+              "maxima_da_fase_c": 34.1
+             }
+            }
+           },
+           "terra_coberta": {
+            "dias_sem_planta_viva": 122,
+            "dias_sem_planta_viva_no_ano": 125,
+            "pelo_satelite": 96
+           },
+           "contra_as_outras": {
+            "soja_milho_braquiaria": {
+             "agua": "depende",
+             "calor": "empate",
+             "terra_coberta": "pior"
+            },
+            "soja_sorgo_pousio": {
+             "agua": "pior",
+             "calor": "pior",
+             "terra_coberta": "empate"
+            }
+           },
+           "evidencia": "Em Rio Verde (GO), no pior ano (safra 2015-16) faltaram 252,7 mm de água para as culturas, com 92 dias de sede; no ano normal (safra 2019-20), 230,2 mm. Na fase crítica das culturas, 9 dias de calor forte no pior ano (soja, 0 dias acima de 40 °C; milho, 9 dias acima de 33 °C). Pelo calendário, a terra fica 122 dias seguidos sem planta viva antes do plantio da soja (125 dias no ano, contando o intervalo entre a soja e a 2ª safra). O satélite viu 96 dias seguidos sem planta verde (o valor do meio entre os pontos medidos).",
+           "beneficio": "Na conta, esta rotação não ficou na frente das outras em água, calor nem terra coberta.",
+           "risco": "Na água do pior ano, ficou atrás de soja, sorgo e pousio (220,3 mm): 252,7 mm de falta. No calor do pior ano, ficou atrás de soja, sorgo e pousio (0 dias): 9 dias de calor forte. Na terra coberta, ficou atrás de soja, milho e braquiária (30 dias): 122 dias seguidos sem planta viva.",
+           "falta_saber": "Na água do pior ano, a comparação com soja, milho e braquiária depende de quanto o capim disputa água com o milho: isso não foi medido, e por isso a conta dá o menor e o maior valor. A conta não mede renda, preço, custo nem produtividade, e a palha entra só pelo lado da evaporação. O quanto de terra a palha do milho cobre é hipótese."
+          },
+          {
+           "id": "soja_milho_braquiaria",
+           "nome": "soja → milho com braquiária (capim)",
+           "apelido": "soja, milho e braquiária",
+           "de_hoje": false,
+           "agua": {
+            "falta_no_ano_normal_mm": {
+             "de": 230.2,
+             "ate": 236.8
+            },
+            "falta_no_pior_ano_mm": {
+             "de": 252.7,
+             "ate": 263.5
+            },
+            "dias_de_sede_no_pior_ano": {
+             "de": 92,
+             "ate": 93
+            },
+            "em_faixa": true,
+            "pior_ano_contra_o_normal": "maior"
+           },
+           "calor": {
+            "dias_de_calor_forte_no_pior_ano": 9,
+            "dias_de_calor_forte_no_ano_normal": 0,
+            "limite_c": 33.0,
+            "cultura_do_limite": "milho",
+            "etiqueta": "publicado",
+            "por_cultura": {
+             "soja": {
+              "limite_c": 40.0,
+              "etiqueta": "publicado",
+              "maxima_da_fase_c": 31.8
+             },
+             "milho": {
+              "limite_c": 33.0,
+              "etiqueta": "publicado",
+              "maxima_da_fase_c": 34.1
+             }
+            }
+           },
+           "terra_coberta": {
+            "dias_sem_planta_viva": 30,
+            "dias_sem_planta_viva_no_ano": 33,
+            "pelo_satelite": null
+           },
+           "contra_as_outras": {
+            "soja_milho_pousio": {
+             "agua": "depende",
+             "calor": "empate",
+             "terra_coberta": "melhor"
+            },
+            "soja_sorgo_pousio": {
+             "agua": "pior",
+             "calor": "pior",
+             "terra_coberta": "melhor"
+            }
+           },
+           "evidencia": "Em Rio Verde (GO), no pior ano (safra 2015-16) faltaram de 252,7 a 263,5 mm de água para as culturas, com 92 a 93 dias de sede; no ano normal (safra 2019-20), de 230,2 a 236,8 mm. Na fase crítica das culturas, 9 dias de calor forte no pior ano (soja, 0 dias acima de 40 °C; milho, 9 dias acima de 33 °C). Pelo calendário, a terra fica 30 dias seguidos sem planta viva antes do plantio da soja (33 dias no ano, contando o intervalo entre a soja e a 2ª safra).",
+           "beneficio": "Na terra coberta, ficou na frente de soja, milho e pousio (122 dias) e soja, sorgo e pousio (122 dias): 30 dias seguidos sem planta viva.",
+           "risco": "Na água do pior ano, ficou atrás de soja, sorgo e pousio (220,3 mm): de 252,7 a 263,5 mm de falta. No calor do pior ano, ficou atrás de soja, sorgo e pousio (0 dias): 9 dias de calor forte. A braquiária bebe água junto com o milho e depois dele: a terra pode chegar mais seca ao plantio da soja.",
+           "falta_saber": "Na água do pior ano, a comparação com soja, milho e pousio depende de quanto o capim disputa água com o milho: isso não foi medido, e por isso a conta dá o menor e o maior valor. Quanto o capim disputa água com o milho não foi medido: por isso os números desta rotação saem em faixa. O satélite não prova esta rotação, e a conta não mede renda nem o custo da semente do capim."
+          },
+          {
+           "id": "soja_sorgo_pousio",
+           "nome": "soja → sorgo safrinha → pousio (terra parada)",
+           "apelido": "soja, sorgo e pousio",
+           "de_hoje": false,
+           "agua": {
+            "falta_no_ano_normal_mm": 204.8,
+            "falta_no_pior_ano_mm": 220.3,
+            "dias_de_sede_no_pior_ano": 90,
+            "em_faixa": false,
+            "pior_ano_contra_o_normal": "maior"
+           },
+           "calor": {
+            "dias_de_calor_forte_no_pior_ano": 0,
+            "dias_de_calor_forte_no_ano_normal": 0,
+            "limite_c": 35.0,
+            "cultura_do_limite": "sorgo",
+            "etiqueta": "publicado",
+            "por_cultura": {
+             "soja": {
+              "limite_c": 40.0,
+              "etiqueta": "publicado",
+              "maxima_da_fase_c": 31.8
+             },
+             "sorgo": {
+              "limite_c": 35.0,
+              "etiqueta": "publicado",
+              "maxima_da_fase_c": 34.1
+             }
+            }
+           },
+           "terra_coberta": {
+            "dias_sem_planta_viva": 122,
+            "dias_sem_planta_viva_no_ano": 125,
+            "pelo_satelite": null
+           },
+           "contra_as_outras": {
+            "soja_milho_pousio": {
+             "agua": "melhor",
+             "calor": "melhor",
+             "terra_coberta": "empate"
+            },
+            "soja_milho_braquiaria": {
+             "agua": "melhor",
+             "calor": "melhor",
+             "terra_coberta": "pior"
+            }
+           },
+           "evidencia": "Em Rio Verde (GO), no pior ano (safra 2015-16) faltaram 220,3 mm de água para as culturas, com 90 dias de sede; no ano normal (safra 2019-20), 204,8 mm. Na fase crítica das culturas, 0 dias de calor forte no pior ano (soja, 0 dias acima de 40 °C; sorgo, 0 dias acima de 35 °C). Pelo calendário, a terra fica 122 dias seguidos sem planta viva antes do plantio da soja (125 dias no ano, contando o intervalo entre a soja e a 2ª safra).",
+           "beneficio": "Na água do pior ano, ficou na frente de soja, milho e pousio (252,7 mm) e soja, milho e braquiária (de 252,7 a 263,5 mm): 220,3 mm de falta. No calor do pior ano, ficou na frente de soja, milho e pousio (9 dias) e soja, milho e braquiária (9 dias): 0 dias de calor forte.",
+           "risco": "Na terra coberta, ficou atrás de soja, milho e braquiária (30 dias): 122 dias seguidos sem planta viva.",
+           "falta_saber": "As fases e o ciclo do sorgo vêm da tabela geral da FAO (o órgão da ONU para a agricultura), que não tem linha de 2ª safra em Goiás, e a raiz do sorgo vale igual à do milho. A conta não mede renda nem o preço do sorgo contra o do milho, e o satélite não prova esta rotação."
+          }
+         ]
+        }
        }
       ],
       "replay": null
@@ -546,7 +750,7 @@
         "preocupacao": "agua",
         "confirmada": true
        },
-       "selo": "5f665e66de6b33accd7f847c3663f28eb56c4ebf7a0766323d656cedc8bdda08",
+       "selo": "bc910a984bb13ade6d0c93c669845327e628bc3a988d2b2fb77fd91790388142",
        "pergunta": null,
        "momento": "antes",
        "falas": [
@@ -564,7 +768,7 @@
         },
         {
          "de": "agente",
-         "texto": "Com a data que você deu (10/11), a soja sai da terra logo antes da segunda safra entrar, nas duas opções.\n\nNo pior ano (safra 2015-16), a rotação com milho teve 252,7 mm de falta de água para as culturas, com 92 dias de sede. A rotação com sorgo teve 220,3 mm, com 90 dias de sede. No ano normal (safra 2019-20), foram 230,2 mm com milho e 204,8 mm com sorgo.\n\nO calor forte na fase crítica no pior ano foi de 9 dias com milho e 0 dias com sorgo. Nas duas, a terra fica 122 dias seguidos sem planta viva.\n\nO sorgo aparece com menos falta de água, mas as fases dele vêm de uma tabela geral da FAO, o órgão da ONU para a agricultura, não de dados de Goiás. A conta não mede preço nem renda. A decisão é sua, com o agrônomo."
+         "texto": "Pelo calendário da conta, com o plantio da soja em 10/11, a soja sai da terra em 05/03. A segunda safra entra em 08/03, no mesmo intervalo de costume.\n\nNo pior ano (safra 2015-16), a rotação com milho teve 252,7 mm de água faltando e 9 dias de calor forte. Com sorgo, faltaram 220,3 mm e houve 0 dias de calor forte. No ano normal (safra 2019-20), o milho teve 230,2 mm de falta e o sorgo, 204,8 mm.\n\nNas duas rotações, a terra fica 122 dias seguidos sem planta viva antes do plantio da soja.\n\nA conta não mede preço, renda nem produtividade. Para decidir entre milho e sorgo, converse com o agrônomo."
         },
         {
          "de": "produtor",
@@ -572,11 +776,11 @@
         },
         {
          "de": "agente",
-         "texto": "A braquiária é um capim plantado junto com o milho. Ele fica cobrindo a terra depois da colheita do milho, então não entra no lugar do milho. Na conta, a rotação com braquiária é a que deixa a terra menos tempo descoberta: 30 dias seguidos sem planta viva, contra 122 dias na rotação de hoje.\n\nMas a água piora um pouco. No pior ano (safra 2015-16), faltaram de 252,7 a 263,5 mm para as culturas, com 92 a 93 dias de sede. Na rotação de hoje, com milho e pousio, faltaram 252,7 mm e foram 92 dias. Não sabemos quanto o capim disputa água com o milho, porque isso não foi medido. Por isso a conta dá uma faixa, do menor ao maior valor. O calor forte no pior ano foi de 9 dias, igual ao da rotação de hoje.\n\nO satélite não viu esta rotação, então esses números são da conta, não da lavoura. Vale conversar com o agrônomo."
+         "texto": "A braquiária é um capim plantado junto com o milho. Ele continua cobrindo a terra depois que o milho é colhido, então não entra no lugar do milho.\n\nNa conta, a rotação com braquiária ficou com 30 dias seguidos de terra sem planta viva antes do plantio da soja. Com milho e pousio, o número foi 122 dias. Essa é a principal vantagem da braquiária.\n\nEm água, a conta dá faixa, porque o quanto o capim disputa água com o milho não foi medido. No pior ano (safra 2015-16) faltaram de 252,7 a 263,5 mm. Com milho e pousio, faltaram 252,7 mm. No ano normal (safra 2019-20), de 230,2 a 236,8 mm.\n\nO calor forte no pior ano foi de 9 dias, igual ao da rotação com milho e pousio. O risco é que a braquiária bebe água junto com o milho, e a terra pode chegar mais seca ao plantio da soja.\n\nCom sorgo e pousio, a conta deu 220,3 mm de falta e 0 dias de calor forte no pior ano. Converse com o agrônomo antes de decidir."
         }
        ]
       },
-      "resposta": "A braquiária é um capim plantado junto com o milho. Ele fica cobrindo a terra depois da colheita do milho, então não entra no lugar do milho. Na conta, a rotação com braquiária é a que deixa a terra menos tempo descoberta: 30 dias seguidos sem planta viva, contra 122 dias na rotação de hoje.\n\nMas a água piora um pouco. No pior ano (safra 2015-16), faltaram de 252,7 a 263,5 mm para as culturas, com 92 a 93 dias de sede. Na rotação de hoje, com milho e pousio, faltaram 252,7 mm e foram 92 dias. Não sabemos quanto o capim disputa água com o milho, porque isso não foi medido. Por isso a conta dá uma faixa, do menor ao maior valor. O calor forte no pior ano foi de 9 dias, igual ao da rotação de hoje.\n\nO satélite não viu esta rotação, então esses números são da conta, não da lavoura. Vale conversar com o agrônomo.",
+      "resposta": "A braquiária é um capim plantado junto com o milho. Ele continua cobrindo a terra depois que o milho é colhido, então não entra no lugar do milho.\n\nNa conta, a rotação com braquiária ficou com 30 dias seguidos de terra sem planta viva antes do plantio da soja. Com milho e pousio, o número foi 122 dias. Essa é a principal vantagem da braquiária.\n\nEm água, a conta dá faixa, porque o quanto o capim disputa água com o milho não foi medido. No pior ano (safra 2015-16) faltaram de 252,7 a 263,5 mm. Com milho e pousio, faltaram 252,7 mm. No ano normal (safra 2019-20), de 230,2 a 236,8 mm.\n\nO calor forte no pior ano foi de 9 dias, igual ao da rotação com milho e pousio. O risco é que a braquiária bebe água junto com o milho, e a terra pode chegar mais seca ao plantio da soja.\n\nCom sorgo e pousio, a conta deu 220,3 mm de falta e 0 dias de calor forte no pior ano. Converse com o agrônomo antes de decidir.",
       "momento": "antes",
       "ficha": {
        "cidade_id": "rio_verde",
@@ -5599,7 +5803,7 @@
         "preocupacao": "agua",
         "confirmada": true
        },
-       "selo": "8ecbe04c4d7adc70a896faccac61ec3aa9e6fdda4e5cc6381b4910af9a2cd8c6",
+       "selo": "606923fc725d5d8cd3306f7b9c0eb031030fba9b780af67f5816fd5703d97953",
        "pergunta": null,
        "momento": "durante",
        "falas": [
@@ -5617,11 +5821,11 @@
         },
         {
          "de": "agente",
-         "texto": "Em 15/11/2026, a soja está na terra. O último dia com dado é 11/11/2026. Nesse dia, a terra tinha 63,0 mm de água na camada onde ficam as raízes, que é 95,4% do que ela consegue segurar (66,0 mm). Por isso, a planta não está com sede.\n\nPara comparar, no mesmo dia do ano normal (safra 2019-20) havia 63,3 mm, e no do pior ano (safra 2015-16), 55,9 mm.\n\nComo a chuva dos últimos dias vem do satélite, o número é aproximado. Usando a chuva estimada por modelo de computador, a água seria 34,8 mm, ou 52,7% da capacidade. Por isso, o valor real deve estar entre esses dois. Converse com o agrônomo antes de decidir."
+         "texto": "Em 15/11/2026, a data da consulta, o último dia com dado é 11/11/2026, quatro dias antes. Nesse dia, a soja estava na terra. A água na camada de terra onde ficam as raízes dá dois valores, cada um com a sua chuva:\n\n• Com a chuva medida por satélite da NASA: 63,0 mm de água, de 66,0 mm que a terra segura (95,4%).\n• Com a chuva estimada por modelo de computador: 34,8 mm, de 66,0 mm que a terra segura (52,7%).\n\nNos dois casos, a planta não estava com sede naquele dia. Os dados de chuva recente são aproximados, e a temperatura vem de um quadrado de cerca de 50 km, não da sua lavoura. Leve esses números ao agrônomo."
         }
        ]
       },
-      "resposta": "Em 15/11/2026, a soja está na terra. O último dia com dado é 11/11/2026. Nesse dia, a terra tinha 63,0 mm de água na camada onde ficam as raízes, que é 95,4% do que ela consegue segurar (66,0 mm). Por isso, a planta não está com sede.\n\nPara comparar, no mesmo dia do ano normal (safra 2019-20) havia 63,3 mm, e no do pior ano (safra 2015-16), 55,9 mm.\n\nComo a chuva dos últimos dias vem do satélite, o número é aproximado. Usando a chuva estimada por modelo de computador, a água seria 34,8 mm, ou 52,7% da capacidade. Por isso, o valor real deve estar entre esses dois. Converse com o agrônomo antes de decidir.",
+      "resposta": "Em 15/11/2026, a data da consulta, o último dia com dado é 11/11/2026, quatro dias antes. Nesse dia, a soja estava na terra. A água na camada de terra onde ficam as raízes dá dois valores, cada um com a sua chuva:\n\n• Com a chuva medida por satélite da NASA: 63,0 mm de água, de 66,0 mm que a terra segura (95,4%).\n• Com a chuva estimada por modelo de computador: 34,8 mm, de 66,0 mm que a terra segura (52,7%).\n\nNos dois casos, a planta não estava com sede naquele dia. Os dados de chuva recente são aproximados, e a temperatura vem de um quadrado de cerca de 50 km, não da sua lavoura. Leve esses números ao agrônomo.",
       "momento": "durante",
       "ficha": {
        "cidade_id": "rio_verde",
@@ -6324,6 +6528,7 @@
           "plantio_da_soja_informado": null,
           "hoje": "2026-11-15",
           "ultimo_dia_com_dado": "2026-11-11",
+          "ultimo_dia_com_dado_de": "da conta: o último dia em que há a temperatura (a da NASA POWER) e a chuva rápida do satélite, as duas, sem dia faltando no meio. É o dia do retrato: o que está na terra, a água e a sede valem neste dia.",
           "atraso_dias": 4,
           "safra": "2026-27",
           "o_que_esta_na_terra": "soja",
@@ -6393,7 +6598,8 @@
             },
             "comecou_em_utc": "2026-11-15T04:09:05Z",
             "terminou_em_utc": "2026-11-15T04:09:08Z",
-            "ultimo_dia_com_dado": "2026-11-13"
+            "ultimo_dia_com_dado": "2026-11-13",
+            "ultimo_dia_com_dado_de": "só da chuva rápida do satélite: o último dia com chuva no arquivo baixado. Pode passar do dia do retrato, que também precisa da temperatura."
            },
            "origem": "data/orbita/recente/rio_verde/chuva-recente.csv (o endereço e a hora de cada consulta estão em fonte.json, na mesma pasta)",
            "chuva_guardada_ate": "2026-09-14",
@@ -6438,7 +6644,7 @@
         "preocupacao": "agua",
         "confirmada": true
        },
-       "selo": "8ecbe04c4d7adc70a896faccac61ec3aa9e6fdda4e5cc6381b4910af9a2cd8c6",
+       "selo": "606923fc725d5d8cd3306f7b9c0eb031030fba9b780af67f5816fd5703d97953",
        "pergunta": null,
        "momento": "durante",
        "falas": [
@@ -6456,7 +6662,7 @@
         },
         {
          "de": "agente",
-         "texto": "Em 15/11/2026, a soja está na terra. O último dia com dado é 11/11/2026. Nesse dia, a terra tinha 63,0 mm de água na camada onde ficam as raízes, que é 95,4% do que ela consegue segurar (66,0 mm). Por isso, a planta não está com sede.\n\nPara comparar, no mesmo dia do ano normal (safra 2019-20) havia 63,3 mm, e no do pior ano (safra 2015-16), 55,9 mm.\n\nComo a chuva dos últimos dias vem do satélite, o número é aproximado. Usando a chuva estimada por modelo de computador, a água seria 34,8 mm, ou 52,7% da capacidade. Por isso, o valor real deve estar entre esses dois. Converse com o agrônomo antes de decidir."
+         "texto": "Em 15/11/2026, a data da consulta, o último dia com dado é 11/11/2026, quatro dias antes. Nesse dia, a soja estava na terra. A água na camada de terra onde ficam as raízes dá dois valores, cada um com a sua chuva:\n\n• Com a chuva medida por satélite da NASA: 63,0 mm de água, de 66,0 mm que a terra segura (95,4%).\n• Com a chuva estimada por modelo de computador: 34,8 mm, de 66,0 mm que a terra segura (52,7%).\n\nNos dois casos, a planta não estava com sede naquele dia. Os dados de chuva recente são aproximados, e a temperatura vem de um quadrado de cerca de 50 km, não da sua lavoura. Leve esses números ao agrônomo."
         },
         {
          "de": "produtor",
@@ -6464,11 +6670,11 @@
         },
         {
          "de": "agente",
-         "texto": "Na safra 2015-16 (a pior da região), o dia a dia foi este:\n• 15/10/2015: entra a soja.\n• 18/10/2015: a água fácil de tirar da terra acabou, com 23,3 mm na terra. Começaram 6 dias seguidos de sede para a soja.\n• 06/02/2016: sai a soja. Ela teve 13 dias de sede, com 5,3 mm de falta.\n• 10/02/2016: entra o milho de 2ª safra.\n• 04/04/2016: a água fácil de tirar acabou, com 17,2 mm na terra. Começaram 60 dias seguidos de sede para o milho.\n• 08/04/2016: primeiro dia de calor forte na fase crítica do milho, com máxima de 33,2 °C. Foram 19 dias assim.\n• 24/04/2016: a água que a planta consegue alcançar acabou. Sobraram só 0,1 mm, e a planta não conseguiu beber nada.\n• 13/06/2016: sai o milho. Ele teve 60 dias de sede, com 220,6 mm de falta.\n\nNo total, a safra teve 225,9 mm de água faltando e 73 dias de sede."
+         "texto": "Na safra 2015-16, a pior de Rio Verde, os marcos foram estes:\n\n15/10/2015: entra a soja.\n18/10/2015: começa a sede da soja. A água fácil de tirar da terra acabou (23,3 mm na terra). Foram 6 dias seguidos de sede.\n06/02/2016: sai a soja. Faltaram 5,3 mm de água, com 13 dias de sede.\n10/02/2016: entra o milho de 2ª safra (o milho safrinha).\n04/04/2016: começa a sede mais longa do milho. A água fácil de tirar acabou (17,2 mm na terra). Foram 60 dias seguidos de sede.\n08/04/2016: primeiro dia de calor forte no milho, com máxima de 33,2 °C. Ao todo foram 19 dias assim.\n24/04/2016: a água que a planta alcança acabou. Sobrou 0,1 mm na terra.\n13/06/2016: sai o milho. Faltaram 220,6 mm de água, com 60 dias de sede.\n\nNo total da safra faltaram 225,9 mm de água, com 73 dias de sede."
         }
        ]
       },
-      "resposta": "Na safra 2015-16 (a pior da região), o dia a dia foi este:\n• 15/10/2015: entra a soja.\n• 18/10/2015: a água fácil de tirar da terra acabou, com 23,3 mm na terra. Começaram 6 dias seguidos de sede para a soja.\n• 06/02/2016: sai a soja. Ela teve 13 dias de sede, com 5,3 mm de falta.\n• 10/02/2016: entra o milho de 2ª safra.\n• 04/04/2016: a água fácil de tirar acabou, com 17,2 mm na terra. Começaram 60 dias seguidos de sede para o milho.\n• 08/04/2016: primeiro dia de calor forte na fase crítica do milho, com máxima de 33,2 °C. Foram 19 dias assim.\n• 24/04/2016: a água que a planta consegue alcançar acabou. Sobraram só 0,1 mm, e a planta não conseguiu beber nada.\n• 13/06/2016: sai o milho. Ele teve 60 dias de sede, com 220,6 mm de falta.\n\nNo total, a safra teve 225,9 mm de água faltando e 73 dias de sede.",
+      "resposta": "Na safra 2015-16, a pior de Rio Verde, os marcos foram estes:\n\n15/10/2015: entra a soja.\n18/10/2015: começa a sede da soja. A água fácil de tirar da terra acabou (23,3 mm na terra). Foram 6 dias seguidos de sede.\n06/02/2016: sai a soja. Faltaram 5,3 mm de água, com 13 dias de sede.\n10/02/2016: entra o milho de 2ª safra (o milho safrinha).\n04/04/2016: começa a sede mais longa do milho. A água fácil de tirar acabou (17,2 mm na terra). Foram 60 dias seguidos de sede.\n08/04/2016: primeiro dia de calor forte no milho, com máxima de 33,2 °C. Ao todo foram 19 dias assim.\n24/04/2016: a água que a planta alcança acabou. Sobrou 0,1 mm na terra.\n13/06/2016: sai o milho. Faltaram 220,6 mm de água, com 60 dias de sede.\n\nNo total da safra faltaram 225,9 mm de água, com 73 dias de sede.",
       "momento": "durante",
       "ficha": {
        "cidade_id": "rio_verde",
@@ -11620,7 +11826,7 @@
         "preocupacao": "agua",
         "confirmada": true
        },
-       "selo": "8ecbe04c4d7adc70a896faccac61ec3aa9e6fdda4e5cc6381b4910af9a2cd8c6",
+       "selo": "5098151a4e5943dde0ca8bcbcc8839be1b8e02cb3fafd72e016b24889d6de08a",
        "pergunta": null,
        "momento": "depois",
        "falas": [
@@ -11638,11 +11844,11 @@
         },
         {
          "de": "agente",
-         "texto": "Pelo calendário das culturas, a terra fica 122 dias sem planta viva. O satélite viu 96 dias seguidos sem planta verde, que é o valor do meio de 36 medidas. Essas medidas vão de 16 dias a 160 dias. Os dois números estão dentro da mesma faixa.\n\nPlanta verde é a folha viva que o satélite enxerga pelo índice NDVI (uma medida do verde). Um ponto sem verde pode, mesmo assim, ter palha por cima. Então o número mostra o tempo sem planta viva, não o tempo de terra nua.\n\nOs pontos foram escolhidos no mapa, perto de Rio Verde. Não se sabe de quem são nem o que foi plantado em cada um. Esse dado vale para a rotação de hoje da região: soja, milho e pousio.\n\nPara ver como a falta de água se deu em cada safra, posso olhar a safra que você quiser."
+         "texto": "Depois da colheita, o satélite de verde (NDVI, que mede o verde das folhas) mostrou o seguinte para a rotação de hoje da região, soja, milho e pousio.\n\nPelo calendário das culturas, a terra fica 122 dias sem planta verde. Pelo satélite, o valor do meio foi de 96 dias seguidos. Os pontos medidos foram de 16 a 160 dias, e a conta usa 36 medidas. O calendário e o satélite dão números diferentes, mas o do calendário cabe dentro da faixa que o satélite viu.\n\nAtenção: \"sem planta verde\" não é o mesmo que terra descoberta. O satélite não vê a palha, que pode cobrir o chão. Esses pontos também não são da sua lavoura. Foram escolhidos no mapa, perto de Rio Verde.\n\nPara ver como foi cada safra, dia a dia, é só me pedir."
         }
        ]
       },
-      "resposta": "Pelo calendário das culturas, a terra fica 122 dias sem planta viva. O satélite viu 96 dias seguidos sem planta verde, que é o valor do meio de 36 medidas. Essas medidas vão de 16 dias a 160 dias. Os dois números estão dentro da mesma faixa.\n\nPlanta verde é a folha viva que o satélite enxerga pelo índice NDVI (uma medida do verde). Um ponto sem verde pode, mesmo assim, ter palha por cima. Então o número mostra o tempo sem planta viva, não o tempo de terra nua.\n\nOs pontos foram escolhidos no mapa, perto de Rio Verde. Não se sabe de quem são nem o que foi plantado em cada um. Esse dado vale para a rotação de hoje da região: soja, milho e pousio.\n\nPara ver como a falta de água se deu em cada safra, posso olhar a safra que você quiser.",
+      "resposta": "Depois da colheita, o satélite de verde (NDVI, que mede o verde das folhas) mostrou o seguinte para a rotação de hoje da região, soja, milho e pousio.\n\nPelo calendário das culturas, a terra fica 122 dias sem planta verde. Pelo satélite, o valor do meio foi de 96 dias seguidos. Os pontos medidos foram de 16 a 160 dias, e a conta usa 36 medidas. O calendário e o satélite dão números diferentes, mas o do calendário cabe dentro da faixa que o satélite viu.\n\nAtenção: \"sem planta verde\" não é o mesmo que terra descoberta. O satélite não vê a palha, que pode cobrir o chão. Esses pontos também não são da sua lavoura. Foram escolhidos no mapa, perto de Rio Verde.\n\nPara ver como foi cada safra, dia a dia, é só me pedir.",
       "momento": "depois",
       "ficha": {
        "cidade_id": "rio_verde",
@@ -11898,7 +12104,7 @@
         "preocupacao": "agua",
         "confirmada": true
        },
-       "selo": "8ecbe04c4d7adc70a896faccac61ec3aa9e6fdda4e5cc6381b4910af9a2cd8c6",
+       "selo": "5098151a4e5943dde0ca8bcbcc8839be1b8e02cb3fafd72e016b24889d6de08a",
        "pergunta": null,
        "momento": "depois",
        "falas": [
@@ -11916,7 +12122,7 @@
         },
         {
          "de": "agente",
-         "texto": "Pelo calendário das culturas, a terra fica 122 dias sem planta viva. O satélite viu 96 dias seguidos sem planta verde, que é o valor do meio de 36 medidas. Essas medidas vão de 16 dias a 160 dias. Os dois números estão dentro da mesma faixa.\n\nPlanta verde é a folha viva que o satélite enxerga pelo índice NDVI (uma medida do verde). Um ponto sem verde pode, mesmo assim, ter palha por cima. Então o número mostra o tempo sem planta viva, não o tempo de terra nua.\n\nOs pontos foram escolhidos no mapa, perto de Rio Verde. Não se sabe de quem são nem o que foi plantado em cada um. Esse dado vale para a rotação de hoje da região: soja, milho e pousio.\n\nPara ver como a falta de água se deu em cada safra, posso olhar a safra que você quiser."
+         "texto": "Depois da colheita, o satélite de verde (NDVI, que mede o verde das folhas) mostrou o seguinte para a rotação de hoje da região, soja, milho e pousio.\n\nPelo calendário das culturas, a terra fica 122 dias sem planta verde. Pelo satélite, o valor do meio foi de 96 dias seguidos. Os pontos medidos foram de 16 a 160 dias, e a conta usa 36 medidas. O calendário e o satélite dão números diferentes, mas o do calendário cabe dentro da faixa que o satélite viu.\n\nAtenção: \"sem planta verde\" não é o mesmo que terra descoberta. O satélite não vê a palha, que pode cobrir o chão. Esses pontos também não são da sua lavoura. Foram escolhidos no mapa, perto de Rio Verde.\n\nPara ver como foi cada safra, dia a dia, é só me pedir."
         },
         {
          "de": "produtor",
@@ -11924,11 +12130,11 @@
         },
         {
          "de": "agente",
-         "texto": "Na safra 2015-16 a soja foi plantada em 15/10/2015 e saiu em 06/02/2016. O milho de segunda safra entrou em 10/02/2016 e saiu em 13/06/2016.\n\nA falta de água começou cedo na soja. Em 18/10/2015 acabou a água fácil de tirar da terra, e foram 6 dias seguidos de sede. No total da soja, faltaram 5,3 mm, com 13 dias de sede.\n\nO milho sofreu mais. Em 04/04/2016 acabou a água fácil de tirar da terra, e a sede durou 60 dias seguidos. Em 08/04/2016 veio o primeiro dia de calor forte na fase crítica, com máxima de 33,2 °C. Em 24/04/2016 a água que a planta consegue alcançar acabou, sobrando 0,1 mm na terra.\n\nNo ano todo da rotação, faltaram 225,9 mm de água, com 73 dias de sede e 19 dias de calor forte. A terra ficou 126 dias sem planta viva. A falta de água do milho foi de 49,6% do que ele pediu. Entre as 10 safras do estudo, essa é a segunda maior. O valor do meio dessas safras é 38,0%.\n\nConverse com o agrônomo sobre isso."
+         "texto": "Na safra 2015-16 (de 01/09/2015 a 31/08/2016), a soja entrou na terra em 15/10/2015 e saiu em 06/02/2016. O milho de 2ª safra entrou em 10/02/2016 e saiu em 13/06/2016.\n\nA água faltou assim: 225,9 mm no total, com 73 dias de sede. A soja perdeu só 5,3 mm. O milho perdeu 220,6 mm, que é 49,6% do que ele pediu, com 60 dias de sede.\n\nA sede do milho começou em 04/04/2016, quando a água fácil de tirar da terra acabou, mas ainda havia água na terra. Em 24/04/2016 a água que a planta alcança acabou, com 0,1 mm sobrando.\n\nTambém houve 19 dias de calor forte na fase crítica do milho, e o primeiro foi em 08/04/2016.\n\nA terra ficou 126 dias sem planta viva nessa safra. Esse número é do calendário, não do satélite.\n\nConverse com o agrônomo sobre o que isso significa para a sua lavoura."
         }
        ]
       },
-      "resposta": "Na safra 2015-16 a soja foi plantada em 15/10/2015 e saiu em 06/02/2016. O milho de segunda safra entrou em 10/02/2016 e saiu em 13/06/2016.\n\nA falta de água começou cedo na soja. Em 18/10/2015 acabou a água fácil de tirar da terra, e foram 6 dias seguidos de sede. No total da soja, faltaram 5,3 mm, com 13 dias de sede.\n\nO milho sofreu mais. Em 04/04/2016 acabou a água fácil de tirar da terra, e a sede durou 60 dias seguidos. Em 08/04/2016 veio o primeiro dia de calor forte na fase crítica, com máxima de 33,2 °C. Em 24/04/2016 a água que a planta consegue alcançar acabou, sobrando 0,1 mm na terra.\n\nNo ano todo da rotação, faltaram 225,9 mm de água, com 73 dias de sede e 19 dias de calor forte. A terra ficou 126 dias sem planta viva. A falta de água do milho foi de 49,6% do que ele pediu. Entre as 10 safras do estudo, essa é a segunda maior. O valor do meio dessas safras é 38,0%.\n\nConverse com o agrônomo sobre isso.",
+      "resposta": "Na safra 2015-16 (de 01/09/2015 a 31/08/2016), a soja entrou na terra em 15/10/2015 e saiu em 06/02/2016. O milho de 2ª safra entrou em 10/02/2016 e saiu em 13/06/2016.\n\nA água faltou assim: 225,9 mm no total, com 73 dias de sede. A soja perdeu só 5,3 mm. O milho perdeu 220,6 mm, que é 49,6% do que ele pediu, com 60 dias de sede.\n\nA sede do milho começou em 04/04/2016, quando a água fácil de tirar da terra acabou, mas ainda havia água na terra. Em 24/04/2016 a água que a planta alcança acabou, com 0,1 mm sobrando.\n\nTambém houve 19 dias de calor forte na fase crítica do milho, e o primeiro foi em 08/04/2016.\n\nA terra ficou 126 dias sem planta viva nessa safra. Esse número é do calendário, não do satélite.\n\nConverse com o agrônomo sobre o que isso significa para a sua lavoura.",
       "momento": "depois",
       "ficha": {
        "cidade_id": "rio_verde",
@@ -12321,7 +12527,7 @@
             "principal": false
            }
           ],
-          "registrado_em": "2026-11-15T03:18:45-03:00",
+          "registrado_em": "2026-11-15T03:34:42-03:00",
           "frase": "Safra 2015-16 em Rio Verde (GO), com soja e milho de 2ª safra: faltaram 225,9 mm de água para as culturas, com 73 dias de sede e 19 dias de calor forte na fase crítica. A terra ficou 126 dias sem planta viva: na comparação das rotações são 125, contados num ano comum, e esta safra tem o dia a mais do ano bissexto. A falta de água do milho de 2ª safra foi de 49,6% do que ele pediu: entre as 10 safras do estudo (as mesmas da comparação das rotações), a 2ª maior (o valor do meio dessas safras é 38,0%).",
           "aviso": "É o registro da conta com o clima guardado da NASA para o ponto da cidade, na rotação informada: não é a medida da lavoura nem a colheita. Converse com o agrônomo."
          }
@@ -12424,7 +12630,7 @@
         "preocupacao": "agua",
         "confirmada": true
        },
-       "selo": "a941180ba9c15d7cd41e402d429fe0a2055c6546a1685b3ff84f9e16ab958eb3",
+       "selo": "606923fc725d5d8cd3306f7b9c0eb031030fba9b780af67f5816fd5703d97953",
        "pergunta": null,
        "momento": "antes",
        "falas": [
@@ -12442,11 +12648,11 @@
         },
         {
          "de": "agente",
-         "texto": "Pela conta, a sua rotação de hoje (soja, milho e pousio) não ficou na frente das outras em água, calor nem terra coberta.\n\nNo pior ano da região (safra 2015-16), na rotação com milho faltaram 225,9 mm de água para as culturas, com 73 dias de sede. Com sorgo no lugar do milho, faltaram 191,3 mm, com 75 dias de sede. No ano normal (safra 2019-20), faltaram 152,8 mm com milho e 126,5 mm com sorgo.\n\nNo calor forte do pior ano, o milho teve 19 dias acima de 33 °C. O sorgo teve 0 dias acima de 35 °C. Nas duas rotações, a terra fica 122 dias sem planta viva antes do plantio da soja.\n\nCom braquiária junto do milho, a falta de água no pior ano ficou entre 229,8 mm e 241,2 mm. Isso acontece porque a quantidade que o capim disputa com o milho não foi medida.\n\nHoje é 15/11/2026. A decisão é sua, e vale conversar com o agrônomo."
+         "texto": "Sua rotação de hoje é soja, milho safrinha e pousio. Pela conta, em Rio Verde faltaram 225,9 mm de água no pior ano (safra 2015-16) e 152,8 mm no ano normal (safra 2019-20). A terra ficou 122 dias seguidos sem planta viva.\n\nVeja as duas trocas:\n\nSoja, sorgo e pousio: faltaram 191,3 mm no pior ano e 126,5 mm no ano normal. Teve 0 dias de calor forte no pior ano. A terra ficou 122 dias seguidos sem planta viva, igual à sua rotação atual. O sorgo entra no lugar do milho, na segunda safra.\n\nSoja, milho com braquiária: faltaram de 229,8 a 241,2 mm no pior ano e de 149,9 a 163,2 mm no ano normal. Teve 19 dias de calor forte no pior ano. A terra ficou 30 dias seguidos sem planta viva. A braquiária, um capim, é plantada junto com o milho e cobre a terra depois da colheita dele. Ela não entra no lugar do milho.\n\nNão foi medido quanto o capim disputa água com o milho, por isso a conta dá uma faixa. A conta também não mede renda nem custo. Converse com o agrônomo antes de decidir."
         }
        ]
       },
-      "resposta": "Pela conta, a sua rotação de hoje (soja, milho e pousio) não ficou na frente das outras em água, calor nem terra coberta.\n\nNo pior ano da região (safra 2015-16), na rotação com milho faltaram 225,9 mm de água para as culturas, com 73 dias de sede. Com sorgo no lugar do milho, faltaram 191,3 mm, com 75 dias de sede. No ano normal (safra 2019-20), faltaram 152,8 mm com milho e 126,5 mm com sorgo.\n\nNo calor forte do pior ano, o milho teve 19 dias acima de 33 °C. O sorgo teve 0 dias acima de 35 °C. Nas duas rotações, a terra fica 122 dias sem planta viva antes do plantio da soja.\n\nCom braquiária junto do milho, a falta de água no pior ano ficou entre 229,8 mm e 241,2 mm. Isso acontece porque a quantidade que o capim disputa com o milho não foi medida.\n\nHoje é 15/11/2026. A decisão é sua, e vale conversar com o agrônomo.",
+      "resposta": "Sua rotação de hoje é soja, milho safrinha e pousio. Pela conta, em Rio Verde faltaram 225,9 mm de água no pior ano (safra 2015-16) e 152,8 mm no ano normal (safra 2019-20). A terra ficou 122 dias seguidos sem planta viva.\n\nVeja as duas trocas:\n\nSoja, sorgo e pousio: faltaram 191,3 mm no pior ano e 126,5 mm no ano normal. Teve 0 dias de calor forte no pior ano. A terra ficou 122 dias seguidos sem planta viva, igual à sua rotação atual. O sorgo entra no lugar do milho, na segunda safra.\n\nSoja, milho com braquiária: faltaram de 229,8 a 241,2 mm no pior ano e de 149,9 a 163,2 mm no ano normal. Teve 19 dias de calor forte no pior ano. A terra ficou 30 dias seguidos sem planta viva. A braquiária, um capim, é plantada junto com o milho e cobre a terra depois da colheita dele. Ela não entra no lugar do milho.\n\nNão foi medido quanto o capim disputa água com o milho, por isso a conta dá uma faixa. A conta também não mede renda nem custo. Converse com o agrônomo antes de decidir.",
       "momento": "antes",
       "ficha": {
        "cidade_id": "rio_verde",
@@ -12875,7 +13081,7 @@
         "preocupacao": "agua",
         "confirmada": true
        },
-       "selo": "a941180ba9c15d7cd41e402d429fe0a2055c6546a1685b3ff84f9e16ab958eb3",
+       "selo": "606923fc725d5d8cd3306f7b9c0eb031030fba9b780af67f5816fd5703d97953",
        "pergunta": null,
        "momento": "antes",
        "falas": [
@@ -12893,7 +13099,7 @@
         },
         {
          "de": "agente",
-         "texto": "Pela conta, a sua rotação de hoje (soja, milho e pousio) não ficou na frente das outras em água, calor nem terra coberta.\n\nNo pior ano da região (safra 2015-16), na rotação com milho faltaram 225,9 mm de água para as culturas, com 73 dias de sede. Com sorgo no lugar do milho, faltaram 191,3 mm, com 75 dias de sede. No ano normal (safra 2019-20), faltaram 152,8 mm com milho e 126,5 mm com sorgo.\n\nNo calor forte do pior ano, o milho teve 19 dias acima de 33 °C. O sorgo teve 0 dias acima de 35 °C. Nas duas rotações, a terra fica 122 dias sem planta viva antes do plantio da soja.\n\nCom braquiária junto do milho, a falta de água no pior ano ficou entre 229,8 mm e 241,2 mm. Isso acontece porque a quantidade que o capim disputa com o milho não foi medida.\n\nHoje é 15/11/2026. A decisão é sua, e vale conversar com o agrônomo."
+         "texto": "Sua rotação de hoje é soja, milho safrinha e pousio. Pela conta, em Rio Verde faltaram 225,9 mm de água no pior ano (safra 2015-16) e 152,8 mm no ano normal (safra 2019-20). A terra ficou 122 dias seguidos sem planta viva.\n\nVeja as duas trocas:\n\nSoja, sorgo e pousio: faltaram 191,3 mm no pior ano e 126,5 mm no ano normal. Teve 0 dias de calor forte no pior ano. A terra ficou 122 dias seguidos sem planta viva, igual à sua rotação atual. O sorgo entra no lugar do milho, na segunda safra.\n\nSoja, milho com braquiária: faltaram de 229,8 a 241,2 mm no pior ano e de 149,9 a 163,2 mm no ano normal. Teve 19 dias de calor forte no pior ano. A terra ficou 30 dias seguidos sem planta viva. A braquiária, um capim, é plantada junto com o milho e cobre a terra depois da colheita dele. Ela não entra no lugar do milho.\n\nNão foi medido quanto o capim disputa água com o milho, por isso a conta dá uma faixa. A conta também não mede renda nem custo. Converse com o agrônomo antes de decidir."
         },
         {
          "de": "produtor",
@@ -12901,11 +13107,11 @@
         },
         {
          "de": "agente",
-         "texto": "Isto é conhecimento geral: não saiu da conta com os dados da NASA.\n\nNa safrinha de milho, as pragas que mais aparecem em Goiás são a lagarta-do-cartucho, que come as folhas novas, a cigarrinha-do-milho, que transmite doenças como os enfezamentos, e a lagarta-da-espiga, que ataca os grãos. Quem monitora a lavoura de perto percebe essas pragas cedo, e o agrônomo indica o controle certo para cada caso.\n\nSobre o adubo, a quantidade depende da análise de solo da sua área, que mostra o que falta na terra. Também pesa a produtividade esperada e o histórico de cada talhão. Por isso, peça a análise de solo e leve o resultado ao agrônomo, que calcula a dose para o seu caso."
+         "texto": "Isto é conhecimento geral: não saiu da conta com os dados da NASA.\n\nEssas perguntas são de conhecimento geral: pragas e adubo não fazem parte do que a conta mede. Respondo sem números.\n\nSobre pragas, no milho safrinha costuma aparecer a lagarta-do-cartucho, que come as folhas novas, e as cigarrinhas, que transmitem doenças. Vale fazer o monitoramento da lavoura com frequência e confirmar o diagnóstico com um técnico local.\n\nSobre adubo, a dose depende da análise do solo, que mostra o que falta de cada nutriente, e da produtividade esperada. Quem define a dose certa é o agrônomo, a partir dessa análise."
         }
        ]
       },
-      "resposta": "Isto é conhecimento geral: não saiu da conta com os dados da NASA.\n\nNa safrinha de milho, as pragas que mais aparecem em Goiás são a lagarta-do-cartucho, que come as folhas novas, a cigarrinha-do-milho, que transmite doenças como os enfezamentos, e a lagarta-da-espiga, que ataca os grãos. Quem monitora a lavoura de perto percebe essas pragas cedo, e o agrônomo indica o controle certo para cada caso.\n\nSobre o adubo, a quantidade depende da análise de solo da sua área, que mostra o que falta na terra. Também pesa a produtividade esperada e o histórico de cada talhão. Por isso, peça a análise de solo e leve o resultado ao agrônomo, que calcula a dose para o seu caso.",
+      "resposta": "Isto é conhecimento geral: não saiu da conta com os dados da NASA.\n\nEssas perguntas são de conhecimento geral: pragas e adubo não fazem parte do que a conta mede. Respondo sem números.\n\nSobre pragas, no milho safrinha costuma aparecer a lagarta-do-cartucho, que come as folhas novas, e as cigarrinhas, que transmitem doenças. Vale fazer o monitoramento da lavoura com frequência e confirmar o diagnóstico com um técnico local.\n\nSobre adubo, a dose depende da análise do solo, que mostra o que falta de cada nutriente, e da produtividade esperada. Quem define a dose certa é o agrônomo, a partir dessa análise.",
       "momento": "antes",
       "ficha": {
        "cidade_id": "rio_verde",

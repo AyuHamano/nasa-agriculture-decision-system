@@ -135,20 +135,30 @@ hoje", logo depois da ficha, e depois a pior safra, dia a dia, com os dias e os 
 com o aviso de conhecimento geral). Cada conversa diz em `texto_de` se o texto é da IA ou de frases prontas. Cada
 texto é conferido de novo contra a conta ao gravar; se sobrar número, nada é gravado. Com a IA, cada conversa é
 tentada até 3 vezes e fica a melhor: sem fala barrada, sem replay que o produtor não pediu, sem duas respostas com o
-mesmo começo, sem "antes de hoje" sem a data ao lado, sem "hoje é tal dia" fora da pergunta do "como está hoje" e sem
-palavra da conta sem explicação. Rodar de novo sempre que o motor mudar.
+mesmo começo, sem "antes de hoje" sem a data ao lado, sem "hoje é tal dia" fora da pergunta do "como está hoje", sem
+palavra da conta sem explicação e sem falar em "valor real" (a conta só dá os valores que calculou). Rodar de novo
+sempre que o motor mudar.
 
-**As que estão guardadas** (`conversas-guardadas/`): gravadas de novo em 2026-11-15, 03h18, depois da fala simples e
-do marco da água no fundo dizendo o que aconteceu, com o Claude Haiku 5.5 e o motor completo. São 12 falas do agente:
-8 com o texto da IA e 4 com frases prontas (a ficha para conferir); nenhuma barrada pela conferência. Foram 3
-gravações seguidas, lidas uma a uma contra a conta: a primeira trouxe letras de outro alfabeto numa resposta (virou
-trava), a segunda dizia "hoje é 15/11/2026" em respostas que não eram a do "como está hoje" (virou regra), e a
-terceira dizia que a rotação de hoje é "a que mais sofre com a falta de água", o que a conta não diz (a rotação com
-capim vai de 229,8 a 241,2 mm, contra 225,9 mm; virou regra). O que ficou guardado: as conversas `antes-plantei-tarde`,
-`replay-2015-16` e `depois-o-que-a-terra-mostrou` da terceira gravação e a `sem-conta-pragas-e-adubo` da segunda (a
-resposta certa; nela ficou a frase "Hoje é 15/11/2026."). O teste `AsConversasQueEstaoNoRepositorio` confere tudo de
-novo a cada rodada. O que a leitura achou e não é erro de número: no "como está hoje", a IA escreveu que "o valor
-real deve estar entre esses dois" (a conta só dá os dois valores, um com cada chuva).
+**As que estão guardadas** (`conversas-guardadas/`): gravadas de novo em 2026-11-15, 03h33 a 03h36, com o Claude
+Haiku 5.5 e o motor completo, depois de três regras novas no pedido à IA (o estado da lavoura é dito na data do último
+dia com dado, nunca na data da consulta; a conta dá os dois valores da água, um com cada chuva, e ninguém diz onde
+está "o valor real"; resposta de conhecimento geral não leva data) e da recusa de "valor real" na gravação. São 12
+falas do agente: 8 com o texto da IA e 4 com frases prontas (a ficha para conferir); nenhuma barrada pela conferência.
+Foram 3 gravações seguidas, lidas uma a uma contra a conta. Em nenhuma das três apareceu "hoje é tal dia" fora do
+"como está hoje", "valor real" ou o estado da lavoura dito na data da consulta: nas três, o "como está hoje" diz que
+em 11/11/2026 a soja estava na terra e dá os dois valores da água (63,0 mm e 34,8 mm), cada um com a sua chuva. O que
+a leitura achou de novo: a primeira e a terceira escreveram "36 pontos medidos" onde a conta diz 36 medidas (os pontos
+são 6); a segunda escreveu que a braquiária "cobre a terra por menos tempo, 30 dias" (são 30 dias sem planta viva: o
+sentido trocado, que a trava dos dias de terra coberta não pegou nessa forma) e "limite de 33 °C" onde a conta
+escreve 33,0 °C; a terceira escreveu que a sede do milho veio "após 60 dias de sede" (os 60 dias começaram naquele
+dia). O que ficou guardado: as conversas `antes-plantei-tarde`, `replay-2015-16` e `sem-conta-pragas-e-adubo` da
+primeira gravação e a `depois-o-que-a-terra-mostrou` da segunda, trocada inteira pelo `id` nos dois arquivos, sem
+mexer em texto nenhum. O teste `AsConversasQueEstaoNoRepositorio` confere tudo de novo a cada rodada.
+
+As ressalvas do que ficou (nada é número errado, e nada foi editado à mão): no "como está hoje" a IA escreveu o atraso
+por extenso ("quatro dias antes"; a conta diz 4); na `depois-o-que-a-terra-mostrou` ela chamou de "sem planta verde"
+os 122 dias do calendário (a conta diz "sem planta"); e na resposta de pragas e adubo ela repetiu, com outras palavras,
+o aviso de conhecimento geral que o programa já escreve na frente.
 
 ## O uso de verdade (2026-11-15)
 
@@ -166,6 +176,8 @@ real deve estar entre esses dois" (a conta só dá os dois valores, um com cada 
 - **O gasto:** 0,27 dólar da chave do hackathon, somando todos os ensaios e as gravações (o teto era 5). Uma conversa de 4 falas
   custa perto de meio centavo de dólar.
   As 3 gravações de 2026-11-15, 03h14 a 03h18, custaram mais 0,05 dólar (61 pedidos).
+  As 3 gravações de 2026-11-15, 03h33 a 03h36, custaram mais 0,05 dólar (60 pedidos; o uso da chave, medido no
+  OpenRouter, foi de 0,3207 para 0,3735 dólar, de um limite de 5).
 
 ## O uso de IA, declarado
 
