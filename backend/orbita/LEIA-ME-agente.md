@@ -1,0 +1,145 @@
+<!-- Gerado com IA (Claude) -->
+# Órbita Rural · o agente (a IA que conversa com o produtor)
+
+**O que é.** O agente é a IA que conversa com o produtor rural. Ele colhe os dados da lavoura numa ficha fechada,
+consulta o motor (o programa que faz a conta com os dados da NASA) por 3 ferramentas e explica o resultado em
+português simples. **A IA não cria número:** cada número do texto dela é conferido contra a conta antes de aparecer.
+E ela não escolhe a rotação pelo produtor: mostra a comparação e manda conferir com o agrônomo.
+
+O agente liga os três momentos do ano da lavoura: **antes** de plantar ("o que eu planto agora?"), **durante** a safra
+("como está a minha lavoura?") e **depois** da colheita ("o que a terra mostrou?").
+
+## O que a IA faz e o que o programa garante
+
+A IA (um modelo de linguagem) faz quatro coisas: entende a fala do produtor, propõe os valores da ficha, escolhe qual
+ferramenta consultar e escreve a explicação. O resto é garantido pelo programa, e não pelo pedido feito à IA:
+
+| a garantia | como o programa garante | o teste |
+|---|---|---|
+| Valor fora da lista não entra na ficha | `ficha.anotar` só aceita valor das listas do motor (as cidades, as rotações, as terras, as preocupações) | `tests/test_ficha.py` |
+| A conta não roda antes de o produtor confirmar | quem lê o "sim" é o programa (`agente._disse_sim`), nunca a IA; ferramenta da conta pedida antes disso devolve erro e não roda | `tests/test_agente.py` |
+| Toda resposta, com a ficha confirmada, traz a comparação de 3 rotações ou mais, contando a de hoje | o programa roda o ensaio em toda fala e recusa comparação com menos de 3, sem a de hoje ou sem as 4 frases (a evidência, o benefício, o risco, o que falta saber) | `tests/test_ferramentas.py`, `tests/test_agente.py` |
+| Número inventado pela IA não chega à tela | o texto é conferido por `conferencia.conferir_texto` contra a ficha, a comparação e o que as ferramentas devolveram nesta fala; sem consulta nenhuma, o texto não pode ter número; sobrou número, a IA tenta de novo uma vez; sobrou outra vez, saem as frases prontas do motor | `tests/test_agente.py` |
+| O aviso do agrônomo | todo passo sai com `aviso: "Converse com o agrônomo antes de decidir."` | `tests/test_agente.py` |
+| A marca do apoio | `apoio` sai das ferramentas que a IA consultou de fato: `conta`, `dados_do_lugar` ou `conhecimento_geral` (aí o programa põe o aviso na frente do texto) | `tests/test_agente.py` |
+| A chave da IA não vaza | ela só existe na variável de ambiente; não entra em arquivo, erro, registro nem conversa guardada | `tests/test_modelo.py`, `tests/test_exportar_conversas.py` |
+
+Nenhum dado pessoal é pedido (nome, telefone, CPF, endereço), e a API continua sem guardar nada.
+
+## Os arquivos (todos em `backend/orbita/`)
+
+| arquivo | o que é |
+|---|---|
+| `ficha.py` | a ficha fechada: o lugar, o que planta hoje, o tipo de terra, a data do plantio da soja (opcional) e o que mais preocupa |
+| `modelo.py` | o encaixe da IA: o modelo de mentira (para os testes) e o de verdade (OpenRouter), no mesmo formato |
+| `ferramentas.py` | as 3 ferramentas: `clima_do_lugar`, `ensaio_da_rotacao` e `verde_do_satelite`; cada uma chama uma função do motor |
+| `agente.py` | o passo da conversa: `agente.passo(estado, texto, modelo)`; é aqui que moram as garantias |
+| `api.py` | a rota nova `POST /agente` (as rotas de antes continuam iguais) |
+| `exportar_conversas.py` | grava as conversas de exemplo que a tela lê quando a API não está ligada |
+| `conversas-guardadas/` | as conversas de exemplo já gravadas (`conversas.js` e `conversas.json`) |
+| `.env.example` | só os nomes das variáveis de ambiente (nunca a chave) |
+| `tests/duble_do_motor.py` | um motor de mentira, no formato combinado, para os testes do agente |
+
+Só a biblioteca padrão do Python 3: nenhum pacote de fora.
+
+## Como rodar sem chave (sem IA e sem internet)
+
+De dentro de `backend/`:
+
+    python3 -m unittest                                         # todos os testes; os do agente usam o modelo de mentira
+    python3 -m orbita.exportar_conversas /tmp/conversas --sem-ia    # grava as conversas com as frases prontas do motor
+
+Sem chave, a API liga do mesmo jeito (`python3 -m orbita.api`); só a rota `/agente` responde 503, e a tela usa as
+conversas guardadas.
+
+## Como ligar com a IA de verdade
+
+A chave é do OpenRouter (https://openrouter.ai). Ela vai **só no ambiente do terminal**, nunca em arquivo:
+
+    export OPENROUTER_API_KEY=...                  # a chave; o arquivo .env.example traz só o nome
+    export ORBITA_MODELO=anthropic/claude-haiku-5.5    # opcional; este é o padrão
+    python3 -m orbita.api                          # liga em http://127.0.0.1:8000 (só esta máquina)
+    python3 -m orbita.agente                       # ou: a conversa no próprio terminal
+
+A API não tem senha: fora do `127.0.0.1` ela fica aberta a quem alcançar a máquina (e gastaria a chave de quem ligou).
+Para pôr na internet, precisa ficar atrás de uma proteção; isso não está feito.
+
+## A rota `POST /agente`
+
+O molde é o do `/conversa`: a API não guarda nada; quem chama guarda o `estado` e devolve na fala seguinte.
+
+    curl -s -X POST http://127.0.0.1:8000/agente -H 'Content-Type: application/json' -d '{"estado": null, "texto": "oi"}'
+
+O pedido: `{"estado": null no começo (ou o que a chamada anterior devolveu), "texto": "a fala do produtor"}`. O corpo
+tem o limite de sempre (16.384 bytes); o estado nunca passa de uns 9.500 bytes.
+
+A resposta:
+
+| campo | o que traz |
+|---|---|
+| `estado` | o que guardar e devolver na fala seguinte: a ficha, as últimas 6 falas (cortadas), a pergunta feita antes da ficha e o momento |
+| `resposta` | o texto do agente, já conferido |
+| `momento` | `antes`, `durante` ou `depois` |
+| `ficha` | `cidade_id`, `rotacao_atual` (a lista das culturas), `terra`, `plantio_da_soja`, `preocupacao`, `confirmada` e `falta` (os campos que ainda não foram ditos) |
+| `comparacao` | a lista de 3 rotações ou mais, como o motor mandou (`comparacao_das_rotacoes`); `null` enquanto a ficha não foi confirmada |
+| `apoio` | `conta`, `dados_do_lugar` ou `conhecimento_geral`; `null` enquanto a ficha não foi confirmada |
+| `conferencia` | `{"passou": ..., "sobras": [...], "tentativas": ...}`: o resultado da conferência do texto da IA; `passou: false` quer dizer que o texto dela foi barrado e a `resposta` são as frases prontas; `sobras` lista os números barrados |
+| `aviso` | "Converse com o agrônomo antes de decidir." |
+| `texto_de` | `ia` (o texto é do modelo de linguagem, conferido) ou `frases_prontas` (frases do programa e do motor, sem IA) |
+| `consultas` | o que a IA leu das ferramentas nesta fala: `[{"ferramenta", "argumentos", "resultado"}]`; serve para qualquer um conferir os números de novo (`agente.conferir_saida`) |
+| `replay` | os dias e os marcos de uma safra, quando o replay foi pedido (para a tela desenhar); senão `null` |
+
+Os erros seguem o `API.md` (`{"erro": "..."}`, em português). Os da rota nova: **503** quando não há chave no
+servidor, quando a IA não responde ou quando o motor não tem a conta (quem chama mantém o estado e usa as conversas
+guardadas); **400** para corpo errado (falta o texto, estado que não é objeto, campo a mais). O `GET /saude` diz se a
+IA está ligada e com que modelo (`ia_do_agente`), sem mostrar a chave.
+
+**Como a conversa anda.** "oi" devolve a saudação pronta (sem gastar a IA). O produtor conta da lavoura; a IA anota
+na ficha. Com a ficha completa, o programa mostra a ficha e pede o "sim". Depois do "sim", a conta roda e a IA
+responde à pergunta que ele fez (se não fez nenhuma: "vale trocar a minha rotação de hoje por outra?"). Mudou a
+ficha depois de confirmada, ela é mostrada de novo e a conta espera outro "sim". "de novo" recomeça.
+
+## As 3 ferramentas
+
+| a ferramenta | o que a IA pode pedir | a função do motor |
+|---|---|---|
+| `clima_do_lugar` | o que os satélites registraram no lugar; com `hoje: true`, como está a água da lavoura hoje | `motor.clima_do_lugar`, `motor.como_esta_hoje` |
+| `ensaio_da_rotacao` | a comparação das rotações no ano normal e no pior ano; com `safra`, o replay daquela safra, dia a dia | `motor.responder`, `motor.replay_da_safra` |
+| `verde_do_satelite` | os dias sem planta viva pelo calendário e pelo satélite (NDVI); com `safra`, o registro daquela safra | `motor.verde_do_satelite`, `motor.registro_da_safra` |
+
+`safra` aceita `"2015-16"`, `"pior_ano"` ou `"ano_normal"`. A ficha é a quarta coisa que a IA pode chamar
+(`anotar_na_ficha`), e não é da conta. Se o motor ainda não tiver o "como está hoje" ou o registro, a ferramenta
+devolve um aviso no lugar, e a IA diz que isso é o próximo passo.
+
+## As conversas guardadas
+
+    python3 -m orbita.exportar_conversas <pasta>            # com a chave no ambiente: a IA de verdade escreve
+    python3 -m orbita.exportar_conversas <pasta> --sem-ia   # sem chave: as frases prontas
+
+Grava `conversas.js` (`window.ORBITA_CONVERSAS = {...};`, o que a tela lê) e `conversas.json` (o mesmo objeto). São 4
+conversas: `antes-plantei-tarde` (plantei a soja tarde: milho ou sorgo?), `replay-2015-16` (a pior safra, dia a dia,
+com os dias e os marcos em `replay`), `depois-o-que-a-terra-mostrou` e `sem-conta-pragas-e-adubo` (sai com o aviso de
+conhecimento geral). Cada conversa diz em `texto_de` se o texto é da IA ou de frases prontas. Cada texto é conferido
+de novo contra a conta ao gravar; se sobrar número, nada é gravado. Rodar de novo sempre que o motor mudar.
+
+## O uso de IA, declarado
+
+- **No produto:** o texto do agente é escrito por um modelo de linguagem, chamado pelo OpenRouter. O padrão é o Claude
+  Haiku 5.5, da Anthropic (`anthropic/claude-haiku-5.5`); a reserva testada é o DeepSeek V4.1 Flash
+  (`deepseek/deepseek-v4.1-flash`). Os números não são da IA: saem do motor, e o texto é conferido contra eles.
+- **No código:** estes arquivos foram gerados com IA (Claude, da Anthropic), e a parte da conferência dos números foi
+  revisada por outra IA (GPT).
+- **O que é marcado:** cada resposta diz `texto_de` (IA ou frases prontas) e `apoio` (a conta, os dados do lugar ou
+  conhecimento geral). O que a conta não mede (nutrientes, pragas, mercado) sai como conhecimento geral, com o aviso.
+
+## Os limites
+
+- A conferência olha se cada número do texto existe na conta; ela não confere a que coisa o número se refere, nem o
+  sinal, nem número por extenso (o começo do `conferencia.py` lista tudo). Uma frase que compara errado dois números
+  certos ("mais perto de") pode passar: por isso o pedido à IA proíbe conta de cabeça, e a comparação lado a lado
+  sai sempre do motor, não da IA.
+- O texto de conhecimento geral (pragas, adubo, mercado) não é conferido por conta nenhuma: só não pode ter número, e
+  sai marcado.
+- A IA entende português livre, mas a ficha só tem as cidades e as rotações que o motor tem.
+- A rota precisa de internet e de uma chave paga; sem elas, valem as conversas guardadas.
+- Não há WhatsApp ligado, nem senha na API, nem limite de pedidos.

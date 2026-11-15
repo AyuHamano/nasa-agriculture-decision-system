@@ -3,6 +3,7 @@
 import datetime
 import json
 import os
+import re
 import tempfile
 import unittest
 from pathlib import Path
@@ -165,6 +166,52 @@ class AsConversasGuardadas(unittest.TestCase):
         with self.assertRaises(ferramentas.ContaIndisponivel):
             exportar_conversas.exportar(self.pasta, None, HOJE)
         self.assertFalse(self.pasta.exists())
+
+
+GUARDADAS = Path(exportar_conversas.__file__).parent / "conversas-guardadas"
+
+
+@unittest.skipUnless((GUARDADAS / "conversas.json").exists(), "as conversas de exemplo ainda não foram gravadas")
+class AsConversasQueEstaoNoRepositorio(unittest.TestCase):
+    """As conversas de exemplo guardadas no repositório (o que os jurados veem), conferidas uma a uma."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.objeto = json.loads((GUARDADAS / "conversas.json").read_text(encoding="utf-8"))
+        cls.dia = datetime.date.fromisoformat(cls.objeto["gerado_em"][:10])
+
+    def test_ha_uma_de_cada_momento_e_o_replay_com_os_dias(self):
+        conversas = self.objeto["conversas"]
+        self.assertEqual({c["momento"] for c in conversas}, {"antes", "durante", "depois"})
+        self.assertIn("replay-2015-16", [c["id"] for c in conversas])
+        replay = next(c for c in conversas if c["id"] == "replay-2015-16")["replay"]
+        self.assertGreater(len(replay["dias"]), 100)
+        self.assertGreater(len(replay["marcos"]), 2)
+        self.assertIn("conhecimento_geral", [p["saida"]["apoio"] for c in conversas for p in c["passos"] if p["de"] == "agente"])
+
+    def test_cada_texto_esta_na_conta_e_cada_resposta_tem_3_rotacoes(self):
+        for conversa in self.objeto["conversas"]:
+            self.assertIn(conversa["texto_de"], ("ia", "frases_prontas"))
+            for passo in conversa["passos"]:
+                if passo["de"] != "agente":
+                    continue
+                saida = passo["saida"]
+                self.assertEqual(agente.conferir_saida(saida, self.dia), [], (conversa["id"], saida["resposta"]))
+                self.assertEqual(saida["aviso"], agente.AVISO)
+                if saida["ficha"]["confirmada"]:
+                    self.assertGreaterEqual(len(saida["comparacao"]), 3)
+                    self.assertEqual([r["de_hoje"] for r in saida["comparacao"]].count(True), 1)
+                    for rotacao in saida["comparacao"]:
+                        for frase in ("evidencia", "beneficio", "risco", "falta_saber"):
+                            self.assertTrue(rotacao[frase].strip())
+
+    def test_o_arquivo_da_tela_e_o_mesmo_e_nao_ha_chave_em_nenhum(self):
+        js = (GUARDADAS / "conversas.js").read_text(encoding="utf-8")
+        inicio = js.index("window.ORBITA_CONVERSAS = ") + len("window.ORBITA_CONVERSAS = ")
+        self.assertEqual(json.loads(js[inicio:].rstrip().rstrip(";")), self.objeto)
+        for arquivo in GUARDADAS.iterdir():
+            texto = arquivo.read_text(encoding="utf-8")
+            self.assertIsNone(re.search(r"sk-or-[A-Za-z0-9_-]{16,}|Bearer\s+\S{16,}", texto), arquivo.name)
 
 
 if __name__ == "__main__":
