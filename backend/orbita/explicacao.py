@@ -140,6 +140,116 @@ def _ndvi(r):
     return ["O NDVI (O VERDE VISTO PELO SATÉLITE): PROVA SÓ DA ROTAÇÃO DE HOJE"] + list(ndvi.get("frases", []))
 
 
+def _mm(valor):
+    """Um número ou uma faixa {"de", "ate"}, em português: "183,9" ou "de 318,0 a 336,3"."""
+    if isinstance(valor, dict):
+        return n(valor["de"]) if valor["de"] == valor["ate"] else f"de {n(valor['de'])} a {n(valor['ate'])}"
+    return n(valor)
+
+
+def _dias(valor):
+    """Dias, um número ou uma faixa: "73" ou "76 a 77"."""
+    if isinstance(valor, dict):
+        return n(valor["de"]) if valor["de"] == valor["ate"] else f"{n(valor['de'])} a {n(valor['ate'])}"
+    return n(valor)
+
+
+def _grau(valor):
+    """A temperatura do limite: "40" se for número redondo, "33,5" se não for."""
+    return str(int(valor)) if float(valor) == int(valor) else n(valor)
+
+
+def _e(partes):
+    """Junta com vírgulas e "e": "a, b e c"."""
+    partes = list(partes)
+    return partes[0] if len(partes) == 1 else ", ".join(partes[:-1]) + " e " + partes[-1]
+
+
+NOMES_DAS_CULTURAS = {"soja": "soja", "milho": "milho", "sorgo": "sorgo"}
+RISCOS_PROPRIOS = {
+    "soja_milho_braquiaria": "A braquiária bebe água junto com o milho e depois dele: a terra pode chegar mais seca "
+                             "ao plantio da soja.",
+}
+FALTA_SABER = {
+    "soja_milho_pousio": "A conta não mede renda, preço, custo nem produtividade, e a palha entra só pelo lado da "
+                         "evaporação. O quanto de terra a palha do milho cobre é hipótese.",
+    "soja_milho_braquiaria": "Quanto o capim disputa água com o milho não foi medido: por isso os números desta "
+                             "rotação saem em faixa. O satélite não prova esta rotação, e a conta não mede renda "
+                             "nem o custo da semente do capim.",
+    "soja_sorgo_pousio": "As fases e o ciclo do sorgo vêm da tabela geral da FAO, que não tem linha de 2ª safra em "
+                         "Goiás, e a raiz do sorgo vale igual à do milho. A conta não mede renda nem o preço do "
+                         "sorgo contra o do milho, e o satélite não prova esta rotação.",
+}
+PERNAS = (("agua", "Na água do pior ano", "mm de falta", "mm"),
+          ("calor", "No calor do pior ano", "dias de calor forte", "dias"),
+          ("terra_coberta", "Na terra coberta", "dias por ano sem planta viva", "dias"))
+
+
+def _valor_da_perna(item, perna):
+    return {"agua": item["agua"]["falta_no_pior_ano_mm"], "calor": item["calor"]["dias_de_calor_forte_no_pior_ano"],
+            "terra_coberta": item["terra_coberta"]["dias_sem_planta_viva"]}[perna]
+
+
+def _frase_do_calor(item):
+    """Os dias de calor forte da rotação no pior ano, cultura por cultura, cada uma com o seu limite."""
+    partes = [f"{NOMES_DAS_CULTURAS[c]}, {d['dias']} dias acima de {_grau(d['limite_c'])} °C"
+              for c, d in item["calor"]["por_cultura"].items()]
+    if not partes:
+        return "Sem temperatura guardada para contar o calor."
+    return (f"Na fase crítica das culturas, {item['calor']['dias_de_calor_forte_no_pior_ano']} dias de calor forte "
+            f"no pior ano ({'; '.join(partes)}).")
+
+
+def frases_da_rotacao(item, itens, r):
+    """As quatro frases prontas de uma rotação da comparação: evidência, benefício, risco e o que falta saber.
+
+    Só entram números da conta (os do próprio item e os das outras rotações, para comparar). O benefício e o risco
+    saem da posição da rotação contra as outras em cada perna (água, calor e terra coberta), não de opinião.
+    """
+    pior, normal = r["comparacao"]["pior_ano"], r["comparacao"]["ano_normal"]
+    agua, terra = item["agua"], item["terra_coberta"]
+    evidencia = (f"Em {r['local']['nome']}, no pior ano (safra {pior}) faltaram {_mm(agua['falta_no_pior_ano_mm'])} "
+                 f"mm de água para as culturas, com {_dias(agua['dias_de_sede_no_pior_ano'])} dias de sede; no ano "
+                 f"normal (safra {normal}), {_mm(agua['falta_no_ano_normal_mm'])} mm. {_frase_do_calor(item)} Pelo "
+                 f"calendário, a terra fica {terra['dias_sem_planta_viva']} dias por ano sem planta viva.")
+    if terra["pelo_satelite"] is not None:
+        evidencia += (f" O satélite viu {n(terra['pelo_satelite'])} dias seguidos sem planta verde (a mediana dos "
+                      "pontos medidos).")
+    outras = {o["id"]: o for o in itens if o["id"] != item["id"]}
+    frente, atras, depende = [], [], []
+    for perna, rotulo, unidade, curta in PERNAS:
+        ganhou = [o for i, o in outras.items() if item["contra_as_outras"][i][perna] == "melhor"]
+        perdeu = [o for i, o in outras.items() if item["contra_as_outras"][i][perna] == "pior"]
+        aberto = [o for i, o in outras.items() if item["contra_as_outras"][i][perna] == "depende"]
+        meu = _mm(_valor_da_perna(item, perna))
+        if ganhou:
+            frente.append(f"{rotulo}, ficou na frente de " + _e(
+                f"{o['apelido']} ({_mm(_valor_da_perna(o, perna))} {curta})" for o in ganhou) + f": {meu} {unidade}.")
+        if perdeu:
+            atras.append(f"{rotulo}, ficou atrás de " + _e(
+                f"{o['apelido']} ({_mm(_valor_da_perna(o, perna))} {curta})" for o in perdeu) + f": {meu} {unidade}.")
+        if aberto:
+            depende.append(f"{rotulo}, a comparação com " + _e(o["apelido"] for o in aberto)
+                           + " muda dentro da faixa da hipótese.")
+    beneficio = " ".join(frente) or ("Na conta, esta rotação não ficou na frente das outras em água, calor nem "
+                                     "terra coberta.")
+    risco = " ".join(atras + ([RISCOS_PROPRIOS[item["id"]]] if item["id"] in RISCOS_PROPRIOS else [])) or (
+        "Na conta, esta rotação não ficou atrás das outras em água, calor nem terra coberta. O risco que a conta "
+        "não vê (praga, preço, data de plantio) continua valendo.")
+    falta = " ".join(depende + [FALTA_SABER.get(item["id"], "A conta não mede renda, preço nem produtividade.")])
+    return {"evidencia": evidencia, "beneficio": beneficio, "risco": risco, "falta_saber": falta}
+
+
+def texto_da_comparacao(r):
+    """As linhas da comparação das rotações do cardápio (três ou mais, contando a de hoje), em frases prontas."""
+    linhas = ["AS ROTAÇÕES LADO A LADO (a de hoje e as outras do cardápio; frases só com números da conta)"]
+    for item in r.get("comparacao_das_rotacoes", []):
+        linhas.append(f"- {item['nome']}{' (a rotação de hoje)' if item['de_hoje'] else ''}")
+        linhas += [f"   A evidência: {item['evidencia']}", f"   O benefício: {item['beneficio']}",
+                   f"   O risco: {item['risco']}", f"   O que falta saber: {item['falta_saber']}"]
+    return linhas
+
+
 def _linha_do_destaque(r):
     """A linha do destaque: com as notas, a maior nota entre o que foi medido; sem elas, o que mais preocupa."""
     destaque = r["destaque"]
@@ -174,6 +284,8 @@ def texto(r):
         linhas = _prioridade(p, r)
         t.append(f"{i}. {linhas[0]}")
         t.extend(linhas[1:])
+    if r.get("comparacao_das_rotacoes"):
+        t += [""] + texto_da_comparacao(r)
     chuva, temperatura = r["clima"]["chuva"], r["clima"]["temperatura"]
     t += ["",
           "A PROVA (a chuva e a temperatura da NASA, e a conta de água do FAO-56)",
@@ -189,6 +301,9 @@ def texto(r):
                  f"{regra['pela_chuva_seria']['pior_ano']} e o normal, a safra {regra['pela_chuva_seria']['ano_normal']}.")
     else:
         t.append(f"A mediana da chuva das {len(regra['chuva_por_safra_mm'])} safras é {n(regra['mediana_mm'])} mm.")
+    if regra.get("empate_do_pior_ano"):
+        t.append(f"As safras {' e '.join(regra['empate_do_pior_ano'])} empatam no pior rendimento; vale a mais "
+                 "antiga.")
     if regra["empate_do_ano_normal"]:
         t.append(f"As safras {' e '.join(regra['empate_do_ano_normal'])} ficam à mesma distância da mediana; "
                  "pelo desempate, vale a mais antiga.")

@@ -1,0 +1,45 @@
+{
+  "cidade_id": "silvania",
+  "nome": "Silvânia (GO)",
+  "latitude": -16.66,
+  "longitude": -48.61,
+  "nasa_power": {
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR,T2M_MAX,T2M_MIN&community=AG&longitude=-48.61&latitude=-16.66&start=20140701&end=20261113&format=JSON&time-standard=LST",
+    "baixado_em": "2026-11-15T00:48:01-03:00",
+    "dias": 4519,
+    "ultimo_dia_com_dado": "20261111",
+    "ponto_devolvido": [
+      -48.61,
+      -16.66,
+      970.61
+    ],
+    "fontes": [
+      "MERRA2",
+      "GEOSIT",
+      "POWER"
+    ]
+  },
+  "imerg": {
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-48.61&latitude=-16.66&start=20140701&end=20261031&format=JSON&time-standard=UTC",
+    "baixado_em": "2026-11-15T00:48:03-03:00",
+    "dias": 4506,
+    "dias_sem_dado": 47,
+    "ultimo_dia_com_dado": "2026-09-14"
+  },
+  "ibge": {
+    "codigo": "5220603",
+    "anos_com_rendimento_do_milho_de_2a_safra": [
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ]
+  }
+}

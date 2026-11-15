@@ -12,8 +12,16 @@
    "https://www.fao.org/4/X0490E/x0490e0h.htm",
    "https://www.gov.br/agricultura/pt-br/assuntos/riscos-seguro/programa-nacional-de-zoneamento-agricola-de-risco-climatico/portarias/2025-2026/goias-go/PORTN368SOJAGO.ret2.pdf",
    "https://www.gov.br/agricultura/pt-br/assuntos/riscos-seguro/programa-nacional-de-zoneamento-agricola-de-risco-climatico/portarias/2022-2023/goias-go/port-no-345-cons-milho-braquiaria-2a-safra-go-ret.pdf",
-   "https://www.dgpf.de/pfg/2014/pfg2014_5_klisch.pdf"
-  ]
+   "https://www.dgpf.de/pfg/2014/pfg2014_5_klisch.pdf",
+   "https://www.infoteca.cnptia.embrapa.br/infoteca/bitstream/doc/1054097/1/doc198.pdf",
+   "https://www.infoteca.cnptia.embrapa.br/infoteca/bitstream/doc/748779/1/Sorgo-Ecofisiologia.pdf",
+   "https://www.infoteca.cnptia.embrapa.br/infoteca/bitstream/doc/748783/1/Sorgo-Zoneamento.pdf",
+   "http://web.archive.org/web/20260604124749/https://www.fao.org/land-water/databases-and-software/crop-information/sorghum/en/",
+   "http://web.archive.org/web/20260309095117/https://www.fao.org/land-water/databases-and-software/crop-information/maize/en",
+   "https://www.alice.cnptia.embrapa.br/alice/bitstream/doc/491176/4/Climasolo.pdf",
+   "https://www.infoteca.cnptia.embrapa.br/infoteca/bitstream/doc/468943/1/SistemasdeProducao9.pdf"
+  ],
+  "acrescimo_de_2026_11_15": "O sorgo de 2ª safra (culturas.sorgo_2a_safra) e os limites de calor (calor), conferidos na página de cada fonte em 2026-11-15, por volta de 00h40 (horário de Brasília), com IA (Claude). As páginas de cultura da FAO (milho e sorgo) foram lidas na cópia do Internet Archive: a página viva deu erro."
  },
  "culturas": {
   "soja": {
@@ -219,6 +227,75 @@
     "etiqueta": "publicado",
     "nota": "Vale para solo nu e seco (a seca de Rio Verde). Cap. 6, Tabela 12, nota 18: \"Kc end » 0.20 for bare, dry soil or dead ground cover\". Cap. 11: \"Kc for bare soil can be calculated as Kc = Kc ini\" e, com chuva frequente, sobe: \"Kc ini can vary between 0.1 and 1.15\" (Figura 29, que é imagem; não li número nela). Usar 0,20 fixo subestima a evaporação nos dias de chuva: é limite a declarar."
    }
+  },
+  "sorgo_2a_safra": {
+   "kc_ini": {
+    "valor": 0.3,
+    "fonte": "https://www.fao.org/4/X0490E/x0490e0b.htm",
+    "trecho": "FAO-56, Tabela 12: 'i. Cereals | 0.3 | 1.15 | 0.4'; a linha 'Sorghum - grain' deixa o Kc ini em branco e vale o do grupo.",
+    "etiqueta": "publicado"
+   },
+   "kc_med": {
+    "valor": 1.05,
+    "fonte": "https://www.fao.org/4/X0490E/x0490e0b.htm",
+    "trecho": "FAO-56, Tabela 12: 'Sorghum - grain | | 1.00-1.10 | 0.55 | 1-2'. A fonte dá a faixa de 1,00 a 1,10; 1,05, o meio da faixa, é escolha desta versão.",
+    "etiqueta": "hipótese"
+   },
+   "kc_fim": {
+    "valor": 0.55,
+    "fonte": "https://www.fao.org/4/X0490E/x0490e0b.htm",
+    "trecho": "FAO-56, Tabela 12: 'Sorghum - grain | | 1.00-1.10 | 0.55 | 1-2'.",
+    "etiqueta": "publicado"
+   },
+   "fase_inicial_dias": {
+    "valor": 20,
+    "fonte": "https://www.fao.org/4/X0490E/x0490e0b.htm",
+    "trecho": "FAO-56, Tabela 11: 'Sorghum | 20 | 35 | 40 | 30 | 130 | May/June | USA, Pakis., Med.' (a outra linha: 20/35/45/30 = 140, região árida). A tabela não tem linha de trópico nem de 2ª safra: usar esta em Goiás é escolha desta versão. Na conta vale a soma das 4 fases, 125 dias (a coluna do total da tabela diz 130), o mesmo ciclo do milho de 2ª safra. Fica no ciclo médio da FAO (110 a 140 dias); a Embrapa descreve cultivar de cerca de 100 dias, e o ZARC de Goiás separa as de menos de 110 e as de mais de 120 dias.",
+    "etiqueta": "publicado"
+   },
+   "fase_crescimento_dias": {
+    "valor": 35,
+    "fonte": "https://www.fao.org/4/X0490E/x0490e0b.htm",
+    "trecho": "FAO-56, Tabela 11: 'Sorghum | 20 | 35 | 40 | 30 | 130 | May/June | USA, Pakis., Med.' (a outra linha: 20/35/45/30 = 140, região árida). A tabela não tem linha de trópico nem de 2ª safra: usar esta em Goiás é escolha desta versão. Na conta vale a soma das 4 fases, 125 dias (a coluna do total da tabela diz 130), o mesmo ciclo do milho de 2ª safra. Fica no ciclo médio da FAO (110 a 140 dias); a Embrapa descreve cultivar de cerca de 100 dias, e o ZARC de Goiás separa as de menos de 110 e as de mais de 120 dias.",
+    "etiqueta": "publicado"
+   },
+   "fase_media_dias": {
+    "valor": 40,
+    "fonte": "https://www.fao.org/4/X0490E/x0490e0b.htm",
+    "trecho": "FAO-56, Tabela 11: 'Sorghum | 20 | 35 | 40 | 30 | 130 | May/June | USA, Pakis., Med.' (a outra linha: 20/35/45/30 = 140, região árida). A tabela não tem linha de trópico nem de 2ª safra: usar esta em Goiás é escolha desta versão. Na conta vale a soma das 4 fases, 125 dias (a coluna do total da tabela diz 130), o mesmo ciclo do milho de 2ª safra. Fica no ciclo médio da FAO (110 a 140 dias); a Embrapa descreve cultivar de cerca de 100 dias, e o ZARC de Goiás separa as de menos de 110 e as de mais de 120 dias.",
+    "etiqueta": "publicado"
+   },
+   "fase_final_dias": {
+    "valor": 30,
+    "fonte": "https://www.fao.org/4/X0490E/x0490e0b.htm",
+    "trecho": "FAO-56, Tabela 11: 'Sorghum | 20 | 35 | 40 | 30 | 130 | May/June | USA, Pakis., Med.' (a outra linha: 20/35/45/30 = 140, região árida). A tabela não tem linha de trópico nem de 2ª safra: usar esta em Goiás é escolha desta versão. Na conta vale a soma das 4 fases, 125 dias (a coluna do total da tabela diz 130), o mesmo ciclo do milho de 2ª safra. Fica no ciclo médio da FAO (110 a 140 dias); a Embrapa descreve cultivar de cerca de 100 dias, e o ZARC de Goiás separa as de menos de 110 e as de mais de 120 dias.",
+    "etiqueta": "publicado"
+   },
+   "raiz_m": {
+    "valor": 0.5,
+    "fonte": "https://www.fao.org/4/X0490E/x0490e0e.htm",
+    "trecho": "Hipótese: a mesma profundidade efetiva que o ZARC usa para o milho de 2ª safra em Goiás (50 cm), para comparar o sorgo e o milho na mesma medida. O FAO-56 (Tabela 22) dá 'Sorghum - grain | 1.0-2.0 | 0.55' e 'Maize, Field (grain) | 1.0-1.7 | 0.55': a raiz do sorgo pode ir mais fundo que a do milho, e a conta não aproveita isso.",
+    "etiqueta": "hipótese"
+   },
+   "p": {
+    "valor": 0.55,
+    "fonte": "https://www.fao.org/4/X0490E/x0490e0e.htm",
+    "trecho": "FAO-56, Tabela 22: 'Sorghum - grain | 1.0-2.0 | 0.55'.",
+    "etiqueta": "publicado"
+   },
+   "plantio_mm_dd": {
+    "valor": "02-10",
+    "fonte": "https://www.infoteca.cnptia.embrapa.br/infoteca/bitstream/doc/1054097/1/doc198.pdf",
+    "trecho": "Embrapa Milho e Sorgo, Documentos 198 (Borghi e outros, 2016), sorgo granífero em Goiás: 'a época de semeadura predominante em Goiás concentra-se entre 10 e 20 de fevereiro' (Ceccon e outros, 2014); o Zoneamento de Risco Climático 'determina que a época de semeadura recomendada está entre 28 de fevereiro e 20 de março'. Na conta o sorgo entra no mesmo dia do milho de 2ª safra (10 de fevereiro), logo depois da soja.",
+    "etiqueta": "publicado"
+   },
+   "ciclo_dias": {
+    "valor": 125,
+    "fonte": "https://www.fao.org/4/X0490E/x0490e0b.htm",
+    "etiqueta": "publicado",
+    "trecho": "FAO-56, Tabela 11: 'Sorghum | 20 | 35 | 40 | 30 | 130 | May/June | USA, Pakis., Med.'",
+    "nota": "A soma das 4 fases dá 125 dias; a coluna do total da tabela diz 130. A conta usa as fases."
+   }
   }
  },
  "terra": {
@@ -400,6 +477,73 @@
   "A janela de plantio da soja em Rio Verde: está no painel do ZARC, não no PDF da portaria.",
   "Embrapa, Kc e fases da soja e do milho medidos no Cerrado: não abri nenhuma página.",
   "Embrapa, dias de dessecação da braquiária antes da soja e água disputada com o milho: não abri nenhuma página.",
-  "TIMESAT: o artigo original de Jönsson e Eklundh não foi aberto; a citação veio de fonte que o cita."
- ]
+  "TIMESAT: o artigo original de Jönsson e Eklundh não foi aberto; a citação veio de fonte que o cita.",
+  "Calor: nenhuma fonte diz se o limite é da temperatura máxima ou da média do dia; aplicar à máxima diária é hipótese.",
+  "Sorgo: a portaria do ZARC em vigor e o calendário da Conab não foram abertos; a janela de plantio vem da Embrapa, que cita o ZARC.",
+  "Sorgo: profundidade efetiva de raiz do ZARC para o sorgo não achada; vale a do milho de 2ª safra (50 cm), como hipótese.",
+  "Calor: Hatfield e outros (2011) e Schlenker e Roberts (2009) não abriram (acesso fechado ou erro); nenhum número deles entrou."
+ ],
+ "calor": {
+  "_sobre": "Os limites de calor forte na fase crítica de cada cultura (acrescentado em 2026-11-15, com IA (Claude)). O critério foi escrito antes de ver os números: de cada cultura, o limite publicado mais diretamente ligado à fase crítica (floração e enchimento); o outro limite publicado fica ao lado, para comparar.",
+  "soja": {
+   "limite_c": {
+    "valor": 40.0,
+    "fonte": "https://www.infoteca.cnptia.embrapa.br/infoteca/bitstream/doc/468943/1/SistemasdeProducao9.pdf",
+    "trecho": "Embrapa Soja, Sistemas de Produção 9 (2005), Tecnologias de Produção de Soja, exigências climáticas: 'Temperaturas acima de 40°C têm efeito adverso na taxa de crescimento, provocam distúrbios na floração e diminuem a capacidade de retenção de vagens.'",
+    "etiqueta": "publicado"
+   },
+   "fase_critica": {
+    "valor": "meio",
+    "fonte": "https://www.infoteca.cnptia.embrapa.br/infoteca/bitstream/doc/468943/1/SistemasdeProducao9.pdf",
+    "trecho": "Embrapa Soja, Sistemas de Produção 9: 'A disponibilidade de água é importante, principalmente, em dois períodos de desenvolvimento da soja: germinação-emergência e floração-enchimento de grãos.' Hipótese desta versão: na conta, a fase crítica é a fase do meio do FAO-56 (Tabela 11, 'Mid'), que vai da cobertura cheia ao começo da maturação e por isso pega a floração e a maior parte do enchimento dos grãos. A fonte diz qual é a fase crítica, não em que dias do calendário ela cai.",
+    "etiqueta": "hipótese"
+   }
+  },
+  "milho": {
+   "limite_c": {
+    "valor": 33.0,
+    "fonte": "https://www.alice.cnptia.embrapa.br/alice/bitstream/doc/491176/4/Climasolo.pdf",
+    "trecho": "Embrapa Milho e Sorgo, Cultivo do Milho, 4ª ed. (2008), Clima e solo: 'Durante a polinização, temperaturas acima de 33 ºC reduzem sensivelmente a germinação do grão de pólen.'",
+    "etiqueta": "publicado"
+   },
+   "outro_limite_c": {
+    "valor": 35.0,
+    "fonte": "https://www.alice.cnptia.embrapa.br/alice/bitstream/doc/491176/4/Climasolo.pdf",
+    "trecho": "O outro limite publicado, na mesma página: 'Quando a temperatura é superior a 35 ºC ocorre diminuição da atividade da redutase do nitrato, podendo alterar o rendimento e a composição protéica dos grãos.' Não entra na conta principal: aparece ao lado, para comparar.",
+    "etiqueta": "publicado"
+   },
+   "fase_critica": {
+    "valor": "meio",
+    "fonte": "http://web.archive.org/web/20260309095117/https://www.fao.org/land-water/databases-and-software/crop-information/maize/en",
+    "trecho": "FAO, Crop Information: Maize (cópia do Internet Archive; a página viva deu erro em 2026-11-15): 'Greatest decrease in grain yields is caused by water deficits during the flowering period (2) including tasselling and silking and pollination'. Hipótese desta versão: na conta, a fase crítica é a fase do meio do FAO-56 (Tabela 11, 'Mid'), que vai da cobertura cheia ao começo da maturação e por isso pega a floração e a maior parte do enchimento dos grãos. A fonte diz qual é a fase crítica, não em que dias do calendário ela cai.",
+    "etiqueta": "hipótese"
+   }
+  },
+  "sorgo": {
+   "limite_c": {
+    "valor": 35.0,
+    "fonte": "http://web.archive.org/web/20260604124749/https://www.fao.org/land-water/databases-and-software/crop-information/sorghum/en/",
+    "trecho": "FAO, Crop Information: Sorghum (cópia do Internet Archive; a página viva deu erro em 2026-11-15): 'Low temperatures (<15°C) during flowering and yield formation, and high temperatures (>35°C) lead to poor seed set, problems with ripening and reduced yields.'",
+    "etiqueta": "publicado"
+   },
+   "outro_limite_c": {
+    "valor": 38.0,
+    "fonte": "https://www.infoteca.cnptia.embrapa.br/infoteca/bitstream/doc/748779/1/Sorgo-Ecofisiologia.pdf",
+    "trecho": "O outro limite publicado: Embrapa Milho e Sorgo, Cultivo do Sorgo, 9ª ed. (2015), Ecofisiologia: 'Acima de 38 ºC e abaixo de 16 ºC, a produtividade decresce (Clegg et al. 1983).' Não é ligado a uma fase. Não entra na conta principal: aparece ao lado, para comparar.",
+    "etiqueta": "publicado"
+   },
+   "fase_critica": {
+    "valor": "meio",
+    "fonte": "https://www.infoteca.cnptia.embrapa.br/infoteca/bitstream/doc/748783/1/Sorgo-Zoneamento.pdf",
+    "trecho": "Embrapa Milho e Sorgo, Cultivo do Sorgo, 9ª ed. (2015), Zoneamento: 'As fases mais críticas de desenvolvimento da cultura coincidem com o florescimento e enchimento de grãos.' Hipótese desta versão: na conta, a fase crítica é a fase do meio do FAO-56 (Tabela 11, 'Mid'), que vai da cobertura cheia ao começo da maturação e por isso pega a floração e a maior parte do enchimento dos grãos. A fonte diz qual é a fase crítica, não em que dias do calendário ela cai.",
+    "etiqueta": "hipótese"
+   }
+  },
+  "maxima_do_dia": {
+   "valor": true,
+   "fonte": "",
+   "trecho": "Hipótese desta versão: 'dia de calor forte' = dia da fase crítica com a temperatura máxima (T2M_MAX, da NASA POWER) acima do limite. As fontes dizem 'temperaturas acima de' e não dizem se é a máxima ou a média do dia; a máxima da NASA POWER é a de um quadrado de uns 50 km, não a da lavoura.",
+   "etiqueta": "hipótese"
+  }
+ }
 }

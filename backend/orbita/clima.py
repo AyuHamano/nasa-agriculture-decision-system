@@ -30,7 +30,33 @@ ORIGENS_DA_CHUVA = {
 }
 ORIGEM_DA_TEMPERATURA = "a NASA POWER (API diária, comunidade AG): T2M_MAX e T2M_MIN, no dia local"
 
+CIDADE_DE_REFERENCIA = "rio_verde"     # a cidade da prova: os dados dela moram nas pastas de sempre
+PASTA_DAS_CIDADES = PASTA_DOS_DADOS / "cidades"
+
 Dia = collections.namedtuple("Dia", "data chuva tmax tmin eto")
+
+
+def pastas_da_cidade(cidade_id=None):
+    """Onde moram os dados guardados de cada cidade (a temperatura, a chuva, a colheita do IBGE e o verde).
+
+    Rio Verde fica nas pastas de sempre; as outras, em data/orbita/cidades/<id>/, baixadas por
+    data/orbita/cidades/baixar_cidade.py (o endereço e a hora de cada consulta ficam ao lado dos dados).
+    """
+    if cidade_id in (None, CIDADE_DE_REFERENCIA):
+        return {"nasa_power": PASTA_NASA_POWER, "chuva": PASTA_DA_CHUVA,
+                "ibge": PASTA_DOS_DADOS / "validacao" / "ibge" / "rendimento_rio_verde.csv",
+                "ndvi": PASTA_DOS_DADOS / "ndvi", "texto": "data/orbita/nasa-power/",
+                "texto_da_chuva": "data/orbita/validacao/chuva/"}
+    base = PASTA_DAS_CIDADES / str(cidade_id)
+    return {"nasa_power": base / "nasa-power", "chuva": base / "chuva", "ibge": base / "ibge" / "rendimento.csv",
+            "ndvi": base / "ndvi", "texto": f"data/orbita/cidades/{cidade_id}/nasa-power/",
+            "texto_da_chuva": f"data/orbita/cidades/{cidade_id}/chuva/"}
+
+
+def chuvas_guardadas(cidade_id=None):
+    """As fontes de chuva que a cidade tem guardadas (a de modelo da NASA POWER vem junto com a temperatura)."""
+    pastas = pastas_da_cidade(cidade_id)
+    return tuple(f for f in FONTES_DE_CHUVA if f == "power" or (pastas["chuva"] / f"{f}.csv").exists())
 
 
 def dia_do_ano(data):
@@ -125,13 +151,14 @@ def ler_chuva_csv(caminho):
     return valores
 
 
-@functools.lru_cache(maxsize=8)
-def _serie_com_aviso(chuva, pasta_da_chuva):
-    dias = ler_serie()
+@functools.lru_cache(maxsize=16)
+def _serie_com_aviso(chuva, pasta_da_chuva, pasta_power=None, lugar=None):
+    dias = ler_serie() if pasta_power is None else ler_serie(pasta_power)
     if chuva == "power":
         return tuple(dias), ("A chuva de modelo da NASA POWER (PRECTOTCORR) fica só como comparação: em Rio Verde "
                              "ela fica bem abaixo da estação em terra do INMET de 2021 para cá (o comando validar "
-                             "mostra safra por safra).",)
+                             "mostra safra por safra)." + ("" if lugar is None else f" Em {lugar} não há estação "
+                                                           "conferida: vale o mesmo cuidado."),)
     if chuva not in FONTES_DE_CHUVA:
         raise ValueError(f"Fonte de chuva desconhecida: '{chuva}'. Use imerg, chirps, era5 ou power.")
     arquivo = Path(pasta_da_chuva) / f"{chuva}.csv"
@@ -153,14 +180,24 @@ def _serie_com_aviso(chuva, pasta_da_chuva):
         avisos.append(f"A chuva desta fonte vai até {pares[-1][0].data.isoformat()}: os {cortados} dias seguintes da "
                       "série, sem dado de chuva, ficaram fora da conta (dia sem dado nunca vira zero).")
     if chuva == "imerg":
-        avisos.append("O dia do IMERG é o UTC (começa 3 horas antes do dia de Rio Verde); a temperatura é do dia "
-                      "local. A chuva de um fim de tarde pode cair no dia seguinte da conta.")
+        avisos.append(f"O dia do IMERG é o UTC (começa 3 horas antes do dia de {lugar or 'Rio Verde'}); a "
+                      "temperatura é do dia local. A chuva de um fim de tarde pode cair no dia seguinte da conta.")
     return tuple(dia._replace(chuva=valor) for dia, valor in pares), tuple(avisos)
 
 
-def ler_serie_com_aviso(chuva="power", pasta_da_chuva=PASTA_DA_CHUVA):
-    """A série do motor com a chuva da fonte pedida (a temperatura e a ETo são sempre da NASA POWER) e os avisos."""
-    dias, avisos = _serie_com_aviso(chuva, str(pasta_da_chuva))
+def ler_serie_com_aviso(chuva="power", pasta_da_chuva=PASTA_DA_CHUVA, cidade_id=None, lugar=None):
+    """A série do motor com a chuva da fonte pedida (a temperatura e a ETo são sempre da NASA POWER) e os avisos.
+
+    `cidade_id`: a cidade (sem ela, Rio Verde, nas pastas de sempre); `lugar`: o nome dela, para os avisos.
+    """
+    if cidade_id in (None, CIDADE_DE_REFERENCIA):
+        dias, avisos = _serie_com_aviso(chuva, str(pasta_da_chuva))
+    else:
+        pastas = pastas_da_cidade(cidade_id)
+        if not (pastas["nasa_power"] / "resposta.json").exists():
+            raise ValueError(f"O clima de '{cidade_id}' não está guardado: falta baixar (data/orbita/cidades/"
+                             "baixar_cidade.py).")
+        dias, avisos = _serie_com_aviso(chuva, str(pastas["chuva"]), str(pastas["nasa_power"]), lugar or cidade_id)
     return list(dias), list(avisos)
 
 

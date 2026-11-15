@@ -1,0 +1,47 @@
+{
+  "o_que_e": "IBGE, Produção Agrícola Municipal (PAM), pela API do SIDRA: o que o município colheu por ano.",
+  "arquivo": "rendimento.csv",
+  "municipio": {
+    "codigo": "5211909",
+    "nome": "Jataí (GO)"
+  },
+  "consultas": [
+    {
+      "produto": "milho_2a_safra",
+      "endereco": "https://apisidra.ibge.gov.br/values/t/839/n6/5211909/v/216,214,112/p/all/c81/114254",
+      "baixado_em": "2026-11-15T01:03:49-03:00"
+    },
+    {
+      "produto": "soja",
+      "endereco": "https://apisidra.ibge.gov.br/values/t/1612/n6/5211909/v/216,214,112/p/all/c81/2713",
+      "baixado_em": "2026-11-15T01:03:49-03:00"
+    }
+  ],
+  "codigos_conferidos_na_resposta": {
+    "milho_2a_safra": {
+      "tabela": "839",
+      "categoria": "114254",
+      "nome_da_categoria_na_resposta": "Milho (em grão) - 2ª safra",
+      "municipio_na_resposta": "Jataí (GO)"
+    },
+    "soja": {
+      "tabela": "1612",
+      "categoria": "2713",
+      "nome_da_categoria_na_resposta": "Soja (em grão)",
+      "municipio_na_resposta": "Jataí (GO)"
+    }
+  },
+  "anos_com_rendimento_do_milho_de_2a_safra": [
+    2015,
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+  ]
+}

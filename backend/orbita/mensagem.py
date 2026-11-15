@@ -78,6 +78,14 @@ def _prioridades(r, quantas):
             for nota, ident, nome, quem in validas[:max(quantas, 0)]]
 
 
+def _titulo_das_prioridades(r):
+    """Com as notas, "Nas suas maiores notas"; sem elas (as notas saíram), o que mais preocupa ou o que foi medido."""
+    lista = _pega(r, "prioridades")
+    if isinstance(lista, list) and any(_inteiro(_pega(p, "nota")) is not None for p in lista):
+        return "Nas suas maiores notas:"
+    return "No que mais preocupa:" if _frase(_pega(r, "preocupacao")) else "No que foi medido:"
+
+
 def _fonte_da_agua(r):
     """De onde vem o número da água, em palavras (sem link): a chuva e a conta."""
     chuva = _frase(_pega(r, "clima", "chuva", "fonte"))
@@ -133,7 +141,7 @@ def texto(resposta, quantas=QUANTAS_PRIORIDADES):
     prioridades = _prioridades(r, quantas if _inteiro(quantas) is not None else QUANTAS_PRIORIDADES)
     blocos = [[f"Órbita Rural · {local}" if local else "Órbita Rural", _pergunta(r)],
               [f"Resposta: {veredito}" if veredito else None],
-              (["Nas suas maiores notas:"] + [linha for _, linha in prioridades]) if prioridades else [],
+              ([_titulo_das_prioridades(r)] + [linha for _, linha in prioridades]) if prioridades else [],
               [_prova(r, [ident for ident, _ in prioridades])],
               [_risco(r)],
               [FECHO]]

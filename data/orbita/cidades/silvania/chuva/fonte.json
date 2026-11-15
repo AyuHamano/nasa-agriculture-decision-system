@@ -1,0 +1,49 @@
+{
+  "o_que_e": "Endereço exato e hora da consulta que gerou o CSV desta pasta.",
+  "ponto": {
+    "latitude": -16.66,
+    "longitude": -48.61,
+    "lugar": "Silvânia (GO)"
+  },
+  "periodo_pedido": {
+    "inicio": "2014-07-01",
+    "fim": "2026-10-31"
+  },
+  "fontes": {
+    "imerg": {
+      "arquivo": "imerg.csv",
+      "o_que_e": "GPM IMERG: chuva estimada por satélites (a missão GPM, da NASA e da JAXA), servida por ponto pela NASA POWER no parâmetro IMERG_PRECTOT.",
+      "consultas": [
+        {
+          "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-48.61&latitude=-16.66&start=20140701&end=20261031&format=JSON&time-standard=UTC",
+          "baixado_em": "2026-11-15T00:48:03-03:00"
+        }
+      ],
+      "cabecalho_da_resposta": {
+        "title": "NASA/POWER Source Native Resolution Daily Data",
+        "api": {
+          "version": "v2.10.3",
+          "name": "POWER Daily API"
+        },
+        "sources": [
+          "IMERG"
+        ],
+        "fill_value": -999.0,
+        "time_standard": "UTC",
+        "start": "20140701",
+        "end": "20261031"
+      },
+      "avisos_da_resposta": [],
+      "ponto_devolvido": [
+        -48.61,
+        -16.66,
+        970.61
+      ],
+      "horario": "UTC (o dia vai das 21h do dia anterior às 21h do dia, em Brasília)",
+      "dias": 4506,
+      "dias_sem_dado": 47,
+      "primeiro_dia": "2014-07-01",
+      "ultimo_dia_com_dado": "2026-09-14"
+    }
+  }
+}

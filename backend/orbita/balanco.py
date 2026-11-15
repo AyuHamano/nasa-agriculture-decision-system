@@ -28,7 +28,7 @@ Registro = collections.namedtuple("Registro", "data tipo chuva eto pedido bebido
                                   "falta_em_cima bebido_do_capim", defaults=(0.0,))
 CAMADA_DE_CIMA_M = 0.10  # a camada que a evaporação seca: os TEW da Tabela 19 do FAO-56 valem para Ze = 0,10 m
 SAFRAS_DO_ESTUDO = tuple(f"{ano}-{(ano + 1) % 100:02d}" for ano in range(2015, 2025))
-TIPOS = ("soja", "milho", BRAQUIARIA, SEM_PLANTA)
+TIPOS = ("soja", "milho", "sorgo", BRAQUIARIA, SEM_PLANTA)
 
 
 def balanco_diario(dias, cobertura, taw, tew, rew, ajustar_p=True, fracao_inicial=0.5, parte_de_cima=None):
@@ -41,6 +41,7 @@ def balanco_diario(dias, cobertura, taw, tew, rew, ajustar_p=True, fracao_inicia
     """
     parte_de_cima = parte_de_cima or {}
     taws = dict(taw) if isinstance(taw, dict) else {tipo: float(taw) for tipo in TIPOS}
+    taws.setdefault("sorgo", taws.get("milho"))     # sem a caixa do sorgo, vale a do milho (as duas são da 2ª safra)
     if any(valor <= 0 for valor in taws.values()) or tew <= rew or rew < 0:
         raise ValueError("A terra precisa de TAW acima de zero e de TEW maior que REW.")
     if not 0.0 <= fracao_inicial <= 1.0:
@@ -88,11 +89,13 @@ def agua_da_terra(par, terra, cal=None):
             "agua_mm_por_m": por_metro, "raizes_m": dict(cal.raizes)}
 
 
-def simular(dias, com_braquiaria, par=None, terra="media", fracao_inicial=0.5, disputa=0.0, cal=None):
+def simular(dias, com_braquiaria, par=None, terra="media", fracao_inicial=0.5, disputa=0.0, cal=None,
+            segunda="milho"):
     """A simulação contínua de uma rotação em todos os dias da série.
 
     `disputa`: o fator a mais no pedido de água enquanto o milho e o capim crescem juntos (só na alternativa).
     `cal`: o calendário já montado (com a data de plantio do produtor); sem ele, vale o de costume.
+    `segunda`: a cultura da 2ª safra da rotação (milho ou sorgo).
     """
     if disputa < 0 or (disputa and not com_braquiaria):
         raise ValueError("A disputa do capim com o milho é um fator de zero para cima e só vale na alternativa "
@@ -100,7 +103,7 @@ def simular(dias, com_braquiaria, par=None, terra="media", fracao_inicial=0.5, d
     par = par or parametros.carregar()
     cal = cal or rotacoes.calendario(par)
     agua = agua_da_terra(par, terra, cal)
-    return balanco_diario(dias, lambda data: rotacoes.cobertura_do_dia(data, com_braquiaria, cal, disputa),
+    return balanco_diario(dias, lambda data: rotacoes.cobertura_do_dia(data, com_braquiaria, cal, disputa, segunda),
                           agua["taw"], agua["tew"], agua["rew"],
                           ajustar_p=parametros.valor(par, "ajustar_p_pela_demanda"), fracao_inicial=fracao_inicial,
                           parte_de_cima={tipo: min(1.0, CAMADA_DE_CIMA_M / raiz) for tipo, raiz in cal.raizes.items()})

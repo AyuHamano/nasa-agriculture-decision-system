@@ -18,11 +18,44 @@ from orbita import parametros
 
 SEM_PLANTA = "sem_planta"
 BRAQUIARIA = "braquiaria"
-CULTURAS = ("soja", "milho")
+CULTURAS = ("soja", "milho", "sorgo")
+# O cardápio das rotações. As chaves "atual" e "alternativa" são as de sempre; "com_sorgo" é a terceira. Cada uma
+# tem o `id` (o nome que vai na comparação), as `culturas` (a lista que `rotacao_atual` aceita) e a `segunda` (a
+# cultura da 2ª safra).
 ROTACOES = {
-    "atual": {"nome": "soja → milho safrinha → pousio (terra parada)", "com_braquiaria": False},
-    "alternativa": {"nome": "soja → milho com braquiária (capim)", "com_braquiaria": True},
+    "atual": {"nome": "soja → milho safrinha → pousio (terra parada)", "com_braquiaria": False,
+              "id": "soja_milho_pousio", "culturas": ["soja", "milho", "pousio"], "segunda": "milho",
+              "apelido": "soja, milho e pousio"},
+    "alternativa": {"nome": "soja → milho com braquiária (capim)", "com_braquiaria": True,
+                    "id": "soja_milho_braquiaria", "culturas": ["soja", "milho", "braquiaria"], "segunda": "milho",
+                    "apelido": "soja, milho e braquiária"},
+    "com_sorgo": {"nome": "soja → sorgo safrinha → pousio (terra parada)", "com_braquiaria": False,
+                  "id": "soja_sorgo_pousio", "culturas": ["soja", "sorgo", "pousio"], "segunda": "sorgo",
+                  "apelido": "soja, sorgo e pousio"},
 }
+CARDAPIO = {rotacao["id"]: dict(rotacao, chave=chave) for chave, rotacao in ROTACOES.items()}   # o mesmo, por id
+SEGUNDAS = {"milho": "milho_2a_safra", "sorgo": "sorgo_2a_safra"}     # a cultura da 2ª safra -> a chave dos parâmetros
+
+
+def _sem_acento(texto):
+    import unicodedata
+    return "".join(c for c in unicodedata.normalize("NFD", str(texto)) if unicodedata.category(c) != "Mn")
+
+
+def achar_rotacao(rotacao):
+    """A rotação do cardápio que bate com o que o produtor disse: a lista das culturas ou o id. Não achou: None.
+
+    Aceita com ou sem acento, em maiúscula ou minúscula, e a lista sem o "pousio" no fim (["soja", "sorgo"]).
+    """
+    if isinstance(rotacao, str):
+        return CARDAPIO.get(rotacao.strip().lower())
+    if not isinstance(rotacao, (list, tuple)):
+        return None
+    dita = [_sem_acento(x).strip().lower() for x in rotacao]
+    for item in CARDAPIO.values():
+        if dita == item["culturas"] or (item["culturas"][-1] == "pousio" and dita == item["culturas"][:-1]):
+            return item
+    return None
 DIAS_DO_MES = 365 / 12
 JANELA_DA_SOJA = ((9, 1), (12, 31))   # o plantio da soja que o produtor informa: de 1 de setembro a 31 de dezembro
 
@@ -105,6 +138,15 @@ class Calendario:
         self.milho_fases = list(v("culturas", "milho_2a_safra", "fases_dias"))
         self.milho_kc = tuple(v("culturas", "milho_2a_safra", k) for k in ("kc_ini", "kc_meio", "kc_fim"))
         self.milho_p = v("culturas", "milho_2a_safra", "p")
+        # As culturas da 2ª safra: o milho (os atributos milho_* de sempre) e o sorgo, cada um com o seu ciclo.
+        self.segundas = {"milho": {"md": self.milho_md, "fases": self.milho_fases, "kc": self.milho_kc,
+                                   "p": self.milho_p, "ciclo": sum(self.milho_fases)}}
+        if "sorgo_2a_safra" in par["culturas"]:
+            fases = list(v("culturas", "sorgo_2a_safra", "fases_dias"))
+            self.segundas["sorgo"] = {
+                "md": _mes_dia(v("culturas", "sorgo_2a_safra", "plantio_mes_dia")), "fases": fases,
+                "kc": tuple(v("culturas", "sorgo_2a_safra", k) for k in ("kc_ini", "kc_meio", "kc_fim")),
+                "p": v("culturas", "sorgo_2a_safra", "p"), "ciclo": sum(fases)}
         self.braquiaria_kc = v("culturas", "braquiaria_apos_milho", "kc")
         self.braquiaria_p = v("culturas", "braquiaria_apos_milho", "p")
         self.dessecacao_dias = int(v("culturas", "braquiaria_apos_milho", "dessecacao_dias_antes_da_soja"))
@@ -118,8 +160,10 @@ class Calendario:
         # A profundidade das raízes de cada cobertura; a terra sem planta vale com a mais funda delas (o perfil).
         self.raizes = {"soja": v("culturas", "soja", "raiz_m"), "milho": v("culturas", "milho_2a_safra", "raiz_m"),
                        BRAQUIARIA: v("culturas", "braquiaria_apos_milho", "raiz_m")}
-        self.raizes[SEM_PLANTA] = max(self.raizes.values())
-        for nome, fases in (("soja", self.soja_fases), ("milho", self.milho_fases)):
+        self.raizes[SEM_PLANTA] = max(self.raizes.values())    # soja, milho e braquiária, como sempre (sem o sorgo)
+        if "sorgo" in self.segundas:
+            self.raizes["sorgo"] = v("culturas", "sorgo_2a_safra", "raiz_m")
+        for nome, fases in [("soja", self.soja_fases)] + [(n, s["fases"]) for n, s in self.segundas.items()]:
             if len(fases) != 4 or any(f <= 0 for f in fases):
                 raise ValueError(f"As fases da cultura ({nome}) têm de ser 4 números de dias, todos acima de zero.")
         self.soja_ciclo, self.milho_ciclo = sum(self.soja_fases), sum(self.milho_fases)
@@ -130,6 +174,10 @@ class Calendario:
         if not self.fim_do_milho(2022) <= self.dessecacao(2022) <= self.plantio_da_soja(2022):
             raise ValueError("Calendário impossível: o milho tem de sair antes de secar a braquiária, e a braquiária "
                              "tem de ser seca antes de plantar a soja.")
+        if "sorgo" in self.segundas and not (self.fim_da_soja(2021) <= self.plantio_da_segunda(2022, "sorgo")
+                                              and self.fim_da_segunda(2022, "sorgo") <= self.plantio_da_soja(2022)):
+            raise ValueError("Calendário impossível: o sorgo tem de entrar depois de a soja sair e sair antes de "
+                             "plantar a soja seguinte.")
 
     def plantio_da_soja(self, ano):
         return datetime.date(ano, *self.soja_md)
@@ -146,6 +194,14 @@ class Calendario:
         """O primeiro dia sem milho vivo na terra (o fim do ciclo; a colheitadeira pode passar depois)."""
         return self.plantio_do_milho(ano) + datetime.timedelta(days=self.milho_ciclo)
 
+    def plantio_da_segunda(self, ano, segunda="milho"):
+        """O plantio da cultura da 2ª safra "do ano" (milho ou sorgo), já com os dias que o calendário andou."""
+        return datetime.date(ano, *self.segundas[segunda]["md"]) + datetime.timedelta(days=self.deslocamento_dias)
+
+    def fim_da_segunda(self, ano, segunda="milho"):
+        """O primeiro dia sem a cultura da 2ª safra viva na terra."""
+        return self.plantio_da_segunda(ano, segunda) + datetime.timedelta(days=self.segundas[segunda]["ciclo"])
+
     def dessecacao(self, ano):
         return self.plantio_da_soja(ano) - datetime.timedelta(days=self.dessecacao_dias)
 
@@ -154,8 +210,10 @@ def calendario(par, plantio_da_soja=None):
     return Calendario(par, plantio_da_soja)
 
 
-def cobertura_do_dia(data, com_braquiaria, cal, disputa=0.0):
-    """O que está na terra no dia: (tipo, Kc do dia, p). Tipos: soja, milho, braquiaria, sem_planta.
+def cobertura_do_dia(data, com_braquiaria, cal, disputa=0.0, segunda="milho"):
+    """O que está na terra no dia: (tipo, Kc do dia, p). Tipos: soja, milho, sorgo, braquiaria, sem_planta.
+
+    `segunda`: a cultura da 2ª safra da rotação (milho ou sorgo).
 
     A palha da rotação baixa o Kc nos dias sem planta e na fase inicial da soja. Com `disputa` acima de zero (só na
     alternativa), o dia de milho devolve um 4º valor: o fator a mais que o capim põe no pedido de água do conjunto.
@@ -167,10 +225,11 @@ def cobertura_do_dia(data, com_braquiaria, cal, disputa=0.0):
             kc = kc_da_fase(n, cal.soja_fases, *cal.soja_kc)
             return ("soja", kc * palha if n < cal.soja_fases[0] else kc, cal.soja_p)
     # Com a soja plantada cedo, a 2ª safra "do ano seguinte" pode entrar ainda em dezembro: olha os dois anos.
+    cultura = cal.segundas[segunda]
     for ano in (data.year, data.year + 1):
-        n = (data - cal.plantio_do_milho(ano)).days
-        if 0 <= n < cal.milho_ciclo:
-            milho = ("milho", kc_da_fase(n, cal.milho_fases, *cal.milho_kc), cal.milho_p)
+        n = (data - cal.plantio_da_segunda(ano, segunda)).days
+        if 0 <= n < cultura["ciclo"]:
+            milho = (segunda, kc_da_fase(n, cultura["fases"], *cultura["kc"]), cultura["p"])
             return milho + (disputa,) if com_braquiaria and disputa else milho
     if com_braquiaria:
         for ano in (data.year, data.year + 1):
@@ -187,6 +246,12 @@ def resumo_do_calendario(par, plantio_da_soja=None):
     proxima_soja, dessecacao = cal.plantio_da_soja(2022), cal.dessecacao(2022)
     dias = {"atual": (proxima_soja - fim_milho).days, "alternativa": (proxima_soja - dessecacao).days}
     inicio = {"atual": fim_milho, "alternativa": dessecacao}
+    sorgo = None
+    if "sorgo" in cal.segundas:
+        plantio_sorgo, fim_sorgo = cal.plantio_da_segunda(2022, "sorgo"), cal.fim_da_segunda(2022, "sorgo")
+        dias["com_sorgo"], inicio["com_sorgo"] = (proxima_soja - fim_sorgo).days, fim_sorgo
+        sorgo = {"plantio": f"{plantio_sorgo:%d/%m}", "sai_da_terra": f"{fim_sorgo:%d/%m}",
+                 "ciclo_dias": cal.segundas["sorgo"]["ciclo"]}
     resumo = {
         "soja": {"plantio": f"{plantio:%d/%m}", "sai_da_terra": f"{fim_soja:%d/%m}", "ciclo_dias": cal.soja_ciclo},
         "milho": {"plantio": f"{plantio_milho:%d/%m}", "sai_da_terra": f"{fim_milho:%d/%m}",
@@ -194,7 +259,9 @@ def resumo_do_calendario(par, plantio_da_soja=None):
         "braquiaria": {"seca_em": f"{dessecacao:%d/%m}", "dias_antes_da_soja": cal.dessecacao_dias},
         "entre_a_soja_e_o_milho_dias": (plantio_milho - fim_soja).days,
     }
-    for rotacao in ROTACOES:
+    if sorgo:
+        resumo["sorgo"] = sorgo
+    for rotacao in dias:
         resumo[rotacao] = {"dias_sem_planta_viva": dias[rotacao],
                            "meses_sem_planta_viva": round(dias[rotacao] / DIAS_DO_MES, 1),
                            "de": f"{inicio[rotacao]:%d/%m}", "ate": f"{proxima_soja:%d/%m}"}

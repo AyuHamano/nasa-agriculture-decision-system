@@ -21,7 +21,19 @@ IMPACTO_EMBRAPA = "https://bs.sede.embrapa.br/2019/relatorios/agropecuariaoeste_
 DOURADOS_EMBRAPA = "https://www.alice.cnptia.embrapa.br/alice/bitstream/doc/909678/1/211Produtividade.pdf"
 ZARC_CONSORCIO = ("https://www.gov.br/agricultura/pt-br/assuntos/riscos-seguro/programa-nacional-de-zoneamento-agricola"
                   "-de-risco-climatico/portarias/2022-2023/goias-go/port-no-345-cons-milho-braquiaria-2a-safra-go-ret.pdf")
+SORGO_GOIAS = "https://www.infoteca.cnptia.embrapa.br/infoteca/bitstream/doc/1054097/1/doc198.pdf"
+SORGO_ECOFISIOLOGIA = "https://www.infoteca.cnptia.embrapa.br/infoteca/bitstream/doc/748779/1/Sorgo-Ecofisiologia.pdf"
+SORGO_ZONEAMENTO = "https://www.infoteca.cnptia.embrapa.br/infoteca/bitstream/doc/748783/1/Sorgo-Zoneamento.pdf"
+SORGO_FAO = ("http://web.archive.org/web/20260604124749/https://www.fao.org/land-water/databases-and-software/"
+             "crop-information/sorghum/en/")
+MILHO_FAO = ("http://web.archive.org/web/20260309095117/https://www.fao.org/land-water/databases-and-software/"
+             "crop-information/maize/en")
+MILHO_CLIMA = "https://www.alice.cnptia.embrapa.br/alice/bitstream/doc/491176/4/Climasolo.pdf"
+SOJA_EMBRAPA = "https://www.infoteca.cnptia.embrapa.br/infoteca/bitstream/doc/468943/1/SistemasdeProducao9.pdf"
 PUBLICADO, HIPOTESE = "publicado", "hipótese"
+FASE_DO_MEIO = ("Hipótese desta versão: na conta, a fase crítica é a fase do meio do FAO-56 (Tabela 11, 'Mid'), que "
+                "vai da cobertura cheia ao começo da maturação e por isso pega a floração e a maior parte do "
+                "enchimento dos grãos. A fonte diz qual é a fase crítica, não em que dias do calendário ela cai.")
 
 
 def _p(valor, fonte, trecho, etiqueta=HIPOTESE):
@@ -53,6 +65,31 @@ PADRAO = {
                          "que seca no campo (nota 11 da tabela)."),
             "p": _p(0.55, FAO8, "FAO-56, Tabela 22, Maize, Field (grain): p 0.55."),
             "raiz_m": _p(1.0, FAO8, "FAO-56, Tabela 22, Maize, Field (grain): raízes de 1.0 a 1.7 m; 1,0 m é escolha."),
+        },
+        "sorgo_2a_safra": {
+            "plantio_mes_dia": _p("02-10", SORGO_GOIAS, "Embrapa Milho e Sorgo, Documentos 198 (Borghi e outros, "
+                                  "2016), sorgo granífero em Goiás: 'a época de semeadura predominante em Goiás "
+                                  "concentra-se entre 10 e 20 de fevereiro' (Ceccon e outros, 2014); o Zoneamento de "
+                                  "Risco Climático 'determina que a época de semeadura recomendada está entre 28 de "
+                                  "fevereiro e 20 de março'. Na conta o sorgo entra no mesmo dia do milho de 2ª "
+                                  "safra (10 de fevereiro), logo depois da soja.", PUBLICADO),
+            "fases_dias": _p([20, 35, 40, 30], FAO6, "FAO-56, Tabela 11: 'Sorghum | 20 | 35 | 40 | 30 | 130 | "
+                             "May/June | USA, Pakis., Med.' (a outra linha: 20/35/45/30 = 140, região árida). A "
+                             "tabela não tem linha de trópico nem de 2ª safra: usar esta em Goiás é escolha desta "
+                             "versão. Na conta vale a soma das 4 fases, 125 dias (a coluna do total da tabela diz "
+                             "130), o mesmo ciclo do milho de 2ª safra. Fica no ciclo médio da FAO (110 a 140 dias); "
+                             "a Embrapa descreve cultivar de cerca de 100 dias, e o ZARC de Goiás separa as de menos "
+                             "de 110 e as de mais de 120 dias.", PUBLICADO),
+            "kc_ini": _p(0.3, FAO6, "FAO-56, Tabela 12: 'i. Cereals | 0.3 | 1.15 | 0.4'; a linha 'Sorghum - grain' "
+                         "deixa o Kc ini em branco e vale o do grupo.", PUBLICADO),
+            "kc_meio": _p(1.05, FAO6, "FAO-56, Tabela 12: 'Sorghum - grain | | 1.00-1.10 | 0.55 | 1-2'. A fonte dá a "
+                          "faixa de 1,00 a 1,10; 1,05, o meio da faixa, é escolha desta versão."),
+            "kc_fim": _p(0.55, FAO6, "FAO-56, Tabela 12: 'Sorghum - grain | | 1.00-1.10 | 0.55 | 1-2'.", PUBLICADO),
+            "p": _p(0.55, FAO8, "FAO-56, Tabela 22: 'Sorghum - grain | 1.0-2.0 | 0.55'.", PUBLICADO),
+            "raiz_m": _p(0.5, FAO8, "Hipótese: a mesma profundidade efetiva que o ZARC usa para o milho de 2ª safra "
+                         "em Goiás (50 cm), para comparar o sorgo e o milho na mesma medida. O FAO-56 (Tabela 22) dá "
+                         "'Sorghum - grain | 1.0-2.0 | 0.55' e 'Maize, Field (grain) | 1.0-1.7 | 0.55': a raiz do "
+                         "sorgo pode ir mais fundo que a do milho, e a conta não aproveita isso."),
         },
         "braquiaria_apos_milho": {
             "kc": _p(0.75, FAO6, "FAO-56, Tabela 12, Grazing Pasture, Extensive Grazing: Kc mid 0.75. Usar o Kc de "
@@ -134,6 +171,49 @@ PADRAO = {
                    "(Equation 72) or by Kcb full' (cap. 10), e 'Kc max ranges from about 1.05 to 1.30 when using the "
                    "grass reference ETo' (cap. 7: " + FAO7 + "). 1,20 (o Kc do milho no meio do ciclo) x 1,08 = 1,30."),
     },
+    "calor": {
+        # O critério foi escrito antes de ver os números (2026-11-15): de cada cultura, o limite publicado mais
+        # diretamente ligado à fase crítica (floração e enchimento). O outro limite publicado fica ao lado.
+        "soja": {
+            "limite_c": _p(40.0, SOJA_EMBRAPA, "Embrapa Soja, Sistemas de Produção 9 (2005), Tecnologias de Produção "
+                           "de Soja, exigências climáticas: 'Temperaturas acima de 40°C têm efeito adverso na taxa de "
+                           "crescimento, provocam distúrbios na floração e diminuem a capacidade de retenção de "
+                           "vagens.'", PUBLICADO),
+            "fase_critica": _p("meio", SOJA_EMBRAPA, "Embrapa Soja, Sistemas de Produção 9: 'A disponibilidade de "
+                               "água é importante, principalmente, em dois períodos de desenvolvimento da soja: "
+                               "germinação-emergência e floração-enchimento de grãos.' " + FASE_DO_MEIO),
+        },
+        "milho": {
+            "limite_c": _p(33.0, MILHO_CLIMA, "Embrapa Milho e Sorgo, Cultivo do Milho, 4ª ed. (2008), Clima e solo: "
+                           "'Durante a polinização, temperaturas acima de 33 ºC reduzem sensivelmente a germinação "
+                           "do grão de pólen.'", PUBLICADO),
+            "outro_limite_c": _p(35.0, MILHO_CLIMA, "O outro limite publicado, na mesma página: 'Quando a temperatura "
+                                 "é superior a 35 ºC ocorre diminuição da atividade da redutase do nitrato, podendo "
+                                 "alterar o rendimento e a composição protéica dos grãos.' Não entra na conta "
+                                 "principal: aparece ao lado, para comparar.", PUBLICADO),
+            "fase_critica": _p("meio", MILHO_FAO, "FAO, Crop Information: Maize (cópia do Internet Archive; a página "
+                               "viva deu erro em 2026-11-15): 'Greatest decrease in grain yields is caused by water "
+                               "deficits during the flowering period (2) including tasselling and silking and "
+                               "pollination'. " + FASE_DO_MEIO),
+        },
+        "sorgo": {
+            "limite_c": _p(35.0, SORGO_FAO, "FAO, Crop Information: Sorghum (cópia do Internet Archive; a página viva "
+                           "deu erro em 2026-11-15): 'Low temperatures (<15°C) during flowering and yield formation, "
+                           "and high temperatures (>35°C) lead to poor seed set, problems with ripening and reduced "
+                           "yields.'", PUBLICADO),
+            "outro_limite_c": _p(38.0, SORGO_ECOFISIOLOGIA, "O outro limite publicado: Embrapa Milho e Sorgo, Cultivo "
+                                 "do Sorgo, 9ª ed. (2015), Ecofisiologia: 'Acima de 38 ºC e abaixo de 16 ºC, a "
+                                 "produtividade decresce (Clegg et al. 1983).' Não é ligado a uma fase. Não entra na "
+                                 "conta principal: aparece ao lado, para comparar.", PUBLICADO),
+            "fase_critica": _p("meio", SORGO_ZONEAMENTO, "Embrapa Milho e Sorgo, Cultivo do Sorgo, 9ª ed. (2015), "
+                               "Zoneamento: 'As fases mais críticas de desenvolvimento da cultura coincidem com o "
+                               "florescimento e enchimento de grãos.' " + FASE_DO_MEIO),
+        },
+        "maxima_do_dia": _p(True, "", "Hipótese desta versão: 'dia de calor forte' = dia da fase crítica com a "
+                            "temperatura máxima (T2M_MAX, da NASA POWER) acima do limite. As fontes dizem "
+                            "'temperaturas acima de' e não dizem se é a máxima ou a média do dia; a máxima da NASA "
+                            "POWER é a de um quadrado de uns 50 km, não a da lavoura."),
+    },
     "ajustar_p_pela_demanda": _p(True, FAO8, "FAO-56, cap. 8: 'p = pTable 22 + 0.04 (5 - ETc)', limitado entre 0.1 e "
                                  "0.8, com a ETc em mm/dia.", PUBLICADO),
     "regras": {
@@ -199,7 +279,7 @@ def _adotar(par, conferido):
                              "trecho": folha.get("trecho") or "(sem trecho no arquivo conferido)", "etiqueta": etiqueta}
         adotados.append(".".join(destino))
 
-    for cultura in ("soja", "milho_2a_safra"):
+    for cultura in ("soja", "milho_2a_safra", "sorgo_2a_safra"):
         for la, ca in (("kc_ini", "kc_ini"), ("kc_med", "kc_meio"), ("kc_fim", "kc_fim"), ("raiz_m", "raiz_m"),
                        ("p", "p"), ("plantio_mm_dd", "plantio_mes_dia")):
             folha = _folha_de(conferido, ("culturas", cultura, la))
@@ -220,7 +300,9 @@ def _adotar(par, conferido):
     if seco:   # no arquivo conferido, este é o Kc do solo SECO (Kc min): guardado à parte, fora da conta
         por(("culturas", "solo_nu", "kc_seco"), seco)
     for caminho in [("ndvi", "fracao_da_amplitude")] + [
-            ("terra", terra, "agua_mm_por_m") for terra in ("pouca", "media", "muita")]:
+            ("terra", terra, "agua_mm_por_m") for terra in ("pouca", "media", "muita")] + [
+            ("calor", cultura, chave) for cultura in ("soja", "milho", "sorgo")
+            for chave in ("limite_c", "outro_limite_c", "fase_critica")] + [("calor", "maxima_do_dia")]:
         folha = _folha_de(conferido, caminho)
         if folha:
             por(caminho, folha)
