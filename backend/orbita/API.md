@@ -270,26 +270,31 @@ O pedido (só estes campos; `cidade_id` e `rotacao_atual` são obrigatórios, `t
     curl -s -X POST http://127.0.0.1:8000/lavoura-hoje -H 'Content-Type: application/json' \
       -d '{"cidade_id": "rio_verde", "rotacao_atual": ["soja", "milho", "pousio"], "terra": "media", "plantio_da_soja": "2026-10-15"}'
 
-A resposta (`motor.lavoura_hoje`; os números mudam com o dado guardado, e aqui vão só os campos principais):
+A resposta (`motor.lavoura_hoje`, rodada em 2026-11-15; os números mudam com o dado guardado, e aqui vão só os campos
+principais):
 
     {"disponivel": true, "local": {"nome": "Rio Verde (GO)", "id": "rio_verde", ...},
-     "rotacao": {"id": "soja_milho_pousio", "nome": "..."}, "terra": "media", "plantio_da_soja_informado": "2026-10-15",
-     "hoje": "2026-11-15", "ultimo_dia_com_dado": "2026-11-11", "ultimo_dia_com_dado_de": "...", "atraso_dias": 4,
+     "rotacao": {"id": "soja_milho_pousio", "nome": "soja → milho safrinha → pousio (terra parada)"}, "terra": "media",
+     "plantio_da_soja_informado": "2026-10-15",
+     "hoje": "2026-11-15", "ultimo_dia_com_dado": "2026-11-14", "ultimo_dia_com_dado_de": "da conta: o último dia com a chuva do satélite em mm, sem dia faltando no meio. ...",
+     "atraso_dias": 1, "ultimo_dia_com_temperatura": "2026-11-12", "dias_com_o_consumo_estimado": 2,
      "safra": "2026-27", "situacao": "atencao", "situacao_nome": "atenção",
-     "frase": "Em Rio Verde (GO), em 11/11/2026 (o último dia com dado), a soja tinha 27 dias e estava em crescimento, sem sede, com ... mm de água ao alcance da planta. Pedem atenção: ...",
+     "frase": "Em Rio Verde (GO), em 14/11/2026, a soja tinha 30 dias e estava em crescimento, sem sede, com 66,0 mm de água ao alcance da planta. Pedem atenção: o calor e o aviso de sede.",
      "itens": [
        {"id": "fase", "titulo": "A fase da cultura", "situacao": "tranquilo", "situacao_nome": "tranquilo",
-        "frase": "Na terra está a soja, plantada em 15/10/2026. Em 11/11/2026, o último dia com dado, fazia 27 dias do plantio e a lavoura estava em crescimento, no dia 8 dos 20 dessa fase. ...",
-        "ultimo_dado": {"data": "2026-11-11", "de": "o calendário da rotação e as fases da tabela da FAO ..."},
+        "frase": "Na terra está a soja, plantada em 15/10/2026. Em 14/11/2026, fazia 30 dias do plantio e a lavoura estava em crescimento, no dia 11 dos 20 dessa fase. A fase crítica (a floração e o enchimento do grão) começa em 24/11/2026, pelo calendário.",
+        "ultimo_dado": {"data": "2026-11-14", "de": "o calendário da rotação e as fases da tabela da FAO (não é medida da lavoura), contados até o último dia com chuva do satélite"},
         "regra_da_situacao": "Atenção: a cultura está na fase crítica ...",
-        "o_que_esta_na_terra": "soja", "cultura": "soja", "plantio": "2026-10-15", "dias_desde_o_plantio": 27,
-        "fase": "crescimento", "dia_da_fase": 8, "dias_da_fase": 20, "fase_critica": false,
-        "fase_critica_de": "2026-11-24", "fase_critica_ate": "2027-01-17", "dias_para_a_fase_critica": 13,
-        "no_dia_da_consulta": {"data": "2026-11-15", "dias_desde_o_plantio": 31, "fase": "crescimento", "fase_critica": false}},
+        "o_que_esta_na_terra": "soja", "cultura": "soja", "plantio": "2026-10-15", "dias_desde_o_plantio": 30,
+        "fase": "crescimento", "fase_nome": "em crescimento", "dia_da_fase": 11, "dias_da_fase": 20, "fase_critica": false,
+        "fase_critica_de": "2026-11-24", "fase_critica_ate": "2027-01-17", "dias_para_a_fase_critica": 10,
+        "no_dia_da_consulta": {"data": "2026-11-15", "dias_desde_o_plantio": 31, "fase": "crescimento", "fase_critica": false},
+        "detalhe_tecnico": "14/11/2026 é o último dia com dado. No dia desta consulta (15/11/2026), 31 dias do plantio."},
        {"id": "agua", ...}, {"id": "calor", ...}, {"id": "verde", ...}, {"id": "terra_coberta", ...},
        {"id": "aviso_de_sede", ...}],
      "regras": {"fase": "...", "agua": "...", "calor": "...", "verde": "...", "terra_coberta": "...", "aviso_de_sede": "..."},
-     "janela_do_consumo_dias": 7, "horizonte_sem_chuva_dias": 30, "aviso": "..."}
+     "janela_do_consumo_dias": 7, "horizonte_sem_chuva_dias": 30,
+     "aviso": "Converse com o agrônomo antes de decidir.", "aviso_tecnico": "...", "detalhe_tecnico": "..."}
 
 - Todo item traz `id`, `titulo`, `situacao` (`tranquilo`, `atencao`, `alerta` ou `sem_dado`), `situacao_nome`, `frase`
   (pronta para o produtor, só com números da conta), `ultimo_dado` (`data`, em ano-mês-dia, e `de`, que diz de qual
@@ -308,9 +313,8 @@ A resposta (`motor.lavoura_hoje`; os números mudam com o dado guardado, e aqui 
   o satélite já marcou depois do último dia da conta, se houver).
 - Desde 2026-11-15 a chuva dos dias recentes é a chuva do satélite em mm de cada dia (`data/orbita/chuva-do-dia/`), e
   não mais a lida da cor da imagem: a água sai como um número só (`faixa_da_agua_na_terra_mm` fica com as duas pontas
-  iguais, `com_a_chuva_de_modelo` fica só para comparar), no painel e no "como está hoje". O exemplo acima foi escrito
-  antes dessa troca. Hoje a conta segue até o último dia com chuva do satélite (`ultimo_dia_com_dado`: `2026-11-14`
-  na consulta de 2026-11-15); onde a temperatura ainda não chegou, o consumo é o do tempo dos 7 dias anteriores
+  iguais, `com_a_chuva_de_modelo` fica só para comparar), no painel e no "como está hoje". A conta segue até o
+  último dia com chuva do satélite (`ultimo_dia_com_dado`); onde a temperatura ainda não chegou, o consumo é o do tempo dos 7 dias anteriores
   (`ultimo_dia_com_temperatura`, `dias_com_o_consumo_estimado`, `consumo_estimado_desde`), e o calor conta só até o
   último dia com temperatura medida. A regra está no `LEIA-ME-motor.md`, seção 12.
 - Sem a chuva recente guardada: `{"disponivel": false, "aviso": ...}`. Entrada errada: 400, com a frase do motor.
@@ -431,6 +435,7 @@ Cada rotação da lista:
 | `terra_coberta.pelo_satelite` | os dias seguidos sem planta verde que o satélite viu, só na rotação soja-milho-pousio (a que a região faz hoje); nas outras, `null` |
 | `contra_as_outras` | para cada outra rotação: `agua`, `calor` e `terra_coberta`, cada um com `melhor`, `pior`, `empate` ou `depende`. A conta usa os números sem arredondar |
 | `evidencia`, `beneficio`, `risco`, `falta_saber` | as 4 frases prontas da rotação. Só têm números da conta: cada uma passa pela conferência. O benefício e o risco saem de `contra_as_outras`, não de opinião |
+| `risco_curto` | o risco em frase curta, a que a tela mostra em "O risco de cada caminho": o número deste caminho e o do melhor dos caminhos de que ele ficou atrás, na mesma perna do `risco` ("Num ano ruim, faltam 225,9 mm de água. Com sorgo faltariam 191,3 mm."). Um número só de cada lado: no milho com capim, o do meio (`comparacao.agua.pela_faixa.por_cenario.meio.falta_mm`); a faixa fica no `risco`. Também passa pela conferência |
 
 Um exemplo dos números (Rio Verde, sem data de plantio): faltaram no pior ano 225,9 mm com soja-milho-pousio, de
 229,8 a 241,2 mm com o capim e 191,3 mm com o sorgo.

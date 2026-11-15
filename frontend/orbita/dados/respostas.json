@@ -1,5 +1,5 @@
 {
- "gerado_em": "2026-11-15T09:32:44-03:00",
+ "gerado_em": "2026-11-15T10:27:36-03:00",
  "gerado_por": "python3 -m orbita.exportar <pasta> (Gerado com IA (Claude))",
  "parametros_usados": {
   "cidade_id": "rio_verde",
@@ -107,7 +107,7 @@
     "id": "soja_milho_pousio",
     "nome": "soja → milho safrinha → pousio (terra parada)",
     "chave": "atual",
-    "nota": "As chaves de sempre (rotacoes.atual, rotacoes.alternativa, comparacao, veredito, prioridades e destaque) comparam soja-milho-pousio com soja-milho-braquiária, no lugar, na terra e na data do produtor; a rotação que ele faz hoje é esta, e a comparação das três está em comparacao_das_rotacoes."
+    "nota": "As chaves de sempre (rotacoes.atual, rotacoes.alternativa, comparacao, veredito, pontos_medidos e destaque) comparam soja-milho-pousio com soja-milho-braquiária, no lugar, na terra e na data do produtor; a rotação que ele faz hoje é esta, e a comparação das três está em comparacao_das_rotacoes."
    },
    "regra_dos_anos": {
     "regra": "rendimento",
@@ -2597,7 +2597,7 @@
      "dias_sem_planta_viva_alternativa": 30
     }
    },
-   "prioridades": [
+   "pontos_medidos": [
     {
      "id": "agua",
      "nome": "Água",
@@ -2673,7 +2673,7 @@
     }
    },
    "destaque": {
-    "prioridade": "agua",
+    "ponto": "agua",
     "nome": "Água",
     "melhor": "empate",
     "veredito_pela_faixa": "depende_da_hipotese"
@@ -3965,6 +3965,7 @@
      "beneficio": "Na conta, esta rotação não ficou na frente das outras em água, calor nem terra coberta.",
      "risco": "Na água do pior ano, ficou atrás de soja, sorgo e pousio (221,6 mm): 258,4 mm de falta.",
      "falta_saber": "Na água do pior ano, a comparação com soja, milho e braquiária depende de quanto o capim disputa água com o milho: isso não foi medido, e por isso a conta dá o menor e o maior valor.",
+     "risco_curto": "Num ano ruim, faltam 258,4 mm de água. Com sorgo faltariam 221,6 mm.",
      "risco_detalhe": "Na água do pior ano, ficou atrás de soja, sorgo e pousio (221,6 mm): 258,4 mm de falta. No calor do pior ano, ficou atrás de soja, sorgo e pousio (0 dias): 19 dias de calor forte. Na terra coberta, ficou atrás de soja, milho e braquiária (30 dias): 122 dias seguidos sem planta viva.",
      "falta_saber_detalhe": "Na água do pior ano, a comparação com soja, milho e braquiária depende de quanto o capim disputa água com o milho: isso não foi medido, e por isso a conta dá o menor e o maior valor. A conta não mede renda, preço, custo nem produtividade, e a palha entra só pelo lado da evaporação. O quanto de terra a palha do milho cobre é hipótese."
     },
@@ -4031,6 +4032,7 @@
      "beneficio": "Na terra coberta, ficou na frente de soja, milho e pousio (122 dias) e soja, sorgo e pousio (122 dias): 30 dias seguidos sem planta viva.",
      "risco": "Na água do pior ano, ficou atrás de soja, sorgo e pousio (221,6 mm): de 257,5 a 267,1 mm de falta.",
      "falta_saber": "Na água do pior ano, a comparação com soja, milho e pousio depende de quanto o capim disputa água com o milho: isso não foi medido, e por isso a conta dá o menor e o maior valor.",
+     "risco_curto": "Num ano ruim, faltam 262,2 mm de água. Com sorgo faltariam 221,6 mm.",
      "risco_detalhe": "Na água do pior ano, ficou atrás de soja, sorgo e pousio (221,6 mm): de 257,5 a 267,1 mm de falta. No calor do pior ano, ficou atrás de soja, sorgo e pousio (0 dias): 19 dias de calor forte. A braquiária bebe água junto com o milho e depois dele: a terra pode chegar mais seca ao plantio da soja.",
      "falta_saber_detalhe": "Na água do pior ano, a comparação com soja, milho e pousio depende de quanto o capim disputa água com o milho: isso não foi medido, e por isso a conta dá o menor e o maior valor. Quanto o capim disputa água com o milho não foi medido: por isso os números desta rotação saem em faixa. O satélite não prova esta rotação, e a conta não mede renda nem o custo da semente do capim."
     },
@@ -4088,6 +4090,7 @@
      "beneficio": "Na água do pior ano, ficou na frente de soja, milho e pousio (258,4 mm) e soja, milho e braquiária (de 257,5 a 267,1 mm): 221,6 mm de falta. No calor do pior ano, ficou na frente de soja, milho e pousio (19 dias) e soja, milho e braquiária (19 dias): 0 dias de calor forte.",
      "risco": "Na terra coberta, ficou atrás de soja, milho e braquiária (30 dias): 122 dias seguidos sem planta viva.",
      "falta_saber": "As fases e o ciclo do sorgo vêm da tabela geral da FAO (o órgão da ONU para a agricultura), que não tem linha de 2ª safra em Goiás, e a raiz do sorgo vale igual à do milho.",
+     "risco_curto": "A terra fica 122 dias seguidos sem planta viva. Com capim seriam 30.",
      "risco_detalhe": "Na terra coberta, ficou atrás de soja, milho e braquiária (30 dias): 122 dias seguidos sem planta viva.",
      "falta_saber_detalhe": "As fases e o ciclo do sorgo vêm da tabela geral da FAO (o órgão da ONU para a agricultura), que não tem linha de 2ª safra em Goiás, e a raiz do sorgo vale igual à do milho. A conta não mede renda nem o preço do sorgo contra o do milho, e o satélite não prova esta rotação."
     }
@@ -4183,7 +4186,7 @@
     "id": "soja_milho_pousio",
     "nome": "soja → milho safrinha → pousio (terra parada)",
     "chave": "atual",
-    "nota": "As chaves de sempre (rotacoes.atual, rotacoes.alternativa, comparacao, veredito, prioridades e destaque) comparam soja-milho-pousio com soja-milho-braquiária, no lugar, na terra e na data do produtor; a rotação que ele faz hoje é esta, e a comparação das três está em comparacao_das_rotacoes."
+    "nota": "As chaves de sempre (rotacoes.atual, rotacoes.alternativa, comparacao, veredito, pontos_medidos e destaque) comparam soja-milho-pousio com soja-milho-braquiária, no lugar, na terra e na data do produtor; a rotação que ele faz hoje é esta, e a comparação das três está em comparacao_das_rotacoes."
    },
    "regra_dos_anos": {
     "regra": "rendimento",
@@ -6656,7 +6659,7 @@
      "dias_sem_planta_viva_alternativa": 30
     }
    },
-   "prioridades": [
+   "pontos_medidos": [
     {
      "id": "agua",
      "nome": "Água",
@@ -6732,7 +6735,7 @@
     }
    },
    "destaque": {
-    "prioridade": "agua",
+    "ponto": "agua",
     "nome": "Água",
     "melhor": "atual",
     "veredito_pela_faixa": "depende_da_hipotese"
@@ -8024,6 +8027,7 @@
      "beneficio": "Na conta, esta rotação não ficou na frente das outras em água, calor nem terra coberta.",
      "risco": "Na água do pior ano, ficou atrás de soja, sorgo e pousio (191,3 mm): 225,9 mm de falta.",
      "falta_saber": "Na água do pior ano, a comparação com soja, milho e braquiária depende de quanto o capim disputa água com o milho: isso não foi medido, e por isso a conta dá o menor e o maior valor.",
+     "risco_curto": "Num ano ruim, faltam 225,9 mm de água. Com sorgo faltariam 191,3 mm.",
      "risco_detalhe": "Na água do pior ano, ficou atrás de soja, sorgo e pousio (191,3 mm): 225,9 mm de falta. No calor do pior ano, ficou atrás de soja, sorgo e pousio (0 dias): 19 dias de calor forte. Na terra coberta, ficou atrás de soja, milho e braquiária (30 dias): 122 dias seguidos sem planta viva.",
      "falta_saber_detalhe": "Na água do pior ano, a comparação com soja, milho e braquiária depende de quanto o capim disputa água com o milho: isso não foi medido, e por isso a conta dá o menor e o maior valor. A conta não mede renda, preço, custo nem produtividade, e a palha entra só pelo lado da evaporação. O quanto de terra a palha do milho cobre é hipótese."
     },
@@ -8090,6 +8094,7 @@
      "beneficio": "Na terra coberta, ficou na frente de soja, milho e pousio (122 dias) e soja, sorgo e pousio (122 dias): 30 dias seguidos sem planta viva.",
      "risco": "Na água do pior ano, ficou atrás de soja, sorgo e pousio (191,3 mm): de 229,8 a 241,2 mm de falta.",
      "falta_saber": "Na água do pior ano, a comparação com soja, milho e pousio depende de quanto o capim disputa água com o milho: isso não foi medido, e por isso a conta dá o menor e o maior valor.",
+     "risco_curto": "Num ano ruim, faltam 235,8 mm de água. Com sorgo faltariam 191,3 mm.",
      "risco_detalhe": "Na água do pior ano, ficou atrás de soja, sorgo e pousio (191,3 mm): de 229,8 a 241,2 mm de falta. No calor do pior ano, ficou atrás de soja, sorgo e pousio (0 dias): 19 dias de calor forte. A braquiária bebe água junto com o milho e depois dele: a terra pode chegar mais seca ao plantio da soja.",
      "falta_saber_detalhe": "Na água do pior ano, a comparação com soja, milho e pousio depende de quanto o capim disputa água com o milho: isso não foi medido, e por isso a conta dá o menor e o maior valor. Quanto o capim disputa água com o milho não foi medido: por isso os números desta rotação saem em faixa. O satélite não prova esta rotação, e a conta não mede renda nem o custo da semente do capim."
     },
@@ -8147,6 +8152,7 @@
      "beneficio": "Na água do pior ano, ficou na frente de soja, milho e pousio (225,9 mm) e soja, milho e braquiária (de 229,8 a 241,2 mm): 191,3 mm de falta. No calor do pior ano, ficou na frente de soja, milho e pousio (19 dias) e soja, milho e braquiária (19 dias): 0 dias de calor forte.",
      "risco": "Na terra coberta, ficou atrás de soja, milho e braquiária (30 dias): 122 dias seguidos sem planta viva.",
      "falta_saber": "As fases e o ciclo do sorgo vêm da tabela geral da FAO (o órgão da ONU para a agricultura), que não tem linha de 2ª safra em Goiás, e a raiz do sorgo vale igual à do milho.",
+     "risco_curto": "A terra fica 122 dias seguidos sem planta viva. Com capim seriam 30.",
      "risco_detalhe": "Na terra coberta, ficou atrás de soja, milho e braquiária (30 dias): 122 dias seguidos sem planta viva.",
      "falta_saber_detalhe": "As fases e o ciclo do sorgo vêm da tabela geral da FAO (o órgão da ONU para a agricultura), que não tem linha de 2ª safra em Goiás, e a raiz do sorgo vale igual à do milho. A conta não mede renda nem o preço do sorgo contra o do milho, e o satélite não prova esta rotação."
     }
@@ -8242,7 +8248,7 @@
     "id": "soja_milho_pousio",
     "nome": "soja → milho safrinha → pousio (terra parada)",
     "chave": "atual",
-    "nota": "As chaves de sempre (rotacoes.atual, rotacoes.alternativa, comparacao, veredito, prioridades e destaque) comparam soja-milho-pousio com soja-milho-braquiária, no lugar, na terra e na data do produtor; a rotação que ele faz hoje é esta, e a comparação das três está em comparacao_das_rotacoes."
+    "nota": "As chaves de sempre (rotacoes.atual, rotacoes.alternativa, comparacao, veredito, pontos_medidos e destaque) comparam soja-milho-pousio com soja-milho-braquiária, no lugar, na terra e na data do produtor; a rotação que ele faz hoje é esta, e a comparação das três está em comparacao_das_rotacoes."
    },
    "regra_dos_anos": {
     "regra": "rendimento",
@@ -10719,7 +10725,7 @@
      "dias_sem_planta_viva_alternativa": 30
     }
    },
-   "prioridades": [
+   "pontos_medidos": [
     {
      "id": "agua",
      "nome": "Água",
@@ -10795,7 +10801,7 @@
     }
    },
    "destaque": {
-    "prioridade": "agua",
+    "ponto": "agua",
     "nome": "Água",
     "melhor": "atual",
     "veredito_pela_faixa": "alternativa_pior"
@@ -12089,6 +12095,7 @@
      "beneficio": "Na água do pior ano, ficou na frente de soja, milho e braquiária (de 211,8 a 224,4 mm): 203,0 mm de falta.",
      "risco": "Na água do pior ano, ficou atrás de soja, sorgo e pousio (168,5 mm): 203,0 mm de falta.",
      "falta_saber": "A conta não mede renda, preço, custo nem produtividade, e a palha entra só pelo lado da evaporação.",
+     "risco_curto": "Num ano ruim, faltam 203,0 mm de água. Com sorgo faltariam 168,5 mm.",
      "risco_detalhe": "Na água do pior ano, ficou atrás de soja, sorgo e pousio (168,5 mm): 203,0 mm de falta. No calor do pior ano, ficou atrás de soja, sorgo e pousio (0 dias): 19 dias de calor forte. Na terra coberta, ficou atrás de soja, milho e braquiária (30 dias): 122 dias seguidos sem planta viva.",
      "falta_saber_detalhe": "A conta não mede renda, preço, custo nem produtividade, e a palha entra só pelo lado da evaporação. O quanto de terra a palha do milho cobre é hipótese."
     },
@@ -12155,6 +12162,7 @@
      "beneficio": "Na terra coberta, ficou na frente de soja, milho e pousio (122 dias) e soja, sorgo e pousio (122 dias): 30 dias seguidos sem planta viva.",
      "risco": "Na água do pior ano, ficou atrás de soja, milho e pousio (203,0 mm) e soja, sorgo e pousio (168,5 mm): de 211,8 a 224,4 mm de falta.",
      "falta_saber": "Quanto o capim disputa água com o milho não foi medido: por isso os números desta rotação saem em faixa.",
+     "risco_curto": "Num ano ruim, faltam 218,3 mm de água. Com sorgo faltariam 168,5 mm.",
      "risco_detalhe": "Na água do pior ano, ficou atrás de soja, milho e pousio (203,0 mm) e soja, sorgo e pousio (168,5 mm): de 211,8 a 224,4 mm de falta. No calor do pior ano, ficou atrás de soja, sorgo e pousio (0 dias): 19 dias de calor forte. A braquiária bebe água junto com o milho e depois dele: a terra pode chegar mais seca ao plantio da soja.",
      "falta_saber_detalhe": "Quanto o capim disputa água com o milho não foi medido: por isso os números desta rotação saem em faixa. O satélite não prova esta rotação, e a conta não mede renda nem o custo da semente do capim."
     },
@@ -12212,6 +12220,7 @@
      "beneficio": "Na água do pior ano, ficou na frente de soja, milho e pousio (203,0 mm) e soja, milho e braquiária (de 211,8 a 224,4 mm): 168,5 mm de falta. No calor do pior ano, ficou na frente de soja, milho e pousio (19 dias) e soja, milho e braquiária (19 dias): 0 dias de calor forte.",
      "risco": "Na terra coberta, ficou atrás de soja, milho e braquiária (30 dias): 122 dias seguidos sem planta viva.",
      "falta_saber": "As fases e o ciclo do sorgo vêm da tabela geral da FAO (o órgão da ONU para a agricultura), que não tem linha de 2ª safra em Goiás, e a raiz do sorgo vale igual à do milho.",
+     "risco_curto": "A terra fica 122 dias seguidos sem planta viva. Com capim seriam 30.",
      "risco_detalhe": "Na terra coberta, ficou atrás de soja, milho e braquiária (30 dias): 122 dias seguidos sem planta viva.",
      "falta_saber_detalhe": "As fases e o ciclo do sorgo vêm da tabela geral da FAO (o órgão da ONU para a agricultura), que não tem linha de 2ª safra em Goiás, e a raiz do sorgo vale igual à do milho. A conta não mede renda nem o preço do sorgo contra o do milho, e o satélite não prova esta rotação."
     }
