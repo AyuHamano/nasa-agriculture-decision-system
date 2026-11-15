@@ -754,8 +754,8 @@ def replay_da_safra(entrada, safra="2015-16", par=None):
             resumo[tipo]["maior_sequencia_de_sede_dias"] = tamanho
             marcos.append({"data": dia["data"], "tipo": "agua_acabou", "cultura": tipo, "dias_seguidos": tamanho,
                            "agua_na_terra_mm": dia["agua_na_terra_mm"],
-                           "frase": f"Neste dia a água fácil de tirar da terra acabou para {nome}: começaram "
-                                    f"{tamanho} dias seguidos de sede."})
+                           "frase": f"Neste dia começou a sede mais longa d{nome}: a água fácil de tirar da terra "
+                                    f"acabou, e foram {tamanho} dias seguidos de sede."})
         # A água no fundo: o primeiro dia em que a água na terra chega ao menor valor do ciclo, só quando nesse dia
         # a planta pediu água e não conseguiu beber nada (se a água não acabou de fato, não há marco). Os números
         # são os dos dias do replay (os que a tela mostra). Com o ciclo pela metade, o menor valor ainda não se sabe.
@@ -763,8 +763,8 @@ def replay_da_safra(entrada, safra="2015-16", par=None):
         fundo = next(linhas[i] for i in indices if linhas[i]["agua_na_terra_mm"] == menor)
         if resumo[tipo]["ciclo_completo"] and fundo["bebido_mm"] == 0.0 and fundo["pedido_mm"] > 0:
             marcos.append({"data": fundo["data"], "tipo": "agua_no_fundo", "cultura": tipo, "agua_na_terra_mm": menor,
-                           "frase": f"Neste dia a água da terra chegou ao fundo para {nome}: ficou em {_n(menor)} mm, "
-                                    "o menor valor do ciclo, e a planta não conseguiu beber nada."})
+                           "frase": f"Neste dia a água que a planta alcança acabou para {nome}: sobrou {_n(menor)} "
+                                    "mm na terra, o menor valor do ciclo, e a planta não conseguiu beber nada."})
         if quentes:
             dia = linhas[quentes[0]]
             marcos.append({"data": dia["data"], "tipo": "calor_forte", "cultura": tipo, "tmax_c": dia["tmax_c"],

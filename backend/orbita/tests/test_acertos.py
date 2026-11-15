@@ -164,21 +164,35 @@ class OMarcoDaAguaNoFundo(unittest.TestCase):
         self.assertEqual([(m["data"], m["tipo"], m["cultura"], m["principal"]) for m in antes], self.DE_ANTES)
         self.assertIn({"data": "2016-04-04", "tipo": "agua_acabou", "cultura": "milho", "dias_seguidos": 60,
                        "agua_na_terra_mm": 17.2, "principal": True,
-                       "frase": "Neste dia a água fácil de tirar da terra acabou para o milho de 2ª safra: começaram "
-                                "60 dias seguidos de sede."}, antes)
+                       # a frase começa pela sede (antes começava por "a água fácil de tirar da terra acabou", e
+                       # quem resumia dizia "a água acabou" no dia 4, vinte dias antes de ela acabar de fato)
+                       "frase": "Neste dia começou a sede mais longa do milho de 2ª safra: a água fácil de tirar da "
+                                "terra acabou, e foram 60 dias seguidos de sede."}, antes)
 
     def test_o_marco_novo_sai_no_dia_em_que_a_agua_chega_ao_fundo(self):
         marcos = self.replay["marcos"]
         novos = [m for m in marcos if m["tipo"] == "agua_no_fundo"]
         self.assertEqual(novos, [{
             "data": "2016-04-24", "tipo": "agua_no_fundo", "cultura": "milho", "agua_na_terra_mm": 0.1,
-            "frase": "Neste dia a água da terra chegou ao fundo para o milho de 2ª safra: ficou em 0,1 mm, o menor "
-                     "valor do ciclo, e a planta não conseguiu beber nada.", "principal": False}])
+            "frase": "Neste dia a água que a planta alcança acabou para o milho de 2ª safra: sobrou 0,1 mm na "
+                     "terra, o menor valor do ciclo, e a planta não conseguiu beber nada.", "principal": False}])
         self.assertEqual(list(novos[0]), ["data", "tipo", "cultura", "agua_na_terra_mm", "frase", "principal"])
         self.assertEqual([m["data"] for m in marcos], sorted(m["data"] for m in marcos))     # em ordem de data
         self.assertEqual(sum(1 for m in marcos if m["principal"]), 1)
         self.assertEqual(conferencia.conferir_texto(novos[0]["frase"], self.replay), [])
         self.assertEqual(motor.registro_da_safra(RIO_VERDE, "2015-16")["marcos"], marcos)
+
+    def test_cada_frase_diz_o_dia_pelo_nome_a_sede_comeca_num_e_a_agua_acaba_no_outro(self):
+        for cidade in ("rio_verde", "jatai", "silvania"):
+            for safra in ("2015-16", "2019-20", "2021-22"):
+                replay = motor.replay_da_safra(dict(RIO_VERDE, cidade_id=cidade), safra)
+                for marco in replay["marcos"]:
+                    if marco["tipo"] == "agua_acabou":                  # o começo da sede: "acabou" só a água fácil
+                        self.assertTrue(marco["frase"].startswith("Neste dia começou a sede mais longa d"), marco)
+                        self.assertNotIn("alcança acabou", marco["frase"])
+                    if marco["tipo"] == "agua_no_fundo":                # o dia em que a água acabou de fato
+                        self.assertTrue(marco["frase"].startswith("Neste dia a água que a planta alcança acabou"), marco)
+                    self.assertEqual(conferencia.conferir_texto(marco["frase"], replay), [], marco)
 
     def test_em_qualquer_cidade_e_safra_o_marco_so_sai_quando_a_agua_acabou_de_fato(self):
         vistos = 0

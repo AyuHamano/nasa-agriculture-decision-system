@@ -80,7 +80,9 @@ rotação que o produtor faz hoje (qualquer uma do cardápio) aparece em `rotaca
   `frase` e `principal` (um só marco é o principal: o começo da maior sequência de dias de sede). As datas dos marcos
   saem da conta.
 - `agua_acabou` é o começo da sede: o dia em que a água fácil de tirar acabou (em Rio Verde, 2015-16, o milho em
-  2016-04-04, com 17,2 mm na terra). Não é o dia em que a água acabou de fato.
+  2016-04-04, com 17,2 mm na terra). Não é o dia em que a água acabou de fato, e por isso a frase dele começa pela
+  sede ("Neste dia começou a sede mais longa do milho de 2ª safra: a água fácil de tirar da terra acabou, e foram 60
+  dias seguidos de sede."); a frase do `agua_no_fundo` é a que diz "a água que a planta alcança acabou".
 - `agua_no_fundo` (acerto de 2026-11-15) é esse dia: o primeiro em que a água na terra chega ao menor valor do ciclo
   da cultura, só quando nesse dia a planta pediu água e não conseguiu beber nada (no mesmo caso, 2016-04-24, com
   0,1 mm). Campos: `data`, `tipo`, `cultura`, `agua_na_terra_mm`, `frase` e `principal` (sempre `false`). Se a água
