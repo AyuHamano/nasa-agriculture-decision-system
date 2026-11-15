@@ -25,7 +25,7 @@ from orbita import hoje as retrato_de_hoje
 from orbita.explicacao import _grau, data_br
 
 UM_DIA = datetime.timedelta(days=1)
-JANELA_DO_CONSUMO_DIAS = 7          # os últimos dias com dado que dão o tempo da conta para a frente (escolha)
+JANELA_DO_CONSUMO_DIAS = retrato_de_hoje.JANELA_DO_CONSUMO_DIAS   # 7: os dias com temperatura que dão o tempo (escolha)
 HORIZONTE_SEM_CHUVA_DIAS = 30       # até onde a conta para a frente vai, sem chuva nenhuma (escolha)
 MINIMO_DE_ANOS_DO_VERDE = 3         # com menos anos na mesma época, o verde não é comparado (escolha)
 ITENS = ("fase", "agua", "calor", "verde", "terra_coberta", "aviso_de_sede")
@@ -65,16 +65,17 @@ AVISO = (retrato_de_hoje.AVISO + " A fase vem do calendário e da tabela da FAO,
          "tempo: é a conta seguida para a frente sem chuva nenhuma.")
 DE_QUAL_DADO = {
     "fase": "o calendário da rotação e as fases da tabela da FAO (não é medida da lavoura), contados até o último "
-            "dia com dado da conta da água",
-    "agua": "a conta da água: o último dia em que há a temperatura (a da NASA POWER) e a chuva do satélite em mm "
-            "de cada dia (o GPM IMERG), as duas",
-    "calor": "a temperatura máxima de cada dia, da NASA POWER (um quadrado de uns 50 km), até o último dia com dado "
-             "da conta da água",
+            "dia com chuva do satélite",
+    "agua": "a conta da água: o último dia com a chuva do satélite em mm (o GPM IMERG); onde a temperatura (a da "
+            "NASA POWER) ainda não chegou, o consumo é o do tempo dos 7 dias anteriores",
+    "calor": "a temperatura máxima de cada dia, da NASA POWER (um quadrado de uns 50 km): o último dia com "
+             "temperatura medida",
     "verde": "a imagem mais recente do satélite com medida boa nos pontos da região (o produto MOD13Q1, da NASA, "
              "que junta 16 dias a partir desta data)",
-    "terra_coberta": "o calendário da rotação (não é medida da lavoura), contado até o último dia com dado da conta "
-                     "da água",
-    "aviso_de_sede": "a conta da água até este dia; daí para a frente é a conta sem chuva nenhuma, não é dado",
+    "terra_coberta": "o calendário da rotação (não é medida da lavoura), contado até o último dia com chuva do "
+                     "satélite",
+    "aviso_de_sede": "a conta da água até este dia, o último com chuva do satélite; daí para a frente é a conta sem "
+                     "chuva nenhuma, não é dado",
 }
 O_QUE_E_O_VERDE = ("O verde do satélite é um índice de 0 a 1: perto de 1, muita planta verde; perto de 0,2, quase "
                    "nenhuma. Cada imagem junta 16 dias.")
@@ -225,12 +226,18 @@ def _item_da_agua(retrato, contas, ultimo):
               f"no do pior ano (safra {pior['safra']}), {_n(pior['agua_na_terra_mm'])} mm.")
     if chuva_ate:
         frase += f" A chuva do satélite já guardada vai até {data_br(chuva_ate)}."
+    if retrato["dias_com_o_consumo_estimado"]:
+        frase += (f" De {data_br(retrato['consumo_estimado_desde'])} em diante a temperatura ainda não chegou: nesses "
+                  f"dias o consumo da cultura é o do tempo dos {JANELA_DO_CONSUMO_DIAS} dias anteriores.")
     campos = ("data", "safra", "agua_na_terra_mm", "agua_na_terra_pct", "com_sede", "diferenca_mm", "leitura")
     return {"situacao": situacao_da_agua(ha_cultura, bool(sede)), "frase": frase,
             "o_que_esta_na_terra": tipo, "agua_na_terra_mm": retrato["agua_na_terra_mm"],
             "agua_que_a_terra_segura_mm": retrato["agua_que_a_terra_segura_mm"],
             "agua_na_terra_pct": retrato["agua_na_terra_pct"], "com_sede": retrato["com_sede"],
             "dias_seguidos_de_sede": sede, "chuva_do_satelite_ate": chuva_ate,
+            "ultimo_dia_com_temperatura": retrato["ultimo_dia_com_temperatura"],
+            "dias_com_o_consumo_estimado": retrato["dias_com_o_consumo_estimado"],
+            "consumo_estimado_desde": retrato["consumo_estimado_desde"], "janela_do_consumo_dias": JANELA_DO_CONSUMO_DIAS,
             "com_a_chuva_de_modelo": {"agua_na_terra_mm": pelo_modelo["agua_na_terra_mm"],
                                       "agua_na_terra_pct": pelo_modelo["agua_na_terra_pct"],
                                       "com_sede": pelo_modelo["com_sede"],
@@ -296,7 +303,7 @@ def _item_do_calor(par, cal, serie, fase, ultimo):
     meio = guardadas["desde_o_plantio"]["valor_do_meio"] if por_safra else None
     nome, grau = NA_TERRA[cultura], _grau(limite["limite_c"])
     teve = f"teve {_dias(desde)}" if desde else "não teve nenhum dia"
-    frase = (f"Do plantio até {data_br(ultimo)}, {nome} {teve} de calor forte (a máxima do dia acima de {grau} °C, "
+    frase = (f"Do plantio até {data_br(ultimo)}, o último dia com temperatura medida, {nome} {teve} de calor forte (a máxima do dia acima de {grau} °C, "
              "o limite da cultura)")
     if desde:
         frase += f", {_dias(na_fase)} na fase atual"
@@ -438,14 +445,15 @@ def _item_da_terra(cal, rotacao, ultimo):
 
 
 # ------------------------------------------------------------------------------------------------ 6. o aviso de sede
-def para_a_frente(entrada, par, serie, cal, janela=JANELA_DO_CONSUMO_DIAS, horizonte=HORIZONTE_SEM_CHUVA_DIAS):
+def para_a_frente(entrada, par, serie, cal, janela=JANELA_DO_CONSUMO_DIAS, horizonte=HORIZONTE_SEM_CHUVA_DIAS,
+                  base=None):
     """A mesma conta da água do motor, seguida para a frente com chuva zero: os registros dos dias seguintes.
 
-    Cada dia seguinte entra sem chuva e com o tempo dos últimos `janela` dias com dado (a média da temperatura e da
-    evaporação de referência); o que a cultura pede em cada dia segue o calendário e as fases, como na conta.
+    Cada dia seguinte entra sem chuva e com o tempo dos últimos `janela` dias com temperatura (a média da temperatura
+    e da evaporação de referência; `base` são os dias com temperatura medida, e sem ela vale a própria série); o que a cultura pede em cada dia segue o calendário e as fases, como na conta.
     """
     from orbita import motor
-    ultimos = serie[-janela:]
+    ultimos = (base or serie)[-janela:]
     media = lambda campo: sum(getattr(dia, campo) for dia in ultimos) / len(ultimos)  # noqa: E731
     futuro = [clima.Dia(serie[-1].data + datetime.timedelta(days=k), 0.0, media("tmax"), media("tmin"), media("eto"))
               for k in range(1, horizonte + 1)]
@@ -504,7 +512,8 @@ def _item_do_aviso(entrada, par, contas, tipo, ultimo, hoje, chuva_recente):
 
     def lado(registros, serie):
         sede = dias_seguidos(registros, com_sede)
-        dias, motivo = (None, "ja_com_sede") if sede else dias_ate_a_sede(para_a_frente(entrada, par, serie, contas["cal"]), tipo)
+        dias, motivo = (None, "ja_com_sede") if sede else dias_ate_a_sede(
+            para_a_frente(entrada, par, serie, contas["cal"], base=contas["com_temperatura"]), tipo)
         return {"ja_com_sede": bool(sede), "dias_seguidos_de_sede": sede, "dias_ate_a_sede": dias,
                 "data_da_sede": None if dias is None else (ultimo + datetime.timedelta(days=dias)).isoformat(),
                 "sem_sede_porque": motivo if dias is None and not sede else None}
@@ -529,10 +538,9 @@ def _item_do_aviso(entrada, par, contas, tipo, ultimo, hoje, chuva_recente):
     else:
         frase = f"Se não chover nada depois de {data_br(ultimo)}, {em_palavras(satelite)}."
     frase += (f" A conta segue a água da terra para a frente com o tempo dos últimos {JANELA_DO_CONSUMO_DIAS} dias "
-              f"com dado, em que a lavoura bebeu em média {_n(consumo)} mm por dia.")
+              f"com temperatura; nos últimos {JANELA_DO_CONSUMO_DIAS} dias da conta a lavoura bebeu em média {_n(consumo)} mm por dia.")
     if hoje > ultimo:
-        frase += (f" Até o dia desta consulta ({data_br(hoje)}) já se passaram {_dias((hoje - ultimo).days)} que a "
-                  "conta ainda não fechou")
+        frase += f" O dia desta consulta é {data_br(hoje)}, {_dias((hoje - ultimo).days)} depois do último dado"
         frase += "." if depois is None else (
             f"; de {data_br(depois['de'])} a {data_br(depois['ate'])} o satélite já marcou "
             f"{_n(depois['satelite_rapido_mm'])} mm de chuva, que ainda não entraram na conta.")
@@ -586,20 +594,23 @@ def lavoura_hoje(entrada, par=None, hoje=None, pasta_da_chuva_recente=None, past
         return retrato
     entrada = motor.validar_entrada(dict(entrada, chuva=None))
     recente, _ = retrato_de_hoje.ler_chuva_recente(entrada["cidade_id"], pasta_da_chuva_recente)
-    contas = retrato_de_hoje.contas_de_hoje(entrada, par, recente)
+    contas = retrato_de_hoje.contas_de_hoje(entrada, par, recente, hoje)
     cal, rotacao = contas["cal"], contas["rotacao"]
     ultimo, tipo = contas["com_recente"][-1].data, retrato["o_que_esta_na_terra"]
     cidade = retrato["local"]["nome"]
     fase = _item_da_fase(cal, rotacao, tipo, ultimo, hoje)
+    # O calor só conta até o último dia com temperatura medida (a fase dele é a desse dia).
+    com_temperatura = contas["com_temperatura"][-1].data
+    fase_do_calor = fase_no_dia(cal, rotacao["segunda"], com_temperatura) or {"cultura": None}
     itens = {"fase": fase, "agua": _item_da_agua(retrato, contas, ultimo),
-             "calor": _item_do_calor(par, cal, contas["com_recente"], fase, ultimo),
+             "calor": _item_do_calor(par, cal, contas["com_temperatura"], fase_do_calor, com_temperatura),
              "verde": _item_do_verde(entrada["cidade_id"], cidade, cal, rotacao, hoje, pasta_do_verde),
              "terra_coberta": _item_da_terra(cal, rotacao, ultimo),
              "aviso_de_sede": _item_do_aviso(entrada, par, contas, tipo, ultimo, hoje, recente)}
     lista = []
     for ident in ITENS:
         item = itens[ident]
-        data = item.get("imagem") if ident == "verde" else ultimo.isoformat()
+        data = {"verde": item.get("imagem"), "calor": com_temperatura.isoformat()}.get(ident, ultimo.isoformat())
         lista.append(dict({"id": ident, "titulo": TITULOS[ident], "situacao": item["situacao"],
                            "situacao_nome": NOMES_DAS_SITUACOES[item["situacao"]], "frase": item["frase"],
                            "ultimo_dado": {"data": data, "de": DE_QUAL_DADO[ident]},
@@ -610,6 +621,8 @@ def lavoura_hoje(entrada, par=None, hoje=None, pasta_da_chuva_recente=None, past
             "plantio_da_soja_informado": retrato["plantio_da_soja_informado"], "hoje": retrato["hoje"],
             "ultimo_dia_com_dado": retrato["ultimo_dia_com_dado"],
             "ultimo_dia_com_dado_de": retrato["ultimo_dia_com_dado_de"], "atraso_dias": retrato["atraso_dias"],
+            "ultimo_dia_com_temperatura": retrato["ultimo_dia_com_temperatura"],
+            "dias_com_o_consumo_estimado": retrato["dias_com_o_consumo_estimado"],
             "safra": retrato["safra"], "situacao": situacao, "situacao_nome": NOMES_DAS_SITUACOES[situacao],
             "frase": _resumo(cidade, ultimo, itens), "itens": lista, "regras": dict(REGRAS),
             "janela_do_consumo_dias": JANELA_DO_CONSUMO_DIAS, "horizonte_sem_chuva_dias": HORIZONTE_SEM_CHUVA_DIAS,

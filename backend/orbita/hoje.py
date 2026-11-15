@@ -25,16 +25,18 @@ from orbita.explicacao import data_br
 
 PASTA_DA_CHUVA_RECENTE = clima.PASTA_DOS_DADOS / "recente"          # a leitura da cor (só a conferência)
 PASTA_DA_CHUVA_DO_DIA = clima.PASTA_DOS_DADOS / "chuva-do-dia"      # a chuva do satélite por dia, em mm
+JANELA_DO_CONSUMO_DIAS = 7      # os dias com temperatura que dão o tempo dos dias em que ela ainda não chegou
 AVISO = ("A chuva dos dias recentes é a chuva medida por satélite da NASA (o GPM IMERG), em mm de cada dia, nas "
          "versões rápidas (a Late e, nos dias em que ela ainda não chegou, a Early), que a NASA ainda corrige; vem da "
          "cópia dos arquivos da NASA que a dynamical.org mantém. A temperatura é a da NASA POWER, de um quadrado de "
-         "uns 50 km, e chega com uns 3 dias de atraso: por isso o último dia da conta fica antes do último dia de "
-         "chuva. É um retrato para conversar com o agrônomo, não uma medida da lavoura.")
+         "uns 50 km, e chega com uns 3 dias de atraso: nos dias em que ela ainda não chegou, a conta usa a chuva "
+         "do satélite e, para o consumo da cultura, o tempo médio dos 7 dias anteriores com temperatura. É um retrato para conversar com o agrônomo, não uma medida da lavoura.")
 
 # As duas datas que se chamam "último dia com dado" são de dados diferentes: cada uma diz de qual, ao lado.
-DIA_DA_CONTA = ("da conta: o último dia em que há a temperatura (a da NASA POWER) e a chuva rápida do satélite, as "
-                "duas, sem dia faltando no meio. É o dia do retrato: o que está na terra, a água e a sede valem "
-                "neste dia.")
+DIA_DA_CONTA = ("da conta: o último dia com a chuva do satélite em mm, sem dia faltando no meio. Nos dias em que a "
+                "temperatura (a da NASA POWER) ainda não chegou, o consumo da cultura é o do tempo médio dos 7 dias "
+                "anteriores com temperatura; a chuva é a do satélite. É o dia do retrato: o que está na terra, a "
+                "água e a sede valem neste dia.")
 DIA_DA_CHUVA_RAPIDA = ("só da chuva rápida do satélite: o último dia com chuva no arquivo baixado. Pode passar do "
                        "dia do retrato, que também precisa da temperatura.")
 
@@ -149,6 +151,25 @@ def esticar(dias_guardados, dias_da_temperatura, chuva_recente):
     return com_recente, com_modelo
 
 
+def seguir_com_a_chuva(serie, chuva_recente, ate=None, janela=JANELA_DO_CONSUMO_DIAS):
+    """Segue a série até o último dia com chuva do satélite, nos dias em que a temperatura ainda não chegou.
+
+    Cada dia a mais entra com a chuva de verdade do satélite e com o tempo médio dos últimos `janela` dias com
+    temperatura (a média da máxima, da mínima e da evaporação de referência): a mesma regra do aviso de sede. Para
+    no primeiro dia sem chuva guardada (dia sem dado nunca vira zero) e nunca passa de `ate` (o dia da consulta).
+    Devolve (a série seguida, os dias em que o consumo é estimado).
+    """
+    ultimos = serie[-janela:]
+    media = lambda campo: sum(getattr(dia, campo) for dia in ultimos) / len(ultimos)  # noqa: E731
+    tmax, tmin, eto = media("tmax"), media("tmin"), media("eto")
+    seguida, estimados, dia = list(serie), [], serie[-1].data + datetime.timedelta(days=1)
+    while (ate is None or dia <= ate) and chuva_recente.get(dia) is not None:
+        seguida.append(clima.Dia(dia, chuva_recente[dia], tmax, tmin, eto))
+        estimados.append(dia)
+        dia += datetime.timedelta(days=1)
+    return seguida, estimados
+
+
 def _no_dia(registros, data):
     for r in reversed(registros):
         if r.data == data:
@@ -179,7 +200,7 @@ def _retrato(registros, data):
             "chuva_desde_1_de_setembro_mm": round(chuva, 1) + 0.0}
 
 
-def contas_de_hoje(entrada, par, chuva_recente):
+def contas_de_hoje(entrada, par, chuva_recente, hoje=None):
     """A conta da água até o último dia com dado, com as duas chuvas: a base do "como está hoje" e do "a lavoura hoje".
 
     `entrada` já conferida (`motor.validar_entrada`). Devolve as séries (a guardada, a esticada com a chuva rápida do
@@ -189,12 +210,16 @@ def contas_de_hoje(entrada, par, chuva_recente):
     from orbita import motor
     guardados, _ = motor._serie(entrada)
     temperatura = clima.ler_serie(clima.pastas_da_cidade(entrada["cidade_id"])["nasa_power"])
-    com_recente, com_modelo = esticar(guardados, temperatura, chuva_recente)
+    com_temperatura, com_modelo = esticar(guardados, temperatura, chuva_recente)
+    # Desde 2026-11-15 a conta segue até o último dia com chuva do satélite: onde a temperatura ainda não chegou, o
+    # consumo é o do tempo médio dos 7 dias anteriores. A conta com a chuva de modelo para no último dia dela.
+    com_recente, estimados = seguir_com_a_chuva(com_temperatura, chuva_recente, ate=hoje)
     cal = rotacoes.calendario(par, entrada["plantio_da_soja"])
     registros, rotacao = motor.simular_a_rotacao_de_hoje(entrada, par, com_recente, cal)
     registros_do_modelo, _ = motor.simular_a_rotacao_de_hoje(entrada, par, com_modelo, cal)
     _, regra = motor._regra_dos_anos(entrada, guardados)
     return {"guardados": guardados, "com_recente": com_recente, "com_modelo": com_modelo, "cal": cal,
+            "com_temperatura": com_temperatura, "dias_estimados": estimados,
             "registros": registros, "registros_do_modelo": registros_do_modelo, "rotacao": rotacao, "regra": regra}
 
 
@@ -222,13 +247,17 @@ def como_esta_hoje(entrada, par=None, hoje=None, pasta_da_chuva_recente=None):
         return {"disponivel": False, "local": dict(cidade, id=entrada["cidade_id"]),
                 "aviso": f"A chuva do dia de {cidade['nome']} não está guardada: rode data/orbita/chuva-do-dia/"
                          "baixar_chuva_do_dia.py para o ponto da cidade."}
-    contas = contas_de_hoje(entrada, par, recente)
+    contas = contas_de_hoje(entrada, par, recente, hoje)
     guardados, com_recente, com_modelo = contas["guardados"], contas["com_recente"], contas["com_modelo"]
     registros, registros_do_modelo = contas["registros"], contas["registros_do_modelo"]
     rotacao, regra = contas["rotacao"], contas["regra"]
     ultimo = com_recente[-1].data
     agora = _retrato(registros, ultimo)
-    pelo_modelo = _retrato(registros_do_modelo, ultimo)
+    pelo_modelo = _retrato(registros_do_modelo, com_modelo[-1].data)     # o último dia com a chuva de modelo
+    com_temperatura, estimados = contas["com_temperatura"][-1].data, contas["dias_estimados"]
+    antes = "1 dia" if (hoje - ultimo).days == 1 else f"{(hoje - ultimo).days} dias"
+    estimado = (f"; de {data_br(estimados[0])} em diante a temperatura ainda não chegou, e o consumo da cultura é o "
+                f"dos {JANELA_DO_CONSUMO_DIAS} dias anteriores" if estimados else "")
     normal = _retrato(registros, _mesmo_dia(ultimo, regra["ano_normal"]))
     pior = _retrato(registros, _mesmo_dia(ultimo, regra["pior_ano"]))
     primeiro_recente = guardados[-1].data + datetime.timedelta(days=1)
@@ -243,11 +272,11 @@ def como_esta_hoje(entrada, par=None, hoje=None, pasta_da_chuva_recente=None):
     na_terra = ("A terra está sem planta viva." if agora["o_que_esta_na_terra"] == "sem_planta"
                 else f"Na terra está {NA_TERRA[agora['o_que_esta_na_terra']]}.")
     # As duas datas vão escritas: a frase continua verdadeira quando é lida depois (numa conversa guardada).
-    frase = (f"Em {cidade['nome']}, o último dia com dado é {data_br(ultimo)}, {(hoje - ultimo).days} dias antes "
+    frase = (f"Em {cidade['nome']}, o último dia com dado é {data_br(ultimo)}, {antes} antes "
              f"do dia desta consulta ({data_br(hoje)}). {na_terra} A conta dá "
              f"{_n(agora['agua_na_terra_mm'])} mm de água na camada de terra onde ficam as raízes, "
              f"{_n(agora['agua_na_terra_pct'])}% do que a terra segura (a chuva do satélite, em mm de cada dia, "
-             f"vai até {data_br(fonte['ultimo_dia_com_dado'])}). No mesmo dia do ano normal (safra {regra['ano_normal']}) "
+             f"vai até {data_br(fonte['ultimo_dia_com_dado'])}{estimado}). No mesmo dia do ano normal (safra {regra['ano_normal']}) "
              f"havia {_n(normal['agua_na_terra_mm'])} mm; no do pior ano (safra {regra['pior_ano']}), "
              f"{_n(pior['agua_na_terra_mm'])} mm.")
     return {
@@ -256,6 +285,9 @@ def como_esta_hoje(entrada, par=None, hoje=None, pasta_da_chuva_recente=None):
         "plantio_da_soja_informado": entrada["plantio_da_soja"],
         "hoje": hoje.isoformat(), "ultimo_dia_com_dado": ultimo.isoformat(), "ultimo_dia_com_dado_de": DIA_DA_CONTA,
         "atraso_dias": (hoje - ultimo).days,
+        "ultimo_dia_com_temperatura": com_temperatura.isoformat(), "dias_com_o_consumo_estimado": len(estimados),
+        "consumo_estimado_desde": estimados[0].isoformat() if estimados else None,
+        "janela_do_consumo_dias": JANELA_DO_CONSUMO_DIAS,
         "safra": balanco.nome_da_safra(ultimo),
         "o_que_esta_na_terra": agora["o_que_esta_na_terra"], "agua_na_terra_mm": agora["agua_na_terra_mm"],
         "agua_que_a_terra_segura_mm": agora["agua_que_a_terra_segura_mm"],

@@ -21,7 +21,8 @@ DIA_DO_TESTE = D(2026, 11, 15)
 PAINEL = motor.lavoura_hoje(ENTRADA, hoje=DIA_DO_TESTE)
 RETRATO = motor.como_esta_hoje(ENTRADA, hoje=DIA_DO_TESTE)
 ITENS = {item["id"]: item for item in PAINEL["itens"]}
-ULTIMO = D.fromisoformat(PAINEL["ultimo_dia_com_dado"])
+ULTIMO = D.fromisoformat(PAINEL["ultimo_dia_com_dado"])                       # o último dia com chuva do satélite
+ULTIMO_COM_TEMPERATURA = D.fromisoformat(PAINEL["ultimo_dia_com_temperatura"])  # o calor só conta até aqui
 PAR = parametros.carregar()
 CAL = rotacoes.calendario(PAR)
 
@@ -108,7 +109,10 @@ class OPainel(unittest.TestCase):
         self.assertTrue(str(erro.exception).startswith("Entrada fora do formato:"))
 
     def test_o_como_esta_hoje_continua_com_os_campos_de_sempre(self):
-        self.assertEqual(sorted(RETRATO), sorted([
+        # Nenhum campo de antes saiu; os 4 a mais entraram quando a conta passou a seguir até o último dia de chuva.
+        novos = ["ultimo_dia_com_temperatura", "dias_com_o_consumo_estimado", "consumo_estimado_desde",
+                 "janela_do_consumo_dias"]
+        self.assertEqual(sorted(RETRATO), sorted(novos + [
             "disponivel", "local", "rotacao", "terra", "plantio_da_soja_informado", "hoje", "ultimo_dia_com_dado",
             "ultimo_dia_com_dado_de", "atraso_dias", "safra", "o_que_esta_na_terra", "agua_na_terra_mm",
             "agua_que_a_terra_segura_mm", "agua_na_terra_pct", "com_sede", "chuva_desde_1_de_setembro_mm",
@@ -202,7 +206,7 @@ class OCalor(unittest.TestCase):
         self.assertEqual((item["cultura"], item["limite_c"]), ("soja", limite))
         maximas = {d.data: d.tmax for d in clima.ler_serie(clima.pastas_da_cidade("rio_verde")["nasa_power"])}
         plantio = D(2026, 10, 15)
-        dias = [plantio + i * UM_DIA for i in range((ULTIMO - plantio).days + 1)]
+        dias = [plantio + i * UM_DIA for i in range((ULTIMO_COM_TEMPERATURA - plantio).days + 1)]
         self.assertEqual(item["dias_de_calor_forte_desde_o_plantio"], sum(maximas[d] > limite for d in dias))
         self.assertLessEqual(item["dias_de_calor_forte_na_fase_atual"], item["dias_de_calor_forte_desde_o_plantio"])
         self.assertEqual(item["dias_de_calor_forte_na_fase_critica"], 0)        # a fase crítica só começa em 24/11
@@ -215,7 +219,10 @@ class OCalor(unittest.TestCase):
             na_mao.append(sum(maximas[comeco + i * UM_DIA] > limite for i in range(len(dias))))
             self.assertEqual(guardadas["por_safra"][safra]["desde_o_plantio"], na_mao[-1], safra)
         self.assertEqual(guardadas["desde_o_plantio"]["valor_do_meio"], statistics.median(na_mao))
-        self.assertEqual(item["ultimo_dado"]["data"], ULTIMO.isoformat())
+        # O calor só conta até o último dia com temperatura medida, e diz a data dele (a conta da água vai além).
+        self.assertEqual(item["ultimo_dado"]["data"], ULTIMO_COM_TEMPERATURA.isoformat())
+        self.assertIn(f"até {lavoura.data_br(ULTIMO_COM_TEMPERATURA)}, o último dia com temperatura medida", item["frase"])
+        self.assertLessEqual(item["dia_da_maxima"], ULTIMO_COM_TEMPERATURA.isoformat())
 
     def test_a_regra_da_situacao_do_calor(self):
         self.assertEqual(lavoura.situacao_do_calor(na_fase_critica=1, desde_o_plantio=1, valor_do_meio=5), "alerta")
@@ -317,8 +324,9 @@ class OAvisoDeSede(unittest.TestCase):
         self.assertEqual(futuros[0].data, contas["com_recente"][-1].data + UM_DIA)
         self.assertTrue(all(r.chuva == 0.0 for r in futuros))
         self.assertTrue(all(b.data == a.data + UM_DIA for a, b in zip(futuros, futuros[1:])))
-        ultimos = contas["com_recente"][-lavoura.JANELA_DO_CONSUMO_DIAS:]
-        self.assertAlmostEqual(futuros[0].eto, sum(d.eto for d in ultimos) / 7)   # o tempo dos últimos 7 dias
+        ultimos = contas["com_temperatura"][-lavoura.JANELA_DO_CONSUMO_DIAS:]
+        medido = lavoura.para_a_frente(entrada, PAR, contas["com_recente"], contas["cal"], base=contas["com_temperatura"])
+        self.assertAlmostEqual(medido[0].eto, sum(d.eto for d in ultimos) / 7)    # o tempo dos últimos 7 dias medidos
         agua = [contas["registros"][-1].agua_na_terra] + [r.agua_na_terra for r in futuros if r.tipo == "soja"]
         self.assertTrue(all(depois <= antes + 1e-9 for antes, depois in zip(agua, agua[1:])))   # sem chuva, só desce
 
@@ -351,12 +359,27 @@ class OAvisoDeSede(unittest.TestCase):
                          {"de": "2026-11-12", "ate": "2026-11-13", "dias": 2, "satelite_rapido_mm": 12.5})
         self.assertEqual(lavoura.chuva_depois(chuva, dia, dia + UM_DIA)["dias"], 1)      # nunca passa do dia da consulta
         self.assertIsNone(lavoura.chuva_depois(chuva, dia + 2 * UM_DIA, D(2026, 11, 15)))  # dia sem dado não vira zero
-        item, (recente, _) = ITENS["aviso_de_sede"], hoje.ler_chuva_recente("rio_verde")
-        depois = item["chuva_depois_do_ultimo_dia"]
-        self.assertEqual(depois["de"], (ULTIMO + UM_DIA).isoformat())
-        self.assertEqual(depois["ate"], RETRATO["chuva_recente"]["fonte"]["ultimo_dia_com_dado"])
-        self.assertEqual(depois["satelite_rapido_mm"], round(sum(
-            recente[ULTIMO + i * UM_DIA] for i in range(1, depois["dias"] + 1)), 1))
+        # No painel a conta já vai até o último dia com chuva do satélite: não sobra chuva fora da conta.
+        self.assertIsNone(ITENS["aviso_de_sede"]["chuva_depois_do_ultimo_dia"])
+
+    def test_a_conta_vai_ate_o_ultimo_dia_com_chuva_e_cada_item_diz_a_data_do_seu_dado(self):
+        self.assertEqual(PAINEL["ultimo_dia_com_dado"], RETRATO["chuva_recente"]["fonte"]["ultimo_dia_com_dado"])
+        self.assertEqual(PAINEL["dias_com_o_consumo_estimado"], (ULTIMO - ULTIMO_COM_TEMPERATURA).days)
+        for nome in ("fase", "agua", "terra_coberta", "aviso_de_sede"):
+            self.assertEqual(ITENS[nome]["ultimo_dado"]["data"], ULTIMO.isoformat(), nome)
+            self.assertIn(lavoura.data_br(ULTIMO), ITENS[nome]["frase"], nome)
+        agua = ITENS["agua"]
+        self.assertEqual((agua["ultimo_dia_com_temperatura"], agua["janela_do_consumo_dias"]),
+                         (ULTIMO_COM_TEMPERATURA.isoformat(), 7))
+        if PAINEL["dias_com_o_consumo_estimado"]:
+            self.assertEqual(agua["consumo_estimado_desde"], (ULTIMO_COM_TEMPERATURA + UM_DIA).isoformat())
+            self.assertIn("o consumo da cultura é o do tempo dos 7 dias anteriores", agua["frase"])
+            entrada = motor.validar_entrada(ENTRADA)
+            contas = hoje.contas_de_hoje(entrada, PAR, hoje.ler_chuva_recente("rio_verde")[0], DIA_DO_TESTE)
+            recente = hoje.ler_chuva_recente("rio_verde")[0]
+            for dia in contas["com_recente"][len(contas["com_temperatura"]):]:
+                self.assertEqual(dia.chuva, recente[dia.data])                    # a chuva de verdade do satélite
+                self.assertAlmostEqual(dia.eto, sum(d.eto for d in contas["com_temperatura"][-7:]) / 7)
 
     def test_a_regra_da_situacao_do_aviso(self):
         s = lavoura.situacao_do_aviso

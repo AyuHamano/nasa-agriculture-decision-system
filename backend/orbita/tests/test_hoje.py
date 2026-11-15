@@ -102,7 +102,33 @@ class Retrato(unittest.TestCase):
         chuva, _ = hoje.ler_chuva_recente("rio_verde")
         com_chuva = max(dia for dia, mm in chuva.items() if mm is not None and dia <= DIA_DO_TESTE)
         self.assertEqual(da_chuva["ultimo_dia_com_dado"], com_chuva.isoformat())
-        self.assertEqual(RETRATO["ultimo_dia_com_dado"], min(com_chuva, temperatura[-1].data).isoformat())
+        # Desde 2026-11-15 a conta segue até o último dia com chuva do satélite: onde a temperatura ainda não chegou,
+        # o consumo é o do tempo dos 7 dias anteriores, e a resposta diz qual é o último dia com temperatura.
+        com_temperatura = min(com_chuva, temperatura[-1].data)
+        self.assertEqual(RETRATO["ultimo_dia_com_dado"], com_chuva.isoformat())
+        self.assertEqual(RETRATO["ultimo_dia_com_temperatura"], com_temperatura.isoformat())
+        self.assertEqual(RETRATO["dias_com_o_consumo_estimado"], (com_chuva - com_temperatura).days)
+        self.assertEqual(RETRATO["janela_do_consumo_dias"], 7)
+        self.assertEqual(RETRATO["com_a_chuva_de_modelo"]["data"], com_temperatura.isoformat())
+        if RETRATO["dias_com_o_consumo_estimado"]:
+            self.assertEqual(RETRATO["consumo_estimado_desde"], (com_temperatura + datetime.timedelta(days=1)).isoformat())
+            self.assertIn("o consumo da cultura é o dos 7 dias anteriores", RETRATO["frase"])
+
+    def test_a_conta_segue_ate_o_ultimo_dia_com_chuva_com_o_tempo_dos_7_dias_anteriores(self):
+        dia = lambda n, tmax, eto: clima.Dia(D(2026, 11, 1) + datetime.timedelta(days=n), 1.0, tmax, 20.0, eto)  # noqa: E731
+        serie = [dia(n, 30.0 + n, 4.0 + n) for n in range(10)]                    # a temperatura vai até 10/11
+        chuva = {D(2026, 11, 10): 99.0, D(2026, 11, 11): 12.5, D(2026, 11, 12): 0.0, D(2026, 11, 13): None,
+                 D(2026, 11, 14): 30.0}
+        seguida, estimados = hoje.seguir_com_a_chuva(serie, chuva)
+        self.assertEqual(estimados, [D(2026, 11, 11), D(2026, 11, 12)])           # para no dia 13, em branco
+        self.assertEqual(seguida[:10], serie)                                     # o que já havia não muda
+        self.assertEqual([d.chuva for d in seguida[10:]], [12.5, 0.0])            # a chuva de verdade do satélite
+        for novo in seguida[10:]:                                                 # o tempo médio dos últimos 7 dias
+            self.assertAlmostEqual(novo.tmax, sum(30.0 + n for n in range(3, 10)) / 7)
+            self.assertAlmostEqual(novo.eto, sum(4.0 + n for n in range(3, 10)) / 7)
+            self.assertAlmostEqual(novo.tmin, 20.0)
+        self.assertEqual(hoje.seguir_com_a_chuva(serie, chuva, ate=D(2026, 11, 11))[1], [D(2026, 11, 11)])
+        self.assertEqual(hoje.seguir_com_a_chuva(serie, {}), (serie, []))
 
     def test_a_frase_so_tem_numero_da_conta(self):
         self.assertEqual(conferencia.conferir_texto(RETRATO["frase"], RETRATO), [])

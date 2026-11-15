@@ -66,8 +66,9 @@ class AsFrasesDoProdutor(unittest.TestCase):
     def test_o_como_esta_hoje_escreve_as_duas_datas_e_nao_um_hoje_solto(self):
         agora = motor.como_esta_hoje(RIO_VERDE, hoje=DIA)
         ultimo = explicacao.data_br(agora["ultimo_dia_com_dado"])
-        self.assertIn(f"o último dia com dado é {ultimo}, {agora['atraso_dias']} dias antes do dia desta consulta "
-                      "(15/11/2026).", agora["frase"])
+        antes = "1 dia" if agora["atraso_dias"] == 1 else f"{agora['atraso_dias']} dias"     # "1 dia", não "1 dias"
+        self.assertIn(f"o último dia com dado é {ultimo}, {antes} antes do dia desta consulta (15/11/2026).",
+                      agora["frase"])
         self.assertNotIn("antes de hoje", agora["frase"])
         self.assertIn("na camada de terra onde ficam as raízes", agora["frase"])
         # Desde 2026-11-15 a água sai como um número só, com a chuva do satélite em mm de cada dia: a frase diz até

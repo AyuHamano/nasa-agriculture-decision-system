@@ -301,7 +301,10 @@ A resposta (`motor.lavoura_hoje`; os números mudam com o dado guardado, e aqui 
 - Desde 2026-11-15 a chuva dos dias recentes é a chuva do satélite em mm de cada dia (`data/orbita/chuva-do-dia/`), e
   não mais a lida da cor da imagem: a água sai como um número só (`faixa_da_agua_na_terra_mm` fica com as duas pontas
   iguais, `com_a_chuva_de_modelo` fica só para comparar), no painel e no "como está hoje". O exemplo acima foi escrito
-  antes dessa troca: com ela e com a temperatura até 12/11/2026, o `ultimo_dia_com_dado` é `2026-11-12`.
+  antes dessa troca. Hoje a conta segue até o último dia com chuva do satélite (`ultimo_dia_com_dado`: `2026-11-14`
+  na consulta de 2026-11-15); onde a temperatura ainda não chegou, o consumo é o do tempo dos 7 dias anteriores
+  (`ultimo_dia_com_temperatura`, `dias_com_o_consumo_estimado`, `consumo_estimado_desde`), e o calor conta só até o
+  último dia com temperatura medida. A regra está no `LEIA-ME-motor.md`, seção 12.
 - Sem a chuva recente guardada: `{"disponivel": false, "aviso": ...}`. Entrada errada: 400, com a frase do motor.
 - As regras de cada situação, a janela de 7 dias e os 30 dias estão no `LEIA-ME-motor.md`, seção 10. Na linha de
   comando: `python3 -m orbita.perguntar --lavoura-hoje --cidade jatai --plantio 2026-10-20` (com `--json`, a estrutura).

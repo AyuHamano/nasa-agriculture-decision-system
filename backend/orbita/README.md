@@ -226,7 +226,7 @@ registro da safra) · `explicacao.py` (o texto) · `mensagem.py` (o texto curto)
 texto) · `ndvi.py` · `perguntar.py` e `validar.py` (os comandos) · `api.py` (as rotas) · `conversa.py` (a conversa em
 passos, sem IA) · `agente.py`, `ficha.py`, `ferramentas.py` e `modelo.py` (o agente) · `exportar.py` e
 `exportar_conversas.py` (os arquivos que a tela lê) · `conversas-guardadas/` (as conversas de exemplo) · `tests/`
-(489 testes, com os da API e os do agente; a rota `POST /lavoura-hoje` e o comando `--lavoura-hoje`, a lavoura hoje em seis itens, estão no `API.md` e no `LEIA-ME-motor.md`, seção 10).
+(491 testes, com os da API e os do agente; a rota `POST /lavoura-hoje` e o comando `--lavoura-hoje`, a lavoura hoje em seis itens, estão no `API.md` e no `LEIA-ME-motor.md`, seção 10).
 
 Os outros manuais desta pasta: `API.md` (as rotas e os campos, um a um), `LEIA-ME-motor.md` (o que o motor ganhou em
 2026-11-15, as fontes novas e os limites) e `LEIA-ME-agente.md` (o agente e as garantias).

@@ -106,7 +106,7 @@ comparação das rotações, e agora cada um diz de onde vem:
 ## 2. Como rodar
 De dentro de `backend/`:
 ```bash
-python3 -m unittest                                   # 489 testes (os 227 de antes e os novos)
+python3 -m unittest                                   # 491 testes (os 227 de antes e os novos)
 python3 -m orbita.perguntar --cidade jatai --rotacao soja,sorgo --plantio 2026-11-20   # 3 rotações comparadas
 python3 -m orbita.perguntar --cidade jatai --rotacao soja,sorgo --plantio 20/11        # entrada errada: a frase, saída 2
 python3 -m orbita.perguntar --cidade silvania --lugar          # os fatos do clima do lugar
@@ -344,9 +344,9 @@ A pedido da coordenação, num commit à parte do painel:
   padrão) pergunta de novo os últimos dias à NASA POWER e troca o -999 pelo valor só onde os três parâmetros já
   chegaram; dia que já tinha valor não muda. Em 2026-11-15, 08h18, entrou o dia 12/11/2026 nas três cidades (o
   endereço e a hora estão em `acrescimos.json`, em cada pasta); 13/11 em diante a NASA POWER ainda não tinha.
-- **A data de cada dado, na consulta de 2026-11-15:** a conta da água, a fase, o calor, a terra coberta e o aviso de
-  sede, até 12/11/2026 (o último dia com a temperatura); a chuva do satélite, até 14/11/2026 (Late até 13/11, Early no
-  dia 14); o verde do satélite, a imagem de 16/10/2026.
+- **A data de cada dado, na consulta de 2026-11-15** (já com a regra da seção 12): a conta da água, a fase, a terra
+  coberta e o aviso de sede, até 14/11/2026 (o último dia com chuva do satélite: Late até 13/11, Early no dia 14); o
+  calor, até 12/11/2026 (o último dia com temperatura medida); o verde do satélite, a imagem de 16/10/2026.
 - **O que saber:** o dia da chuva nova é o de Brasília e o da temperatura e da chuva guardada é o da NASA POWER (na
   emenda de 14 para 15/09/2026 ficam 3 horas sem entrar em nenhuma das duas); em Rio Verde, de 15/09 a 12/11/2026, a
   chuva nova soma 431,8 mm (a lida da cor dava 411,0 mm até 11/11).
@@ -355,3 +355,27 @@ A pedido da coordenação, num commit à parte do painel:
   agente (`agente.py`) ainda manda dar "os dois valores da água"; os documentos de `docs/orbita/` e a seção 3 deste
   arquivo ainda descrevem a leitura da cor como a fonte da conta. Nenhuma rotina agendada baixa a chuva ou a
   temperatura: é rodar os dois programas à mão.
+
+## 12. A conta segue até o último dia com chuva do satélite (2026-11-15, 08h30)
+A temperatura da NASA POWER chega uns 3 dias depois; a chuva do satélite, no dia seguinte. Antes a conta parava no
+último dia com as duas (12/11/2026) e deixava de fora a chuva que já tinha chegado (em Rio Verde, 23,7 mm em 13 e
+14/11). **A regra, escolha desta versão:**
+- A conta da água segue até o último dia com chuva do satélite guardada, sem dia faltando no meio e nunca depois do
+  dia da consulta (`hoje.seguir_com_a_chuva`). Nos dias em que a temperatura ainda não chegou, entra a chuva de
+  verdade do satélite e, para o consumo da cultura, o tempo médio dos últimos 7 dias com temperatura (a média da
+  máxima, da mínima e da evaporação de referência): a mesma regra que o aviso de sede usa para a frente. O que a
+  cultura pede nesses dias segue o calendário e as fases, como no resto da conta.
+- A fase, a terra coberta e o aviso de sede acompanham esse dia. O aviso de sede parte dele, e o tempo dos dias para a
+  frente continua sendo o dos últimos 7 dias com temperatura medida (não os estimados).
+- **O calor não usa dia estimado:** conta só até o último dia com temperatura medida, e a frase e o `ultimo_dado`
+  dele dizem essa data.
+- A conta com a chuva de modelo (`com_a_chuva_de_modelo`, só para comparar) para no último dia com temperatura, que é
+  até onde a chuva de modelo vai; o campo `data` dela diz o dia.
+- Na resposta do `como_esta_hoje` e do painel entraram `ultimo_dia_com_temperatura`, `dias_com_o_consumo_estimado`,
+  `consumo_estimado_desde` e `janela_do_consumo_dias` (7); `ultimo_dia_com_dado` passa a ser o último dia com chuva.
+  A frase da água diz, em poucas palavras, de que dia em diante o consumo é o dos 7 dias anteriores.
+- Na consulta de 2026-11-15: a conta vai até 14/11/2026, com 2 dias de consumo estimado (13 e 14/11); em Rio Verde a
+  água passou de 58,6 mm (em 12/11) para 66,0 mm (em 14/11, a terra cheia), e a sede, sem chuva, chega em 7 dias
+  (21/11/2026).
+- O limite: nos dias estimados a temperatura de verdade pode ter sido outra; quando ela chega (rodando
+  `data/orbita/nasa-power/acrescentar_dias.py`), a conta desses dias é refeita com o dado medido.
