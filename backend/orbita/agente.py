@@ -1,0 +1,555 @@
+# Gerado com IA (Claude)
+"""O agente: a IA que conversa com o produtor, colhe a ficha, consulta a conta e explica o resultado.
+
+Uso (o molde é o do `conversa.passo`; nada fica guardado aqui dentro):
+    from orbita import agente, modelo
+    estado, saida = agente.passo(None, "oi", modelo.do_ambiente())        # o começo: o estado é None
+    estado, saida = agente.passo(estado, "planto soja e milho em Jataí", modelo.do_ambiente())
+    agente.resposta_da_rota(estado, saida)                                # o que a rota POST /agente devolve
+
+No terminal, de dentro de backend/ (precisa da chave no ambiente; ver LEIA-ME-agente.md):
+    python3 -m orbita.agente
+
+O que a IA faz: entende a fala do produtor, propõe os valores da ficha, escolhe qual ferramenta consultar e
+escreve a explicação. O que o PROGRAMA garante, sem depender do pedido à IA:
+- A ficha é fechada: só entra valor das listas do motor (`ficha.py`), e é o programa que lê o "sim" do produtor.
+- A conta só roda com a ficha confirmada. Ferramenta da conta pedida antes disso não roda.
+- Com a ficha confirmada, toda resposta sai com a comparação de 3 rotações ou mais, contando a de hoje, cada uma
+  com a evidência, o benefício, o risco e o que falta saber (`comparacao`), e com o aviso do agrônomo (`aviso`).
+- A trava dos números: o texto da IA é conferido por `conferencia.conferir_texto` contra a ficha, a comparação e
+  o que as ferramentas devolveram nesta fala; se ela não consultou nada nesta fala, o texto não pode ter número
+  nenhum. Sobrou número, a IA tenta uma vez de novo; sobrou outra vez, o texto dela não sai: saem as frases
+  prontas, feitas só com as frases do motor (`texto_de` diz qual dos dois foi).
+- A marca `apoio` sai das ferramentas que a IA consultou de fato: `conta` (o ensaio, o replay, o registro, o
+  "como está hoje"), `dados_do_lugar` (só o clima ou o verde do satélite) ou `conhecimento_geral` (nenhuma; aí o
+  programa põe o aviso na frente do texto). Antes de a ficha ser confirmada, `apoio` e `comparacao` são vazios.
+- O `momento`: `depois` (o verde do satélite ou o registro), `durante` (o replay de uma safra ou o "como está
+  hoje") ou `antes` (o resto).
+
+O estado é pequeno e vira JSON: a ficha, a pergunta que o produtor fez antes de fechar a ficha, o momento e as
+últimas falas (cortadas). Quem chama guarda e devolve na fala seguinte; cabe no limite do corpo da API.
+A IA não escolhe a rotação pelo produtor, e nenhum dado pessoal é pedido.
+"""
+import datetime
+import json
+import re
+import sys
+
+from orbita import conferencia, conversa, ferramentas, ficha
+
+VERSAO = 1
+MAX_FALAS = 6                    # as últimas falas que voltam no estado (3 do produtor e 3 do agente)
+TAMANHO_DA_FALA = 1300           # o tamanho de cada fala guardada no estado, em bytes, já como JSON
+TAMANHO_DO_TEXTO = 1500          # letras da fala do produtor que o agente lê
+TAMANHO_DA_PERGUNTA = 500        # o tamanho da pergunta guardada, em bytes, já como JSON
+VOLTAS = 4                       # rodadas de ferramenta por fala
+PEDIDOS = 7                      # pedidos à IA por fala, no máximo
+MOMENTOS = ("antes", "durante", "depois")
+APOIOS = ("conta", "dados_do_lugar", "conhecimento_geral")
+QUANTOS_MARCOS = 8
+
+AVISO = "Converse com o agrônomo antes de decidir."
+AVISO_DE_CONHECIMENTO_GERAL = "Isto é conhecimento geral: não saiu da conta com os dados da NASA."
+PERGUNTA_PADRAO = "Vale trocar a minha rotação de hoje por outra?"
+SAUDACAO = ("Olá! Aqui é o Órbita Rural. Eu ensaio a sua rotação de culturas com o que os satélites da NASA "
+            "registraram na sua região: comparo o que você planta hoje com outras rotações, no ano normal e no pior "
+            "ano, e cada número vem da conta.\nNão peço nome nem telefone. A decisão é sua, com o seu agrônomo.")
+NAO_ENTENDI = "Não entendi."
+PODE_PERGUNTAR = ("Pode perguntar sobre a sua rotação. Por exemplo: vale trocar o que eu planto? Como foi a pior "
+                  "safra, dia a dia? Quantos dias a terra fica sem planta viva?")
+DE_NADA = "Por nada! " + PODE_PERGUNTAR + " A comparação das rotações continua aqui embaixo."
+FICHA_MUDOU = "Mudei a sua ficha, e por isso a conta espera você confirmar de novo."
+FICHA_NAO_CONFIRMADA = ("A ficha ainda não foi confirmada pelo produtor: a conta só roda depois do sim dele. Não "
+                        "diga nenhum número da conta.")
+SEM_CONTA = ("Sobre isso eu não tenho conta, e por isso não dou número. O que a conta mostra da sua rotação está na "
+             "comparação aqui embaixo. Para esse assunto, converse com o agrônomo.")
+SEM_NUMERO = "Fiz a conta. O resultado de cada rotação está na comparação aqui embaixo."
+CONTA_RECUSADA = "Não consegui fazer a conta com essa ficha. {motivo} Diga o que corrigir."
+AVISO_DA_TRAVA = ("A conferência achou números que não estão no que as ferramentas devolveram nesta fala: {sobras}. "
+                  "Escreva a resposta inteira de novo sem esses números. Se o número é da conta, consulte a "
+                  "ferramenta nesta fala e use o número exato dela. Não peça desculpa nem fale da correção.")
+
+OLA = ("oi", "ola", "oie", "opa", "alo", "bom dia", "boa tarde", "boa noite", "e ai", "eai", "oi tudo bem",
+       "ola tudo bem", "oi bom dia", "oi boa tarde", "oi boa noite", "comecar", "inicio")
+CORTESIAS = ("obrigado", "obrigada", "muito obrigado", "muito obrigada", "brigado", "brigada", "valeu", "ok",
+             "ok obrigado", "ok obrigada", "beleza", "entendi", "certo", "ta bom", "tudo bem", "legal", "tchau",
+             "ate mais", "ate logo")
+SIM = ("sim", "s", "isso", "isso mesmo", "e isso", "e isso mesmo", "confirmo", "confirmado", "confirma", "certo",
+       "esta certo", "ta certo", "tudo certo", "certinho", "correto", "esta correto", "ta correto", "exato", "ok",
+       "perfeito", "positivo", "fechado", "pode sim", "pode fazer", "pode seguir", "pode rodar", "pode fazer a conta")
+NEGAM = ("mas", "nao", "porem", "errado", "errada", "corrige", "corrigir", "corrija", "menos")
+
+REGRAS = """Você é o agente do Órbita Rural. Você conversa com um produtor rural de Goiás sobre a rotação de \
+culturas dele (o que ele planta, em que ordem, ao longo do ano). Fale em português simples, com frases curtas. Se \
+usar um termo técnico, explique na mesma frase.
+
+Como a conversa anda:
+1. Primeiro a ficha: o lugar da lavoura, o que ele planta hoje, o tipo de terra, o que mais preocupa e, se ele \
+disser, o dia do plantio da soja. Tudo o que ele disser sobre isso você anota com a ferramenta anotar_na_ficha. Só \
+existem os valores das listas da ferramenta: se ele disser algo fora da lista, diga quais são as opções. Não anote \
+o que ele não disse.
+2. O programa mostra a ficha e o produtor confirma. Quem lê o "sim" é o programa, não você.
+3. Com a ficha confirmada, você responde às perguntas dele consultando as ferramentas da conta: clima_do_lugar, \
+ensaio_da_rotacao e verde_do_satelite.
+
+Qual ferramenta para qual pergunta:
+- Antes de plantar ("o que eu planto agora?", "vale trocar?", "milho ou sorgo?"): ensaio_da_rotacao.
+- Durante a safra ("como está a lavoura?", "como foi tal safra, dia a dia?"): clima_do_lugar com hoje=true, ou \
+ensaio_da_rotacao com a safra (vale "pior_ano").
+- Depois da colheita ("o que a terra mostrou?", "quantos dias ficou sem planta?"): verde_do_satelite, com a safra \
+se ele falar de uma.
+
+As regras que nunca mudam:
+- Você não cria número. Todo número que você escrever tem de estar, igual, no que uma ferramenta devolveu nesta \
+fala. Não some, não subtraia, não tire média, não faça porcentagem, não conte itens. Precisa de um número? Chame a \
+ferramenta. Não tem o número? Diga sem número.
+- Você não escolhe a rotação pelo produtor. Você mostra o que a conta diz de cada rotação (a evidência, o \
+benefício, o risco e o que falta saber) e ajuda a comparar. A decisão é dele, com o agrônomo.
+- Pergunta sobre o que a conta não mede (adubo e nutrientes, pragas e doenças, preço e mercado, máquinas, \
+crédito): não chame ferramenta; responda em poucas frases como conhecimento geral, sem número nenhum, e diga que \
+isso não saiu da conta.
+- Não peça nome, telefone, CPF nem endereço. Não prometa lucro nem produtividade.
+- Embaixo da sua resposta o programa mostra a comparação das rotações lado a lado e o aviso de conversar com o \
+agrônomo. Não repita a tabela inteira: explique o que ela mostra para a pergunta dele.
+- Escreva texto corrido, sem markdown (sem asterisco, sem cerquilha, sem tabela), com até uns 900 caracteres."""
+
+
+def _cortar(texto, teto):
+    """O texto cortado para caber em `teto` bytes depois de virar JSON (a conta mais larga: \\uXXXX por letra
+    acentuada). Assim o estado cabe no corpo da API, escreva quem chama o JSON como escrever."""
+    texto = texto.strip()
+    if len(json.dumps(texto)) <= teto:
+        return texto
+    while texto and len(json.dumps(texto + "…")) > teto:
+        texto = texto[:max(len(texto) * 9 // 10, len(texto) - 40)].rstrip()
+    return texto + "…"
+
+
+def _sem_marcas(texto):
+    """O texto da IA sem as marcas de markdown, que a tela não desenha."""
+    texto = re.sub(r"[*`]", "", texto or "")
+    texto = re.sub(r"(?m)^\s{0,3}#{1,6}\s*", "", texto)
+    texto = re.sub(r"(?m)^\s*[-–]\s+", "• ", texto)
+    return re.sub(r"\n{3,}", "\n\n", texto).strip()
+
+
+def _disse_sim(fala):
+    """O "sim" do produtor, lido pelo programa: a fala começa por uma confirmação e não traz ressalva."""
+    palavras = re.findall(r"[a-z0-9]+", fala)
+    junto = " ".join(palavras)
+    if not palavras or any(palavra in NEGAM for palavra in palavras):
+        return False
+    return any(junto == sim or junto.startswith(sim + " ") for sim in SIM)
+
+
+def _novo():
+    return {"v": VERSAO, "ficha": ficha.nova(), "pergunta": None, "momento": "antes", "falas": []}
+
+
+def _conferir_estado(estado, listas, hoje):
+    """O estado limpo (só o que o agente conhece), ou None se veio vazio ou estragado: aí a conversa recomeça."""
+    if not isinstance(estado, dict) or estado.get("v") != VERSAO:
+        return None
+    falas = []
+    for item in estado["falas"][-MAX_FALAS:] if isinstance(estado.get("falas"), list) else []:
+        if (isinstance(item, dict) and item.get("de") in ("produtor", "agente")
+                and isinstance(item.get("texto"), str) and item["texto"].strip()):
+            falas.append({"de": item["de"], "texto": _cortar(item["texto"], TAMANHO_DA_FALA)})
+    while falas and falas[0]["de"] != "produtor":
+        falas.pop(0)
+    pergunta = estado.get("pergunta")
+    return {"v": VERSAO, "ficha": ficha.conferir(estado.get("ficha"), listas, hoje),
+            "pergunta": _cortar(pergunta, TAMANHO_DA_PERGUNTA) if isinstance(pergunta, str) and pergunta.strip()
+            else None,
+            "momento": estado.get("momento") if estado.get("momento") in MOMENTOS else "antes", "falas": falas}
+
+
+def _instrucoes(fch, hoje):
+    """As regras do agente, com a ficha de agora e o ponto em que a conversa está."""
+    if fch["confirmada"]:
+        ponto = ("A ficha está confirmada. Para cada pergunta, consulte a ferramenta que responde a ela antes de "
+                 "escrever. Se o produtor quiser mudar a ficha (outro lugar, outra terra, outra data), anote com "
+                 "anotar_na_ficha: o programa pede a confirmação de novo.")
+    elif ficha.completa(fch):
+        ponto = ("A ficha está completa e espera o sim do produtor. Se ele corrigir algo, anote. As ferramentas da "
+                 "conta só funcionam depois do sim; até lá, não diga nenhum número da conta.")
+    else:
+        ponto = ("A ficha ainda não está completa. Anote o que o produtor disser e peça o que falta, numa frase só. "
+                 "As ferramentas da conta só funcionam depois que ele confirmar a ficha; até lá, não diga nenhum "
+                 "número da conta.")
+    return (f"{REGRAS}\n\nHoje é {hoje.isoformat()}.\nA ficha agora: "
+            f"{json.dumps(ficha.publica(fch), ensure_ascii=False)}\n{ponto}")
+
+
+def _conversa(estado, fch, hoje, fala_do_produtor):
+    return ([{"de": "sistema", "texto": _instrucoes(fch, hoje)}]
+            + [{"de": item["de"], "texto": item["texto"]} for item in estado["falas"]]
+            + [{"de": "produtor", "texto": fala_do_produtor}])
+
+
+def _conta(fch, comparacao, consultas):
+    """A conta contra a qual o texto é conferido: a ficha, a comparação e o que a IA leu das ferramentas."""
+    return {"ficha": fch, "comparacao": comparacao, "consultas": list(consultas)}
+
+
+def _permitidos(hoje, comparacao=None):
+    """Os números que valem além da conta: a data de hoje e quantas rotações a comparação tem."""
+    return [hoje.isoformat()] + ([len(comparacao)] if comparacao else [])
+
+
+def conferir_saida(saida, hoje):
+    """Confere de novo o texto de uma saída guardada, só com o que está nela. Lista vazia = o texto está na conta.
+
+    `hoje` é o dia em que a saída foi feita. Serve a quem guarda conversas (`exportar_conversas`) e a quem duvidar.
+    """
+    return conferencia.conferir_texto(saida["resposta"],
+                                      _conta(saida["ficha"], saida["comparacao"], saida["consultas"]),
+                                      _permitidos(hoje, saida["comparacao"]))
+
+
+def _sair(estado, texto, resposta, hoje, *, comparacao=None, apoio=None, momento=None,
+          texto_de="frases_prontas", passou=True, sobras=(), tentativas=0, consultas=(), replay=None):
+    """Monta o estado novo e a saída. O texto que sai, de quem for, passa pela conferência mais uma vez."""
+    conta = _conta(ficha.publica(estado["ficha"]), comparacao, consultas)
+    if conferencia.conferir_texto(resposta, conta, _permitidos(hoje, comparacao)):
+        resposta, texto_de, passou = (SEM_NUMERO if comparacao else NAO_ENTENDI), "frases_prontas", False
+    momento = momento or estado["momento"]
+    falas = estado["falas"] + [{"de": "produtor", "texto": _cortar(texto, TAMANHO_DA_FALA) or "…"},
+                               {"de": "agente", "texto": _cortar(resposta, TAMANHO_DA_FALA)}]
+    estado = dict(estado, momento=momento, falas=falas[-MAX_FALAS:])
+    saida = {"resposta": resposta, "momento": momento, "ficha": ficha.publica(estado["ficha"]),
+             "comparacao": comparacao, "apoio": apoio,
+             "conferencia": {"passou": passou, "sobras": list(sobras), "tentativas": tentativas},
+             "aviso": AVISO, "texto_de": texto_de, "consultas": list(consultas), "replay": replay}
+    return estado, saida
+
+
+def resposta_da_rota(estado, saida):
+    """O que a rota POST /agente devolve: o estado (para quem chama guardar) e a saída do passo."""
+    return dict({"estado": estado}, **saida)
+
+
+# ---------------------------------------------------------------------------------------------- a ficha
+
+def _resultado_da_ficha(fch, aceitos, recusados, listas):
+    if ficha.completa(fch):
+        dizer = ("A ficha está completa. O programa mostra a ficha ao produtor e pede o sim dele: não escreva a "
+                 "ficha de novo.")
+    else:
+        dizer = "Peça ao produtor o que falta, numa frase só e sem número. " + ficha.pergunta_do_que_falta(fch, listas)
+    return {"anotado": aceitos, "recusado": recusados, "ficha": ficha.publica(fch), "o_que_dizer": dizer}
+
+
+def _colher(estado, texto, modelo, listas, hoje):
+    """A ficha ainda não foi confirmada: a IA anota o que o produtor disse e pede o que falta."""
+    antes = fch = estado["ficha"]
+    definicoes = [ficha.definicao(listas)]
+    mensagens = _conversa(estado, fch, hoje, texto)
+    texto_da_ia, pedidos = "", 0
+    while pedidos < 3:
+        resposta = modelo.responder(mensagens, definicoes)
+        pedidos += 1
+        if not resposta["chamadas"]:
+            texto_da_ia = _sem_marcas(resposta["texto"])
+            break
+        mensagens.append({"de": "agente", "texto": resposta["texto"], "chamadas": resposta["chamadas"]})
+        for pedido in resposta["chamadas"]:
+            if pedido["nome"] == "anotar_na_ficha":
+                fch, aceitos, recusados = ficha.anotar(fch, pedido["argumentos"], listas, hoje)
+                resultado = _resultado_da_ficha(fch, aceitos, recusados, listas)
+            elif pedido["nome"] in ferramentas.NOMES:            # a conta não roda antes do sim do produtor
+                resultado = {"erro": FICHA_NAO_CONFIRMADA}
+            else:
+                resultado = {"erro": f"A ferramenta {pedido['nome']} não existe."}
+            mensagens.append({"de": "ferramenta", "id": pedido["id"], "nome": pedido["nome"],
+                              "resultado": resultado})
+        if ficha.completa(fch) and fch != antes:                 # o programa mostra a ficha: não precisa de mais
+            break
+    estado = dict(estado, ficha=fch)
+    if "?" in texto:
+        estado["pergunta"] = _cortar(texto, TAMANHO_DA_PERGUNTA)
+    sobras = (conferencia.conferir_texto(texto_da_ia, _conta(ficha.publica(fch), None, ()), _permitidos(hoje))
+              if texto_da_ia else [])
+    vale = bool(texto_da_ia) and not sobras
+    if ficha.completa(fch):
+        pronto = ficha.resumo(fch, listas)
+        vale = vale and fch == antes                             # mudou a ficha: sai só a ficha, para conferir
+    else:
+        pronto = ficha.pergunta_do_que_falta(fch, listas)
+    if not vale:
+        resposta_final = pronto
+    elif ficha.completa(fch) or "?" not in texto_da_ia:
+        resposta_final = texto_da_ia + "\n\n" + pronto
+    else:
+        resposta_final = texto_da_ia
+    return _sair(estado, texto, resposta_final, hoje, texto_de="ia" if vale else "frases_prontas",
+                 passou=not sobras, sobras=sobras, tentativas=1 if texto_da_ia else 0)
+
+
+# ---------------------------------------------------------------------------------------------- a conta
+
+class _Consultas:
+    """As consultas de uma fala: roda cada ferramenta, guarda o que a IA leu e não repete o ensaio."""
+
+    def __init__(self, fch):
+        self.ficha, self.feitas, self.replay, self._ensaio = fch, [], None, None
+
+    def ensaio(self):
+        if self._ensaio is None:
+            self._ensaio = ferramentas.ensaio_da_rotacao(self.ficha)
+        return self._ensaio
+
+    def chamar(self, nome, argumentos):
+        argumentos = {chave: valor for chave, valor in (argumentos if isinstance(argumentos, dict) else {}).items()
+                      if chave in ("safra", "hoje") and valor not in (None, "", False)}
+        if nome == "ensaio_da_rotacao" and not argumentos.get("safra"):
+            resultado = self.ensaio()
+        else:
+            resultado = ferramentas.chamar(nome, self.ficha, argumentos)
+        if "erro" in resultado:
+            return resultado
+        if isinstance(resultado.get("replay"), dict):
+            self.replay = resultado["replay"]
+        self.feitas.append({"ferramenta": nome, "argumentos": argumentos,
+                            "resultado": ferramentas.para_a_ia(resultado)})
+        return self.feitas[-1]["resultado"]
+
+
+def _tem(consulta, chave):
+    bloco = consulta["resultado"].get(chave)
+    return isinstance(bloco, dict) and bloco.get("disponivel") is not False
+
+
+def _apoio(consultas):
+    """Em que a resposta se apoia, pelo que a IA consultou de fato."""
+    if any(c["ferramenta"] == "ensaio_da_rotacao" or _tem(c, "registro") or _tem(c, "hoje") for c in consultas):
+        return "conta"
+    return "dados_do_lugar" if consultas else "conhecimento_geral"
+
+
+def _momento(consultas):
+    if any(_tem(c, "registro") for c in consultas):
+        return "depois"
+    if any(_tem(c, "replay") or _tem(c, "hoje") for c in consultas):
+        return "durante"
+    return "depois" if any(c["ferramenta"] == "verde_do_satelite" for c in consultas) else "antes"
+
+
+def _frases_de(bloco):
+    """As frases prontas que o motor pôs num bloco: `frase` e `frases`."""
+    if not isinstance(bloco, dict):
+        return []
+    frases = [bloco.get("frase")] + (bloco["frases"] if isinstance(bloco.get("frases"), list) else [])
+    return [f.strip() for f in frases if isinstance(f, str) and f.strip()]
+
+
+def _data_do_marco(iso):
+    try:
+        dia = datetime.date.fromisoformat(str(iso)[:10])
+    except ValueError:
+        return str(iso)
+    return f"{dia.day:02d}/{dia.month:02d}/{dia.year}"
+
+
+def _frases_da_comparacao(comparacao, lugar):
+    linhas = [f"Fiz a conta para {lugar} e comparei {len(comparacao)} rotações, contando a sua de hoje:"]
+    linhas += [f"• {item['nome']}{' (a de hoje)' if item.get('de_hoje') is True else ''}: {item['evidencia']}"
+               for item in comparacao]
+    return "\n".join(linhas + ["O benefício, o risco e o que falta saber de cada uma estão na comparação aqui embaixo."])
+
+
+def _frases_prontas(consultas, comparacao, lugar):
+    """A resposta sem IA: só as frases que o motor escreveu, na ordem do que foi consultado."""
+    if not consultas:
+        return SEM_CONTA
+    partes = []
+    for consulta in consultas:
+        resultado = consulta["resultado"]
+        if consulta["ferramenta"] == "clima_do_lugar":
+            anos = resultado.get("regra_dos_anos") if isinstance(resultado.get("regra_dos_anos"), dict) else {}
+            if anos.get("pior_ano") and anos.get("ano_normal"):
+                partes.append(f"Em {lugar}, pelo que os satélites registraram, a pior safra foi a de "
+                              f"{anos['pior_ano']} e a safra normal, a de {anos['ano_normal']}.")
+            partes += _frases_de(resultado) + _frases_de(resultado.get("calor"))
+            hoje = resultado.get("hoje") if isinstance(resultado.get("hoje"), dict) else {}
+            partes += _frases_de(hoje) + ([hoje["aviso"]] if isinstance(hoje.get("aviso"), str) else [])
+        elif consulta["ferramenta"] == "verde_do_satelite":
+            partes += _frases_de(resultado) + ([resultado["aviso"]] if isinstance(resultado.get("aviso"), str) else [])
+            registro = resultado.get("registro") if isinstance(resultado.get("registro"), dict) else {}
+            partes += _frases_de(registro) + ([registro["aviso"]] if isinstance(registro.get("aviso"), str) else [])
+        elif isinstance(resultado.get("replay"), dict):
+            replay = resultado["replay"]
+            marcos = [m for m in replay.get("marcos") or [] if isinstance(m, dict) and isinstance(m.get("frase"), str)]
+            if marcos:
+                partes.append(f"A safra {replay.get('safra')} em {lugar}, dia a dia:\n" + "\n".join(
+                    f"• {_data_do_marco(m.get('data'))}: {m['frase']}" for m in marcos[:QUANTOS_MARCOS]))
+    return "\n\n".join(dict.fromkeys(partes + [_frases_da_comparacao(comparacao, lugar)]))
+
+
+def _conta_recusada(estado, texto, erro, hoje):
+    """O motor recusou a ficha: ela deixa de estar confirmada, e o produtor lê o motivo em português."""
+    motivo = str(erro).replace("Entrada fora do formato:", "").strip().rstrip(".") + "."
+    estado = dict(estado, ficha=dict(estado["ficha"], confirmada=False))
+    return _sair(estado, texto, CONTA_RECUSADA.format(motivo=motivo[0].upper() + motivo[1:]), hoje,
+                 consultas=[{"ferramenta": "ensaio_da_rotacao", "argumentos": {}, "resultado": {"erro": motivo}}])
+
+
+def _responder(estado, texto, pergunta, modelo, listas, hoje):
+    """A ficha está confirmada: a IA consulta as ferramentas e explica; o programa confere e completa."""
+    fch = estado["ficha"]
+    consultas = _Consultas(fch)
+    try:
+        base = consultas.ensaio()                    # a comparação sai sempre, pergunte a IA ou não
+    except ferramentas.FichaRecusada as erro:
+        return _conta_recusada(estado, texto, erro, hoje)
+    comparacao, lugar = base["rotacoes"], base["lugar"]
+    permitidos = _permitidos(hoje, comparacao)
+
+    def conta():
+        return _conta(ficha.publica(fch), comparacao, consultas.feitas)
+
+    if pergunta is None:                              # uma cortesia ("obrigado"): não precisa da IA
+        return _sair(estado, texto, DE_NADA, hoje, comparacao=comparacao, apoio="conta")
+    definicoes = ferramentas.definicoes() + [ficha.definicao(listas)]
+    mensagens = _conversa(estado, fch, hoje, pergunta)
+    texto_da_ia, sobras_da_ia, pedidos, voltas, tentativas, nova_ficha = "", [], 0, 0, 0, None
+    while pedidos < PEDIDOS:
+        resposta = modelo.responder(mensagens, definicoes)
+        pedidos += 1
+        if resposta["chamadas"]:
+            if voltas >= VOLTAS:
+                break
+            voltas += 1
+            mensagens.append({"de": "agente", "texto": resposta["texto"], "chamadas": resposta["chamadas"]})
+            for pedido in resposta["chamadas"]:
+                if pedido["nome"] == "anotar_na_ficha":
+                    mudada, aceitos, recusados = ficha.anotar(nova_ficha or fch, pedido["argumentos"], listas, hoje)
+                    if mudada != (nova_ficha or fch):
+                        nova_ficha = mudada
+                    resultado = _resultado_da_ficha(mudada, aceitos, recusados, listas)
+                elif pedido["nome"] in ferramentas.NOMES and nova_ficha is None:
+                    try:
+                        resultado = consultas.chamar(pedido["nome"], pedido["argumentos"])
+                    except ferramentas.FichaRecusada as erro:
+                        return _conta_recusada(estado, texto, erro, hoje)
+                elif pedido["nome"] in ferramentas.NOMES:
+                    resultado = {"erro": FICHA_NAO_CONFIRMADA}
+                else:
+                    resultado = {"erro": f"A ferramenta {pedido['nome']} não existe."}
+                mensagens.append({"de": "ferramenta", "id": pedido["id"], "nome": pedido["nome"],
+                                  "resultado": resultado})
+            if nova_ficha is not None:
+                break
+            continue
+        tentativas += 1
+        texto_da_ia = _sem_marcas(resposta["texto"])
+        if not texto_da_ia:
+            break
+        if consultas.feitas:
+            sobras = conferencia.conferir_texto(texto_da_ia, conta(), permitidos)
+        else:                                         # sem consulta nesta fala, o texto não pode ter número nenhum
+            sobras = conferencia.conferir_texto(texto_da_ia, {})
+        if not sobras:
+            break
+        sobras_da_ia, falhou, texto_da_ia = sobras, texto_da_ia, ""
+        if tentativas >= 2:
+            break
+        mensagens.append({"de": "agente", "texto": falhou})
+        mensagens.append({"de": "programa", "texto": AVISO_DA_TRAVA.format(sobras=", ".join(sobras))})
+
+    if nova_ficha is not None:                        # a ficha mudou: a conta espera o sim de novo
+        estado = dict(estado, ficha=nova_ficha, pergunta=_cortar(texto, TAMANHO_DA_PERGUNTA) if "?" in texto else None)
+        return _sair(estado, texto, FICHA_MUDOU + "\n\n" + ficha.resumo(nova_ficha, listas), hoje)
+    apoio = _apoio(consultas.feitas)
+    if texto_da_ia:
+        final = texto_da_ia if apoio != "conhecimento_geral" else AVISO_DE_CONHECIMENTO_GERAL + "\n\n" + texto_da_ia
+        sobras_da_ia = []
+    else:
+        final = _frases_prontas(consultas.feitas, comparacao, lugar)
+    return _sair(dict(estado, pergunta=None), texto, final, hoje, comparacao=comparacao, apoio=apoio, momento=_momento(consultas.feitas), texto_de="ia" if texto_da_ia else "frases_prontas",
+                 passou=not sobras_da_ia, sobras=sobras_da_ia, tentativas=tentativas, consultas=consultas.feitas,
+                 replay=consultas.replay)
+
+
+# ---------------------------------------------------------------------------------------------- o passo
+
+def passo(estado, texto, modelo, hoje=None):
+    """Um passo da conversa: o estado anterior (None no começo), a fala do produtor e o modelo (a IA).
+
+    Devolve (o estado novo, a saída). A saída tem os campos do mapa (seção 7.4): `resposta`, `momento`, `ficha`,
+    `comparacao`, `apoio`, `conferencia` e `aviso`; e mais `texto_de` ("ia" ou "frases_prontas"), `consultas` (o que a
+    IA leu das ferramentas nesta fala, para qualquer um conferir os números de novo) e `replay` (os dias de uma
+    safra, quando o replay foi pedido). `hoje` é a data de hoje (serve aos testes).
+    Erros: `ferramentas.ContaIndisponivel` (o motor não tem a conta) e `modelo.ErroDoModelo` (a IA não respondeu).
+    """
+    if estado is not None and not isinstance(estado, dict):
+        raise ValueError("Conversa fora do formato: o estado tem de ser o que a chamada anterior devolveu (um objeto) "
+                         "ou vazio (null), no começo.")
+    if not isinstance(texto, str):
+        raise ValueError("Conversa fora do formato: o texto tem de ser a frase que a pessoa escreveu.")
+    hoje = hoje or datetime.date.today()
+    listas = ferramentas.listas()
+    texto = " ".join(texto.split())[:TAMANHO_DO_TEXTO]
+    fala = conversa._limpar(texto)
+    estado = _conferir_estado(estado, listas, hoje) or _novo()
+    if fala in conversa.DE_NOVO:
+        estado = _novo()
+    fch = estado["ficha"]
+    vazia = not any(fch.get(campo) for campo in ficha.CAMPOS)
+    if vazia and (not fala or fala in OLA or fala in conversa.DE_NOVO):
+        return _sair(estado, texto, SAUDACAO + "\n\n" + ficha.pergunta_do_que_falta(fch, listas), hoje)
+    if not fala:
+        pronto = (PODE_PERGUNTAR if fch["confirmada"] else ficha.resumo(fch, listas) if ficha.completa(fch)
+                  else ficha.pergunta_do_que_falta(fch, listas))
+        return _sair(estado, texto, NAO_ENTENDI + " " + pronto, hoje)
+    if ficha.completa(fch) and not fch["confirmada"] and _disse_sim(fala):
+        pergunta = texto if "?" in texto else (estado["pergunta"] or PERGUNTA_PADRAO)
+        estado = dict(estado, ficha=ficha.confirmar(fch))
+        return _responder(estado, texto, f"{texto}\n\n[Aviso do programa; o produtor não vê] O produtor confirmou a "
+                          f"ficha. Responda agora à pergunta dele: «{pergunta}»", modelo, listas, hoje)
+    if not fch["confirmada"]:
+        return _colher(estado, texto, modelo, listas, hoje)
+    return _responder(estado, texto, None if fala in CORTESIAS else texto, modelo, listas, hoje)
+
+
+def texto_inteiro(saida):
+    """A saída em texto corrido, para um canal sem tela: a resposta, a comparação (as frases do motor) e o aviso."""
+    blocos = [saida["resposta"]]
+    for item in saida.get("comparacao") or []:
+        blocos.append("\n".join([f"{item['nome']}{' (a de hoje)' if item.get('de_hoje') is True else ''}",
+                                 f"A evidência: {item['evidencia']}", f"O benefício: {item['beneficio']}",
+                                 f"O risco: {item['risco']}", f"O que falta saber: {item['falta_saber']}"]))
+    return "\n\n".join(blocos + [saida["aviso"]])
+
+
+def main():
+    """Uma conversa no terminal, com a IA de verdade (a chave vem do ambiente)."""
+    from orbita import modelo as pecas
+    try:
+        ia = pecas.do_ambiente()
+    except pecas.SemChave as erro:
+        print(f"{erro} Sem chave, rode os testes (python3 -m unittest) ou grave as conversas de exemplo "
+              "(python3 -m orbita.exportar_conversas <pasta>).", file=sys.stderr)
+        return 1
+    print(f"Órbita Rural · o agente (modelo: {ia.nome}). Linha vazia ou Ctrl+C encerra.\n")
+    estado = None
+    try:
+        estado, saida = passo(estado, "oi", ia)
+        while True:
+            print(texto_inteiro(saida) + f"\n[apoio: {saida['apoio']} · texto de: {saida['texto_de']} · "
+                  f"conferência: {saida['conferencia']}]\n")
+            fala_do_produtor = input("> ").strip()
+            if not fala_do_produtor:
+                break
+            estado, saida = passo(estado, fala_do_produtor, ia)
+    except (KeyboardInterrupt, EOFError):
+        pass
+    except (pecas.ErroDoModelo, ferramentas.ContaIndisponivel) as erro:
+        print(str(erro), file=sys.stderr)
+        return 1
+    print(f"\nGasto desta conversa: {ia.uso['pedidos']} pedidos à IA, {ia.uso['custo_usd']:.4f} dólares.")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
