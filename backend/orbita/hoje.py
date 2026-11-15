@@ -140,8 +140,10 @@ def como_esta_hoje(entrada, par=None, hoje=None, pasta_da_chuva_recente=None):
         return {"diferenca_mm": diferenca, "leitura": "igual" if abs(diferenca) < 0.05 else (
             "mais água na terra" if diferenca > 0 else "menos água na terra")}
 
+    na_terra = ("A terra está sem planta viva." if agora["o_que_esta_na_terra"] == "sem_planta"
+                else f"Na terra está {NA_TERRA[agora['o_que_esta_na_terra']]}.")
     frase = (f"Em {cidade['nome']}, o último dia com dado é {ultimo.isoformat()}, {(hoje - ultimo).days} dias antes "
-             f"de hoje. Na terra está {NA_TERRA[agora['o_que_esta_na_terra']]}. A conta dá "
+             f"de hoje. {na_terra} A conta dá "
              f"{_n(agora['agua_na_terra_mm'])} mm de água na zona das raízes, {_n(agora['agua_na_terra_pct'])}% do "
              f"que a terra segura (com a chuva de modelo no lugar da chuva rápida do satélite, "
              f"{_n(pelo_modelo['agua_na_terra_mm'])} mm). No mesmo dia do ano normal (safra {regra['ano_normal']}) "

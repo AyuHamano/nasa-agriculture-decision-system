@@ -80,5 +80,60 @@ class Exportar(unittest.TestCase):
         self.assertIn("pasta", erros)
 
 
+class ExportarComOpcoes(unittest.TestCase):
+    """As opções novas (2026-11-15): a cidade, a rotação, a data do plantio, sem as notas, e o arquivo com tudo."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.temporaria = tempfile.TemporaryDirectory()
+        cls.pasta = Path(cls.temporaria.name) / "dados"
+        cls.codigo, cls.saida, cls.erros = rodar([str(cls.pasta), "--cidade", "jatai", "--rotacao", "soja,sorgo",
+                                                  "--plantio", "2026-11-20", "--preocupacao", "calor", "--sem-notas",
+                                                  "--tudo"])
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.temporaria.cleanup()
+
+    def test_as_respostas_seguem_a_pergunta_pedida(self):
+        self.assertEqual(self.codigo, 0, self.erros)
+        dados = json.loads((self.pasta / "respostas.json").read_text(encoding="utf-8"))
+        self.assertEqual(list(dados["respostas"]), ["pouca", "media", "muita"])
+        for terra, resposta in dados["respostas"].items():
+            self.assertEqual(resposta["local"]["id"], "jatai")
+            self.assertEqual(resposta["rotacao_de_hoje"]["id"], "soja_sorgo_pousio")
+            self.assertEqual(resposta["calendario"]["plantio_da_soja_informado"], "2026-11-20")
+            self.assertEqual(resposta["entrada"]["terra"], terra)
+            self.assertIsNone(resposta["entrada"]["prioridades"])
+            self.assertEqual(len(resposta["comparacao_das_rotacoes"]), 3)
+        self.assertNotIn("prioridades", dados["parametros_usados"])
+        self.assertEqual(dados["parametros_usados"]["cidade_id"], "jatai")
+
+    def test_o_arquivo_com_tudo_o_que_o_motor_oferece(self):
+        self.assertEqual(sorted(p.name for p in self.pasta.iterdir()),
+                         ["motor.js", "motor.json", "respostas.js", "respostas.json"])
+        js = (self.pasta / "motor.js").read_text(encoding="utf-8")
+        self.assertTrue(js.startswith("/* Gerado com IA (Claude) */"))
+        linha = next(linha for linha in js.split("\n") if linha.startswith("window.ORBITA_MOTOR = "))
+        tudo = json.loads(linha[len("window.ORBITA_MOTOR = "):-1])
+        self.assertEqual(tudo, json.loads((self.pasta / "motor.json").read_text(encoding="utf-8"))["motor"])
+        self.assertEqual(set(tudo), {"lugares", "respostas", "replay", "hoje", "registro"})
+        for parte in tudo.values():
+            self.assertEqual(set(parte), set(motor.CIDADES))
+        self.assertEqual(tudo["replay"]["rio_verde"]["safra"], exportar.SAFRA_DO_REPLAY)
+        self.assertEqual(tudo["replay"]["jatai"]["rotacao"]["id"], "soja_sorgo_pousio")
+        self.assertTrue(tudo["hoje"]["silvania"]["disponivel"])
+
+    def test_opcao_errada_diz_o_que_fazer_e_entrada_errada_diz_o_porque(self):
+        codigo, _, erros = rodar([str(self.pasta), "--cidade"])
+        self.assertEqual(codigo, 2)
+        self.assertIn("--cidade", erros)
+        codigo, _, erros = rodar([str(self.pasta), "--outra"])
+        self.assertEqual(codigo, 2)
+        codigo, _, erros = rodar([str(self.pasta), "--cidade", "sorriso"])
+        self.assertEqual(codigo, 1)
+        self.assertIn("Entrada fora do formato", erros)
+
+
 if __name__ == "__main__":
     unittest.main()
