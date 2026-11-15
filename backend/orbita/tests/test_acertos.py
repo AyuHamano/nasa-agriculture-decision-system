@@ -2,7 +2,7 @@
 """Testes dos acertos de 2026-11-15 no motor: cada um falhava no código de antes."""
 import unittest
 
-from orbita import conferencia, explicacao, mensagem, motor
+from orbita import balanco, conferencia, explicacao, mensagem, motor, parametros, rotacoes
 
 HOJE = ["soja", "milho", "pousio"]
 JATAI = {"cidade_id": "jatai", "rotacao_atual": HOJE, "terra": "media"}
@@ -121,6 +121,29 @@ class ORegistroEAComparacaoUsamAMesmaRegra(unittest.TestCase):
         self.assertIn("Esta safra fica à parte, como na conta", recente["frase"])
         self.assertIn("ao lado das 10 safras do estudo", recente["frase"])
         self.assertEqual(conferencia.conferir_texto(recente["frase"], recente), [])
+
+
+class OTetoIgualDaFaixaECoincidencia(unittest.TestCase):
+    """Rio Verde com o plantio em 20 de novembro: o teto da faixa da rotação com braquiária sai 266,8 mm no ano
+    normal e também no pior ano. Não é defeito (este teste já passava): são duas contas diferentes, com parcelas
+    diferentes, que arredondam para o mesmo número. Fica aqui a prova."""
+
+    def test_os_dois_tetos_sao_contas_diferentes_que_arredondam_igual(self):
+        par = parametros.carregar()
+        entrada = motor.validar_entrada(RIO_VERDE_TARDE)
+        dias, _ = motor._serie(entrada)
+        cal = rotacoes.calendario(par, entrada["plantio_da_soja"])
+        alta = parametros.valor(par, "disputa_com_o_milho", "alta")      # o teto da faixa é a disputa alta
+        numeros = balanco.numeros_por_safra(balanco.simular(dias, True, par, "media", disputa=alta, cal=cal))
+        normal, pior = numeros["2019-20"], numeros["2015-16"]
+        self.assertEqual((motor.r1(normal["total"]["falta_mm"]), motor.r1(pior["total"]["falta_mm"])), (266.8, 266.8))
+        self.assertGreater(abs(normal["total"]["falta_mm"] - pior["total"]["falta_mm"]), 0.05)   # 266,788 e 266,843
+        self.assertGreater(abs(normal["milho"]["pedido_mm"] - pior["milho"]["pedido_mm"]), 20)   # 396,5 e 417,8
+        self.assertGreater(abs(normal["milho"]["bebido_mm"] - pior["milho"]["bebido_mm"]), 20)   # 129,7 e 151,9
+        self.assertEqual(normal["soja"]["falta_mm"], 0.0)                                        # a soja: 0 e 0,97
+        self.assertGreater(pior["soja"]["falta_mm"], 0.9)
+        agua = _por_id(motor.responder(RIO_VERDE_TARDE))["soja_milho_braquiaria"]["agua"]
+        self.assertEqual((agua["falta_no_ano_normal_mm"]["ate"], agua["falta_no_pior_ano_mm"]["ate"]), (266.8, 266.8))
 
 
 if __name__ == "__main__":
