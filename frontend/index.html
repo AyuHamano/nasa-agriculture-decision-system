@@ -1,97 +1,124 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Desenhar a fazendinha (Geoman)</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-		integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
-  <link rel="stylesheet" href="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.17.0/dist/leaflet-geoman.css">
-  <style>
-	html, body { height: 100%; margin: 0; }
-	#map { height: 100%; }
-	#info { position: absolute; z-index: 1000; bottom: 12px; left: 12px; right: 12px;
-			background: #fff; padding: 8px 12px; border-radius: 8px; font: 15px system-ui, sans-serif; }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Órbita Rural — Inteligência do espaço. Decisões para a terra.">
+  <title>Órbita Rural | Painel técnico</title>
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="preconnect" href="https://unpkg.com">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div id="map"></div>
-  <div id="info">Use os ícones à esquerda para desenhar a propriedade.</div>
+  <header class="topbar">
+    <img class="logo" src="assets/logo.png" alt="Órbita Rural">
+    <nav class="tabs" aria-label="Navegação principal">
+      <button class="tab active" data-tab="register"><span data-lucide="map-pinned"></span>Cadastrar propriedade</button>
+      <button class="tab" data-tab="saved"><span data-lucide="list"></span>Propriedades salvas <b id="savedCount">0</b></button>
+    </nav>
+    <!-- Placeholder profile for the MVP: no login yet -->
+    <div class="topbar-user">
+      <span class="coop-chip"><span data-lucide="users"></span>Cooperativa Cerrado Vivo</span>
+      <span class="avatar">RM</span>
+      <span class="user-copy"><strong>Rafael Martins</strong><small>Técnico agrícola</small></span>
+    </div>
+  </header>
 
-  <!-- A ordem importa: Leaflet primeiro, depois o Geoman -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-		  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script src="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.17.0/dist/leaflet-geoman.min.js"></script>
+  <main>
+    <!-- Page 1: register / edit a property -->
+    <section class="page active" data-page="register">
+      <div class="page-heading">
+        <h1 id="registerTitle">Cadastrar propriedade</h1>
+        <p>Desenhe o talhão no mapa para definir a área de análise.</p>
+      </div>
+
+      <div class="register-layout">
+        <div class="map-column">
+          <div class="map-shell">
+            <div id="map" aria-label="Mapa para delimitação do talhão"></div>
+            <div class="map-tools">
+              <button id="drawButton"><span data-lucide="pentagon"></span><span id="drawLabel">Desenhar polígono</span></button>
+              <button id="editButton"><span data-lucide="mouse-pointer-2"></span>Editar pontos</button>
+              <button id="clearButton"><span data-lucide="trash-2"></span>Limpar</button>
+            </div>
+            <div class="map-hint" id="mapHint"><span data-lucide="mouse-pointer-click"></span>Clique no mapa para adicionar vértices e use “Concluir desenho” ao terminar</div>
+          </div>
+          <div class="plot-summary">
+            <span>Área estimada <b id="plotArea">—</b></span>
+            <span>Centro <b id="plotCentroid">—</b></span>
+            <span><b id="vertexCount">0</b> vértices</span>
+            <button id="coordinatesButton" type="button">Ver coordenadas</button>
+          </div>
+          <pre class="coordinates-panel" id="coordinatesPanel" hidden></pre>
+        </div>
+
+        <aside class="form-column">
+          <form class="panel property-form" id="propertyForm">
+            <h2>Dados do cooperado</h2>
+            <div class="section-label">Responsável</div>
+            <div class="form-pair">
+              <label>Nome completo <b>*</b><input id="producerName" placeholder="Ex.: João da Silva" required></label>
+              <label>CPF ou CNPJ <b>*</b><input id="documentNumber" placeholder="000.000.000-00" required></label>
+            </div>
+            <div class="form-pair">
+              <label>Telefone <b>*</b><input id="phoneNumber" placeholder="(00) 00000-0000" required></label>
+              <label>E-mail <b>*</b><input id="emailAddress" type="email" placeholder="nome@exemplo.com" required></label>
+            </div>
+
+            <div class="section-label">Propriedade</div>
+            <label>Nome da propriedade <b>*</b><input id="propertyName" placeholder="Ex.: Fazenda Santa Clara" required></label>
+            <div class="form-pair">
+              <label>Município <b>*</b><select id="municipality" required></select></label>
+            </div>
+            <div class="form-pair">
+              <label>Tipo de solo
+                <select id="soil"><option value="">Não informado</option><option>Argiloso</option><option>Arenoso</option><option>Textura média</option></select>
+              </label>
+              <label>Irrigação
+                <select id="irrigation"><option value="">Não informado</option><option>Não</option><option>Sim — pivô</option><option>Sim — gotejo</option></select>
+              </label>
+            </div>
+            <label>Rotação atual
+              <select id="rotation"><option value="">Não informada</option><option>Milho → Feijão</option><option>Soja → Milho safrinha → Pousio</option><option>Soja → Milho → Braquiária</option><option>Algodão → Soja</option></select>
+            </label>
+            <button class="primary-action" type="submit" id="saveButton"><span data-lucide="save"></span>Salvar cadastro</button>
+          </form>
+
+          <!-- Slot for the NASA historical data (next step) -->
+          <article class="panel climate-card">
+            <h2><span data-lucide="cloud-rain-wind"></span>Dados climáticos</h2>
+            <p>Os dados históricos da NASA do talhão aparecerão aqui.</p>
+          </article>
+        </aside>
+      </div>
+    </section>
+
+    <!-- Page 2: saved properties -->
+    <section class="page" data-page="saved">
+      <div class="page-heading">
+        <h1>Propriedades salvas</h1>
+        <p>Cadastros feitos neste navegador. Abra um para ver o talhão no mapa ou editá-lo.</p>
+      </div>
+      <div class="panel table-panel">
+        <table id="savedTable" hidden>
+          <thead><tr><th>Propriedade</th><th>Município</th><th>Área</th><th>Salva em</th><th></th></tr></thead>
+          <tbody id="savedRows"></tbody>
+        </table>
+        <div class="empty-state" id="emptyState">
+          <strong>Nenhuma propriedade salva</strong>
+          <p>Cadastre a primeira propriedade para vê-la aqui.</p>
+          <button class="primary-action" data-tab="register">Cadastrar propriedade</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://unpkg.com/@turf/turf@7.2.0/turf.min.js"></script>
-  <script>
-	const DEFAULT_MESSAGE = 'Use the icons on top left corner to edit the area';
-    const infoBox = document.getElementById('info');
-
-	// 1. Mapa e fundo (igual aos exemplos anteriores)
-	const map = L.map('map').setView([-16.68, -49.25], 14);
-	L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-		maxZoom: 19,
-		attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-	}).addTo(map);
-
-	// 2. O Geoman adiciona o objeto "pm" ao mapa. Aqui ligamos só o que precisamos.
-	map.pm.addControls({
-		position: 'topleft',
-		drawPolygon: true, drawRectangle: true,
-		editMode: true, removalMode: true,
-		drawMarker: true, drawCircle: true, drawPolyline: false,
-		drawCircleMarker: false, drawText: false,
-		cutPolygon: false, rotateMode: false, dragMode: true
-	});
-	map.pm.setGlobalOptions({ pathOptions: { color: '#26a122', weight: 3 } });
-
-	const placeCache = {};
-
-    async function getPlaceName(lat, lng) {
-		const key = lat.toFixed(3) + ',' + lng.toFixed(3);
-		if (placeCache[key]) return placeCache[key];
-
-		const url = 'https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=10'
-				+ '&accept-language=en&lat=' + lat + '&lon=' + lng;
-		const response = await fetch(url);
-		if (!response.ok) throw new Error('HTTP ' + response.status);
-
-		const address = (await response.json()).address || {};
-		// The city name can come in different fields depending on the place
-		const city = address.city || address.town || address.village
-				|| address.municipality || address.county || 'Unknown place';
-		return placeCache[key] = city + (address.state ? ' - ' + address.state : '');
-    }
-
-	// 3. Lê a área desenhada e mostra um resumo
-	async function readArea(layer) {
-		const polygon = layer.toGeoJSON();
-		// Turf returns [longitude, latitude], the opposite order of Leaflet
-		const [lng, lat] = turf.centerOfMass(polygon).geometry.coordinates;
-
-		infoBox.innerHTML = 'Center: ' + lat.toFixed(5) + ', ' + lng.toFixed(5) + '<br>';
-		try {
-			infoBox.innerHTML += await getPlaceName(lat, lng);
-		} catch (error) {
-			infoBox.innerHTML = 'Unable to find the city. Center: '
-								+ lat.toFixed(5) + ', ' + lng.toFixed(5);
-		}
-	}
-
-	let drawnLayer = null;
-
-	// 4. Eventos do Geoman
-	map.on('pm:create', e => {                     // terminou de desenhar
-		if (drawnLayer) map.removeLayer(drawnLayer);       // mantém uma área só
-		drawnLayer = e.layer;
-		drawnLayer.on('pm:edit', () => readArea(drawnLayer));      // vertex dragged
-    	drawnLayer.on('pm:dragend', () => readArea(drawnLayer));   // whole shape moved
-		readArea(drawnLayer);
-	});
-	map.on('pm:remove', () => {                     // apagou com a lixeira
-		drawnLayer = null;
-		infoBox.textContent = DEFAULT_MESSAGE;
-	});
-  </script>
+  <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
