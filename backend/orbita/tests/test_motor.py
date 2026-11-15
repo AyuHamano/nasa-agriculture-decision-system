@@ -26,7 +26,10 @@ class Entrada(unittest.TestCase):
         self.assertEqual(motor.validar_entrada(entrada)["terra"], "media")
 
     def test_erros_em_portugues_dizendo_o_que_falta(self):
-        self.assertIn("prioridades", erro_de({k: v for k, v in ENTRADA.items() if k != "prioridades"}))
+        # Mudou de sentido em 2026-11-15: as notas de 1 a 5 saíram (o dono do projeto: "tira isso"), e a entrada sem
+        # prioridades passou a valer. Continua sendo erro mandar as prioridades pela metade ou fora do formato.
+        self.assertIsNone(motor.validar_entrada({k: v for k, v in ENTRADA.items() if k != "prioridades"})["prioridades"])
+        self.assertIn("prioridades", erro_de(dict(ENTRADA, prioridades="alta")))
         sem_agua = copy.deepcopy(ENTRADA)
         del sem_agua["prioridades"]["agua"]
         self.assertIn("agua", erro_de(sem_agua))

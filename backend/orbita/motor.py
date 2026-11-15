@@ -22,7 +22,10 @@ CIDADES = {"rio_verde": {"nome": "Rio Verde (GO)", "latitude": -17.79, "longitud
 ROTACAO_DE_HOJE = ["soja", "milho", "pousio"]
 TERRAS = ("pouca", "media", "muita")
 ORDEM_DE_DESEMPATE = ("agua", "solo", "erosao", "renda")
-NOMES = {"agua": "Água", "solo": "Solo", "erosao": "Erosão", "renda": "Renda"}
+NOMES = {"agua": "Água", "solo": "Solo", "erosao": "Erosão", "renda": "Renda", "calor": "Calor"}
+PREOCUPACOES = ("agua", "calor", "terra")       # o que mais preocupa o produtor: só muda a ordem e o destaque
+PERNAS = ("agua", "calor", "terra")             # as três pernas do projeto, na ordem de costume
+NA_FRENTE = {"agua": ("agua",), "terra": ("solo", "erosao"), "calor": ()}   # a preocupação nas prioridades antigas
 NAO_MEDIDO = "não medido"
 SAFRA_A_PARTE = "2025-26"
 CHUVA_PADRAO, REGRA_PADRAO = "imerg", "rendimento"
@@ -66,9 +69,10 @@ def r1(numero):
 def validar_entrada(entrada):
     """Confere a entrada e devolve-a completa (sem terra, vale media). Fora do formato: erro dizendo o que falta."""
     if not isinstance(entrada, dict):
-        raise ValueError('Entrada fora do formato: tem de ser um objeto com cidade_id, rotacao_atual, prioridades '
-                         'e terra (opcional), como {"cidade_id": "rio_verde", "rotacao_atual": ["soja", "milho", '
-                         '"pousio"], "prioridades": {"agua": 5, "solo": 4, "renda": 2, "erosao": 3}, "terra": "media"}.')
+        raise ValueError('Entrada fora do formato: tem de ser um objeto com cidade_id e rotacao_atual (e, se quiser, '
+                         'terra, plantio_da_soja e preocupacao), como {"cidade_id": "rio_verde", "rotacao_atual": '
+                         '["soja", "milho", "pousio"], "terra": "media", "plantio_da_soja": "2026-11-05", '
+                         '"preocupacao": "agua"}.')
     problemas = []
     cidade = entrada.get("cidade_id")
     if cidade is None:
@@ -81,8 +85,11 @@ def validar_entrada(entrada):
     elif not isinstance(rotacao, list) or [str(x).strip().lower() for x in rotacao] != ROTACAO_DE_HOJE:
         problemas.append(f'rotacao_atual {rotacao!r} ainda não existe: o motor só conhece ["soja", "milho", "pousio"]')
     notas = entrada.get("prioridades")
-    if not isinstance(notas, dict):
-        problemas.append("faltam as prioridades (agua, solo, renda e erosao, cada uma com nota de 1 a 5)")
+    if notas is None:
+        pass    # as notas de 1 a 5 saíram (decisão do dono, 2026-11-14): sem elas, vale a ordem de costume
+    elif not isinstance(notas, dict):
+        problemas.append("as prioridades, quando vêm, são as 4 notas (agua, solo, renda e erosao, cada uma de 1 a "
+                         "5); sem notas, não mande o campo")
     else:
         for nome in ("agua", "solo", "renda", "erosao"):
             nota = notas.get(nome)
@@ -106,11 +113,14 @@ def validar_entrada(entrada):
             plantio = rotacoes.ler_plantio_da_soja(plantio).isoformat()
         except ValueError as erro:
             problemas.append(str(erro))
+    preocupacao = entrada.get("preocupacao") or None
+    if preocupacao is not None and preocupacao not in PREOCUPACOES:
+        problemas.append(f'preocupacao "{preocupacao}" não existe: use agua, calor ou terra (o que mais preocupa)')
     if problemas:
         raise ValueError("Entrada fora do formato: " + "; ".join(problemas) + ".")
     return {"cidade_id": cidade, "rotacao_atual": list(ROTACAO_DE_HOJE),
-            "prioridades": {nome: notas[nome] for nome in ("agua", "solo", "renda", "erosao")}, "terra": terra,
-            "chuva": chuva, "regra": regra, "plantio_da_soja": plantio}
+            "prioridades": None if notas is None else {nome: notas[nome] for nome in ("agua", "solo", "renda", "erosao")},
+            "terra": terra, "chuva": chuva, "regra": regra, "plantio_da_soja": plantio, "preocupacao": preocupacao}
 
 
 def ler_rendimento_do_milho(arquivo=ARQUIVO_DO_IBGE):
@@ -518,14 +528,18 @@ def responder(entrada, par=None, dias=None, rendimentos=None):
     solo = "empate" if dias_hoje == dias_alternativa else ("alternativa" if dias_alternativa < dias_hoje else "atual")
     melhores = {"agua": comparacao_da_agua["melhor"], "solo": solo, "erosao": solo, "renda": NAO_MEDIDO}
     notas = entrada["prioridades"]
-    ordem = sorted(ORDEM_DE_DESEMPATE, key=lambda p: -notas[p])
+    na_frente = NA_FRENTE.get(entrada["preocupacao"], ())
+    if notas is None:       # sem as notas: a ordem de costume, com a preocupação do produtor na frente
+        ordem = list(na_frente) + [p for p in ORDEM_DE_DESEMPATE if p not in na_frente]
+    else:                   # com as notas, como antes: a maior nota primeiro (a preocupação só desempata)
+        ordem = sorted(ORDEM_DE_DESEMPATE, key=lambda p: (-notas[p], p not in na_frente))
     medidas = {"agua": "a falta de água da soja e do milho no pior ano, com a alternativa em faixa (a disputa do "
                        "capim com o milho), e as safras de sede forte",
                "solo": "os dias do ano sem planta viva na terra (o mesmo número da erosão)",
                "erosao": "os dias do ano sem planta viva na terra (o mesmo número do solo)",
                "renda": "não medido: o motor não tem preço, custo nem produtividade"}
-    prioridades = [{"id": p, "nome": NOMES[p], "nota": notas[p], "melhor": melhores[p], "medida": medidas[p]}
-                   for p in ordem]
+    prioridades = [{"id": p, "nome": NOMES[p], "nota": None if notas is None else notas[p], "melhor": melhores[p],
+                    "medida": medidas[p]} for p in ordem]
     for p in prioridades:
         if p["id"] == "agua":
             p["veredito_pela_faixa"] = agua_pela_faixa["codigo"]
@@ -563,6 +577,9 @@ def responder(entrada, par=None, dias=None, rendimentos=None):
                        "solo_e_erosao": {"melhor": solo, "dias_sem_planta_viva_hoje": dias_hoje,
                                          "dias_sem_planta_viva_alternativa": dias_alternativa}},
         "prioridades": prioridades,
+        "preocupacao": entrada["preocupacao"],
+        "ordem_das_pernas": [p for p in PERNAS if p == entrada["preocupacao"]] + [
+            p for p in PERNAS if p != entrada["preocupacao"]],
         "sede_forte": sede_forte,
         "destaque": dict({"prioridade": primeira_medida["id"], "nome": primeira_medida["nome"],
                           "nota": primeira_medida["nota"], "melhor": primeira_medida["melhor"]},

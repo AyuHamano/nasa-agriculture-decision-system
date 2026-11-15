@@ -60,7 +60,8 @@ def _prioridade(p, r):
     hoje, alternativa = r["rotacoes"]["atual"], r["rotacoes"]["alternativa"]
     seco = r["comparacao"]["pior_ano"]
     rotulo = "No pior ano" if r["regra_dos_anos"]["regra"] == "rendimento" else "No ano mais seco"
-    linhas = [f"{p['nome']} (nota {p['nota']}): {_quem(p)}."]
+    nota = "" if p.get("nota") is None else f" (nota {p['nota']})"
+    linhas = [f"{p['nome']}{nota}: {_quem(p)}."]
     if p["id"] == "agua":
         a, faixa = hoje["safras"][seco]["total"], alternativa["faixa"][seco]["falta_total_mm"]
         meio = alternativa["safras"][seco]["total"]
@@ -139,6 +140,16 @@ def _ndvi(r):
     return ["O NDVI (O VERDE VISTO PELO SATÉLITE): PROVA SÓ DA ROTAÇÃO DE HOJE"] + list(ndvi.get("frases", []))
 
 
+def _linha_do_destaque(r):
+    """A linha do destaque: com as notas, a maior nota entre o que foi medido; sem elas, o que mais preocupa."""
+    destaque = r["destaque"]
+    if destaque.get("nota") is not None:
+        return (f"Na sua maior nota entre o que foi medido ({destaque['nome'].lower()}, nota {destaque['nota']}): "
+                f"{_quem(destaque)}.")
+    de_onde = "No que mais preocupa" if r.get("preocupacao") else "No primeiro ponto medido"
+    return f"{de_onde} ({destaque['nome'].lower()}): {_quem(destaque)}."
+
+
 def texto(r):
     """O texto inteiro da resposta, a partir da resposta do motor."""
     hoje, alternativa = r["rotacoes"]["atual"], r["rotacoes"]["alternativa"]
@@ -154,10 +165,11 @@ def texto(r):
          "",
          "RESPOSTA",
          r["veredito"]["frase"],
-         f"Na sua maior nota entre o que foi medido ({r['destaque']['nome'].lower()}, nota {r['destaque']['nota']}): "
-         f"{_quem(r['destaque'])}.",
+         _linha_do_destaque(r),
          "",
-         "SUAS PRIORIDADES, DA MAIOR NOTA PARA A MENOR (elas só mudam a ordem; nenhum número muda)"]
+         "SUAS PRIORIDADES, DA MAIOR NOTA PARA A MENOR (elas só mudam a ordem; nenhum número muda)"
+         if r["destaque"].get("nota") is not None else
+         "O QUE FOI MEDIDO, COM O QUE MAIS PREOCUPA NA FRENTE (a ordem não muda nenhum número)"]
     for i, p in enumerate(r["prioridades"], start=1):
         linhas = _prioridade(p, r)
         t.append(f"{i}. {linhas[0]}")
