@@ -203,8 +203,9 @@
     if (tela) irPara(tela); else rota();
   }
   function guardarColheita(form) {
-    var x = app.registro, l = app.lavoura, valores = {}, algum = false;
-    Array.prototype.forEach.call(form.querySelectorAll("input[name]"), function (c) { var n = Number(String(c.value).replace(",", ".")); if (c.value !== "" && isFinite(n) && n > 0) { valores[c.name] = n; algum = true; } });
+    var x = app.registro, l = app.lavoura, valores = {}, algum = false, acimaDoLimite = false;
+    Array.prototype.forEach.call(form.querySelectorAll("input[name]"), function (c) { var n = Number(String(c.value).replace(",", ".")); if (c.value !== "" && isFinite(n) && n > 9999) acimaDoLimite = true; else if (c.value !== "" && isFinite(n) && n > 0) { valores[c.name] = n; algum = true; } });
+    if (acimaDoLimite) { form.querySelector(".o-recado").textContent = "O limite é 9999 sacas por hectare."; return; }
     if (!algum) { form.querySelector(".o-recado").textContent = "Escreva quanto colheu, em sacas por hectare."; return; }
     var h = new Date(), todas = ler(CHAVE_SAFRAS) || {};
     valores.em = h.getFullYear() + "-" + doisDigitos(h.getMonth() + 1) + "-" + doisDigitos(h.getDate());

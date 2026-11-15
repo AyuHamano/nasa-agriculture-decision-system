@@ -210,7 +210,7 @@
     var posicao = typeof entre.posicao === "number" && entre.de ? '<p class="o-posicao">' + (entre.a_parte ? "Ao lado das " + num(entre.de, 0) + " safras guardadas, a falta de água da 2ª safra seria a " : "Entre as " + num(entre.de, 0) + " safras guardadas, a falta de água da 2ª safra foi a ") + num(entre.posicao, 0) + "ª maior.</p>" : "";
     var campos = plantado.map(function (c) {
       var v = colheita && colheita[c.cultura] != null ? colheita[c.cultura] : "";
-      return '<label class="o-campo"><span>' + esc(maiuscula(cultura(c.cultura))) + '</span><input type="number" inputmode="decimal" min="0" max="400" step="0.1" name="' + esc(c.cultura) + '" value="' + esc(v) + '" placeholder="sacas por hectare"></label>';
+      return '<label class="o-campo"><span>' + esc(maiuscula(cultura(c.cultura))) + '</span><input type="number" inputmode="decimal" min="0" max="9999" step="0.1" name="' + esc(c.cultura) + '" value="' + esc(v) + '" placeholder="sacas por hectare"></label>';
     }).join("");
     return '<div class="o-tela estreita">' + cab + escolha +
       '<h2 class="o-sub">O que foi plantado</h2><ul class="o-linhas">' + linhas + "</ul>" +
