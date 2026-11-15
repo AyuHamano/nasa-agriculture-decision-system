@@ -1,0 +1,21 @@
+codigo_ibge,municipio,na_lista,area_colhida_media_ha,spearman,pior_safra,rendimento_da_pior_kg_ha,posto_da_pior_na_falta,pior_entre_as_3_de_maior_falta
+5218805,Rio Verde - GO,sim,303150.0,-0.515,2015-16,3300.0,2,sim
+5211909,Jataí - GO,sim,236700.0,-0.298,2015-16,4200.0,6,não
+5213756,Montividiu - GO,sim,111320.0,-0.767,2015-16,3600.0,2,sim
+5213103,Mineiros - GO,sim,88200.0,-0.188,2015-16,4000.0,5,não
+5206206,Cristalina - GO,sim,76041.3,-0.479,2015-16,3517.0,1,sim
+5205471,Chapadão do Céu - GO,sim,60950.0,-0.624,2015-16,4200.0,3,sim
+5216403,Paraúna - GO,sim,51250.0,-0.842,2015-16,2400.0,1,sim
+5204409,Caiapônia - GO,sim,44450.0,-0.249,2015-16,4020.0,2,sim
+5219308,Santa Helena de Goiás - GO,sim,40790.0,-0.049,2015-16,1800.0,2,sim
+5216452,Perolândia - GO,sim,34000.0,-0.176,2015-16,4000.0,5,não
+5203500,Bom Jesus de Goiás - GO,sim,33993.0,-0.608,2015-16,1600.0,1,sim
+5220603,Silvânia - GO,sim,31700.0,-0.815,2015-16,5000.0,2,sim
+5209101,Goiatuba - GO,sim,27990.0,-0.648,2015-16,1500.0,1,sim
+5200134,Acreúna - GO,sim,23640.0,-0.109,2015-16,2400.0,2,sim
+5220504,Serranópolis - GO,sim,22700.0,-0.479,2015-16,4000.0,5,não
+5200175,Água Fria de Goiás - GO,sim,19205.0,-0.231,2015-16,3000.0,1,sim
+5207253,Doverlândia - GO,sim,17220.0,-0.382,2015-16,3900.0,2,sim
+5212501,Luziânia - GO,sim,15991.8,-0.6,2015-16,4800.0,2,sim
+5210109,Ipameri - GO,sim,14906.0,-0.663,2015-16,2213.0,1,sim
+5211503,Itumbiara - GO,sim,14765.0,-0.648,2015-16,1922.0,1,sim

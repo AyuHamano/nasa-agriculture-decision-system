@@ -1,0 +1,3019 @@
+{
+ "gerado_com": "IA (Claude)",
+ "inmet": {
+  "pagina": "https://portal.inmet.gov.br/dadoshistoricos",
+  "zips": {
+   "2016": {
+    "arquivos": [
+     {
+      "arquivo_no_zip": "2016/INMET_CO_DF_A001_BRASILIA_01-01-2016_A_31-12-2016.CSV",
+      "bytes": 808215,
+      "guardado_em": "inmet/2016/INMET_CO_DF_A001_BRASILIA_01-01-2016_A_31-12-2016.CSV",
+      "sha256": "e9d7edcb8246c2ae9ffb074532d475c39ca4a1d3db043f4f4ce6229dfcb63b31"
+     },
+     {
+      "arquivo_no_zip": "2016/INMET_CO_DF_A045_AGUAS EMENDADAS_01-01-2016_A_31-12-2016.CSV",
+      "bytes": 812366,
+      "guardado_em": "inmet/2016/INMET_CO_DF_A045_AGUAS EMENDADAS_01-01-2016_A_31-12-2016.CSV",
+      "sha256": "65255072779fdc50419422eba586e81e375d7d1d2bc3fc7857bbeb0e470b3884"
+     },
+     {
+      "arquivo_no_zip": "2016/INMET_CO_DF_A046_GAMA (PONTE ALTA)_01-01-2016_A_31-12-2016.CSV",
+      "bytes": 816754,
+      "guardado_em": "inmet/2016/INMET_CO_DF_A046_GAMA (PONTE ALTA)_01-01-2016_A_31-12-2016.CSV",
+      "sha256": "68a9a7276fa7063c2585d06e27445ea63cb52f5d5127a38f8cf5cec754e6cbf4"
+     },
+     {
+      "arquivo_no_zip": "2016/INMET_CO_GO_A002_GOIANIA_01-01-2016_A_31-12-2016.CSV",
+      "bytes": 807402,
+      "guardado_em": "inmet/2016/INMET_CO_GO_A002_GOIANIA_01-01-2016_A_31-12-2016.CSV",
+      "sha256": "b87a90a89e3ee22d8e04d5b5f8d660214f8f87a9e740f7182d4949337c5b9d3f"
+     },
+     {
+      "arquivo_no_zip": "2016/INMET_CO_GO_A003_MORRINHOS_01-01-2016_A_31-12-2016.CSV",
+      "bytes": 814115,
+      "guardado_em": "inmet/2016/INMET_CO_GO_A003_MORRINHOS_01-01-2016_A_31-12-2016.CSV",
+      "sha256": "e2ed3afbde266d22aee4476463343cc142bd7fcf8138a3484c2269fd42a91219"
+     },
+     {
+      "arquivo_no_zip": "2016/INMET_CO_GO_A011_SAO SIMAO_01-01-2016_A_31-12-2016.CSV",
+      "bytes": 858901,
+      "guardado_em": "inmet/2016/INMET_CO_GO_A011_SAO SIMAO_01-01-2016_A_31-12-2016.CSV",
+      "sha256": "27e1b856b9f076d08ce092b4a6fc6e0e5d0b354dd0e454d05d745debe89dafc0"
+     },
+     {
+      "arquivo_no_zip": "2016/INMET_CO_GO_A012_LUZIANIA_01-01-2016_A_31-12-2016.CSV",
+      "bytes": 808988,
+      "guardado_em": "inmet/2016/INMET_CO_GO_A012_LUZIANIA_01-01-2016_A_31-12-2016.CSV",
+      "sha256": "11b248464376d734adb2d4f44a5fecd56916c36bf0939dfd5671fdd98fea7091"
+     },
+     {
+      "arquivo_no_zip": "2016/INMET_CO_GO_A013_ARAGARCAS_01-01-2016_A_31-12-2016.CSV",
+      "bytes": 870452,
+      "guardado_em": "inmet/2016/INMET_CO_GO_A013_ARAGARCAS_01-01-2016_A_31-12-2016.CSV",
+      "sha256": "cf378139bcc02b87490a29d0ee482db383a1034b6841c460e1536ab7181a286b"
+     },
+     {
+      "arquivo_no_zip": "2016/INMET_CO_GO_A014_GOIAS_01-01-2016_A_31-12-2016.CSV",
+      "bytes": 803674,
+      "guardado_em": "inmet/2016/INMET_CO_GO_A014_GOIAS_01-01-2016_A_31-12-2016.CSV",
+      "sha256": "10eabdd5bf4201b8cd2ecfbd85d2a2b47aae3580136158140b4cd0bac0503ef9"
+     },
+     {
+      "arquivo_no_zip": "2016/INMET_CO_GO_A015_ITAPACI_01-01-2016_A_31-12-2016.CSV",
+      "bytes": 814523,
+      "guardado_em": "inmet/2016/INMET_CO_GO_A015_ITAPACI_01-01-2016_A_31-12-2016.CSV",
+      "sha256": "34eda1f185965c97a7970d971cebf549848657466751481d48ed1041f377651c"
+     },
+     {
+      "arquivo_no_zip": "2016/INMET_CO_GO_A016_JATAI_01-01-2016_A_31-12-2016.CSV",
+      "bytes": 808622,
+      "guardado_em": "inmet/2016/INMET_CO_GO_A016_JATAI_01-01-2016_A_31-12-2016.CSV",
+      "sha256": "3afd51b06fa106fa420512fa6b0516517c94b9669e4b05cc437f7494a4830de1"
+     },
+     {
+      "arquivo_no_zip": "2016/INMET_CO_GO_A017_POSSE_01-01-2016_A_31-12-2016.CSV",
+      "bytes": 833642,
+      "guardado_em": "inmet/2016/INMET_CO_GO_A017_POSSE_01-01-2016_A_31-12-2016.CSV",
+      "sha256": "c27012fed1961f0996ad1b6aad6128bf7373c480b97d9e276dade45056a97311"
+     },
+     {
+      "arquivo_no_zip": "2016/INMET_CO_GO_A022_GOIANESIA_01-01-2016_A_31-12-2016.CSV",
+      "bytes": 828442,
+      "guardado_em": "inmet/2016/INMET_CO_GO_A022_GOIANESIA_01-01-2016_A_31-12-2016.CSV",
+      "sha256": "b16d405d61484a85df3e32cf417a9fca13de89ddfad03a2b05ef0d2c51cbbf3a"
+     },
+     {
+      "arquivo_no_zip": "2016/INMET_CO_GO_A023_CAIAPONIA_01-01-2016_A_31-12-2016.CSV",
+      "bytes": 797809,
+      "guardado_em": "inmet/2016/INMET_CO_GO_A023_CAIAPONIA_01-01-2016_A_31-12-2016.CSV",
+      "sha256": "ed8f1626aa84a87ca269ab3b2d09d55af943b7936154e8bee54291cc1bfb558e"
+     },
+     {
+      "arquivo_no_zip": "2016/INMET_CO_GO_A024_ALTO PARAISO DE GOIAS_01-01-2016_A_31-12-2016.CSV",
+      "bytes": 800496,
+      "guardado_em": "inmet/2016/INMET_CO_GO_A024_ALTO PARAISO DE GOIAS_01-01-2016_A_31-12-2016.CSV",
+      "sha256": "319e66ed5dd41d6bee5f0dc8c65c5ceaaead4b651574c31efb13aa559a34dffc"
+     },
+     {
+      "arquivo_no_zip": "2016/INMET_CO_GO_A025_RIO VERDE_01-01-2016_A_31-12-2016.CSV",
+      "bytes": 831047,
+      "guardado_em": "inmet/2016/INMET_CO_GO_A025_RIO VERDE_01-01-2016_A_31-12-2016.CSV",
+      "sha256": "c701723d71cd6d5759d03067558fd462cba68e4c00e0e7ddfe83c2fb8e882777"
+     },
+     {
+      "arquivo_no_zip": "2016/INMET_CO_GO_A026_MINEIROS_01-01-2016_A_31-12-2016.CSV",
+      "bytes": 860658,
+      "guardado_em": "inmet/2016/INMET_CO_GO_A026_MINEIROS_01-01-2016_A_31-12-2016.CSV",
+      "sha256": "f1619fd5086117e3b025fb9f9c26899f1af9902beb9a27eb5de7cdd782eba602"
+     },
+     {
+      "arquivo_no_zip": "2016/INMET_CO_GO_A027_PARAUNA_01-01-2016_A_31-12-2016.CSV",
+      "bytes": 802770,
+      "guardado_em": "inmet/2016/INMET_CO_GO_A027_PARAUNA_01-01-2016_A_31-12-2016.CSV",
+      "sha256": "e30b630edcfa09eef85efeafa731297087b4ce766aa353feb5f7889f33c5e771"
+     },
+     {
+      "arquivo_no_zip": "2016/INMET_CO_GO_A028_IPORA_01-01-2016_A_31-12-2016.CSV",
+      "bytes": 807608,
+      "guardado_em": "inmet/2016/INMET_CO_GO_A028_IPORA_01-01-2016_A_31-12-2016.CSV",
+      "sha256": "a0bc1c3afde84aee2c9639fe6964bf39649b140680aeb3a77f337dcae7e888e7"
+     },
+     {
+      "arquivo_no_zip": "2016/INMET_CO_GO_A032_MONTE ALEGRE DE GOIAS_01-01-2016_A_31-12-2016.CSV",
+      "bytes": 812704,
+      "guardado_em": "inmet/2016/INMET_CO_GO_A032_MONTE ALEGRE DE GOIAS_01-01-2016_A_31-12-2016.CSV",
+      "sha256": "aad16e4adc97a0dc938e9a8f768ab5797fe8c146f4515cba3ea1ff656ddc02f6"
+     },
+     {
+      "arquivo_no_zip": "2016/INMET_CO_GO_A033_PIRES DO RIO_01-01-2016_A_31-12-2016.CSV",
+      "bytes": 800285,
+      "guardado_em": "inmet/2016/INMET_CO_GO_A033_PIRES DO RIO_01-01-2016_A_31-12-2016.CSV",
+      "sha256": "1acff014129e18082e9b035e200e86c1d7ed34aee1648278c1ccd6c7fcd4a06d"
+     },
+     {
+      "arquivo_no_zip": "2016/INMET_CO_GO_A034_CATALAO_01-01-2016_A_31-12-2016.CSV",
+      "bytes": 805242,
+      "guardado_em": "inmet/2016/INMET_CO_GO_A034_CATALAO_01-01-2016_A_31-12-2016.CSV",
+      "sha256": "365cffc2385ad52c260499547ea3af632a037f7dc57d7f85a51c5049836073fc"
+     },
+     {
+      "arquivo_no_zip": "2016/INMET_CO_GO_A035_ITUMBIARA_01-01-2016_A_31-12-2016.CSV",
+      "bytes": 790881,
+      "guardado_em": "inmet/2016/INMET_CO_GO_A035_ITUMBIARA_01-01-2016_A_31-12-2016.CSV",
+      "sha256": "76a35244fbfeb15bfbbf4bf462f9f5dd034d04079176bc357101fdd64ae04c75"
+     },
+     {
+      "arquivo_no_zip": "2016/INMET_CO_GO_A036_CRISTALINA_01-01-2016_A_31-12-2016.CSV",
+      "bytes": 804864,
+      "guardado_em": "inmet/2016/INMET_CO_GO_A036_CRISTALINA_01-01-2016_A_31-12-2016.CSV",
+      "sha256": "6ce2f0e3702b488e33d1dcb88c05535e63714ccc3a90cd7c86ee26cf085ce1bb"
+     },
+     {
+      "arquivo_no_zip": "2016/INMET_CO_GO_A037_SILVANIA_01-01-2016_A_31-12-2016.CSV",
+      "bytes": 809958,
+      "guardado_em": "inmet/2016/INMET_CO_GO_A037_SILVANIA_01-01-2016_A_31-12-2016.CSV",
+      "sha256": "1c4e4ad0dc2f14f79055fc1dbc372afd2b6c535ffa190a3cb0e78b036d899f8d"
+     }
+    ],
+    "baixado_em_utc": "2026-11-15T10:08:29Z",
+    "endereco": "https://portal.inmet.gov.br/uploads/dadoshistoricos/2016.zip",
+    "zip_bytes": 102439056,
+    "zip_sha256": "62a88787f1d976d7898dba2acbf5874f79cd486816e6d9531c53966557eb20a6"
+   },
+   "2017": {
+    "arquivos": [
+     {
+      "arquivo_no_zip": "2017/INMET_CO_DF_A001_BRASILIA_01-01-2017_A_31-12-2017.CSV",
+      "bytes": 802580,
+      "guardado_em": "inmet/2017/INMET_CO_DF_A001_BRASILIA_01-01-2017_A_31-12-2017.CSV",
+      "sha256": "61bed8d4b73e02228e497ce662ed9e69bf649963d6393c4b41d7932336f6b10d"
+     },
+     {
+      "arquivo_no_zip": "2017/INMET_CO_DF_A042_BRAZLANDIA_19-07-2017_A_31-12-2017.CSV",
+      "bytes": 368877,
+      "guardado_em": "inmet/2017/INMET_CO_DF_A042_BRAZLANDIA_19-07-2017_A_31-12-2017.CSV",
+      "sha256": "0e4e7415fdc28f5b38e2011b60e89ca0fbd300663c23e505f477f0a2db795463"
+     },
+     {
+      "arquivo_no_zip": "2017/INMET_CO_DF_A045_AGUAS EMENDADAS_01-01-2017_A_31-12-2017.CSV",
+      "bytes": 810032,
+      "guardado_em": "inmet/2017/INMET_CO_DF_A045_AGUAS EMENDADAS_01-01-2017_A_31-12-2017.CSV",
+      "sha256": "3d57e223dd04a7a78558b34a9568235c88d3528c0cb24965f331109198eef5f3"
+     },
+     {
+      "arquivo_no_zip": "2017/INMET_CO_DF_A046_GAMA (PONTE ALTA)_01-01-2017_A_31-12-2017.CSV",
+      "bytes": 813189,
+      "guardado_em": "inmet/2017/INMET_CO_DF_A046_GAMA (PONTE ALTA)_01-01-2017_A_31-12-2017.CSV",
+      "sha256": "2c9323114c1106fea5cfcdcb325a97533b18f26ff267313564bf8fd241b13a37"
+     },
+     {
+      "arquivo_no_zip": "2017/INMET_CO_DF_A047_PARANOA (COOPA-DF)_07-02-2017_A_31-12-2017.CSV",
+      "bytes": 733555,
+      "guardado_em": "inmet/2017/INMET_CO_DF_A047_PARANOA (COOPA-DF)_07-02-2017_A_31-12-2017.CSV",
+      "sha256": "6a354ffb31febcd7bc684cd5d5ae2ebc7ea64a3526d7e41a32985c48a9359157"
+     },
+     {
+      "arquivo_no_zip": "2017/INMET_CO_GO_A002_GOIANIA_01-01-2017_A_31-12-2017.CSV",
+      "bytes": 802490,
+      "guardado_em": "inmet/2017/INMET_CO_GO_A002_GOIANIA_01-01-2017_A_31-12-2017.CSV",
+      "sha256": "e9c374846e5e9fe76fa5efb16e013adb021715a80775ab3a0f0defbe95231253"
+     },
+     {
+      "arquivo_no_zip": "2017/INMET_CO_GO_A003_MORRINHOS_01-01-2017_A_31-12-2017.CSV",
+      "bytes": 810860,
+      "guardado_em": "inmet/2017/INMET_CO_GO_A003_MORRINHOS_01-01-2017_A_31-12-2017.CSV",
+      "sha256": "6517a0f906b3b9bcad0ef5bdbe6f825af551050bdda8d4a5d7872a053773f8df"
+     },
+     {
+      "arquivo_no_zip": "2017/INMET_CO_GO_A011_SAO SIMAO_01-01-2017_A_31-12-2017.CSV",
+      "bytes": 839095,
+      "guardado_em": "inmet/2017/INMET_CO_GO_A011_SAO SIMAO_01-01-2017_A_31-12-2017.CSV",
+      "sha256": "5e98abe57141fe9b9b96b121f3dff95b7c1f96dc88c2d1686437f38c40b23881"
+     },
+     {
+      "arquivo_no_zip": "2017/INMET_CO_GO_A012_LUZIANIA_01-01-2017_A_31-12-2017.CSV",
+      "bytes": 805756,
+      "guardado_em": "inmet/2017/INMET_CO_GO_A012_LUZIANIA_01-01-2017_A_31-12-2017.CSV",
+      "sha256": "d8798da72f3de8b94ded3c353a07e4fe27e16233c114041e017d9d06bbaa2566"
+     },
+     {
+      "arquivo_no_zip": "2017/INMET_CO_GO_A013_ARAGARCAS_01-01-2017_A_31-12-2017.CSV",
+      "bytes": 804672,
+      "guardado_em": "inmet/2017/INMET_CO_GO_A013_ARAGARCAS_01-01-2017_A_31-12-2017.CSV",
+      "sha256": "b27b475d9595d9146d5f20affdef66d92da4da267110fd452513e7d03b8a7fba"
+     },
+     {
+      "arquivo_no_zip": "2017/INMET_CO_GO_A014_GOIAS_01-01-2017_A_31-12-2017.CSV",
+      "bytes": 815575,
+      "guardado_em": "inmet/2017/INMET_CO_GO_A014_GOIAS_01-01-2017_A_31-12-2017.CSV",
+      "sha256": "ecfba88043f1283d52a1299e9b343728dd31b95b980c40cb9ff432d3ad1a67d1"
+     },
+     {
+      "arquivo_no_zip": "2017/INMET_CO_GO_A015_ITAPACI_01-01-2017_A_31-12-2017.CSV",
+      "bytes": 814457,
+      "guardado_em": "inmet/2017/INMET_CO_GO_A015_ITAPACI_01-01-2017_A_31-12-2017.CSV",
+      "sha256": "6fe4583f0cbb626935e575e6e8a2c1cf0f5779cdd5f9715e5d694e628646f02c"
+     },
+     {
+      "arquivo_no_zip": "2017/INMET_CO_GO_A016_JATAI_01-01-2017_A_31-12-2017.CSV",
+      "bytes": 821215,
+      "guardado_em": "inmet/2017/INMET_CO_GO_A016_JATAI_01-01-2017_A_31-12-2017.CSV",
+      "sha256": "382026d71ccb4250f34a10b9ebddccc660efd7e1677a1cb6dec85bc186c22f69"
+     },
+     {
+      "arquivo_no_zip": "2017/INMET_CO_GO_A017_POSSE_01-01-2017_A_31-12-2017.CSV",
+      "bytes": 822491,
+      "guardado_em": "inmet/2017/INMET_CO_GO_A017_POSSE_01-01-2017_A_31-12-2017.CSV",
+      "sha256": "3e384101c5bbeb318c9e81247dce0be1acc39add937a094e2458143a183881a6"
+     },
+     {
+      "arquivo_no_zip": "2017/INMET_CO_GO_A022_GOIANESIA_01-01-2017_A_31-12-2017.CSV",
+      "bytes": 812819,
+      "guardado_em": "inmet/2017/INMET_CO_GO_A022_GOIANESIA_01-01-2017_A_31-12-2017.CSV",
+      "sha256": "5ddb0cf88672ab40c01e4b1d1d3ce1a89dbc9b39dafc1a4d14a32663c108d846"
+     },
+     {
+      "arquivo_no_zip": "2017/INMET_CO_GO_A023_CAIAPONIA_01-01-2017_A_31-12-2017.CSV",
+      "bytes": 824095,
+      "guardado_em": "inmet/2017/INMET_CO_GO_A023_CAIAPONIA_01-01-2017_A_31-12-2017.CSV",
+      "sha256": "ece5528d9f45658615c552037ed8169bf2ab2d373407785bd2bc051c1ee78585"
+     },
+     {
+      "arquivo_no_zip": "2017/INMET_CO_GO_A024_ALTO PARAISO DE GOIAS_01-01-2017_A_31-12-2017.CSV",
+      "bytes": 810336,
+      "guardado_em": "inmet/2017/INMET_CO_GO_A024_ALTO PARAISO DE GOIAS_01-01-2017_A_31-12-2017.CSV",
+      "sha256": "0ee103c4a71cf174cdb8474cc47699e9018b7623222fe24dfcd0c8a136469863"
+     },
+     {
+      "arquivo_no_zip": "2017/INMET_CO_GO_A025_RIO VERDE_01-01-2017_A_31-12-2017.CSV",
+      "bytes": 802307,
+      "guardado_em": "inmet/2017/INMET_CO_GO_A025_RIO VERDE_01-01-2017_A_31-12-2017.CSV",
+      "sha256": "bf0a68bae312518330fc6dd9371b5e6015911b0cd125a1ed8a98d34a12414814"
+     },
+     {
+      "arquivo_no_zip": "2017/INMET_CO_GO_A026_MINEIROS_01-01-2017_A_31-12-2017.CSV",
+      "bytes": 901726,
+      "guardado_em": "inmet/2017/INMET_CO_GO_A026_MINEIROS_01-01-2017_A_31-12-2017.CSV",
+      "sha256": "b06de6c9460b46bf433e88c613f93799c4c3dd54bcc9e5ac03bfbd8e627d0651"
+     },
+     {
+      "arquivo_no_zip": "2017/INMET_CO_GO_A027_PARAUNA_01-01-2017_A_31-12-2017.CSV",
+      "bytes": 830775,
+      "guardado_em": "inmet/2017/INMET_CO_GO_A027_PARAUNA_01-01-2017_A_31-12-2017.CSV",
+      "sha256": "73eb2eea5f31d74483cb51f713fc45175b4fcccf36276d79172f5051658b6efd"
+     },
+     {
+      "arquivo_no_zip": "2017/INMET_CO_GO_A028_IPORA_01-01-2017_A_31-12-2017.CSV",
+      "bytes": 802965,
+      "guardado_em": "inmet/2017/INMET_CO_GO_A028_IPORA_01-01-2017_A_31-12-2017.CSV",
+      "sha256": "17d0513e242ee0cdfdda8358df725a46e289fb04ef5f6b2013e33704dbc8ece1"
+     },
+     {
+      "arquivo_no_zip": "2017/INMET_CO_GO_A029_EDEIA_26-08-2017_A_31-12-2017.CSV",
+      "bytes": 285138,
+      "guardado_em": "inmet/2017/INMET_CO_GO_A029_EDEIA_26-08-2017_A_31-12-2017.CSV",
+      "sha256": "2fd1b5ab266995b116b79b662e13a5947a49990b1c9afbaef9eb2ab241f35a37"
+     },
+     {
+      "arquivo_no_zip": "2017/INMET_CO_GO_A031_SAO MIGUEL DO ARAGUAIA_29-06-2017_A_31-12-2017.CSV",
+      "bytes": 418187,
+      "guardado_em": "inmet/2017/INMET_CO_GO_A031_SAO MIGUEL DO ARAGUAIA_29-06-2017_A_31-12-2017.CSV",
+      "sha256": "28896b9ac2aa75b81da29a1ec8e4d16d9af9366e72b82133a7e4ac1a0ff982d4"
+     },
+     {
+      "arquivo_no_zip": "2017/INMET_CO_GO_A032_MONTE ALEGRE DE GOIAS_01-01-2017_A_31-12-2017.CSV",
+      "bytes": 856503,
+      "guardado_em": "inmet/2017/INMET_CO_GO_A032_MONTE ALEGRE DE GOIAS_01-01-2017_A_31-12-2017.CSV",
+      "sha256": "0a79c6f4599dc934577e972d0db27d73d5a21c2ebe90ec7f74597e8d9707759a"
+     },
+     {
+      "arquivo_no_zip": "2017/INMET_CO_GO_A033_PIRES DO RIO_01-01-2017_A_31-12-2017.CSV",
+      "bytes": 822421,
+      "guardado_em": "inmet/2017/INMET_CO_GO_A033_PIRES DO RIO_01-01-2017_A_31-12-2017.CSV",
+      "sha256": "471d9c38b7cb1586c9e82d1de41b95096d3924e9cd38769499e1a4ff5cfd2b04"
+     },
+     {
+      "arquivo_no_zip": "2017/INMET_CO_GO_A034_CATALAO_01-01-2017_A_31-12-2017.CSV",
+      "bytes": 801315,
+      "guardado_em": "inmet/2017/INMET_CO_GO_A034_CATALAO_01-01-2017_A_31-12-2017.CSV",
+      "sha256": "10448ac70a4b360585a2a96db1282ecb9ef8d883f7e238454d9bc83a1761514f"
+     },
+     {
+      "arquivo_no_zip": "2017/INMET_CO_GO_A035_ITUMBIARA_01-01-2017_A_31-12-2017.CSV",
+      "bytes": 812484,
+      "guardado_em": "inmet/2017/INMET_CO_GO_A035_ITUMBIARA_01-01-2017_A_31-12-2017.CSV",
+      "sha256": "99dff594c8ceaaa11a13b39e82f66d50563d3a7054417aa124e5744773accbe4"
+     },
+     {
+      "arquivo_no_zip": "2017/INMET_CO_GO_A036_CRISTALINA_01-01-2017_A_31-12-2017.CSV",
+      "bytes": 797484,
+      "guardado_em": "inmet/2017/INMET_CO_GO_A036_CRISTALINA_01-01-2017_A_31-12-2017.CSV",
+      "sha256": "73c8c5f0f81acfae2fd6f179efeb6ad780e93e13bc4229200c5f717f9df49ff7"
+     },
+     {
+      "arquivo_no_zip": "2017/INMET_CO_GO_A037_SILVANIA_01-01-2017_A_31-12-2017.CSV",
+      "bytes": 802955,
+      "guardado_em": "inmet/2017/INMET_CO_GO_A037_SILVANIA_01-01-2017_A_31-12-2017.CSV",
+      "sha256": "bae27429c810eff9b21eef93f7fbc2b5f53e0bf62920ad234e636dc68698bf41"
+     }
+    ],
+    "baixado_em_utc": "2026-11-15T10:08:37Z",
+    "endereco": "https://portal.inmet.gov.br/uploads/dadoshistoricos/2017.zip",
+    "zip_bytes": 109677898,
+    "zip_sha256": "0f620edffe32a9df55e2c0619f5f9d2fe9965ffe2fa03bfa48abac4a4a34c061"
+   },
+   "2018": {
+    "arquivos": [
+     {
+      "arquivo_no_zip": "2018/INMET_CO_DF_A001_BRASILIA_01-01-2018_A_31-12-2018.CSV",
+      "bytes": 807350,
+      "guardado_em": "inmet/2018/INMET_CO_DF_A001_BRASILIA_01-01-2018_A_31-12-2018.CSV",
+      "sha256": "a29f5307e58bea47c51ba816adb911ac61d0dfe2c6da2bd94a527a5dad6b42ee"
+     },
+     {
+      "arquivo_no_zip": "2018/INMET_CO_DF_A042_BRAZLANDIA_01-01-2018_A_31-12-2018.CSV",
+      "bytes": 804780,
+      "guardado_em": "inmet/2018/INMET_CO_DF_A042_BRAZLANDIA_01-01-2018_A_31-12-2018.CSV",
+      "sha256": "e7f955bf269f2029bd409b0238565999896cd495b291a75a1fca9acd43e3e4ec"
+     },
+     {
+      "arquivo_no_zip": "2018/INMET_CO_DF_A045_AGUAS EMENDADAS_01-01-2018_A_31-12-2018.CSV",
+      "bytes": 806225,
+      "guardado_em": "inmet/2018/INMET_CO_DF_A045_AGUAS EMENDADAS_01-01-2018_A_31-12-2018.CSV",
+      "sha256": "5826bc4121085336b3a0da02eff09532be9174307996f959ac17d2548f09c516"
+     },
+     {
+      "arquivo_no_zip": "2018/INMET_CO_DF_A046_GAMA (PONTE ALTA)_01-01-2018_A_31-12-2018.CSV",
+      "bytes": 806612,
+      "guardado_em": "inmet/2018/INMET_CO_DF_A046_GAMA (PONTE ALTA)_01-01-2018_A_31-12-2018.CSV",
+      "sha256": "be4a9d69a9ac9291b22aea385e7414aaf7fb62d46e1c12833d9ce69a8f690c06"
+     },
+     {
+      "arquivo_no_zip": "2018/INMET_CO_DF_A047_PARANOA (COOPA-DF)_01-01-2018_A_31-12-2018.CSV",
+      "bytes": 808795,
+      "guardado_em": "inmet/2018/INMET_CO_DF_A047_PARANOA (COOPA-DF)_01-01-2018_A_31-12-2018.CSV",
+      "sha256": "eef09c7ef7f3ac900af30a1c856c4d728dd04ee2a1bbb4831838fd722ae4aa2c"
+     },
+     {
+      "arquivo_no_zip": "2018/INMET_CO_GO_A002_GOIANIA_01-01-2018_A_31-12-2018.CSV",
+      "bytes": 805418,
+      "guardado_em": "inmet/2018/INMET_CO_GO_A002_GOIANIA_01-01-2018_A_31-12-2018.CSV",
+      "sha256": "8625fd91da21ab6f46dc86e51d132104e343ce40bd8aa805e6014e219b0a7bbe"
+     },
+     {
+      "arquivo_no_zip": "2018/INMET_CO_GO_A003_MORRINHOS_01-01-2018_A_31-12-2018.CSV",
+      "bytes": 811860,
+      "guardado_em": "inmet/2018/INMET_CO_GO_A003_MORRINHOS_01-01-2018_A_31-12-2018.CSV",
+      "sha256": "e29ac778d094603b698833d316dfe0fa5957ea22f6007f9f84e85ecf6ec2c799"
+     },
+     {
+      "arquivo_no_zip": "2018/INMET_CO_GO_A005_PORANGATU_13-09-2018_A_31-12-2018.CSV",
+      "bytes": 245201,
+      "guardado_em": "inmet/2018/INMET_CO_GO_A005_PORANGATU_13-09-2018_A_31-12-2018.CSV",
+      "sha256": "ce53d882d0ce4741686761a422e49bcb60657d4702b765252b81dc19e2174518"
+     },
+     {
+      "arquivo_no_zip": "2018/INMET_CO_GO_A011_SAO SIMAO_01-01-2018_A_31-12-2018.CSV",
+      "bytes": 808555,
+      "guardado_em": "inmet/2018/INMET_CO_GO_A011_SAO SIMAO_01-01-2018_A_31-12-2018.CSV",
+      "sha256": "6dce4a45cc5a12c45ea6dd8fbad83bc8b6d1316528096f1ae880fea0bd212109"
+     },
+     {
+      "arquivo_no_zip": "2018/INMET_CO_GO_A012_LUZIANIA_01-01-2018_A_31-12-2018.CSV",
+      "bytes": 804644,
+      "guardado_em": "inmet/2018/INMET_CO_GO_A012_LUZIANIA_01-01-2018_A_31-12-2018.CSV",
+      "sha256": "fbbe7897b9d755b9613a5dd4ad943b7c1f68f65d0568b7d4662c30339081aa7f"
+     },
+     {
+      "arquivo_no_zip": "2018/INMET_CO_GO_A013_ARAGARCAS_01-01-2018_A_31-12-2018.CSV",
+      "bytes": 829875,
+      "guardado_em": "inmet/2018/INMET_CO_GO_A013_ARAGARCAS_01-01-2018_A_31-12-2018.CSV",
+      "sha256": "f5e63144419a220785f550bf8a55e772dd846c0f4d4cf008048f4f2fd35ca145"
+     },
+     {
+      "arquivo_no_zip": "2018/INMET_CO_GO_A014_GOIAS_01-01-2018_A_31-12-2018.CSV",
+      "bytes": 785517,
+      "guardado_em": "inmet/2018/INMET_CO_GO_A014_GOIAS_01-01-2018_A_31-12-2018.CSV",
+      "sha256": "26dfbd2bab54f5ac0e023cd199f2fa80450d3ab09ebb205179646d123a1c09bb"
+     },
+     {
+      "arquivo_no_zip": "2018/INMET_CO_GO_A015_ITAPACI_01-01-2018_A_31-12-2018.CSV",
+      "bytes": 803737,
+      "guardado_em": "inmet/2018/INMET_CO_GO_A015_ITAPACI_01-01-2018_A_31-12-2018.CSV",
+      "sha256": "ab19a39ba227a1e730fbdaadefcbf0a9886ecaae7a58a1cbf5f7ca0f89776587"
+     },
+     {
+      "arquivo_no_zip": "2018/INMET_CO_GO_A016_JATAI_01-01-2018_A_31-12-2018.CSV",
+      "bytes": 805854,
+      "guardado_em": "inmet/2018/INMET_CO_GO_A016_JATAI_01-01-2018_A_31-12-2018.CSV",
+      "sha256": "dba5c1b236ab18e0c02fcb7b888f4f50d72e4970d9d374d027662bad85e53af8"
+     },
+     {
+      "arquivo_no_zip": "2018/INMET_CO_GO_A017_POSSE_01-01-2018_A_31-12-2018.CSV",
+      "bytes": 804392,
+      "guardado_em": "inmet/2018/INMET_CO_GO_A017_POSSE_01-01-2018_A_31-12-2018.CSV",
+      "sha256": "0256e422e1384b08c4dcee458f07fdb595c40bbccbac51eeea0068154ffcee40"
+     },
+     {
+      "arquivo_no_zip": "2018/INMET_CO_GO_A022_GOIANESIA_01-01-2018_A_31-12-2018.CSV",
+      "bytes": 850525,
+      "guardado_em": "inmet/2018/INMET_CO_GO_A022_GOIANESIA_01-01-2018_A_31-12-2018.CSV",
+      "sha256": "3348cb101a641421d05c939e86b9ed62a2bb238578991954809d595da7eb799e"
+     },
+     {
+      "arquivo_no_zip": "2018/INMET_CO_GO_A023_CAIAPONIA_01-01-2018_A_31-12-2018.CSV",
+      "bytes": 804308,
+      "guardado_em": "inmet/2018/INMET_CO_GO_A023_CAIAPONIA_01-01-2018_A_31-12-2018.CSV",
+      "sha256": "74f72f1d2094bf9d2bf775c10445d645f810042cad765dab9275def7393ca5be"
+     },
+     {
+      "arquivo_no_zip": "2018/INMET_CO_GO_A024_ALTO PARAISO DE GOIAS_01-01-2018_A_31-12-2018.CSV",
+      "bytes": 812975,
+      "guardado_em": "inmet/2018/INMET_CO_GO_A024_ALTO PARAISO DE GOIAS_01-01-2018_A_31-12-2018.CSV",
+      "sha256": "0bae34db050d418662549a2313aaf7f3d5f551b8f6d335c2ef6508630afdf7f1"
+     },
+     {
+      "arquivo_no_zip": "2018/INMET_CO_GO_A025_RIO VERDE_01-01-2018_A_31-12-2018.CSV",
+      "bytes": 803321,
+      "guardado_em": "inmet/2018/INMET_CO_GO_A025_RIO VERDE_01-01-2018_A_31-12-2018.CSV",
+      "sha256": "9b42d71b55a86db588f07724f38df4ee5d78af231b70314f60ac3007f4a1caaa"
+     },
+     {
+      "arquivo_no_zip": "2018/INMET_CO_GO_A026_MINEIROS_01-01-2018_A_31-12-2018.CSV",
+      "bytes": 879582,
+      "guardado_em": "inmet/2018/INMET_CO_GO_A026_MINEIROS_01-01-2018_A_31-12-2018.CSV",
+      "sha256": "fd7433cbc89b64136574f6c4304b3986c3206965fae45239cd24c18f5d8a324f"
+     },
+     {
+      "arquivo_no_zip": "2018/INMET_CO_GO_A027_PARAUNA_01-01-2018_A_31-12-2018.CSV",
+      "bytes": 810178,
+      "guardado_em": "inmet/2018/INMET_CO_GO_A027_PARAUNA_01-01-2018_A_31-12-2018.CSV",
+      "sha256": "bad31f222cdc349b0ae503e9614f1c43db738434764b9233ea29eba0038bb714"
+     },
+     {
+      "arquivo_no_zip": "2018/INMET_CO_GO_A028_IPORA_01-01-2018_A_31-12-2018.CSV",
+      "bytes": 819468,
+      "guardado_em": "inmet/2018/INMET_CO_GO_A028_IPORA_01-01-2018_A_31-12-2018.CSV",
+      "sha256": "e02211fbf364adcab27217ccf10b35ed57488e4d577a0ccd51282cf830714370"
+     },
+     {
+      "arquivo_no_zip": "2018/INMET_CO_GO_A029_EDEIA_01-01-2018_A_31-12-2018.CSV",
+      "bytes": 808251,
+      "guardado_em": "inmet/2018/INMET_CO_GO_A029_EDEIA_01-01-2018_A_31-12-2018.CSV",
+      "sha256": "1ca577ff0a70d69f13fa4ac41bce8162df20bf25677ba92ba3c1257d87970372"
+     },
+     {
+      "arquivo_no_zip": "2018/INMET_CO_GO_A031_SAO MIGUEL DO ARAGUAIA_01-01-2018_A_31-12-2018.CSV",
+      "bytes": 811407,
+      "guardado_em": "inmet/2018/INMET_CO_GO_A031_SAO MIGUEL DO ARAGUAIA_01-01-2018_A_31-12-2018.CSV",
+      "sha256": "b2e339315603eb14f7cb8e4e0e8d1361d9e236d24079d8b135d1d791a7b10f6b"
+     },
+     {
+      "arquivo_no_zip": "2018/INMET_CO_GO_A032_MONTE ALEGRE DE GOIAS_01-01-2018_A_31-12-2018.CSV",
+      "bytes": 816996,
+      "guardado_em": "inmet/2018/INMET_CO_GO_A032_MONTE ALEGRE DE GOIAS_01-01-2018_A_31-12-2018.CSV",
+      "sha256": "4306fd2e10eefb7fd2d6b9113584d27cc46cdffd26e1da0547409c3d0b8f994d"
+     },
+     {
+      "arquivo_no_zip": "2018/INMET_CO_GO_A033_PIRES DO RIO_01-01-2018_A_31-12-2018.CSV",
+      "bytes": 794293,
+      "guardado_em": "inmet/2018/INMET_CO_GO_A033_PIRES DO RIO_01-01-2018_A_31-12-2018.CSV",
+      "sha256": "834759e5445435130f39ad0c16c0701635c279d1baee8ff7282e91db29a3b361"
+     },
+     {
+      "arquivo_no_zip": "2018/INMET_CO_GO_A034_CATALAO_01-01-2018_A_31-12-2018.CSV",
+      "bytes": 854761,
+      "guardado_em": "inmet/2018/INMET_CO_GO_A034_CATALAO_01-01-2018_A_31-12-2018.CSV",
+      "sha256": "ffddeb368ff5dd444a4f7a76fb4f39be242783d50270f0c2ee515c79f1462048"
+     },
+     {
+      "arquivo_no_zip": "2018/INMET_CO_GO_A035_ITUMBIARA_01-01-2018_A_31-12-2018.CSV",
+      "bytes": 796952,
+      "guardado_em": "inmet/2018/INMET_CO_GO_A035_ITUMBIARA_01-01-2018_A_31-12-2018.CSV",
+      "sha256": "9cd87fb4521409766da21e477b1b5fc3c5fe5224a54374a6d467fcd4b5ed5b67"
+     },
+     {
+      "arquivo_no_zip": "2018/INMET_CO_GO_A036_CRISTALINA_01-01-2018_A_31-12-2018.CSV",
+      "bytes": 780775,
+      "guardado_em": "inmet/2018/INMET_CO_GO_A036_CRISTALINA_01-01-2018_A_31-12-2018.CSV",
+      "sha256": "3569ca959b8e5ba1fe9dbc7863640d7f483aa26ee3149188003eec1633b4a309"
+     },
+     {
+      "arquivo_no_zip": "2018/INMET_CO_GO_A037_SILVANIA_01-01-2018_A_31-12-2018.CSV",
+      "bytes": 802429,
+      "guardado_em": "inmet/2018/INMET_CO_GO_A037_SILVANIA_01-01-2018_A_31-12-2018.CSV",
+      "sha256": "34c3477b8584f12e266e7ca134dfe22e0686821725caae23cc81762de6bfb382"
+     },
+     {
+      "arquivo_no_zip": "2018/INMET_CO_GO_A056_CRISTALINA (FAZENDA SANTA MONICA)_25-01-2018_A_31-12-2018.CSV",
+      "bytes": 757290,
+      "guardado_em": "inmet/2018/INMET_CO_GO_A056_CRISTALINA (FAZENDA SANTA MONICA)_25-01-2018_A_31-12-2018.CSV",
+      "sha256": "76e6bbc908d78531b042905057380f66790b6f4ba375055ad8b52ef5cb497333"
+     }
+    ],
+    "baixado_em_utc": "2026-11-15T10:08:47Z",
+    "endereco": "https://portal.inmet.gov.br/uploads/dadoshistoricos/2018.zip",
+    "zip_bytes": 117898042,
+    "zip_sha256": "ca44308b336e72d830ab1daedef45a59debc2f52bfda1a8be02c1e3d948861bb"
+   },
+   "2019": {
+    "arquivos": [
+     {
+      "arquivo_no_zip": "2019/INMET_CO_DF_A001_BRASILIA_01-01-2019_A_31-12-2019.CSV",
+      "bytes": 810234,
+      "guardado_em": "inmet/2019/INMET_CO_DF_A001_BRASILIA_01-01-2019_A_31-12-2019.CSV",
+      "sha256": "4a989f90edeced103f621cdfd701f13a818836f2f459a8be4d975ee34f02b811"
+     },
+     {
+      "arquivo_no_zip": "2019/INMET_CO_DF_A042_BRAZLANDIA_01-01-2019_A_31-12-2019.CSV",
+      "bytes": 791781,
+      "guardado_em": "inmet/2019/INMET_CO_DF_A042_BRAZLANDIA_01-01-2019_A_31-12-2019.CSV",
+      "sha256": "2366975db4c372dc18e870bb9547872ccebc431f1d628f487e31ae7c3f6c4910"
+     },
+     {
+      "arquivo_no_zip": "2019/INMET_CO_DF_A045_AGUAS EMENDADAS_01-01-2019_A_31-12-2019.CSV",
+      "bytes": 805948,
+      "guardado_em": "inmet/2019/INMET_CO_DF_A045_AGUAS EMENDADAS_01-01-2019_A_31-12-2019.CSV",
+      "sha256": "159c3fe099d89953059b3c16b5412e75308943d90f9f7051f3d70aaf66496a11"
+     },
+     {
+      "arquivo_no_zip": "2019/INMET_CO_DF_A046_GAMA (PONTE ALTA)_01-01-2019_A_31-12-2019.CSV",
+      "bytes": 810574,
+      "guardado_em": "inmet/2019/INMET_CO_DF_A046_GAMA (PONTE ALTA)_01-01-2019_A_31-12-2019.CSV",
+      "sha256": "11d417f5b155579c3baf5afca70c62290bbde9ef653f02cecd24d3b25989c7b7"
+     },
+     {
+      "arquivo_no_zip": "2019/INMET_CO_DF_A047_PARANOA (COOPA-DF)_01-01-2019_A_31-12-2019.CSV",
+      "bytes": 807827,
+      "guardado_em": "inmet/2019/INMET_CO_DF_A047_PARANOA (COOPA-DF)_01-01-2019_A_31-12-2019.CSV",
+      "sha256": "2c512c3134b19824a11ce1a11743c100c6737bd3949e6142c94289b7e8d1654f"
+     },
+     {
+      "arquivo_no_zip": "2019/INMET_CO_GO_A002_GOIANIA_01-01-2019_A_31-12-2019.CSV",
+      "bytes": 808883,
+      "guardado_em": "inmet/2019/INMET_CO_GO_A002_GOIANIA_01-01-2019_A_31-12-2019.CSV",
+      "sha256": "90dca48ffecfc98bca6ae218a9f75b223bbb61cbe8aad131a1b5175c71553386"
+     },
+     {
+      "arquivo_no_zip": "2019/INMET_CO_GO_A003_MORRINHOS_01-01-2019_A_31-12-2019.CSV",
+      "bytes": 809731,
+      "guardado_em": "inmet/2019/INMET_CO_GO_A003_MORRINHOS_01-01-2019_A_31-12-2019.CSV",
+      "sha256": "f59174ce9b4a1e71e647c6491e7d1abf304e132ff02d408b78e912213d33f3de"
+     },
+     {
+      "arquivo_no_zip": "2019/INMET_CO_GO_A005_PORANGATU_01-01-2019_A_31-12-2019.CSV",
+      "bytes": 809401,
+      "guardado_em": "inmet/2019/INMET_CO_GO_A005_PORANGATU_01-01-2019_A_31-12-2019.CSV",
+      "sha256": "29739b0c72ffa0c4273e86cbe706869508c9c7a0199f1ce66e61793bf8900676"
+     },
+     {
+      "arquivo_no_zip": "2019/INMET_CO_GO_A011_SAO SIMAO_01-01-2019_A_31-12-2019.CSV",
+      "bytes": 767342,
+      "guardado_em": "inmet/2019/INMET_CO_GO_A011_SAO SIMAO_01-01-2019_A_31-12-2019.CSV",
+      "sha256": "29e6edff3614d5b049762b74f3509e459b1f23ce2cc1a160e2d0868786cc603d"
+     },
+     {
+      "arquivo_no_zip": "2019/INMET_CO_GO_A012_LUZIANIA_01-01-2019_A_31-12-2019.CSV",
+      "bytes": 779617,
+      "guardado_em": "inmet/2019/INMET_CO_GO_A012_LUZIANIA_01-01-2019_A_31-12-2019.CSV",
+      "sha256": "81df1285b137218d24063af8cf9aeb7708ed172b5f5c23edf0ff6f64b09eaaf9"
+     },
+     {
+      "arquivo_no_zip": "2019/INMET_CO_GO_A013_ARAGARCAS_01-01-2019_A_31-12-2019.CSV",
+      "bytes": 811736,
+      "guardado_em": "inmet/2019/INMET_CO_GO_A013_ARAGARCAS_01-01-2019_A_31-12-2019.CSV",
+      "sha256": "8410fdf5054d1556b617d92f7e8cd6340f2cac6d1bd2aad7070202ecc244fb85"
+     },
+     {
+      "arquivo_no_zip": "2019/INMET_CO_GO_A014_GOIAS_01-01-2019_A_31-12-2019.CSV",
+      "bytes": 745933,
+      "guardado_em": "inmet/2019/INMET_CO_GO_A014_GOIAS_01-01-2019_A_31-12-2019.CSV",
+      "sha256": "a43186b4db949a97d86349ff6b4344d4cd0466cb0d53bbb427c520d5d7785033"
+     },
+     {
+      "arquivo_no_zip": "2019/INMET_CO_GO_A015_ITAPACI_01-01-2019_A_31-12-2019.CSV",
+      "bytes": 768607,
+      "guardado_em": "inmet/2019/INMET_CO_GO_A015_ITAPACI_01-01-2019_A_31-12-2019.CSV",
+      "sha256": "253c7a64d6edb2d3dbebdd1e60a023a4048af00697a6787d2b1feb28210e8475"
+     },
+     {
+      "arquivo_no_zip": "2019/INMET_CO_GO_A016_JATAI_01-01-2019_A_31-12-2019.CSV",
+      "bytes": 696912,
+      "guardado_em": "inmet/2019/INMET_CO_GO_A016_JATAI_01-01-2019_A_31-12-2019.CSV",
+      "sha256": "24b0babc28e78c276cccc866cb3944163e67471da5dc16e7baf61015b585e7ba"
+     },
+     {
+      "arquivo_no_zip": "2019/INMET_CO_GO_A017_POSSE_01-01-2019_A_31-12-2019.CSV",
+      "bytes": 732938,
+      "guardado_em": "inmet/2019/INMET_CO_GO_A017_POSSE_01-01-2019_A_31-12-2019.CSV",
+      "sha256": "d988c27d1f80df6841ca05767087187590081f894107984938aa653b7eb13db2"
+     },
+     {
+      "arquivo_no_zip": "2019/INMET_CO_GO_A022_GOIANESIA_01-01-2019_A_31-12-2019.CSV",
+      "bytes": 793809,
+      "guardado_em": "inmet/2019/INMET_CO_GO_A022_GOIANESIA_01-01-2019_A_31-12-2019.CSV",
+      "sha256": "361c8596e9631b46f38573bc94f7e13481cb1e9843983a072a553d31210ca27a"
+     },
+     {
+      "arquivo_no_zip": "2019/INMET_CO_GO_A023_CAIAPONIA_01-01-2019_A_31-12-2019.CSV",
+      "bytes": 810971,
+      "guardado_em": "inmet/2019/INMET_CO_GO_A023_CAIAPONIA_01-01-2019_A_31-12-2019.CSV",
+      "sha256": "8ec03e270f6eb7a71e4b1ce96b0e6db324a54a8bf4d7394b31dfbd5196ad6f8c"
+     },
+     {
+      "arquivo_no_zip": "2019/INMET_CO_GO_A024_ALTO PARAISO DE GOIAS_01-01-2019_A_31-12-2019.CSV",
+      "bytes": 746430,
+      "guardado_em": "inmet/2019/INMET_CO_GO_A024_ALTO PARAISO DE GOIAS_01-01-2019_A_31-12-2019.CSV",
+      "sha256": "2fbbd1850abfe58cdc44e87b7f88a12d40a3b3eee9f5f35e2fdcb92e301ad120"
+     },
+     {
+      "arquivo_no_zip": "2019/INMET_CO_GO_A025_RIO VERDE_01-01-2019_A_31-12-2019.CSV",
+      "bytes": 767997,
+      "guardado_em": "inmet/2019/INMET_CO_GO_A025_RIO VERDE_01-01-2019_A_31-12-2019.CSV",
+      "sha256": "e681664acbe053e21ab5d940cdd53eaf49e20aaf1f44c5d59c525d83f790d299"
+     },
+     {
+      "arquivo_no_zip": "2019/INMET_CO_GO_A026_MINEIROS_01-01-2019_A_31-12-2019.CSV",
+      "bytes": 808130,
+      "guardado_em": "inmet/2019/INMET_CO_GO_A026_MINEIROS_01-01-2019_A_31-12-2019.CSV",
+      "sha256": "9d5778e17d323f00ff324171f6e38aed83fe3ce5f3e9b6291c937364c6541d6d"
+     },
+     {
+      "arquivo_no_zip": "2019/INMET_CO_GO_A027_PARAUNA_01-01-2019_A_31-12-2019.CSV",
+      "bytes": 809595,
+      "guardado_em": "inmet/2019/INMET_CO_GO_A027_PARAUNA_01-01-2019_A_31-12-2019.CSV",
+      "sha256": "b1d458fc806b64a974c968df46052614d8bbaadb0ab5ffb0450265dfdc342bd9"
+     },
+     {
+      "arquivo_no_zip": "2019/INMET_CO_GO_A028_IPORA_01-01-2019_A_31-12-2019.CSV",
+      "bytes": 806296,
+      "guardado_em": "inmet/2019/INMET_CO_GO_A028_IPORA_01-01-2019_A_31-12-2019.CSV",
+      "sha256": "b78aa06ba8b6e5973aa57b6e1107a5c68ad224f93f39c7732b93805524c36548"
+     },
+     {
+      "arquivo_no_zip": "2019/INMET_CO_GO_A029_EDEIA_01-01-2019_A_31-12-2019.CSV",
+      "bytes": 787511,
+      "guardado_em": "inmet/2019/INMET_CO_GO_A029_EDEIA_01-01-2019_A_31-12-2019.CSV",
+      "sha256": "f143786c325f786638a3bd9d4537a9397422df65951e306dadd7ed7fa803ed01"
+     },
+     {
+      "arquivo_no_zip": "2019/INMET_CO_GO_A031_SAO MIGUEL DO ARAGUAIA_01-01-2019_A_31-12-2019.CSV",
+      "bytes": 679404,
+      "guardado_em": "inmet/2019/INMET_CO_GO_A031_SAO MIGUEL DO ARAGUAIA_01-01-2019_A_31-12-2019.CSV",
+      "sha256": "5ae169129f364ed3e18d83516975bab043ff50d38d3970c465fe21c742e6ce61"
+     },
+     {
+      "arquivo_no_zip": "2019/INMET_CO_GO_A032_MONTE ALEGRE DE GOIAS_01-01-2019_A_31-12-2019.CSV",
+      "bytes": 780624,
+      "guardado_em": "inmet/2019/INMET_CO_GO_A032_MONTE ALEGRE DE GOIAS_01-01-2019_A_31-12-2019.CSV",
+      "sha256": "789c6f055cc85a12990b1cf05f38dd0ca028ec2337043628fcad221d8f649c20"
+     },
+     {
+      "arquivo_no_zip": "2019/INMET_CO_GO_A033_PIRES DO RIO_01-01-2019_A_31-12-2019.CSV",
+      "bytes": 792193,
+      "guardado_em": "inmet/2019/INMET_CO_GO_A033_PIRES DO RIO_01-01-2019_A_31-12-2019.CSV",
+      "sha256": "4ae714dd5f6d84cff0f8512a626adaeb796bb6fd440f860e324acd1ad3ca5cab"
+     },
+     {
+      "arquivo_no_zip": "2019/INMET_CO_GO_A034_CATALAO_01-01-2019_A_31-12-2019.CSV",
+      "bytes": 807002,
+      "guardado_em": "inmet/2019/INMET_CO_GO_A034_CATALAO_01-01-2019_A_31-12-2019.CSV",
+      "sha256": "3cffb4f4d363e6c7f1a8f47d0d9c91e090bc8baff62ced9d8eedd48efda48462"
+     },
+     {
+      "arquivo_no_zip": "2019/INMET_CO_GO_A035_ITUMBIARA_01-01-2019_A_31-12-2019.CSV",
+      "bytes": 790059,
+      "guardado_em": "inmet/2019/INMET_CO_GO_A035_ITUMBIARA_01-01-2019_A_31-12-2019.CSV",
+      "sha256": "d99f3d2d62f9d5ca2bde2be62ae07deffbee3848a0e4df3f1da94c91f2c86f34"
+     },
+     {
+      "arquivo_no_zip": "2019/INMET_CO_GO_A036_CRISTALINA_01-01-2019_A_31-12-2019.CSV",
+      "bytes": 778342,
+      "guardado_em": "inmet/2019/INMET_CO_GO_A036_CRISTALINA_01-01-2019_A_31-12-2019.CSV",
+      "sha256": "5ee11f218c45165ef3baadfc276ef1f19b5094068334d59c10dfb4de9bc145be"
+     },
+     {
+      "arquivo_no_zip": "2019/INMET_CO_GO_A037_SILVANIA_01-01-2019_A_31-12-2019.CSV",
+      "bytes": 807498,
+      "guardado_em": "inmet/2019/INMET_CO_GO_A037_SILVANIA_01-01-2019_A_31-12-2019.CSV",
+      "sha256": "ae419f6349ddc5cc27e61ed8dc4e0fb6827d1b9573180d43fce76696c85e6c70"
+     },
+     {
+      "arquivo_no_zip": "2019/INMET_CO_GO_A056_CRISTALINA (FAZENDA SANTA MONICA)_01-01-2019_A_31-12-2019.CSV",
+      "bytes": 807915,
+      "guardado_em": "inmet/2019/INMET_CO_GO_A056_CRISTALINA (FAZENDA SANTA MONICA)_01-01-2019_A_31-12-2019.CSV",
+      "sha256": "e1452d3ab86a593dcd90b0438728b15c22881612b9054237c56ab08b9cacae8c"
+     }
+    ],
+    "baixado_em_utc": "2026-11-15T10:08:48Z",
+    "endereco": "https://portal.inmet.gov.br/uploads/dadoshistoricos/2019.zip",
+    "zip_bytes": 117560201,
+    "zip_sha256": "f09fa1f4314330be69093f574e7b273954881a5dcb24fc3eca9782545136af49"
+   },
+   "2020": {
+    "arquivos": [
+     {
+      "arquivo_no_zip": "INMET_CO_DF_A001_BRASILIA_01-01-2020_A_31-12-2020.CSV",
+      "bytes": 813147,
+      "guardado_em": "inmet/2020/INMET_CO_DF_A001_BRASILIA_01-01-2020_A_31-12-2020.CSV",
+      "sha256": "3fa68d3d2eac4bc23ab337ea9cf07c6fc4e75f004f1db278b201ee8a17ce8466"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_DF_A042_BRAZLANDIA_01-01-2020_A_31-12-2020.CSV",
+      "bytes": 800906,
+      "guardado_em": "inmet/2020/INMET_CO_DF_A042_BRAZLANDIA_01-01-2020_A_31-12-2020.CSV",
+      "sha256": "05187417a3bd8bf1469d6e1af55cd45a244e7a3f04822b9470179c795987abdc"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_DF_A045_AGUAS EMENDADAS_01-01-2020_A_31-12-2020.CSV",
+      "bytes": 802171,
+      "guardado_em": "inmet/2020/INMET_CO_DF_A045_AGUAS EMENDADAS_01-01-2020_A_31-12-2020.CSV",
+      "sha256": "506c17bcea183ec049c4708e28005fa8af1b4f78e6fcf5372d543d3c4268d1f8"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_DF_A046_GAMA (PONTE ALTA)_01-01-2020_A_31-12-2020.CSV",
+      "bytes": 808923,
+      "guardado_em": "inmet/2020/INMET_CO_DF_A046_GAMA (PONTE ALTA)_01-01-2020_A_31-12-2020.CSV",
+      "sha256": "ea62e157a2eed2e6a8dc799a650b0609829d9d0a518583ac82670b525c2567ae"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_DF_A047_PARANOA (COOPA-DF)_01-01-2020_A_31-12-2020.CSV",
+      "bytes": 802870,
+      "guardado_em": "inmet/2020/INMET_CO_DF_A047_PARANOA (COOPA-DF)_01-01-2020_A_31-12-2020.CSV",
+      "sha256": "0f6df04e576fef1f1fcc0f3a5b8ed85a6b1c5f125f15e23e9d9c3e0cdd7c60b5"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A002_GOIANIA_01-01-2020_A_31-12-2020.CSV",
+      "bytes": 808158,
+      "guardado_em": "inmet/2020/INMET_CO_GO_A002_GOIANIA_01-01-2020_A_31-12-2020.CSV",
+      "sha256": "984349e812cdeec3faaaee48f8b392c2b6bc30d9e916fb72811ce2e6ede7ca49"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A003_MORRINHOS_01-01-2020_A_31-12-2020.CSV",
+      "bytes": 809840,
+      "guardado_em": "inmet/2020/INMET_CO_GO_A003_MORRINHOS_01-01-2020_A_31-12-2020.CSV",
+      "sha256": "5e37d879c2b8bb9b3db061524a99f87cd070bf0b318912bd69ecb7ae98358c9f"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A005_PORANGATU_01-01-2020_A_31-12-2020.CSV",
+      "bytes": 596717,
+      "guardado_em": "inmet/2020/INMET_CO_GO_A005_PORANGATU_01-01-2020_A_31-12-2020.CSV",
+      "sha256": "e63a6cbaab761884e7523be8f593b9aa99805674da088f694cc20bfa2b1deffd"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A011_SAO SIMAO_01-01-2020_A_31-12-2020.CSV",
+      "bytes": 551999,
+      "guardado_em": "inmet/2020/INMET_CO_GO_A011_SAO SIMAO_01-01-2020_A_31-12-2020.CSV",
+      "sha256": "5b2172f802ea138c26f9915409bd5eac8b8f8dbdd105e687b10c91abd939fb58"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A012_LUZIANIA_01-01-2020_A_31-12-2020.CSV",
+      "bytes": 705602,
+      "guardado_em": "inmet/2020/INMET_CO_GO_A012_LUZIANIA_01-01-2020_A_31-12-2020.CSV",
+      "sha256": "4211cd0ed69d38c17d09c50e703812ea6c14489dca0b4a2d57a014647484626f"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A013_ARAGARCAS_01-01-2020_A_31-12-2020.CSV",
+      "bytes": 790189,
+      "guardado_em": "inmet/2020/INMET_CO_GO_A013_ARAGARCAS_01-01-2020_A_31-12-2020.CSV",
+      "sha256": "d5ad966e4db4693dc899bdae8316a4968703ba23c09876d17436f51c69c31eed"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A014_GOIAS_01-01-2020_A_31-12-2020.CSV",
+      "bytes": 808158,
+      "guardado_em": "inmet/2020/INMET_CO_GO_A014_GOIAS_01-01-2020_A_31-12-2020.CSV",
+      "sha256": "fc10399938b5802a32e9c078c542801692588da691e989e4f43e7000423161ee"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A015_ITAPACI_01-01-2020_A_31-12-2020.CSV",
+      "bytes": 789922,
+      "guardado_em": "inmet/2020/INMET_CO_GO_A015_ITAPACI_01-01-2020_A_31-12-2020.CSV",
+      "sha256": "8c52489faf2965cc4a2b1646335995a15b14fd8532dd61c65085dd294ab36f2d"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A016_JATAI_01-01-2020_A_31-12-2020.CSV",
+      "bytes": 810990,
+      "guardado_em": "inmet/2020/INMET_CO_GO_A016_JATAI_01-01-2020_A_31-12-2020.CSV",
+      "sha256": "4fb48afdcf802a8b1eb6ddc5ebc7eb58b1b34c056cda6d5ad64ca4438d094f61"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A017_POSSE_01-01-2020_A_31-12-2020.CSV",
+      "bytes": 721227,
+      "guardado_em": "inmet/2020/INMET_CO_GO_A017_POSSE_01-01-2020_A_31-12-2020.CSV",
+      "sha256": "fd4dc64c8d3bbee6977218c67dbd09e5138e94420872e9ee8e512f012c9c6689"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A022_GOIANESIA_01-01-2020_A_31-12-2020.CSV",
+      "bytes": 615421,
+      "guardado_em": "inmet/2020/INMET_CO_GO_A022_GOIANESIA_01-01-2020_A_31-12-2020.CSV",
+      "sha256": "319818a210044c69db842e061038473c00effe58eac4713962c357b900139c81"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A023_CAIAPONIA_01-01-2020_A_31-12-2020.CSV",
+      "bytes": 793164,
+      "guardado_em": "inmet/2020/INMET_CO_GO_A023_CAIAPONIA_01-01-2020_A_31-12-2020.CSV",
+      "sha256": "8a1b161c255757c69ad212d3aa874fd03db66029279c1698709e9370fb30ea3d"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A024_ALTO PARAISO DE GOIAS_01-01-2020_A_31-12-2020.CSV",
+      "bytes": 754834,
+      "guardado_em": "inmet/2020/INMET_CO_GO_A024_ALTO PARAISO DE GOIAS_01-01-2020_A_31-12-2020.CSV",
+      "sha256": "aaa94dc7edd602d70ab34b7f4ff4cbaf03732d91aa3bca25288e6ab109b79d3f"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A025_RIO VERDE_01-01-2020_A_31-12-2020.CSV",
+      "bytes": 362364,
+      "guardado_em": "inmet/2020/INMET_CO_GO_A025_RIO VERDE_01-01-2020_A_31-12-2020.CSV",
+      "sha256": "28c07e979699551913294f120b6ed2d995cfa361513d8616ff859573e658a680"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A026_MINEIROS_01-01-2020_A_31-12-2020.CSV",
+      "bytes": 808557,
+      "guardado_em": "inmet/2020/INMET_CO_GO_A026_MINEIROS_01-01-2020_A_31-12-2020.CSV",
+      "sha256": "b3e1b4d818d83dd7231aeb511a71509b4c401f9c46450a51dada4b9bb8a578b1"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A027_PARAUNA_01-01-2020_A_31-12-2020.CSV",
+      "bytes": 809904,
+      "guardado_em": "inmet/2020/INMET_CO_GO_A027_PARAUNA_01-01-2020_A_31-12-2020.CSV",
+      "sha256": "258309863f75142b0862eb23fadff6aa01c5fed95fc1e8b6e1b19ad4cdd277d3"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A028_IPORA_01-01-2020_A_31-12-2020.CSV",
+      "bytes": 597902,
+      "guardado_em": "inmet/2020/INMET_CO_GO_A028_IPORA_01-01-2020_A_31-12-2020.CSV",
+      "sha256": "cdbe4dd8e3f3b356bb1198c3b7f6bd0f47ed112c8aba271ef1292cfd67e0e24c"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A029_EDEIA_01-01-2020_A_31-12-2020.CSV",
+      "bytes": 693125,
+      "guardado_em": "inmet/2020/INMET_CO_GO_A029_EDEIA_01-01-2020_A_31-12-2020.CSV",
+      "sha256": "3cc474aa219c34ae86c0c1f5582c10a3ff42f580ffd10c988b59f87c97e217fc"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A031_SAO MIGUEL DO ARAGUAIA_01-01-2020_A_31-12-2020.CSV",
+      "bytes": 486569,
+      "guardado_em": "inmet/2020/INMET_CO_GO_A031_SAO MIGUEL DO ARAGUAIA_01-01-2020_A_31-12-2020.CSV",
+      "sha256": "d0a5540db39578595bbc6c94c3e9dd66520226ef4d09d457fa3dd4f74c5a9477"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A032_MONTE ALEGRE DE GOIAS_01-01-2020_A_31-12-2020.CSV",
+      "bytes": 765244,
+      "guardado_em": "inmet/2020/INMET_CO_GO_A032_MONTE ALEGRE DE GOIAS_01-01-2020_A_31-12-2020.CSV",
+      "sha256": "20f25578e385ba96c1b7800f120e360dbd7bb3d8ec553f8f608abe038fbedd8a"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A033_PIRES DO RIO_01-01-2020_A_31-12-2020.CSV",
+      "bytes": 769227,
+      "guardado_em": "inmet/2020/INMET_CO_GO_A033_PIRES DO RIO_01-01-2020_A_31-12-2020.CSV",
+      "sha256": "eea41ff9cd6a0384b8c616f0b29d1857fa153bd7776444d21e77903c6add9fa3"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A034_CATALAO_01-01-2020_A_31-12-2020.CSV",
+      "bytes": 809414,
+      "guardado_em": "inmet/2020/INMET_CO_GO_A034_CATALAO_01-01-2020_A_31-12-2020.CSV",
+      "sha256": "9b9c5954c44992d2f5d60ec1cd42e14c9c0ca5602660c0490e5fd74645f514ad"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A035_ITUMBIARA_01-01-2020_A_31-12-2020.CSV",
+      "bytes": 778934,
+      "guardado_em": "inmet/2020/INMET_CO_GO_A035_ITUMBIARA_01-01-2020_A_31-12-2020.CSV",
+      "sha256": "65aa5b3588e26c748eb25c1c1935a0de0030aa4e27254dbfdcef43200c7d7ae4"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A036_CRISTALINA_01-01-2020_A_31-12-2020.CSV",
+      "bytes": 781807,
+      "guardado_em": "inmet/2020/INMET_CO_GO_A036_CRISTALINA_01-01-2020_A_31-12-2020.CSV",
+      "sha256": "d944ccaffbeb07d29493cbb1d8554bcc41b0dfd7d1055ed41abab731767eeafa"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A037_SILVANIA_01-01-2020_A_31-12-2020.CSV",
+      "bytes": 808604,
+      "guardado_em": "inmet/2020/INMET_CO_GO_A037_SILVANIA_01-01-2020_A_31-12-2020.CSV",
+      "sha256": "f0c4df406a2845454a36510226041eeac683212eed675617d0e8ea160c67c7e8"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A056_CRISTALINA (FAZENDA SANTA MONICA)_01-01-2020_A_31-12-2020.CSV",
+      "bytes": 809299,
+      "guardado_em": "inmet/2020/INMET_CO_GO_A056_CRISTALINA (FAZENDA SANTA MONICA)_01-01-2020_A_31-12-2020.CSV",
+      "sha256": "ba0659140422948f36a19414a2955d2363e6b6cfe2a4d9f76e6316a4242a7626"
+     }
+    ],
+    "baixado_em_utc": "2026-11-15T10:10:01Z",
+    "endereco": "https://portal.inmet.gov.br/uploads/dadoshistoricos/2020.zip",
+    "zip_bytes": 103653055,
+    "zip_sha256": "e6cf2016dd3b78d7180dac8cbd482e5f549b227dc87a9dff642ecb7bb9e5ba0b"
+   },
+   "2021": {
+    "arquivos": [
+     {
+      "arquivo_no_zip": "INMET_CO_DF_A001_BRASILIA_01-01-2021_A_31-12-2021.CSV",
+      "bytes": 810196,
+      "guardado_em": "inmet/2021/INMET_CO_DF_A001_BRASILIA_01-01-2021_A_31-12-2021.CSV",
+      "sha256": "baa9f5d0e0826af6ee38ae3a7fc9b0332dfeb91ce6aea91488cccfd743e6cf95"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_DF_A042_BRAZLANDIA_01-01-2021_A_31-12-2021.CSV",
+      "bytes": 797360,
+      "guardado_em": "inmet/2021/INMET_CO_DF_A042_BRAZLANDIA_01-01-2021_A_31-12-2021.CSV",
+      "sha256": "03215ca23caea3221645096fd9d6af02da7c18f117c24ed0d4ecfeef649f829f"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_DF_A045_AGUAS EMENDADAS_01-01-2021_A_31-12-2021.CSV",
+      "bytes": 796358,
+      "guardado_em": "inmet/2021/INMET_CO_DF_A045_AGUAS EMENDADAS_01-01-2021_A_31-12-2021.CSV",
+      "sha256": "90454b9720913e81a3ffc76339a860b0e29c3ee98f675fa8d1d087b2e070f5f1"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_DF_A046_GAMA (PONTE ALTA)_01-01-2021_A_31-12-2021.CSV",
+      "bytes": 809415,
+      "guardado_em": "inmet/2021/INMET_CO_DF_A046_GAMA (PONTE ALTA)_01-01-2021_A_31-12-2021.CSV",
+      "sha256": "d370fe684615212fa2e2a072baf1acadb7c3753c4c9d9ef97ed1bb7c285a9106"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_DF_A047_PARANOA (COOPA-DF)_01-01-2021_A_31-12-2021.CSV",
+      "bytes": 797806,
+      "guardado_em": "inmet/2021/INMET_CO_DF_A047_PARANOA (COOPA-DF)_01-01-2021_A_31-12-2021.CSV",
+      "sha256": "ffc6e54063d6a2df793ae70f6c191ab5add7ec60aecc32f434ea7986c7bbdda4"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A002_GOIANIA_01-01-2021_A_31-12-2021.CSV",
+      "bytes": 799501,
+      "guardado_em": "inmet/2021/INMET_CO_GO_A002_GOIANIA_01-01-2021_A_31-12-2021.CSV",
+      "sha256": "87b001abda136fda5a109a04534428a4e00dfa0e5a4e8cd803bfa036b3cda498"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A003_MORRINHOS_01-01-2021_A_31-12-2021.CSV",
+      "bytes": 709451,
+      "guardado_em": "inmet/2021/INMET_CO_GO_A003_MORRINHOS_01-01-2021_A_31-12-2021.CSV",
+      "sha256": "cdc155f2f094619099207e101978291c9892d85d3cae9ba5b8e4cf45edfd78a9"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A005_PORANGATU_01-01-2021_A_31-12-2021.CSV",
+      "bytes": 552026,
+      "guardado_em": "inmet/2021/INMET_CO_GO_A005_PORANGATU_01-01-2021_A_31-12-2021.CSV",
+      "sha256": "995208c99a091f9fdfce7efaf77d66681d072890f6449756c7a4ce6d2c3e7dc2"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A011_SAO SIMAO_01-01-2021_A_31-12-2021.CSV",
+      "bytes": 564378,
+      "guardado_em": "inmet/2021/INMET_CO_GO_A011_SAO SIMAO_01-01-2021_A_31-12-2021.CSV",
+      "sha256": "6f056e41312b3e7c65a8b2cad11b8e6684c19efd032ccf4da422720d9a4316cc"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A012_LUZIANIA_01-01-2021_A_31-12-2021.CSV",
+      "bytes": 807494,
+      "guardado_em": "inmet/2021/INMET_CO_GO_A012_LUZIANIA_01-01-2021_A_31-12-2021.CSV",
+      "sha256": "25655acc83b8148bcbd2cb6ec69f61021a2bf13a67a9d30ecf6e8e4234f56fef"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A013_ARAGARCAS_01-01-2021_A_31-12-2021.CSV",
+      "bytes": 440488,
+      "guardado_em": "inmet/2021/INMET_CO_GO_A013_ARAGARCAS_01-01-2021_A_31-12-2021.CSV",
+      "sha256": "c86bb13b2f07d024ce4a30d7ebc5a68c016ec67ebdd5b584cab340f3c01c383c"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A014_GOIAS_01-01-2021_A_31-12-2021.CSV",
+      "bytes": 801996,
+      "guardado_em": "inmet/2021/INMET_CO_GO_A014_GOIAS_01-01-2021_A_31-12-2021.CSV",
+      "sha256": "e29c7d4f43e57c135aac8801487fcb6a1e5629ec8c57dbe9efa92a601aedeb43"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A015_ITAPACI_01-01-2021_A_31-12-2021.CSV",
+      "bytes": 783968,
+      "guardado_em": "inmet/2021/INMET_CO_GO_A015_ITAPACI_01-01-2021_A_31-12-2021.CSV",
+      "sha256": "ecc9a001ca16ad01dfb7b855f254fc23f0f7c74611d7adf3f15c06cb5fd82248"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A016_JATAI_01-01-2021_A_31-12-2021.CSV",
+      "bytes": 806656,
+      "guardado_em": "inmet/2021/INMET_CO_GO_A016_JATAI_01-01-2021_A_31-12-2021.CSV",
+      "sha256": "b70dbcf8e6dcf2147c3ca3b0322eaee7737b258cfe4022d420608afea72df2b6"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A017_POSSE_01-01-2021_A_31-12-2021.CSV",
+      "bytes": 780413,
+      "guardado_em": "inmet/2021/INMET_CO_GO_A017_POSSE_01-01-2021_A_31-12-2021.CSV",
+      "sha256": "eb4f31b57779fd2ba631f234289b55ee617d42567d062e54ac13f01b395ad993"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A022_GOIANESIA_01-01-2021_A_31-12-2021.CSV",
+      "bytes": 641254,
+      "guardado_em": "inmet/2021/INMET_CO_GO_A022_GOIANESIA_01-01-2021_A_31-12-2021.CSV",
+      "sha256": "72cf39fefdfdd0860acc8ab7b684d86e556aafe9a8cfd42389a331c26b9c04e2"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A023_CAIAPONIA_01-01-2021_A_31-12-2021.CSV",
+      "bytes": 609993,
+      "guardado_em": "inmet/2021/INMET_CO_GO_A023_CAIAPONIA_01-01-2021_A_31-12-2021.CSV",
+      "sha256": "2a0d294721e809182eaaa9f54e9441eb240ba6553c972650b458e52b1654832b"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A024_ALTO PARAISO DE GOIAS_01-01-2021_A_31-12-2021.CSV",
+      "bytes": 745692,
+      "guardado_em": "inmet/2021/INMET_CO_GO_A024_ALTO PARAISO DE GOIAS_01-01-2021_A_31-12-2021.CSV",
+      "sha256": "b01a5b76675fe159b94e2cf4ec573c2b04dbb5e89e5c8372dcd25851b1a43950"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A025_RIO VERDE_01-01-2021_A_31-12-2021.CSV",
+      "bytes": 524711,
+      "guardado_em": "inmet/2021/INMET_CO_GO_A025_RIO VERDE_01-01-2021_A_31-12-2021.CSV",
+      "sha256": "b0fb9cb8a684c808755bac7e233cd07df0bce04922acabe7007a3980b3b62deb"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A026_MINEIROS_01-01-2021_A_31-12-2021.CSV",
+      "bytes": 664992,
+      "guardado_em": "inmet/2021/INMET_CO_GO_A026_MINEIROS_01-01-2021_A_31-12-2021.CSV",
+      "sha256": "ee5ae0e6050314d205d639409eea5d9a5ac49a9ab41664740ac9bf7bf2e71327"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A027_PARAUNA_01-01-2021_A_31-12-2021.CSV",
+      "bytes": 808700,
+      "guardado_em": "inmet/2021/INMET_CO_GO_A027_PARAUNA_01-01-2021_A_31-12-2021.CSV",
+      "sha256": "7a05f3d3d195f694ca78ee401e87e8b57c5f9a4d6852f65917adf84ad5056c88"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A028_IPORA_01-01-2021_A_31-12-2021.CSV",
+      "bytes": 633234,
+      "guardado_em": "inmet/2021/INMET_CO_GO_A028_IPORA_01-01-2021_A_31-12-2021.CSV",
+      "sha256": "0f979c27e63298295ccc090d9e500ae8a6ffb8db7bbea54c423bc50a9c315854"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A029_EDEIA_01-01-2021_A_31-12-2021.CSV",
+      "bytes": 687786,
+      "guardado_em": "inmet/2021/INMET_CO_GO_A029_EDEIA_01-01-2021_A_31-12-2021.CSV",
+      "sha256": "aeb7515b8a663bd62ba8e4f01c6458dee4d32358a71786fc7aaf2904e460a350"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A031_SAO MIGUEL DO ARAGUAIA_01-01-2021_A_31-12-2021.CSV",
+      "bytes": 596715,
+      "guardado_em": "inmet/2021/INMET_CO_GO_A031_SAO MIGUEL DO ARAGUAIA_01-01-2021_A_31-12-2021.CSV",
+      "sha256": "b676e216b6815b1091a0a0c4bb83e44efd174abae74de7f364f7f1e781567d19"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A032_MONTE ALEGRE DE GOIAS_01-01-2021_A_31-12-2021.CSV",
+      "bytes": 795234,
+      "guardado_em": "inmet/2021/INMET_CO_GO_A032_MONTE ALEGRE DE GOIAS_01-01-2021_A_31-12-2021.CSV",
+      "sha256": "4c6e1b30a523d28190232aae7f8516752f579c0ad22a34d57abfcd0aa25309e0"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A033_PIRES DO RIO_01-01-2021_A_31-12-2021.CSV",
+      "bytes": 788272,
+      "guardado_em": "inmet/2021/INMET_CO_GO_A033_PIRES DO RIO_01-01-2021_A_31-12-2021.CSV",
+      "sha256": "c6ff1479b4777a804dbe4e7e4d3696016bc4c93498049e82c19dafddc0728779"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A034_CATALAO_01-01-2021_A_31-12-2021.CSV",
+      "bytes": 799598,
+      "guardado_em": "inmet/2021/INMET_CO_GO_A034_CATALAO_01-01-2021_A_31-12-2021.CSV",
+      "sha256": "eebc35990648424b5445e7c90822e545e8dce95cb35423a5f08dc473bb48af18"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A035_ITUMBIARA_01-01-2021_A_31-12-2021.CSV",
+      "bytes": 575700,
+      "guardado_em": "inmet/2021/INMET_CO_GO_A035_ITUMBIARA_01-01-2021_A_31-12-2021.CSV",
+      "sha256": "e48945634ddceb54a9d8ab0d7a0866d31a813a49d3053d9467390bc748bb8dbf"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A036_CRISTALINA_01-01-2021_A_31-12-2021.CSV",
+      "bytes": 807076,
+      "guardado_em": "inmet/2021/INMET_CO_GO_A036_CRISTALINA_01-01-2021_A_31-12-2021.CSV",
+      "sha256": "06d795150bf629671c045bfe766e0d230d9fdf04d061b4d69ff9a2df1bb6639d"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A037_SILVANIA_01-01-2021_A_31-12-2021.CSV",
+      "bytes": 805048,
+      "guardado_em": "inmet/2021/INMET_CO_GO_A037_SILVANIA_01-01-2021_A_31-12-2021.CSV",
+      "sha256": "4480e951a8303ac9a58fe291b9706f8237f1c45fe057ffbbc859832eb3029ee7"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A056_CRISTALINA (FAZENDA SANTA MONICA)_01-01-2021_A_31-12-2021.CSV",
+      "bytes": 768982,
+      "guardado_em": "inmet/2021/INMET_CO_GO_A056_CRISTALINA (FAZENDA SANTA MONICA)_01-01-2021_A_31-12-2021.CSV",
+      "sha256": "4230fbf0be82975a90c8e2ca8b18cfe63822bf7daa27e4053831283b1460bc00"
+     }
+    ],
+    "baixado_em_utc": "2026-11-15T10:09:48Z",
+    "endereco": "https://portal.inmet.gov.br/uploads/dadoshistoricos/2021.zip",
+    "zip_bytes": 80571564,
+    "zip_sha256": "360e53e612cf30473371d76b520585f8cd34e61d0d2185e3afe1206ce949433b"
+   },
+   "2022": {
+    "arquivos": [
+     {
+      "arquivo_no_zip": "INMET_CO_DF_A001_BRASILIA_01-01-2022_A_31-12-2022.CSV",
+      "bytes": 809036,
+      "guardado_em": "inmet/2022/INMET_CO_DF_A001_BRASILIA_01-01-2022_A_31-12-2022.CSV",
+      "sha256": "5f0c3a2f7327338197e60580c3f6da56ece23a00b4022a77f646860065e6c96a"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_DF_A042_BRAZLANDIA_01-01-2022_A_31-12-2022.CSV",
+      "bytes": 794389,
+      "guardado_em": "inmet/2022/INMET_CO_DF_A042_BRAZLANDIA_01-01-2022_A_31-12-2022.CSV",
+      "sha256": "8744b41db5753fa6c5dd8de18f25cad739a08a467a079bc5b2b10f10d182041c"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_DF_A045_AGUAS EMENDADAS_01-01-2022_A_31-12-2022.CSV",
+      "bytes": 794753,
+      "guardado_em": "inmet/2022/INMET_CO_DF_A045_AGUAS EMENDADAS_01-01-2022_A_31-12-2022.CSV",
+      "sha256": "8fb6e9e92b653a66b28a4125ba4d59db83ca900399af8234752de3bafa951774"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_DF_A046_GAMA (PONTE ALTA)_01-01-2022_A_31-12-2022.CSV",
+      "bytes": 804380,
+      "guardado_em": "inmet/2022/INMET_CO_DF_A046_GAMA (PONTE ALTA)_01-01-2022_A_31-12-2022.CSV",
+      "sha256": "888894ee767fa72749c1aee4082a5ab5b0ea2c0aa9b29a487fc91bb67ac82e7a"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_DF_A047_PARANOA (COOPA-DF)_01-01-2022_A_31-12-2022.CSV",
+      "bytes": 795453,
+      "guardado_em": "inmet/2022/INMET_CO_DF_A047_PARANOA (COOPA-DF)_01-01-2022_A_31-12-2022.CSV",
+      "sha256": "c27714bb917167a9b773361c917f423ab9cbd9bf0d47144b4c27cf35307ef2f8"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A002_GOIANIA_01-01-2022_A_31-12-2022.CSV",
+      "bytes": 805449,
+      "guardado_em": "inmet/2022/INMET_CO_GO_A002_GOIANIA_01-01-2022_A_31-12-2022.CSV",
+      "sha256": "a1ae9a8d6e14114611ade87430d52b552927091c1c8e49eb80259a725a308bce"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A003_MORRINHOS_01-01-2022_A_31-12-2022.CSV",
+      "bytes": 803469,
+      "guardado_em": "inmet/2022/INMET_CO_GO_A003_MORRINHOS_01-01-2022_A_31-12-2022.CSV",
+      "sha256": "b95a3d4d3bce8b64a33fd4326dfc3920de705b5bc521467e3467907da3ee7016"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A005_PORANGATU_01-01-2022_A_31-12-2022.CSV",
+      "bytes": 796211,
+      "guardado_em": "inmet/2022/INMET_CO_GO_A005_PORANGATU_01-01-2022_A_31-12-2022.CSV",
+      "sha256": "8c83cb65c5f253ae7fec63b83aca30c76cc4dee007309db6e423776d37a7b5de"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A011_SAO SIMAO_01-01-2022_A_31-12-2022.CSV",
+      "bytes": 765021,
+      "guardado_em": "inmet/2022/INMET_CO_GO_A011_SAO SIMAO_01-01-2022_A_31-12-2022.CSV",
+      "sha256": "71ab5177e8166deb2db0e28c80e2a76db795c0648c85bf127456eead5fd35e24"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A012_LUZIANIA_01-01-2022_A_31-12-2022.CSV",
+      "bytes": 807472,
+      "guardado_em": "inmet/2022/INMET_CO_GO_A012_LUZIANIA_01-01-2022_A_31-12-2022.CSV",
+      "sha256": "9c2699fbb013cfbf5c9c7241ddb785d7e6defeb20594e98a5b2f5e455ec77226"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A013_ARAGARCAS_01-01-2022_A_31-12-2022.CSV",
+      "bytes": 587907,
+      "guardado_em": "inmet/2022/INMET_CO_GO_A013_ARAGARCAS_01-01-2022_A_31-12-2022.CSV",
+      "sha256": "5491c736e0407f69b6e37758e5816e5301a35206730aab5b5966643785e76b5e"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A014_GOIAS_01-01-2022_A_31-12-2022.CSV",
+      "bytes": 801605,
+      "guardado_em": "inmet/2022/INMET_CO_GO_A014_GOIAS_01-01-2022_A_31-12-2022.CSV",
+      "sha256": "1327bf9cbcf669f0d953f6fb82ae943a4be1a34b98815998cc9f4841d1f50220"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A015_ITAPACI_01-01-2022_A_31-12-2022.CSV",
+      "bytes": 699872,
+      "guardado_em": "inmet/2022/INMET_CO_GO_A015_ITAPACI_01-01-2022_A_31-12-2022.CSV",
+      "sha256": "bdd0ce7b23253acad95990c3847c9bd062fcf79c846b03b2d9a364333f51934d"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A016_JATAI_01-01-2022_A_31-12-2022.CSV",
+      "bytes": 773551,
+      "guardado_em": "inmet/2022/INMET_CO_GO_A016_JATAI_01-01-2022_A_31-12-2022.CSV",
+      "sha256": "0d51c30267893d42fa6dcb7c45f442b3b2b5ab4295b74f25f1dc7194e48e1200"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A017_POSSE_01-01-2022_A_31-12-2022.CSV",
+      "bytes": 624734,
+      "guardado_em": "inmet/2022/INMET_CO_GO_A017_POSSE_01-01-2022_A_31-12-2022.CSV",
+      "sha256": "5f3f779a85a993db3c1be97fd6563ba7e37cf0480f9b846dc8c36e0b801aa2ee"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A022_GOIANESIA_01-01-2022_A_31-12-2022.CSV",
+      "bytes": 742516,
+      "guardado_em": "inmet/2022/INMET_CO_GO_A022_GOIANESIA_01-01-2022_A_31-12-2022.CSV",
+      "sha256": "5f14d349933c8e69ccf70bac228acf0ccf731062470b499b1204c05971a80917"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A023_CAIAPONIA_01-01-2022_A_31-12-2022.CSV",
+      "bytes": 787731,
+      "guardado_em": "inmet/2022/INMET_CO_GO_A023_CAIAPONIA_01-01-2022_A_31-12-2022.CSV",
+      "sha256": "150af7958b00ff5e3fdc64cf8cf11ad217c184ae2611ad0d7a0611b52283379b"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A024_ALTO PARAISO DE GOIAS_01-01-2022_A_31-12-2022.CSV",
+      "bytes": 692493,
+      "guardado_em": "inmet/2022/INMET_CO_GO_A024_ALTO PARAISO DE GOIAS_01-01-2022_A_31-12-2022.CSV",
+      "sha256": "45103105988c7aa502cbefbc6773ea1a8e775ecf726f26c55f0c158a6956c6ba"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A025_RIO VERDE_01-01-2022_A_31-12-2022.CSV",
+      "bytes": 808612,
+      "guardado_em": "inmet/2022/INMET_CO_GO_A025_RIO VERDE_01-01-2022_A_31-12-2022.CSV",
+      "sha256": "959432d62987239b327c0496b090d507ff450081b8e3ecc3ccdd6ba0781817db"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A026_MINEIROS_01-01-2022_A_31-12-2022.CSV",
+      "bytes": 795562,
+      "guardado_em": "inmet/2022/INMET_CO_GO_A026_MINEIROS_01-01-2022_A_31-12-2022.CSV",
+      "sha256": "0baaed4d6284851ed24a73c28d47b97343a5c511c9aa2a0f487947948c11ae44"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A027_PARAUNA_01-01-2022_A_31-12-2022.CSV",
+      "bytes": 764202,
+      "guardado_em": "inmet/2022/INMET_CO_GO_A027_PARAUNA_01-01-2022_A_31-12-2022.CSV",
+      "sha256": "48544208cdda36fdd7fd1dc49f701c970cb42cc6a203186181107e4abf0a91c7"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A028_IPORA_01-01-2022_A_31-12-2022.CSV",
+      "bytes": 776323,
+      "guardado_em": "inmet/2022/INMET_CO_GO_A028_IPORA_01-01-2022_A_31-12-2022.CSV",
+      "sha256": "435aeaff41efa241f3301c468ad9f8b30081045ae76195edd8f4a86462c4be8e"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A029_EDEIA_01-01-2022_A_31-12-2022.CSV",
+      "bytes": 793750,
+      "guardado_em": "inmet/2022/INMET_CO_GO_A029_EDEIA_01-01-2022_A_31-12-2022.CSV",
+      "sha256": "0e3f434e519c060a5ad17becb44de9d74acb10a12ebc4ef3ddd4b524719b9a5e"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A031_SAO MIGUEL DO ARAGUAIA_01-01-2022_A_31-12-2022.CSV",
+      "bytes": 808100,
+      "guardado_em": "inmet/2022/INMET_CO_GO_A031_SAO MIGUEL DO ARAGUAIA_01-01-2022_A_31-12-2022.CSV",
+      "sha256": "b7a19bf7bf9d236f0fb9c121a738e37a9b4055c9624a7ea02b106f2cb95c2603"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A032_MONTE ALEGRE DE GOIAS_01-01-2022_A_31-12-2022.CSV",
+      "bytes": 791849,
+      "guardado_em": "inmet/2022/INMET_CO_GO_A032_MONTE ALEGRE DE GOIAS_01-01-2022_A_31-12-2022.CSV",
+      "sha256": "1650045d3054e110fa3a851176f242a57deb4747d999b7fdd55383f7569a4fc1"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A033_PIRES DO RIO_01-01-2022_A_31-12-2022.CSV",
+      "bytes": 728031,
+      "guardado_em": "inmet/2022/INMET_CO_GO_A033_PIRES DO RIO_01-01-2022_A_31-12-2022.CSV",
+      "sha256": "00456aad53af1545abc29cb9e7ac94fb712cf745f7faba870c2ddc9811ceea04"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A034_CATALAO_01-01-2022_A_31-12-2022.CSV",
+      "bytes": 787660,
+      "guardado_em": "inmet/2022/INMET_CO_GO_A034_CATALAO_01-01-2022_A_31-12-2022.CSV",
+      "sha256": "a427017c9de37a5e411855405d1aa42ed2a4d79e5ee2f69ec6ce808c3d127fc1"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A035_ITUMBIARA_01-01-2022_A_31-12-2022.CSV",
+      "bytes": 802083,
+      "guardado_em": "inmet/2022/INMET_CO_GO_A035_ITUMBIARA_01-01-2022_A_31-12-2022.CSV",
+      "sha256": "6098a942e2a58ca878f573779816ae1419bb4435aa475cb9b32a0df985ae1f9e"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A036_CRISTALINA_01-01-2022_A_31-12-2022.CSV",
+      "bytes": 797457,
+      "guardado_em": "inmet/2022/INMET_CO_GO_A036_CRISTALINA_01-01-2022_A_31-12-2022.CSV",
+      "sha256": "dc8d325e3c8d913f0da1c1a152489addc9e787fe6fceea434d11f50a26632b49"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A037_SILVANIA_01-01-2022_A_31-12-2022.CSV",
+      "bytes": 782633,
+      "guardado_em": "inmet/2022/INMET_CO_GO_A037_SILVANIA_01-01-2022_A_31-12-2022.CSV",
+      "sha256": "7a0f14141a5d0b54f935ae4fe822957fe466a8276bd7c0de3dda23103ca204e4"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A056_CRISTALINA (FAZENDA SANTA MONICA)_01-01-2022_A_31-12-2022.CSV",
+      "bytes": 795139,
+      "guardado_em": "inmet/2022/INMET_CO_GO_A056_CRISTALINA (FAZENDA SANTA MONICA)_01-01-2022_A_31-12-2022.CSV",
+      "sha256": "5a834f97b60e6973ee2d64e7d5fa7938ca3db3f9c53986fee351e36c6ed2e859"
+     }
+    ],
+    "baixado_em_utc": "2026-11-15T10:10:06Z",
+    "endereco": "https://portal.inmet.gov.br/uploads/dadoshistoricos/2022.zip",
+    "zip_bytes": 90362801,
+    "zip_sha256": "292d997e0589486404827055f887327732f11d0bed9b5507952e6cad9bea286b"
+   },
+   "2023": {
+    "arquivos": [
+     {
+      "arquivo_no_zip": "INMET_CO_DF_A001_BRASILIA_01-01-2023_A_31-12-2023.CSV",
+      "bytes": 811707,
+      "guardado_em": "inmet/2023/INMET_CO_DF_A001_BRASILIA_01-01-2023_A_31-12-2023.CSV",
+      "sha256": "8c20dab917bb999c66879b853c81847ff10ced4f30e28e501b6d4017e5fdb571"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_DF_A042_BRAZLANDIA_01-01-2023_A_31-12-2023.CSV",
+      "bytes": 791996,
+      "guardado_em": "inmet/2023/INMET_CO_DF_A042_BRAZLANDIA_01-01-2023_A_31-12-2023.CSV",
+      "sha256": "0fdc3381e4bf53f9e63dfe9d30d8cd4cec571f2de861f73a55453d45465e23e7"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_DF_A045_AGUAS EMENDADAS_01-01-2023_A_31-12-2023.CSV",
+      "bytes": 785632,
+      "guardado_em": "inmet/2023/INMET_CO_DF_A045_AGUAS EMENDADAS_01-01-2023_A_31-12-2023.CSV",
+      "sha256": "8904c9527158dacc7c61211112ed18924ec8890dc4ebc865c33cff50deca28fd"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_DF_A046_GAMA (PONTE ALTA)_01-01-2023_A_31-12-2023.CSV",
+      "bytes": 809386,
+      "guardado_em": "inmet/2023/INMET_CO_DF_A046_GAMA (PONTE ALTA)_01-01-2023_A_31-12-2023.CSV",
+      "sha256": "9afa010a8fb16a6a5ef2d5bbdb2ede859fdc5410a0bc033fcac13f4f304933f8"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_DF_A047_PARANOA (COOPA-DF)_01-01-2023_A_31-12-2023.CSV",
+      "bytes": 792150,
+      "guardado_em": "inmet/2023/INMET_CO_DF_A047_PARANOA (COOPA-DF)_01-01-2023_A_31-12-2023.CSV",
+      "sha256": "3a8809cce4ca9e169cd2b626b5fb8854b9c91ec213c8a740a2b747f6dd58c63f"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A002_GOIANIA_01-01-2023_A_31-12-2023.CSV",
+      "bytes": 807827,
+      "guardado_em": "inmet/2023/INMET_CO_GO_A002_GOIANIA_01-01-2023_A_31-12-2023.CSV",
+      "sha256": "e3ab74afd2944a95a15f666ea46c4feb77fcc8da521d4b913fd4c96a265d16ea"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A003_MORRINHOS_01-01-2023_A_31-12-2023.CSV",
+      "bytes": 811266,
+      "guardado_em": "inmet/2023/INMET_CO_GO_A003_MORRINHOS_01-01-2023_A_31-12-2023.CSV",
+      "sha256": "25e130fdd5013c1be92ac9b0ff620c37a85a8afb71b75c64334cb516ccab1e84"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A005_PORANGATU_01-01-2023_A_31-12-2023.CSV",
+      "bytes": 660416,
+      "guardado_em": "inmet/2023/INMET_CO_GO_A005_PORANGATU_01-01-2023_A_31-12-2023.CSV",
+      "sha256": "239a6589ca30366cc11f4078fdbbf19572f88af8184b6764605f51e078b1aa54"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A011_SAO SIMAO_01-01-2023_A_31-12-2023.CSV",
+      "bytes": 748740,
+      "guardado_em": "inmet/2023/INMET_CO_GO_A011_SAO SIMAO_01-01-2023_A_31-12-2023.CSV",
+      "sha256": "3f9851eccc143c883ec8b4df7571af2d579aa8b61038cd045dc4e7bb940d1793"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A012_LUZIANIA_01-01-2023_A_31-12-2023.CSV",
+      "bytes": 770712,
+      "guardado_em": "inmet/2023/INMET_CO_GO_A012_LUZIANIA_01-01-2023_A_31-12-2023.CSV",
+      "sha256": "a8d38c15fd973b8b8dd7c4f8dae0df61349431c8b3a5543ac6ac8d6a50582583"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A013_ARAGARCAS_01-01-2023_A_31-12-2023.CSV",
+      "bytes": 535329,
+      "guardado_em": "inmet/2023/INMET_CO_GO_A013_ARAGARCAS_01-01-2023_A_31-12-2023.CSV",
+      "sha256": "096cded917c241392c3e5533aed22f09ac72e21dbf19f6a334796415697b5719"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A014_GOIAS_01-01-2023_A_31-12-2023.CSV",
+      "bytes": 736060,
+      "guardado_em": "inmet/2023/INMET_CO_GO_A014_GOIAS_01-01-2023_A_31-12-2023.CSV",
+      "sha256": "0d75197d0c91720188ecfb1ec34f5bb9c82e112f245ba6bd422269928d904ca5"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A015_ITAPACI_01-01-2023_A_31-12-2023.CSV",
+      "bytes": 761280,
+      "guardado_em": "inmet/2023/INMET_CO_GO_A015_ITAPACI_01-01-2023_A_31-12-2023.CSV",
+      "sha256": "8e922f776e929b315bc19da6b347d5e66e880fdf73f8965dfe5e618877943eda"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A016_JATAI_01-01-2023_A_31-12-2023.CSV",
+      "bytes": 669957,
+      "guardado_em": "inmet/2023/INMET_CO_GO_A016_JATAI_01-01-2023_A_31-12-2023.CSV",
+      "sha256": "05e77872bfe3bfcb17f0a9e1f60cc3f504c9747a461e61052a0b5b19f7138344"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A017_POSSE_01-01-2023_A_31-12-2023.CSV",
+      "bytes": 674406,
+      "guardado_em": "inmet/2023/INMET_CO_GO_A017_POSSE_01-01-2023_A_31-12-2023.CSV",
+      "sha256": "165fe789178092395d1dc4544093cfe069bdfd3fb291ba5838e08ee6842253f3"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A022_GOIANESIA_01-01-2023_A_31-12-2023.CSV",
+      "bytes": 591584,
+      "guardado_em": "inmet/2023/INMET_CO_GO_A022_GOIANESIA_01-01-2023_A_31-12-2023.CSV",
+      "sha256": "97ff883603a4d3c668b8404290a380d7d311162774fb7c7eb0490c13b4f14487"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A023_CAIAPONIA_01-01-2023_A_31-12-2023.CSV",
+      "bytes": 686070,
+      "guardado_em": "inmet/2023/INMET_CO_GO_A023_CAIAPONIA_01-01-2023_A_31-12-2023.CSV",
+      "sha256": "d709b9c4ce560b127638dbb364d3d0b5023096f5aab086424bdcd6cfb9c46c37"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A024_ALTO PARAISO DE GOIAS_01-01-2023_A_31-12-2023.CSV",
+      "bytes": 773579,
+      "guardado_em": "inmet/2023/INMET_CO_GO_A024_ALTO PARAISO DE GOIAS_01-01-2023_A_31-12-2023.CSV",
+      "sha256": "95d60067449aafbcefe0a28cce35b80c0fc852ac31bba5bb645d1effb922a94c"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A025_RIO VERDE_01-01-2023_A_31-12-2023.CSV",
+      "bytes": 812195,
+      "guardado_em": "inmet/2023/INMET_CO_GO_A025_RIO VERDE_01-01-2023_A_31-12-2023.CSV",
+      "sha256": "aebf7ecd63829c7f7973f14b9725722b397d89ec5c4c7612d8a1c3f1a579f0c3"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A026_MINEIROS_01-01-2023_A_31-12-2023.CSV",
+      "bytes": 792967,
+      "guardado_em": "inmet/2023/INMET_CO_GO_A026_MINEIROS_01-01-2023_A_31-12-2023.CSV",
+      "sha256": "d85caeabada7488a60fcd1fff678a8bee11685dca2ceed6b264d171e5ec709a7"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A027_PARAUNA_01-01-2023_A_31-12-2023.CSV",
+      "bytes": 582256,
+      "guardado_em": "inmet/2023/INMET_CO_GO_A027_PARAUNA_01-01-2023_A_31-12-2023.CSV",
+      "sha256": "658acdd2753b0cd26b6b3dcc0c7be3de24b53ac420a91fcdb7933cc377d803f0"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A028_IPORA_01-01-2023_A_31-12-2023.CSV",
+      "bytes": 777551,
+      "guardado_em": "inmet/2023/INMET_CO_GO_A028_IPORA_01-01-2023_A_31-12-2023.CSV",
+      "sha256": "62b3a988d183d8c29e90d3e295b334f1b2be383c1ded8b4f472dd412f43962b2"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A029_EDEIA_01-01-2023_A_31-12-2023.CSV",
+      "bytes": 786894,
+      "guardado_em": "inmet/2023/INMET_CO_GO_A029_EDEIA_01-01-2023_A_31-12-2023.CSV",
+      "sha256": "0309c275f5b374755a3abdfbba4bfe2599e73ddd8938ad8bdd6b780c531dd0c8"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A031_SAO MIGUEL DO ARAGUAIA_01-01-2023_A_31-12-2023.CSV",
+      "bytes": 793391,
+      "guardado_em": "inmet/2023/INMET_CO_GO_A031_SAO MIGUEL DO ARAGUAIA_01-01-2023_A_31-12-2023.CSV",
+      "sha256": "bf776461c4e4a41108f6ce8de12e8002fd152095809126ce77cff71084b9c709"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A032_MONTE ALEGRE DE GOIAS_01-01-2023_A_31-12-2023.CSV",
+      "bytes": 786222,
+      "guardado_em": "inmet/2023/INMET_CO_GO_A032_MONTE ALEGRE DE GOIAS_01-01-2023_A_31-12-2023.CSV",
+      "sha256": "906cbe0665c6c5d5d120c81f51db79fe8b18e10d00d49d61afa3d839e9c7ca69"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A033_PIRES DO RIO_01-01-2023_A_31-12-2023.CSV",
+      "bytes": 716474,
+      "guardado_em": "inmet/2023/INMET_CO_GO_A033_PIRES DO RIO_01-01-2023_A_31-12-2023.CSV",
+      "sha256": "8a86b17274cbd9f089fe774795d124ba0ac3f5e29d0732cebcef291d05af1f87"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A034_CATALAO_01-01-2023_A_31-12-2023.CSV",
+      "bytes": 808588,
+      "guardado_em": "inmet/2023/INMET_CO_GO_A034_CATALAO_01-01-2023_A_31-12-2023.CSV",
+      "sha256": "49b88feaeb35890633e5b9eee15cea4c272fa5756a57269c6a829148afb0ef44"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A035_ITUMBIARA_01-01-2023_A_31-12-2023.CSV",
+      "bytes": 796889,
+      "guardado_em": "inmet/2023/INMET_CO_GO_A035_ITUMBIARA_01-01-2023_A_31-12-2023.CSV",
+      "sha256": "b78b8bacdb1017a71e3d4b0c074b6c0d6d9bab92d51b4d0fe260147980ac57a1"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A036_CRISTALINA_01-01-2023_A_31-12-2023.CSV",
+      "bytes": 807771,
+      "guardado_em": "inmet/2023/INMET_CO_GO_A036_CRISTALINA_01-01-2023_A_31-12-2023.CSV",
+      "sha256": "f7416c1b4141ab6c6172bd95753d099df70a784c00ad8eba78ec93e78e0e82db"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A037_SILVANIA_01-01-2023_A_31-12-2023.CSV",
+      "bytes": 772596,
+      "guardado_em": "inmet/2023/INMET_CO_GO_A037_SILVANIA_01-01-2023_A_31-12-2023.CSV",
+      "sha256": "0cc518b22c195c4a81d7fc70212ebf1bc220b18b3e1f73b2379d0c7dcc9e276d"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A056_CRISTALINA (FAZENDA SANTA MONICA)_01-01-2023_A_31-12-2023.CSV",
+      "bytes": 790105,
+      "guardado_em": "inmet/2023/INMET_CO_GO_A056_CRISTALINA (FAZENDA SANTA MONICA)_01-01-2023_A_31-12-2023.CSV",
+      "sha256": "9f692cf35b5597289e267db5bd908baded87d233b4074bc29ae9c0204e1cd566"
+     }
+    ],
+    "baixado_em_utc": "2026-11-15T10:10:28Z",
+    "endereco": "https://portal.inmet.gov.br/uploads/dadoshistoricos/2023.zip",
+    "zip_bytes": 107069252,
+    "zip_sha256": "b17391392cc1219151977cc2c46a7ab24368d821fd780311da9fff62a627bfd8"
+   },
+   "2024": {
+    "arquivos": [
+     {
+      "arquivo_no_zip": "INMET_CO_DF_A001_BRASILIA_01-01-2024_A_31-12-2024.CSV",
+      "bytes": 811646,
+      "guardado_em": "inmet/2024/INMET_CO_DF_A001_BRASILIA_01-01-2024_A_31-12-2024.CSV",
+      "sha256": "4752b7919c0d2426af51f5027d96bb425999c26c6971e768886234babc493a6e"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_DF_A042_BRAZLANDIA_01-01-2024_A_31-12-2024.CSV",
+      "bytes": 796238,
+      "guardado_em": "inmet/2024/INMET_CO_DF_A042_BRAZLANDIA_01-01-2024_A_31-12-2024.CSV",
+      "sha256": "6a9b2cc88b85fbf05e185458d9b5f61fe4d56722f615461b53a2f2a403dae011"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_DF_A045_AGUAS EMENDADAS_01-01-2024_A_31-12-2024.CSV",
+      "bytes": 786127,
+      "guardado_em": "inmet/2024/INMET_CO_DF_A045_AGUAS EMENDADAS_01-01-2024_A_31-12-2024.CSV",
+      "sha256": "e3cee0138bd5ed9555d5ae9246366e996d5697498d99f4d18be42d3f8e3cb445"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_DF_A046_GAMA (PONTE ALTA)_01-01-2024_A_31-12-2024.CSV",
+      "bytes": 802910,
+      "guardado_em": "inmet/2024/INMET_CO_DF_A046_GAMA (PONTE ALTA)_01-01-2024_A_31-12-2024.CSV",
+      "sha256": "dc1ba80ca83c55eeadf35aa754e583eae5ff0e4bf36410f3d7357d4f72b8cd87"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_DF_A047_PARANOA (COOPA-DF)_01-01-2024_A_31-12-2024.CSV",
+      "bytes": 790450,
+      "guardado_em": "inmet/2024/INMET_CO_DF_A047_PARANOA (COOPA-DF)_01-01-2024_A_31-12-2024.CSV",
+      "sha256": "51eeaed033af3f314b5946a2038b4c706b60909c19ab93dc201701d4cfd727c8"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A002_GOIANIA_01-01-2024_A_31-12-2024.CSV",
+      "bytes": 804676,
+      "guardado_em": "inmet/2024/INMET_CO_GO_A002_GOIANIA_01-01-2024_A_31-12-2024.CSV",
+      "sha256": "7230bd4da6b2292d030e12b52dbfd9d1234c617029d47450b5a23d0baf68909c"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A003_MORRINHOS_01-01-2024_A_31-12-2024.CSV",
+      "bytes": 808195,
+      "guardado_em": "inmet/2024/INMET_CO_GO_A003_MORRINHOS_01-01-2024_A_31-12-2024.CSV",
+      "sha256": "c73e07059fa6a22067224f11f2b794c1b9d6662f728355fb40154e44aac7033e"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A005_PORANGATU_01-01-2024_A_31-12-2024.CSV",
+      "bytes": 791379,
+      "guardado_em": "inmet/2024/INMET_CO_GO_A005_PORANGATU_01-01-2024_A_31-12-2024.CSV",
+      "sha256": "4c880becc39bfe350ee022e8fa19b545cc81a39509ec933047f393e99a0d7aeb"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A011_SAO SIMAO_01-01-2024_A_31-12-2024.CSV",
+      "bytes": 448455,
+      "guardado_em": "inmet/2024/INMET_CO_GO_A011_SAO SIMAO_01-01-2024_A_31-12-2024.CSV",
+      "sha256": "aab1e7014fc5a5fa44670ef801108df82d645bfb68ad11fd2777aececcf341fc"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A012_LUZIANIA_01-01-2024_A_31-12-2024.CSV",
+      "bytes": 800209,
+      "guardado_em": "inmet/2024/INMET_CO_GO_A012_LUZIANIA_01-01-2024_A_31-12-2024.CSV",
+      "sha256": "fcccdb44414db9297406d7c9d77daeae4c6b5042b499e098082901df5c18ceb7"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A013_ARAGARCAS_01-01-2024_A_31-12-2024.CSV",
+      "bytes": 588704,
+      "guardado_em": "inmet/2024/INMET_CO_GO_A013_ARAGARCAS_01-01-2024_A_31-12-2024.CSV",
+      "sha256": "e4900cd95dceb343f24c977e5d0c82d84fd634921e85cd8895c63d2964b30437"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A014_GOIAS_01-01-2024_A_31-12-2024.CSV",
+      "bytes": 713087,
+      "guardado_em": "inmet/2024/INMET_CO_GO_A014_GOIAS_01-01-2024_A_31-12-2024.CSV",
+      "sha256": "c9542a5606d91189c78cc5fbc57ea036849ea9b494c9d369687aaad7b5ef305c"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A015_ITAPACI_01-01-2024_A_31-12-2024.CSV",
+      "bytes": 793191,
+      "guardado_em": "inmet/2024/INMET_CO_GO_A015_ITAPACI_01-01-2024_A_31-12-2024.CSV",
+      "sha256": "77979bb4761d7fe671e02894bd3e6bb79b52cbab7176c399a0554e5365f48a59"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A016_JATAI_01-01-2024_A_31-12-2024.CSV",
+      "bytes": 812684,
+      "guardado_em": "inmet/2024/INMET_CO_GO_A016_JATAI_01-01-2024_A_31-12-2024.CSV",
+      "sha256": "2fcc94fe9aa4ffe9c72bc8e0c867572d30c96023c144569a42199cc6aa41edff"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A017_POSSE_01-01-2024_A_31-12-2024.CSV",
+      "bytes": 808562,
+      "guardado_em": "inmet/2024/INMET_CO_GO_A017_POSSE_01-01-2024_A_31-12-2024.CSV",
+      "sha256": "f9664632b5b5daaaa47f0e05882f4de39d7a52db66b451f46eccaca8c49dcbe1"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A022_GOIANESIA_01-01-2024_A_31-12-2024.CSV",
+      "bytes": 783897,
+      "guardado_em": "inmet/2024/INMET_CO_GO_A022_GOIANESIA_01-01-2024_A_31-12-2024.CSV",
+      "sha256": "5a278611717f6c923e300ee410d0d3ab7d098db0a707ca94759a2e44d9a9956d"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A023_CAIAPONIA_01-01-2024_A_31-12-2024.CSV",
+      "bytes": 809118,
+      "guardado_em": "inmet/2024/INMET_CO_GO_A023_CAIAPONIA_01-01-2024_A_31-12-2024.CSV",
+      "sha256": "e89704500bd121994fce9f582707282068a24d28ec69360e27f48c53c61179e6"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A024_ALTO PARAISO DE GOIAS_01-01-2024_A_31-12-2024.CSV",
+      "bytes": 736670,
+      "guardado_em": "inmet/2024/INMET_CO_GO_A024_ALTO PARAISO DE GOIAS_01-01-2024_A_31-12-2024.CSV",
+      "sha256": "a9f0e2ed2ba5bc2e1ad06eaefccfa0e874361035c615e046fde859d77c3da61e"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A025_RIO VERDE_01-01-2024_A_31-12-2024.CSV",
+      "bytes": 635753,
+      "guardado_em": "inmet/2024/INMET_CO_GO_A025_RIO VERDE_01-01-2024_A_31-12-2024.CSV",
+      "sha256": "cd2c36590b36d78d46529ae4f40e617891aa1a004b98f0e097b38a516a14d160"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A026_MINEIROS_01-01-2024_A_31-12-2024.CSV",
+      "bytes": 682402,
+      "guardado_em": "inmet/2024/INMET_CO_GO_A026_MINEIROS_01-01-2024_A_31-12-2024.CSV",
+      "sha256": "ec995e15a802c81c9be0a3f0253a5f5dcae033dcd04e0084847f309f063d4b29"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A027_PARAUNA_01-01-2024_A_31-12-2024.CSV",
+      "bytes": 800249,
+      "guardado_em": "inmet/2024/INMET_CO_GO_A027_PARAUNA_01-01-2024_A_31-12-2024.CSV",
+      "sha256": "5eb517238fce40732ddfc4dac49f320e552ad8c014483bb8793e315c86fca62a"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A028_IPORA_01-01-2024_A_31-12-2024.CSV",
+      "bytes": 449218,
+      "guardado_em": "inmet/2024/INMET_CO_GO_A028_IPORA_01-01-2024_A_31-12-2024.CSV",
+      "sha256": "cca2cfc9e878023a0173e4c0d7864ee8f7390e7888a54e2dc214f280fc012527"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A029_EDEIA_01-01-2024_A_31-12-2024.CSV",
+      "bytes": 781058,
+      "guardado_em": "inmet/2024/INMET_CO_GO_A029_EDEIA_01-01-2024_A_31-12-2024.CSV",
+      "sha256": "c38c947b29c168d6f5a2dfae149d0cf8f8f353eda7da05b9d993c8c0fc4b3708"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A031_SAO MIGUEL DO ARAGUAIA_01-01-2024_A_31-12-2024.CSV",
+      "bytes": 727912,
+      "guardado_em": "inmet/2024/INMET_CO_GO_A031_SAO MIGUEL DO ARAGUAIA_01-01-2024_A_31-12-2024.CSV",
+      "sha256": "50afeae00850e587ab5195efcb3e9c3e343392b67cc3d38c42d72b388542eaa6"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A032_MONTE ALEGRE DE GOIAS_01-01-2024_A_31-12-2024.CSV",
+      "bytes": 701699,
+      "guardado_em": "inmet/2024/INMET_CO_GO_A032_MONTE ALEGRE DE GOIAS_01-01-2024_A_31-12-2024.CSV",
+      "sha256": "5ba350bf498cd4b5a779ea940f6bf6ed04404ec3e57028b61667202fc1562719"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A033_PIRES DO RIO_01-01-2024_A_31-12-2024.CSV",
+      "bytes": 809685,
+      "guardado_em": "inmet/2024/INMET_CO_GO_A033_PIRES DO RIO_01-01-2024_A_31-12-2024.CSV",
+      "sha256": "4f8f685dd57bc9fd027290c1204f47f318eae12119bf989e255721368a189fa1"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A034_CATALAO_01-01-2024_A_31-12-2024.CSV",
+      "bytes": 810249,
+      "guardado_em": "inmet/2024/INMET_CO_GO_A034_CATALAO_01-01-2024_A_31-12-2024.CSV",
+      "sha256": "6a8d545a478354f942bd0b0d151f57fff13e04ae53b7aa9b4b5bd5d00c91530c"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A035_ITUMBIARA_01-01-2024_A_31-12-2024.CSV",
+      "bytes": 692728,
+      "guardado_em": "inmet/2024/INMET_CO_GO_A035_ITUMBIARA_01-01-2024_A_31-12-2024.CSV",
+      "sha256": "35e3df36b67dbad825ccedd0acad3f164c6a9ebc0c038ddde59b4ce2d64c56a4"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A036_CRISTALINA_01-01-2024_A_31-12-2024.CSV",
+      "bytes": 810592,
+      "guardado_em": "inmet/2024/INMET_CO_GO_A036_CRISTALINA_01-01-2024_A_31-12-2024.CSV",
+      "sha256": "f6651162a083332687e1a6a8a801799b14a7db197302ef22fe68cc5eb7e5caca"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A037_SILVANIA_01-01-2024_A_31-12-2024.CSV",
+      "bytes": 775133,
+      "guardado_em": "inmet/2024/INMET_CO_GO_A037_SILVANIA_01-01-2024_A_31-12-2024.CSV",
+      "sha256": "02ba3178890a408b249cd768147b2a566c7374259ad4d8e28eeb2d0ed69dee63"
+     },
+     {
+      "arquivo_no_zip": "INMET_CO_GO_A056_CRISTALINA (FAZENDA SANTA MONICA)_01-01-2024_A_31-12-2024.CSV",
+      "bytes": 775081,
+      "guardado_em": "inmet/2024/INMET_CO_GO_A056_CRISTALINA (FAZENDA SANTA MONICA)_01-01-2024_A_31-12-2024.CSV",
+      "sha256": "eb0c72b92a21ab5b1fdf4d22bdcd03dd5a7f45b8b0e76f28f39f18a61f7c9207"
+     }
+    ],
+    "baixado_em_utc": "2026-11-15T10:11:21Z",
+    "endereco": "https://portal.inmet.gov.br/uploads/dadoshistoricos/2024.zip",
+    "zip_bytes": 102772199,
+    "zip_sha256": "0a7f89de57427f79b6f82943b2f7f2e932202d9253e34bf25629ed088d108ae7"
+   },
+   "2025": {
+    "arquivos": [
+     {
+      "arquivo_no_zip": "2025/INMET_CO_DF_A001_BRASILIA_01-01-2025_A_31-12-2025.CSV",
+      "bytes": 810242,
+      "guardado_em": "inmet/2025/INMET_CO_DF_A001_BRASILIA_01-01-2025_A_31-12-2025.CSV",
+      "sha256": "36bce36c72615aa56ee0ab16c0ce95bdffcd0daa9173b221e3edbcba3521a85d"
+     },
+     {
+      "arquivo_no_zip": "2025/INMET_CO_DF_A042_BRAZLANDIA_01-01-2025_A_31-12-2025.CSV",
+      "bytes": 804515,
+      "guardado_em": "inmet/2025/INMET_CO_DF_A042_BRAZLANDIA_01-01-2025_A_31-12-2025.CSV",
+      "sha256": "2bb2f1b291c370276b7d61c635edb4b342e75ca9124f20d4a8e9f6dad793f4e3"
+     },
+     {
+      "arquivo_no_zip": "2025/INMET_CO_DF_A045_AGUAS EMENDADAS_01-01-2025_A_31-12-2025.CSV",
+      "bytes": 806550,
+      "guardado_em": "inmet/2025/INMET_CO_DF_A045_AGUAS EMENDADAS_01-01-2025_A_31-12-2025.CSV",
+      "sha256": "cd1bce6227f5d974573c7a70023ab3135864861c258eb6b88d960e508165fe28"
+     },
+     {
+      "arquivo_no_zip": "2025/INMET_CO_DF_A046_GAMA (PONTE ALTA)_01-01-2025_A_31-12-2025.CSV",
+      "bytes": 807798,
+      "guardado_em": "inmet/2025/INMET_CO_DF_A046_GAMA (PONTE ALTA)_01-01-2025_A_31-12-2025.CSV",
+      "sha256": "bd642ede18c9681e5a9656399573ade6685cf48578dc8c1ef4979362761fee8b"
+     },
+     {
+      "arquivo_no_zip": "2025/INMET_CO_DF_A047_PARANOA (COOPA-DF)_01-01-2025_A_31-12-2025.CSV",
+      "bytes": 811062,
+      "guardado_em": "inmet/2025/INMET_CO_DF_A047_PARANOA (COOPA-DF)_01-01-2025_A_31-12-2025.CSV",
+      "sha256": "5cb5b526aea28c767fe01a73f49b15069d197be41168bbfb38c52be323612a64"
+     },
+     {
+      "arquivo_no_zip": "2025/INMET_CO_GO_A002_GOIANIA_01-01-2025_A_31-12-2025.CSV",
+      "bytes": 662580,
+      "guardado_em": "inmet/2025/INMET_CO_GO_A002_GOIANIA_01-01-2025_A_31-12-2025.CSV",
+      "sha256": "0e64daed4e9a095277a18da0c1c55b6063735baeb45233d06dddec4e8bab13f2"
+     },
+     {
+      "arquivo_no_zip": "2025/INMET_CO_GO_A003_MORRINHOS_01-01-2025_A_31-12-2025.CSV",
+      "bytes": 805549,
+      "guardado_em": "inmet/2025/INMET_CO_GO_A003_MORRINHOS_01-01-2025_A_31-12-2025.CSV",
+      "sha256": "9fac85703a05ba6c77999c48d246ac74a15afcdeca118b8dacf86bd56cd8311c"
+     },
+     {
+      "arquivo_no_zip": "2025/INMET_CO_GO_A005_PORANGATU_01-01-2025_A_31-12-2025.CSV",
+      "bytes": 793899,
+      "guardado_em": "inmet/2025/INMET_CO_GO_A005_PORANGATU_01-01-2025_A_31-12-2025.CSV",
+      "sha256": "49f95b59f55f0c01973bfccabcc99c4f645050b09532b0f3f6b60807cddad3c6"
+     },
+     {
+      "arquivo_no_zip": "2025/INMET_CO_GO_A011_SAO SIMAO_01-01-2025_A_31-12-2025.CSV",
+      "bytes": 799425,
+      "guardado_em": "inmet/2025/INMET_CO_GO_A011_SAO SIMAO_01-01-2025_A_31-12-2025.CSV",
+      "sha256": "f1b53ce89bcc89beda8d33e91c891002ec19a0af5d8430d4c03f0041517d8f88"
+     },
+     {
+      "arquivo_no_zip": "2025/INMET_CO_GO_A012_LUZIANIA_01-01-2025_A_31-12-2025.CSV",
+      "bytes": 789213,
+      "guardado_em": "inmet/2025/INMET_CO_GO_A012_LUZIANIA_01-01-2025_A_31-12-2025.CSV",
+      "sha256": "76360356930bac74bcb85301250d0895dc21b720c5900be70f4e9405ba7c6015"
+     },
+     {
+      "arquivo_no_zip": "2025/INMET_CO_GO_A013_ARAGARCAS_01-01-2025_A_31-12-2025.CSV",
+      "bytes": 649351,
+      "guardado_em": "inmet/2025/INMET_CO_GO_A013_ARAGARCAS_01-01-2025_A_31-12-2025.CSV",
+      "sha256": "ee6e285c47f19619bf2e7c784458f5900266afa0dcd1f6b54fe139dc933bd153"
+     },
+     {
+      "arquivo_no_zip": "2025/INMET_CO_GO_A014_GOIAS_01-01-2025_A_31-12-2025.CSV",
+      "bytes": 804246,
+      "guardado_em": "inmet/2025/INMET_CO_GO_A014_GOIAS_01-01-2025_A_31-12-2025.CSV",
+      "sha256": "a9d6e107f5ffadb03342c8e07094d9eaa9c97ddd17e55f69d937f65b2358eedf"
+     },
+     {
+      "arquivo_no_zip": "2025/INMET_CO_GO_A015_ITAPACI_01-01-2025_A_31-12-2025.CSV",
+      "bytes": 726962,
+      "guardado_em": "inmet/2025/INMET_CO_GO_A015_ITAPACI_01-01-2025_A_31-12-2025.CSV",
+      "sha256": "6068e16842cad175d3651807acb8c1efc8f25437adfd73e15eca95068fefbb9b"
+     },
+     {
+      "arquivo_no_zip": "2025/INMET_CO_GO_A016_JATAI_01-01-2025_A_31-12-2025.CSV",
+      "bytes": 805516,
+      "guardado_em": "inmet/2025/INMET_CO_GO_A016_JATAI_01-01-2025_A_31-12-2025.CSV",
+      "sha256": "a69625150453a57369c1e9c64b6db5608b2be51c912296f626950f42d1ab0fe3"
+     },
+     {
+      "arquivo_no_zip": "2025/INMET_CO_GO_A017_POSSE_01-01-2025_A_31-12-2025.CSV",
+      "bytes": 808832,
+      "guardado_em": "inmet/2025/INMET_CO_GO_A017_POSSE_01-01-2025_A_31-12-2025.CSV",
+      "sha256": "b743259f16a880868492d8b0b1b422f4c7ec3aa54fe1b1b48cd84187fd8f6122"
+     },
+     {
+      "arquivo_no_zip": "2025/INMET_CO_GO_A022_GOIANESIA_01-01-2025_A_31-12-2025.CSV",
+      "bytes": 780007,
+      "guardado_em": "inmet/2025/INMET_CO_GO_A022_GOIANESIA_01-01-2025_A_31-12-2025.CSV",
+      "sha256": "328c37bc07b5152b87b6197dafe2782d90a0f7fff6ab6b2f4b54e9c053c5e1d6"
+     },
+     {
+      "arquivo_no_zip": "2025/INMET_CO_GO_A023_CAIAPONIA_01-01-2025_A_31-12-2025.CSV",
+      "bytes": 800369,
+      "guardado_em": "inmet/2025/INMET_CO_GO_A023_CAIAPONIA_01-01-2025_A_31-12-2025.CSV",
+      "sha256": "f005c559e6ba870c8e4b2372cc5133b673a22d4164580593680515be3779d53c"
+     },
+     {
+      "arquivo_no_zip": "2025/INMET_CO_GO_A024_ALTO PARAISO DE GOIAS_01-01-2025_A_31-12-2025.CSV",
+      "bytes": 646597,
+      "guardado_em": "inmet/2025/INMET_CO_GO_A024_ALTO PARAISO DE GOIAS_01-01-2025_A_31-12-2025.CSV",
+      "sha256": "715c4dbd6863a9c856f1542fff0354755331ac793a8396147602bf27239cbb8c"
+     },
+     {
+      "arquivo_no_zip": "2025/INMET_CO_GO_A025_RIO VERDE_01-01-2025_A_31-12-2025.CSV",
+      "bytes": 798437,
+      "guardado_em": "inmet/2025/INMET_CO_GO_A025_RIO VERDE_01-01-2025_A_31-12-2025.CSV",
+      "sha256": "e4df8f6ff529ad77d18544595601a168aa53b4473a20e03d8e12543be0f4e1c2"
+     },
+     {
+      "arquivo_no_zip": "2025/INMET_CO_GO_A026_MINEIROS_01-01-2025_A_31-12-2025.CSV",
+      "bytes": 333997,
+      "guardado_em": "inmet/2025/INMET_CO_GO_A026_MINEIROS_01-01-2025_A_31-12-2025.CSV",
+      "sha256": "a57a745feb1d180082358cb69fc68b9624df46d8399ea992bc11ad080bc6145f"
+     },
+     {
+      "arquivo_no_zip": "2025/INMET_CO_GO_A027_PARAUNA_01-01-2025_A_31-12-2025.CSV",
+      "bytes": 798804,
+      "guardado_em": "inmet/2025/INMET_CO_GO_A027_PARAUNA_01-01-2025_A_31-12-2025.CSV",
+      "sha256": "3969a55c1710b2d5dca0fa0aaa75357069b9fe84809541dc1663bd1f1d623696"
+     },
+     {
+      "arquivo_no_zip": "2025/INMET_CO_GO_A028_IPORA_01-01-2025_A_31-12-2025.CSV",
+      "bytes": 794780,
+      "guardado_em": "inmet/2025/INMET_CO_GO_A028_IPORA_01-01-2025_A_31-12-2025.CSV",
+      "sha256": "7cfed75e8ac5ef3a2952da71377f0b4871828ca08e2f3e05bda2cd6efcfb8374"
+     },
+     {
+      "arquivo_no_zip": "2025/INMET_CO_GO_A029_EDEIA_01-01-2025_A_31-12-2025.CSV",
+      "bytes": 589660,
+      "guardado_em": "inmet/2025/INMET_CO_GO_A029_EDEIA_01-01-2025_A_31-12-2025.CSV",
+      "sha256": "83612d116bb74eb87f619f7cf094f67facc27d675745dc5710a10e9062fd984e"
+     },
+     {
+      "arquivo_no_zip": "2025/INMET_CO_GO_A031_SAO MIGUEL DO ARAGUAIA_01-01-2025_A_31-12-2025.CSV",
+      "bytes": 806685,
+      "guardado_em": "inmet/2025/INMET_CO_GO_A031_SAO MIGUEL DO ARAGUAIA_01-01-2025_A_31-12-2025.CSV",
+      "sha256": "2b5e26760964d33bd9a02c63fd92f4af14edd63dba6e96a8fd4d58634a616af4"
+     },
+     {
+      "arquivo_no_zip": "2025/INMET_CO_GO_A032_MONTE ALEGRE DE GOIAS_01-01-2025_A_31-12-2025.CSV",
+      "bytes": 653176,
+      "guardado_em": "inmet/2025/INMET_CO_GO_A032_MONTE ALEGRE DE GOIAS_01-01-2025_A_31-12-2025.CSV",
+      "sha256": "ffa267f28f33f65eadc76cfaebd7558a76d4289fb0d662cd2ca882596c23fe12"
+     },
+     {
+      "arquivo_no_zip": "2025/INMET_CO_GO_A033_PIRES DO RIO_01-01-2025_A_31-12-2025.CSV",
+      "bytes": 806784,
+      "guardado_em": "inmet/2025/INMET_CO_GO_A033_PIRES DO RIO_01-01-2025_A_31-12-2025.CSV",
+      "sha256": "0c1da4ce5aa24836f4f77fda7ad62ff48b76fd29c99939a846a4fb0cff0a32e3"
+     },
+     {
+      "arquivo_no_zip": "2025/INMET_CO_GO_A034_CATALAO_01-01-2025_A_31-12-2025.CSV",
+      "bytes": 807582,
+      "guardado_em": "inmet/2025/INMET_CO_GO_A034_CATALAO_01-01-2025_A_31-12-2025.CSV",
+      "sha256": "22b779460e6c391407cb4480c9225c1d8875327ba42c5da909eeab7287093206"
+     },
+     {
+      "arquivo_no_zip": "2025/INMET_CO_GO_A035_ITUMBIARA_01-01-2025_A_31-12-2025.CSV",
+      "bytes": 798637,
+      "guardado_em": "inmet/2025/INMET_CO_GO_A035_ITUMBIARA_01-01-2025_A_31-12-2025.CSV",
+      "sha256": "8a4a8aad6b3dd2a50bc9b5baabfa9f76fe7f6a8bbe516ea6dda1dd7796117d31"
+     },
+     {
+      "arquivo_no_zip": "2025/INMET_CO_GO_A036_CRISTALINA_01-01-2025_A_31-12-2025.CSV",
+      "bytes": 798937,
+      "guardado_em": "inmet/2025/INMET_CO_GO_A036_CRISTALINA_01-01-2025_A_31-12-2025.CSV",
+      "sha256": "8c485419900ddaef9bb9cff1168ea83acdbbbda8550c3b0e1727a9300f68db71"
+     },
+     {
+      "arquivo_no_zip": "2025/INMET_CO_GO_A037_SILVANIA_01-01-2025_A_31-12-2025.CSV",
+      "bytes": 777659,
+      "guardado_em": "inmet/2025/INMET_CO_GO_A037_SILVANIA_01-01-2025_A_31-12-2025.CSV",
+      "sha256": "9fe80dddf56a934bcbfc5ed5086610e4491b98cce99ba338f4730c99bd2fb918"
+     },
+     {
+      "arquivo_no_zip": "2025/INMET_CO_GO_A056_CRISTALINA (FAZENDA SANTA MONICA)_01-01-2025_A_31-12-2025.CSV",
+      "bytes": 789643,
+      "guardado_em": "inmet/2025/INMET_CO_GO_A056_CRISTALINA (FAZENDA SANTA MONICA)_01-01-2025_A_31-12-2025.CSV",
+      "sha256": "721a86dae5d87cb09db319251a44ffdea48bd03127dc18df32272a43ef200ac0"
+     }
+    ],
+    "baixado_em_utc": "2026-11-15T10:11:25Z",
+    "endereco": "https://portal.inmet.gov.br/uploads/dadoshistoricos/2025.zip",
+    "zip_bytes": 90898634,
+    "zip_sha256": "14988d0b736ba969b48881589f602f3a6d7e97b95bd1de934456851fdac2cb89"
+   }
+  }
+ },
+ "o_que_e": "De onde veio cada dado desta pasta: endereço, hora, tamanho e assinatura (sha256).",
+ "power": {
+  "A001": {
+   "imerg": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:30-03:00",
+    "bytes": 57378,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-47.92583&latitude=-15.78944&start=20160101&end=20251231&format=JSON&time-standard=UTC",
+    "fontes_no_cabecalho": [
+     "IMERG"
+    ],
+    "guardado_em": "power/A001-imerg.json",
+    "padrao_de_hora": "UTC",
+    "ponto_devolvido": [
+     -47.926,
+     -15.789,
+     984.96
+    ],
+    "sha256": "cb7b66ce3893b5bd6f04f4440264467a0686c04d9e762d967df8377c8757ab6d"
+   },
+   "power": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:30-03:00",
+    "bytes": 57883,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR&community=AG&longitude=-47.92583&latitude=-15.78944&start=20160101&end=20251231&format=JSON&time-standard=LST",
+    "fontes_no_cabecalho": [
+     "MERRA2"
+    ],
+    "guardado_em": "power/A001-power.json",
+    "padrao_de_hora": "LST",
+    "ponto_devolvido": [
+     -47.926,
+     -15.789,
+     984.96
+    ],
+    "sha256": "de4dfa2b3b5fc0e6c4495ec17855bf24d71b44ac8c6b223fb45b7fd1e59971f9"
+   }
+  },
+  "A002": {
+   "imerg": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:30-03:00",
+    "bytes": 57534,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-49.22028&latitude=-16.64278&start=20160101&end=20251231&format=JSON&time-standard=UTC",
+    "fontes_no_cabecalho": [
+     "IMERG"
+    ],
+    "guardado_em": "power/A002-imerg.json",
+    "padrao_de_hora": "UTC",
+    "ponto_devolvido": [
+     -49.22,
+     -16.643,
+     807.47
+    ],
+    "sha256": "de74f5ec0c44f59407a8ef339a8421fe329690c0259975dc4b482618cab7d15f"
+   },
+   "power": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:30-03:00",
+    "bytes": 57998,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR&community=AG&longitude=-49.22028&latitude=-16.64278&start=20160101&end=20251231&format=JSON&time-standard=LST",
+    "fontes_no_cabecalho": [
+     "MERRA2"
+    ],
+    "guardado_em": "power/A002-power.json",
+    "padrao_de_hora": "LST",
+    "ponto_devolvido": [
+     -49.22,
+     -16.643,
+     807.47
+    ],
+    "sha256": "90d5a12034d83b3a76b90533323542b71a3d6cd6679a0fd8865a8659c13bb1ba"
+   }
+  },
+  "A003": {
+   "imerg": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:31-03:00",
+    "bytes": 57295,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-49.10167&latitude=-17.74500&start=20160101&end=20251231&format=JSON&time-standard=UTC",
+    "fontes_no_cabecalho": [
+     "IMERG"
+    ],
+    "guardado_em": "power/A003-imerg.json",
+    "padrao_de_hora": "UTC",
+    "ponto_devolvido": [
+     -49.102,
+     -17.745,
+     679.38
+    ],
+    "sha256": "998996b3a4e86e12c0f1973919713cde67743f772e7a86f354ef0cfa527e2316"
+   },
+   "power": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:31-03:00",
+    "bytes": 58004,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR&community=AG&longitude=-49.10167&latitude=-17.74500&start=20160101&end=20251231&format=JSON&time-standard=LST",
+    "fontes_no_cabecalho": [
+     "MERRA2"
+    ],
+    "guardado_em": "power/A003-power.json",
+    "padrao_de_hora": "LST",
+    "ponto_devolvido": [
+     -49.102,
+     -17.745,
+     679.38
+    ],
+    "sha256": "966185d32bc76d210e36c13bfc8939a0a8588f38faf5485502bd68ca6196ee93"
+   }
+  },
+  "A005": {
+   "imerg": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:31-03:00",
+    "bytes": 57312,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-49.11750&latitude=-13.30944&start=20160101&end=20251231&format=JSON&time-standard=UTC",
+    "fontes_no_cabecalho": [
+     "IMERG"
+    ],
+    "guardado_em": "power/A005-imerg.json",
+    "padrao_de_hora": "UTC",
+    "ponto_devolvido": [
+     -49.117,
+     -13.309,
+     357.44
+    ],
+    "sha256": "1dd845c355800b306e0feb8e9e160e19c7b2b642b848b1de1d2cf9cbc8be5238"
+   },
+   "power": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:31-03:00",
+    "bytes": 57701,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR&community=AG&longitude=-49.11750&latitude=-13.30944&start=20160101&end=20251231&format=JSON&time-standard=LST",
+    "fontes_no_cabecalho": [
+     "MERRA2"
+    ],
+    "guardado_em": "power/A005-power.json",
+    "padrao_de_hora": "LST",
+    "ponto_devolvido": [
+     -49.117,
+     -13.309,
+     357.44
+    ],
+    "sha256": "65e11c4341f27b0d37e8a35566deb7cf419cb1cc198adce79c1c922b41d25abf"
+   }
+  },
+  "A011": {
+   "imerg": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:31-03:00",
+    "bytes": 57474,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-50.63333&latitude=-18.96917&start=20160101&end=20251231&format=JSON&time-standard=UTC",
+    "fontes_no_cabecalho": [
+     "IMERG"
+    ],
+    "guardado_em": "power/A011-imerg.json",
+    "padrao_de_hora": "UTC",
+    "ponto_devolvido": [
+     -50.633,
+     -18.969,
+     446.79
+    ],
+    "sha256": "f2d1f14e59d99c1865b6a369b4ff00014a27e808ccb2011d089fc5e66f7ae060"
+   },
+   "power": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:32-03:00",
+    "bytes": 57945,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR&community=AG&longitude=-50.63333&latitude=-18.96917&start=20160101&end=20251231&format=JSON&time-standard=LST",
+    "fontes_no_cabecalho": [
+     "MERRA2"
+    ],
+    "guardado_em": "power/A011-power.json",
+    "padrao_de_hora": "LST",
+    "ponto_devolvido": [
+     -50.633,
+     -18.969,
+     446.79
+    ],
+    "sha256": "b5ee615a506eb7eddedddcaa694629af088a7b7e2bf41b6e8c395dc7e59d7a09"
+   }
+  },
+  "A012": {
+   "imerg": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:31-03:00",
+    "bytes": 57230,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-47.96694&latitude=-16.26056&start=20160101&end=20251231&format=JSON&time-standard=UTC",
+    "fontes_no_cabecalho": [
+     "IMERG"
+    ],
+    "guardado_em": "power/A012-imerg.json",
+    "padrao_de_hora": "UTC",
+    "ponto_devolvido": [
+     -47.967,
+     -16.261,
+     908.39
+    ],
+    "sha256": "f21e5bd01eacf16b87455ac1f803979017a405722c218334e765d7662c55ee17"
+   },
+   "power": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:32-03:00",
+    "bytes": 57906,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR&community=AG&longitude=-47.96694&latitude=-16.26056&start=20160101&end=20251231&format=JSON&time-standard=LST",
+    "fontes_no_cabecalho": [
+     "MERRA2"
+    ],
+    "guardado_em": "power/A012-power.json",
+    "padrao_de_hora": "LST",
+    "ponto_devolvido": [
+     -47.967,
+     -16.261,
+     908.39
+    ],
+    "sha256": "843f37c73b5bf0288a0a46ee55b97620e92c87b6cb2d41a2c2f0e0fffcd788a9"
+   }
+  },
+  "A013": {
+   "imerg": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:32-03:00",
+    "bytes": 57313,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-52.24528&latitude=-15.90278&start=20160101&end=20251231&format=JSON&time-standard=UTC",
+    "fontes_no_cabecalho": [
+     "IMERG"
+    ],
+    "guardado_em": "power/A013-imerg.json",
+    "padrao_de_hora": "UTC",
+    "ponto_devolvido": [
+     -52.245,
+     -15.903,
+     426.35
+    ],
+    "sha256": "1f9b625a9ae68700bd43d1a06dbd86b0bfc4dc35bcb696411a735ac038b810ff"
+   },
+   "power": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:32-03:00",
+    "bytes": 57956,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR&community=AG&longitude=-52.24528&latitude=-15.90278&start=20160101&end=20251231&format=JSON&time-standard=LST",
+    "fontes_no_cabecalho": [
+     "MERRA2"
+    ],
+    "guardado_em": "power/A013-power.json",
+    "padrao_de_hora": "LST",
+    "ponto_devolvido": [
+     -52.245,
+     -15.903,
+     426.35
+    ],
+    "sha256": "0f6432e082a34fdc9cd8b82d0fd1869fb474911e5be5924c279fe4ca9b587b42"
+   }
+  },
+  "A014": {
+   "imerg": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:32-03:00",
+    "bytes": 57383,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-50.14139&latitude=-15.93972&start=20160101&end=20251231&format=JSON&time-standard=UTC",
+    "fontes_no_cabecalho": [
+     "IMERG"
+    ],
+    "guardado_em": "power/A014-imerg.json",
+    "padrao_de_hora": "UTC",
+    "ponto_devolvido": [
+     -50.141,
+     -15.94,
+     687.49
+    ],
+    "sha256": "b61b10048c8361116516690329e1e21cb8caa3fa57f868693bf770faa2b2a258"
+   },
+   "power": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:32-03:00",
+    "bytes": 57894,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR&community=AG&longitude=-50.14139&latitude=-15.93972&start=20160101&end=20251231&format=JSON&time-standard=LST",
+    "fontes_no_cabecalho": [
+     "MERRA2"
+    ],
+    "guardado_em": "power/A014-power.json",
+    "padrao_de_hora": "LST",
+    "ponto_devolvido": [
+     -50.141,
+     -15.94,
+     687.49
+    ],
+    "sha256": "0a4df090d246aacb908566b4e1fce014eb73a6f28f4b63a11219582b5e3e68c1"
+   }
+  },
+  "A015": {
+   "imerg": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:33-03:00",
+    "bytes": 57339,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-49.53944&latitude=-14.97972&start=20160101&end=20251231&format=JSON&time-standard=UTC",
+    "fontes_no_cabecalho": [
+     "IMERG"
+    ],
+    "guardado_em": "power/A015-imerg.json",
+    "padrao_de_hora": "UTC",
+    "ponto_devolvido": [
+     -49.539,
+     -14.98,
+     625.36
+    ],
+    "sha256": "5c6f5709ce3467c55c693847d1d8947b55d6482465c2c4cc24a9f5173d12a70d"
+   },
+   "power": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:32-03:00",
+    "bytes": 57847,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR&community=AG&longitude=-49.53944&latitude=-14.97972&start=20160101&end=20251231&format=JSON&time-standard=LST",
+    "fontes_no_cabecalho": [
+     "MERRA2"
+    ],
+    "guardado_em": "power/A015-power.json",
+    "padrao_de_hora": "LST",
+    "ponto_devolvido": [
+     -49.539,
+     -14.98,
+     625.36
+    ],
+    "sha256": "987e5d5bfd7bf18ae64c82f305937605ed3268a2fdf123703f020f0d44b062d2"
+   }
+  },
+  "A016": {
+   "imerg": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:33-03:00",
+    "bytes": 57532,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-51.71750&latitude=-17.92361&start=20160101&end=20251231&format=JSON&time-standard=UTC",
+    "fontes_no_cabecalho": [
+     "IMERG"
+    ],
+    "guardado_em": "power/A016-imerg.json",
+    "padrao_de_hora": "UTC",
+    "ponto_devolvido": [
+     -51.718,
+     -17.924,
+     729.31
+    ],
+    "sha256": "6472c26bd088632c687658bf9a1ffff58581b05e245a349cc6cf4528e3df77b4"
+   },
+   "power": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:33-03:00",
+    "bytes": 58044,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR&community=AG&longitude=-51.71750&latitude=-17.92361&start=20160101&end=20251231&format=JSON&time-standard=LST",
+    "fontes_no_cabecalho": [
+     "MERRA2"
+    ],
+    "guardado_em": "power/A016-power.json",
+    "padrao_de_hora": "LST",
+    "ponto_devolvido": [
+     -51.718,
+     -17.924,
+     729.31
+    ],
+    "sha256": "43172f59b92693646a801610bd26157bfe43e5ead4d80ac5f8f4c0d0f30f9761"
+   }
+  },
+  "A017": {
+   "imerg": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:34-03:00",
+    "bytes": 57102,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-46.36639&latitude=-14.08917&start=20160101&end=20251231&format=JSON&time-standard=UTC",
+    "fontes_no_cabecalho": [
+     "IMERG"
+    ],
+    "guardado_em": "power/A017-imerg.json",
+    "padrao_de_hora": "UTC",
+    "ponto_devolvido": [
+     -46.366,
+     -14.089,
+     783.65
+    ],
+    "sha256": "fc9a10b5823a04dd24a3c0bbc226fb6a0c6c478b5221841eeaf48ea219397bbf"
+   },
+   "power": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:34-03:00",
+    "bytes": 57624,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR&community=AG&longitude=-46.36639&latitude=-14.08917&start=20160101&end=20251231&format=JSON&time-standard=LST",
+    "fontes_no_cabecalho": [
+     "MERRA2"
+    ],
+    "guardado_em": "power/A017-power.json",
+    "padrao_de_hora": "LST",
+    "ponto_devolvido": [
+     -46.366,
+     -14.089,
+     783.65
+    ],
+    "sha256": "8428e62dc5025dc8abaf47a3f5110771ae9f1e18a9bcbbe4ffb20ac0bd2e0ae8"
+   }
+  },
+  "A022": {
+   "imerg": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:34-03:00",
+    "bytes": 57326,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-48.99000&latitude=-15.22028&start=20160101&end=20251231&format=JSON&time-standard=UTC",
+    "fontes_no_cabecalho": [
+     "IMERG"
+    ],
+    "guardado_em": "power/A022-imerg.json",
+    "padrao_de_hora": "UTC",
+    "ponto_devolvido": [
+     -48.99,
+     -15.22,
+     628.01
+    ],
+    "sha256": "6279d62586405c171459d7bd454fe355e221f0cb9468e9c8e7e37b8cfb5e4e92"
+   },
+   "power": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:34-03:00",
+    "bytes": 57752,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR&community=AG&longitude=-48.99000&latitude=-15.22028&start=20160101&end=20251231&format=JSON&time-standard=LST",
+    "fontes_no_cabecalho": [
+     "MERRA2"
+    ],
+    "guardado_em": "power/A022-power.json",
+    "padrao_de_hora": "LST",
+    "ponto_devolvido": [
+     -48.99,
+     -15.22,
+     628.01
+    ],
+    "sha256": "80fdd9b494096f3d0120ece57d32159d696adc63449820318c7d6a0127a21df4"
+   }
+  },
+  "A023": {
+   "imerg": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:35-03:00",
+    "bytes": 57369,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-51.81750&latitude=-16.96694&start=20160101&end=20251231&format=JSON&time-standard=UTC",
+    "fontes_no_cabecalho": [
+     "IMERG"
+    ],
+    "guardado_em": "power/A023-imerg.json",
+    "padrao_de_hora": "UTC",
+    "ponto_devolvido": [
+     -51.818,
+     -16.967,
+     751.26
+    ],
+    "sha256": "5b3eeaad510566ffd7c62867b6160083f5f366993c588f7872e8bec296016ff2"
+   },
+   "power": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:34-03:00",
+    "bytes": 57998,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR&community=AG&longitude=-51.81750&latitude=-16.96694&start=20160101&end=20251231&format=JSON&time-standard=LST",
+    "fontes_no_cabecalho": [
+     "MERRA2"
+    ],
+    "guardado_em": "power/A023-power.json",
+    "padrao_de_hora": "LST",
+    "ponto_devolvido": [
+     -51.818,
+     -16.967,
+     751.26
+    ],
+    "sha256": "f6ecd784f29e656efec4f6f2af7c7cb0926c2fb9ab03beac031b29391c500c94"
+   }
+  },
+  "A024": {
+   "imerg": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:35-03:00",
+    "bytes": 57288,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-47.52333&latitude=-14.13306&start=20160101&end=20251231&format=JSON&time-standard=UTC",
+    "fontes_no_cabecalho": [
+     "IMERG"
+    ],
+    "guardado_em": "power/A024-imerg.json",
+    "padrao_de_hora": "UTC",
+    "ponto_devolvido": [
+     -47.523,
+     -14.133,
+     901.99
+    ],
+    "sha256": "a283ab7c2663d7f1e798c7925eac30402d6f34effcb3172468237bd95b395ef9"
+   },
+   "power": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:35-03:00",
+    "bytes": 57641,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR&community=AG&longitude=-47.52333&latitude=-14.13306&start=20160101&end=20251231&format=JSON&time-standard=LST",
+    "fontes_no_cabecalho": [
+     "MERRA2"
+    ],
+    "guardado_em": "power/A024-power.json",
+    "padrao_de_hora": "LST",
+    "ponto_devolvido": [
+     -47.523,
+     -14.133,
+     901.99
+    ],
+    "sha256": "fbcefb1e03a10211da2cf5a867b2aaf146c97c1d559b11ba98b2a4e054273a36"
+   }
+  },
+  "A025": {
+   "imerg": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:36-03:00",
+    "bytes": 57484,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-50.96500&latitude=-17.78528&start=20160101&end=20251231&format=JSON&time-standard=UTC",
+    "fontes_no_cabecalho": [
+     "IMERG"
+    ],
+    "guardado_em": "power/A025-imerg.json",
+    "padrao_de_hora": "UTC",
+    "ponto_devolvido": [
+     -50.965,
+     -17.785,
+     731.58
+    ],
+    "sha256": "22e2ebd52aeb2766bd8013566167885622322569532389d4262fca79e2a1c46c"
+   },
+   "power": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:35-03:00",
+    "bytes": 58022,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR&community=AG&longitude=-50.96500&latitude=-17.78528&start=20160101&end=20251231&format=JSON&time-standard=LST",
+    "fontes_no_cabecalho": [
+     "MERRA2"
+    ],
+    "guardado_em": "power/A025-power.json",
+    "padrao_de_hora": "LST",
+    "ponto_devolvido": [
+     -50.965,
+     -17.785,
+     731.58
+    ],
+    "sha256": "3ba321291ed192cf5f381f50fc2c097e3131634b37e6d3f8aa0262a055af1858"
+   }
+  },
+  "A026": {
+   "imerg": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:36-03:00",
+    "bytes": 57562,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-52.60111&latitude=-17.45472&start=20160101&end=20251231&format=JSON&time-standard=UTC",
+    "fontes_no_cabecalho": [
+     "IMERG"
+    ],
+    "guardado_em": "power/A026-imerg.json",
+    "padrao_de_hora": "UTC",
+    "ponto_devolvido": [
+     -52.601,
+     -17.455,
+     759.92
+    ],
+    "sha256": "fb17e85dbd226ad551694ef2df03e1f7969b42e6514ded265f95ac6df4aef6fa"
+   },
+   "power": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:36-03:00",
+    "bytes": 58009,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR&community=AG&longitude=-52.60111&latitude=-17.45472&start=20160101&end=20251231&format=JSON&time-standard=LST",
+    "fontes_no_cabecalho": [
+     "MERRA2"
+    ],
+    "guardado_em": "power/A026-power.json",
+    "padrao_de_hora": "LST",
+    "ponto_devolvido": [
+     -52.601,
+     -17.455,
+     759.92
+    ],
+    "sha256": "8fe5314da05278af1de7cade5d6b9f17621987a6a631cdcb065c36d33f8d1b8c"
+   }
+  },
+  "A027": {
+   "imerg": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:36-03:00",
+    "bytes": 57342,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-50.42556&latitude=-16.96250&start=20160101&end=20251231&format=JSON&time-standard=UTC",
+    "fontes_no_cabecalho": [
+     "IMERG"
+    ],
+    "guardado_em": "power/A027-imerg.json",
+    "padrao_de_hora": "UTC",
+    "ponto_devolvido": [
+     -50.426,
+     -16.962,
+     670.41
+    ],
+    "sha256": "3bad40c3535a8b700feeeee68ea2f72635671292e638121eec2f32b5f98944c9"
+   },
+   "power": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:36-03:00",
+    "bytes": 57906,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR&community=AG&longitude=-50.42556&latitude=-16.96250&start=20160101&end=20251231&format=JSON&time-standard=LST",
+    "fontes_no_cabecalho": [
+     "MERRA2"
+    ],
+    "guardado_em": "power/A027-power.json",
+    "padrao_de_hora": "LST",
+    "ponto_devolvido": [
+     -50.426,
+     -16.962,
+     670.41
+    ],
+    "sha256": "c464208de5c7fa77989d46e5e9c5d22c64482e3c710c8d97312767421fdd9b2b"
+   }
+  },
+  "A028": {
+   "imerg": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:36-03:00",
+    "bytes": 57332,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-51.14889&latitude=-16.42306&start=20160101&end=20251231&format=JSON&time-standard=UTC",
+    "fontes_no_cabecalho": [
+     "IMERG"
+    ],
+    "guardado_em": "power/A028-imerg.json",
+    "padrao_de_hora": "UTC",
+    "ponto_devolvido": [
+     -51.149,
+     -16.423,
+     558.82
+    ],
+    "sha256": "302d75c5813f8b79b6b34397ac2896f328f08d0555c8a24026eb5f3ac43aaf00"
+   },
+   "power": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:36-03:00",
+    "bytes": 57893,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR&community=AG&longitude=-51.14889&latitude=-16.42306&start=20160101&end=20251231&format=JSON&time-standard=LST",
+    "fontes_no_cabecalho": [
+     "MERRA2"
+    ],
+    "guardado_em": "power/A028-power.json",
+    "padrao_de_hora": "LST",
+    "ponto_devolvido": [
+     -51.149,
+     -16.423,
+     558.82
+    ],
+    "sha256": "74baf0de825e2540c36ba91456252d6277208a071384625c9d7d3d3465ee26b5"
+   }
+  },
+  "A029": {
+   "imerg": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:37-03:00",
+    "bytes": 57380,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-49.91472&latitude=-17.33694&start=20160101&end=20251231&format=JSON&time-standard=UTC",
+    "fontes_no_cabecalho": [
+     "IMERG"
+    ],
+    "guardado_em": "power/A029-imerg.json",
+    "padrao_de_hora": "UTC",
+    "ponto_devolvido": [
+     -49.915,
+     -17.337,
+     532.96
+    ],
+    "sha256": "6c4ccaa13445379c7cb04443da2b2162860b90f30ef9d0e20db682392734a2f3"
+   },
+   "power": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:37-03:00",
+    "bytes": 57926,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR&community=AG&longitude=-49.91472&latitude=-17.33694&start=20160101&end=20251231&format=JSON&time-standard=LST",
+    "fontes_no_cabecalho": [
+     "MERRA2"
+    ],
+    "guardado_em": "power/A029-power.json",
+    "padrao_de_hora": "LST",
+    "ponto_devolvido": [
+     -49.915,
+     -17.337,
+     532.96
+    ],
+    "sha256": "cd5498df5582572f4ecdc74683d4bece5428c707a4716a708b69c7728c317e03"
+   }
+  },
+  "A031": {
+   "imerg": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:38-03:00",
+    "bytes": 57436,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-50.33583&latitude=-12.82056&start=20160101&end=20251231&format=JSON&time-standard=UTC",
+    "fontes_no_cabecalho": [
+     "IMERG"
+    ],
+    "guardado_em": "power/A031-imerg.json",
+    "padrao_de_hora": "UTC",
+    "ponto_devolvido": [
+     -50.336,
+     -12.821,
+     220.97
+    ],
+    "sha256": "61adbd0f5056a35f591ca3ae4d5b5906ff4b1d439cbd25471feccbf016cb8d0f"
+   },
+   "power": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:37-03:00",
+    "bytes": 57731,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR&community=AG&longitude=-50.33583&latitude=-12.82056&start=20160101&end=20251231&format=JSON&time-standard=LST",
+    "fontes_no_cabecalho": [
+     "MERRA2"
+    ],
+    "guardado_em": "power/A031-power.json",
+    "padrao_de_hora": "LST",
+    "ponto_devolvido": [
+     -50.336,
+     -12.821,
+     220.97
+    ],
+    "sha256": "9676451cf14a1f1a02faf63a5ef422f0ca03369dc8836275d47ae2fd6548aacf"
+   }
+  },
+  "A032": {
+   "imerg": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:38-03:00",
+    "bytes": 57081,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-46.89028&latitude=-13.25361&start=20160101&end=20251231&format=JSON&time-standard=UTC",
+    "fontes_no_cabecalho": [
+     "IMERG"
+    ],
+    "guardado_em": "power/A032-imerg.json",
+    "padrao_de_hora": "UTC",
+    "ponto_devolvido": [
+     -46.89,
+     -13.254,
+     551.21
+    ],
+    "sha256": "ec408c77bc1c142e5317361a7de98aff32a5be07bb658ef996063ba62cfdeaab"
+   },
+   "power": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:38-03:00",
+    "bytes": 57554,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR&community=AG&longitude=-46.89028&latitude=-13.25361&start=20160101&end=20251231&format=JSON&time-standard=LST",
+    "fontes_no_cabecalho": [
+     "MERRA2"
+    ],
+    "guardado_em": "power/A032-power.json",
+    "padrao_de_hora": "LST",
+    "ponto_devolvido": [
+     -46.89,
+     -13.254,
+     551.21
+    ],
+    "sha256": "537c222db6300170fd7acfe5e58760fac64aaf356e835191c1dc6a25a60fa677"
+   }
+  },
+  "A033": {
+   "imerg": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:38-03:00",
+    "bytes": 57269,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-48.28417&latitude=-17.30417&start=20160101&end=20251231&format=JSON&time-standard=UTC",
+    "fontes_no_cabecalho": [
+     "IMERG"
+    ],
+    "guardado_em": "power/A033-imerg.json",
+    "padrao_de_hora": "UTC",
+    "ponto_devolvido": [
+     -48.284,
+     -17.304,
+     805.76
+    ],
+    "sha256": "3fba41bd6c1d11891b6bf01838c8a24c8d5d86d675722b6277a562f612a8a7eb"
+   },
+   "power": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:39-03:00",
+    "bytes": 57881,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR&community=AG&longitude=-48.28417&latitude=-17.30417&start=20160101&end=20251231&format=JSON&time-standard=LST",
+    "fontes_no_cabecalho": [
+     "MERRA2"
+    ],
+    "guardado_em": "power/A033-power.json",
+    "padrao_de_hora": "LST",
+    "ponto_devolvido": [
+     -48.284,
+     -17.304,
+     805.76
+    ],
+    "sha256": "2176a0b9193758a756d425fa2da37a05f4cd20fc31cdb2c9764964124f202235"
+   }
+  },
+  "A034": {
+   "imerg": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:39-03:00",
+    "bytes": 57251,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-47.92750&latitude=-18.15472&start=20160101&end=20251231&format=JSON&time-standard=UTC",
+    "fontes_no_cabecalho": [
+     "IMERG"
+    ],
+    "guardado_em": "power/A034-imerg.json",
+    "padrao_de_hora": "UTC",
+    "ponto_devolvido": [
+     -47.928,
+     -18.155,
+     744.66
+    ],
+    "sha256": "596d3add63944c5db758ca2b26e0d233764de3e33a2db4014d77fea5bb55f79b"
+   },
+   "power": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:39-03:00",
+    "bytes": 57796,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR&community=AG&longitude=-47.92750&latitude=-18.15472&start=20160101&end=20251231&format=JSON&time-standard=LST",
+    "fontes_no_cabecalho": [
+     "MERRA2"
+    ],
+    "guardado_em": "power/A034-power.json",
+    "padrao_de_hora": "LST",
+    "ponto_devolvido": [
+     -47.928,
+     -18.155,
+     744.66
+    ],
+    "sha256": "b177a3118dc56de65a413d235ee61fac835158ea4a3ab464753acb738c92b583"
+   }
+  },
+  "A035": {
+   "imerg": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:39-03:00",
+    "bytes": 57523,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-49.19194&latitude=-18.40972&start=20160101&end=20251231&format=JSON&time-standard=UTC",
+    "fontes_no_cabecalho": [
+     "IMERG"
+    ],
+    "guardado_em": "power/A035-imerg.json",
+    "padrao_de_hora": "UTC",
+    "ponto_devolvido": [
+     -49.192,
+     -18.41,
+     558.77
+    ],
+    "sha256": "caaaea0e8ca12eca9cbfdcbbeee1e7f88ff9c0a62fe85f4c2e7fbb4ae7852fe8"
+   },
+   "power": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:39-03:00",
+    "bytes": 57888,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR&community=AG&longitude=-49.19194&latitude=-18.40972&start=20160101&end=20251231&format=JSON&time-standard=LST",
+    "fontes_no_cabecalho": [
+     "MERRA2"
+    ],
+    "guardado_em": "power/A035-power.json",
+    "padrao_de_hora": "LST",
+    "ponto_devolvido": [
+     -49.192,
+     -18.41,
+     558.77
+    ],
+    "sha256": "8f465e70a8609a637ed39124506a4aa2fd83d02c5407edacf30d3e41c041b76a"
+   }
+  },
+  "A036": {
+   "imerg": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:39-03:00",
+    "bytes": 57251,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-47.61306&latitude=-16.78500&start=20160101&end=20251231&format=JSON&time-standard=UTC",
+    "fontes_no_cabecalho": [
+     "IMERG"
+    ],
+    "guardado_em": "power/A036-imerg.json",
+    "padrao_de_hora": "UTC",
+    "ponto_devolvido": [
+     -47.613,
+     -16.785,
+     900.86
+    ],
+    "sha256": "ad3e368570bbebc96adb7962d57ecad0570d874ed377185d212df25763015fd9"
+   },
+   "power": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:40-03:00",
+    "bytes": 57780,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR&community=AG&longitude=-47.61306&latitude=-16.78500&start=20160101&end=20251231&format=JSON&time-standard=LST",
+    "fontes_no_cabecalho": [
+     "MERRA2"
+    ],
+    "guardado_em": "power/A036-power.json",
+    "padrao_de_hora": "LST",
+    "ponto_devolvido": [
+     -47.613,
+     -16.785,
+     900.86
+    ],
+    "sha256": "946b0eceabd00a8e16e75dd9dadd5a8a255c4da96e76c3c33b70df38de450b18"
+   }
+  },
+  "A037": {
+   "imerg": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:39-03:00",
+    "bytes": 57402,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-48.61806&latitude=-16.67972&start=20160101&end=20251231&format=JSON&time-standard=UTC",
+    "fontes_no_cabecalho": [
+     "IMERG"
+    ],
+    "guardado_em": "power/A037-imerg.json",
+    "padrao_de_hora": "UTC",
+    "ponto_devolvido": [
+     -48.618,
+     -16.68,
+     970.61
+    ],
+    "sha256": "058a74315c6448e04a13d92d3cca71eb00c5eedaaef733669f103d7e0f66eb64"
+   },
+   "power": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:40-03:00",
+    "bytes": 57995,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR&community=AG&longitude=-48.61806&latitude=-16.67972&start=20160101&end=20251231&format=JSON&time-standard=LST",
+    "fontes_no_cabecalho": [
+     "MERRA2"
+    ],
+    "guardado_em": "power/A037-power.json",
+    "padrao_de_hora": "LST",
+    "ponto_devolvido": [
+     -48.618,
+     -16.68,
+     970.61
+    ],
+    "sha256": "a30603e1d3362182001fdc13625dcec876cb965f475816a4d5aa8566bb43a4e4"
+   }
+  },
+  "A042": {
+   "imerg": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:41-03:00",
+    "bytes": 57250,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-48.13111&latitude=-15.59972&start=20160101&end=20251231&format=JSON&time-standard=UTC",
+    "fontes_no_cabecalho": [
+     "IMERG"
+    ],
+    "guardado_em": "power/A042-imerg.json",
+    "padrao_de_hora": "UTC",
+    "ponto_devolvido": [
+     -48.131,
+     -15.6,
+     886.8
+    ],
+    "sha256": "2eb897f4750e2c2591c54e6d877bd8f265b0740e31d54e1d0404523ec921fc0f"
+   },
+   "power": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:40-03:00",
+    "bytes": 57827,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR&community=AG&longitude=-48.13111&latitude=-15.59972&start=20160101&end=20251231&format=JSON&time-standard=LST",
+    "fontes_no_cabecalho": [
+     "MERRA2"
+    ],
+    "guardado_em": "power/A042-power.json",
+    "padrao_de_hora": "LST",
+    "ponto_devolvido": [
+     -48.131,
+     -15.6,
+     886.8
+    ],
+    "sha256": "676a37e6864d8f89876db9decf1e4ae70e596a2de75d9590d2de7d78a155db59"
+   }
+  },
+  "A045": {
+   "imerg": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:41-03:00",
+    "bytes": 57244,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-47.62583&latitude=-15.59639&start=20160101&end=20251231&format=JSON&time-standard=UTC",
+    "fontes_no_cabecalho": [
+     "IMERG"
+    ],
+    "guardado_em": "power/A045-imerg.json",
+    "padrao_de_hora": "UTC",
+    "ponto_devolvido": [
+     -47.626,
+     -15.596,
+     947.71
+    ],
+    "sha256": "5550a8a7b5f1ad7c7967effa89c19fcdbaac5a9bfdced0eae6b1897160b0fe88"
+   },
+   "power": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:41-03:00",
+    "bytes": 57694,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR&community=AG&longitude=-47.62583&latitude=-15.59639&start=20160101&end=20251231&format=JSON&time-standard=LST",
+    "fontes_no_cabecalho": [
+     "MERRA2"
+    ],
+    "guardado_em": "power/A045-power.json",
+    "padrao_de_hora": "LST",
+    "ponto_devolvido": [
+     -47.626,
+     -15.596,
+     947.71
+    ],
+    "sha256": "88436972e3af8fa96ead7cc280548fe231c96ca5c442e6312e7cb1ada3945840"
+   }
+  },
+  "A046": {
+   "imerg": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:40-03:00",
+    "bytes": 57393,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-48.13750&latitude=-15.93528&start=20160101&end=20251231&format=JSON&time-standard=UTC",
+    "fontes_no_cabecalho": [
+     "IMERG"
+    ],
+    "guardado_em": "power/A046-imerg.json",
+    "padrao_de_hora": "UTC",
+    "ponto_devolvido": [
+     -48.138,
+     -15.935,
+     984.96
+    ],
+    "sha256": "efd834a367281938add9f03960924f8ce89313fc27d97a408eaa38337715a533"
+   },
+   "power": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:41-03:00",
+    "bytes": 57884,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR&community=AG&longitude=-48.13750&latitude=-15.93528&start=20160101&end=20251231&format=JSON&time-standard=LST",
+    "fontes_no_cabecalho": [
+     "MERRA2"
+    ],
+    "guardado_em": "power/A046-power.json",
+    "padrao_de_hora": "LST",
+    "ponto_devolvido": [
+     -48.138,
+     -15.935,
+     984.96
+    ],
+    "sha256": "a50b494ad3a86639c71946689d6ef82dafb07ccd749adaf208be87c30bacb3d5"
+   }
+  },
+  "A047": {
+   "imerg": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:42-03:00",
+    "bytes": 57190,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-47.55750&latitude=-16.01222&start=20160101&end=20251231&format=JSON&time-standard=UTC",
+    "fontes_no_cabecalho": [
+     "IMERG"
+    ],
+    "guardado_em": "power/A047-imerg.json",
+    "padrao_de_hora": "UTC",
+    "ponto_devolvido": [
+     -47.557,
+     -16.012,
+     945.25
+    ],
+    "sha256": "ebb8c78906c511efc4c65e2dd57014baf7e28e93d1f2994ed330d5e3e02b0b99"
+   },
+   "power": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:41-03:00",
+    "bytes": 57747,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR&community=AG&longitude=-47.55750&latitude=-16.01222&start=20160101&end=20251231&format=JSON&time-standard=LST",
+    "fontes_no_cabecalho": [
+     "MERRA2"
+    ],
+    "guardado_em": "power/A047-power.json",
+    "padrao_de_hora": "LST",
+    "ponto_devolvido": [
+     -47.557,
+     -16.012,
+     945.25
+    ],
+    "sha256": "4c103842a4f05307ced944350c03e806006e7081b4cd7331a5c2a858374595f9"
+   }
+  },
+  "A056": {
+   "imerg": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:42-03:00",
+    "bytes": 57218,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-47.62583&latitude=-16.39944&start=20160101&end=20251231&format=JSON&time-standard=UTC",
+    "fontes_no_cabecalho": [
+     "IMERG"
+    ],
+    "guardado_em": "power/A056-imerg.json",
+    "padrao_de_hora": "UTC",
+    "ponto_devolvido": [
+     -47.626,
+     -16.399,
+     916.35
+    ],
+    "sha256": "36023f0d06afe7ff975546845859d056c7d441a568ff3a26c909dc9bc94f5c5f"
+   },
+   "power": {
+    "avisos": [],
+    "baixado_em": "2026-11-15T07:11:41-03:00",
+    "bytes": 57787,
+    "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR&community=AG&longitude=-47.62583&latitude=-16.39944&start=20160101&end=20251231&format=JSON&time-standard=LST",
+    "fontes_no_cabecalho": [
+     "MERRA2"
+    ],
+    "guardado_em": "power/A056-power.json",
+    "padrao_de_hora": "LST",
+    "ponto_devolvido": [
+     -47.626,
+     -16.399,
+     916.35
+    ],
+    "sha256": "4a19cb7213895ffde174011aa7e596ca94cc751a9dae7a883459c8582354ef2f"
+   }
+  }
+ }
+}

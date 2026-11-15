@@ -1,0 +1,578 @@
+{
+  "cidades_de_goias_na_tabela": 246,
+  "com_rendimento_nos_10_anos": 84,
+  "escolhidas": [
+    "5218805",
+    "5211909",
+    "5213756",
+    "5213103",
+    "5206206",
+    "5205471",
+    "5216403",
+    "5204409",
+    "5219308",
+    "5216452",
+    "5203500",
+    "5220603",
+    "5209101",
+    "5200134",
+    "5220504",
+    "5200175",
+    "5207253",
+    "5212501",
+    "5210109",
+    "5211503"
+  ],
+  "a_parte": [],
+  "nomes": {
+    "5218805": "Rio Verde - GO",
+    "5211909": "Jataí - GO",
+    "5213756": "Montividiu - GO",
+    "5213103": "Mineiros - GO",
+    "5206206": "Cristalina - GO",
+    "5205471": "Chapadão do Céu - GO",
+    "5216403": "Paraúna - GO",
+    "5204409": "Caiapônia - GO",
+    "5219308": "Santa Helena de Goiás - GO",
+    "5216452": "Perolândia - GO",
+    "5203500": "Bom Jesus de Goiás - GO",
+    "5220603": "Silvânia - GO",
+    "5209101": "Goiatuba - GO",
+    "5200134": "Acreúna - GO",
+    "5220504": "Serranópolis - GO",
+    "5200175": "Água Fria de Goiás - GO",
+    "5207253": "Doverlândia - GO",
+    "5212501": "Luziânia - GO",
+    "5210109": "Ipameri - GO",
+    "5211503": "Itumbiara - GO"
+  },
+  "area_media_ha": {
+    "5218805": 303150.0,
+    "5211909": 236700.0,
+    "5213756": 111320.0,
+    "5213103": 88200.0,
+    "5206206": 76041.3,
+    "5205471": 60950.0,
+    "5216403": 51250.0,
+    "5204409": 44450.0,
+    "5219308": 40790.0,
+    "5216452": 34000.0,
+    "5203500": 33993.0,
+    "5220603": 31700.0,
+    "5209101": 27990.0,
+    "5200134": 23640.0,
+    "5220504": 22700.0,
+    "5200175": 19205.0,
+    "5207253": 17220.0,
+    "5212501": 15991.8,
+    "5210109": 14906.0,
+    "5211503": 14765.0
+  },
+  "conferencia_com_o_motor": {
+    "rio_verde": {
+      "iguais": true,
+      "spearman_nos_dados_guardados": -0.5151515151515151,
+      "falta_pct": {
+        "2015-16": 49.6,
+        "2016-17": 25.8,
+        "2017-18": 35.1,
+        "2018-19": 29.4,
+        "2019-20": 34.7,
+        "2020-21": 45.9,
+        "2021-22": 54.8,
+        "2022-23": 41.0,
+        "2023-24": 41.8,
+        "2024-25": 32.7
+      }
+    },
+    "jatai": {
+      "iguais": true,
+      "spearman_nos_dados_guardados": -0.2978737164032316,
+      "falta_pct": {
+        "2015-16": 39.0,
+        "2016-17": 32.3,
+        "2017-18": 28.8,
+        "2018-19": 18.1,
+        "2019-20": 30.8,
+        "2020-21": 49.8,
+        "2021-22": 49.3,
+        "2022-23": 41.0,
+        "2023-24": 40.4,
+        "2024-25": 41.0
+      }
+    },
+    "silvania": {
+      "iguais": true,
+      "spearman_nos_dados_guardados": -0.8145934285312865,
+      "falta_pct": {
+        "2015-16": 62.2,
+        "2016-17": 22.3,
+        "2017-18": 33.2,
+        "2018-19": 22.9,
+        "2019-20": 24.2,
+        "2020-21": 54.0,
+        "2021-22": 63.8,
+        "2022-23": 39.1,
+        "2023-24": 47.0,
+        "2024-25": 37.0
+      }
+    }
+  },
+  "principal": {
+    "a_por_cidade": {
+      "5218805": {
+        "spearman": -0.5151515151515151,
+        "pior_safra": "2015-16",
+        "rendimento_da_pior_kg_ha": 3300.0,
+        "posto_da_pior_na_falta": 2,
+        "pior_entre_as_3_de_maior_falta": true
+      },
+      "5211909": {
+        "spearman": -0.2978737164032316,
+        "pior_safra": "2015-16",
+        "rendimento_da_pior_kg_ha": 4200.0,
+        "posto_da_pior_na_falta": 6,
+        "pior_entre_as_3_de_maior_falta": false
+      },
+      "5213756": {
+        "spearman": -0.7669288989248111,
+        "pior_safra": "2015-16",
+        "rendimento_da_pior_kg_ha": 3600.0,
+        "posto_da_pior_na_falta": 2,
+        "pior_entre_as_3_de_maior_falta": true
+      },
+      "5213103": {
+        "spearman": -0.18845071854082002,
+        "pior_safra": "2015-16",
+        "rendimento_da_pior_kg_ha": 4000.0,
+        "posto_da_pior_na_falta": 5,
+        "pior_entre_as_3_de_maior_falta": false
+      },
+      "5206206": {
+        "spearman": -0.47878787878787876,
+        "pior_safra": "2015-16",
+        "rendimento_da_pior_kg_ha": 3517.0,
+        "posto_da_pior_na_falta": 1,
+        "pior_entre_as_3_de_maior_falta": true
+      },
+      "5205471": {
+        "spearman": -0.6242424242424243,
+        "pior_safra": "2015-16",
+        "rendimento_da_pior_kg_ha": 4200.0,
+        "posto_da_pior_na_falta": 3,
+        "pior_entre_as_3_de_maior_falta": true
+      },
+      "5216403": {
+        "spearman": -0.8424242424242424,
+        "pior_safra": "2015-16",
+        "rendimento_da_pior_kg_ha": 2400.0,
+        "posto_da_pior_na_falta": 1,
+        "pior_entre_as_3_de_maior_falta": true
+      },
+      "5204409": {
+        "spearman": -0.24924127290882647,
+        "pior_safra": "2015-16",
+        "rendimento_da_pior_kg_ha": 4020.0,
+        "posto_da_pior_na_falta": 2,
+        "pior_entre_as_3_de_maior_falta": true
+      },
+      "5219308": {
+        "spearman": -0.04863244349440517,
+        "pior_safra": "2015-16",
+        "rendimento_da_pior_kg_ha": 1800.0,
+        "posto_da_pior_na_falta": 2,
+        "pior_entre_as_3_de_maior_falta": true
+      },
+      "5216452": {
+        "spearman": -0.17575757575757575,
+        "pior_safra": "2015-16",
+        "rendimento_da_pior_kg_ha": 4000.0,
+        "posto_da_pior_na_falta": 5,
+        "pior_entre_as_3_de_maior_falta": false
+      },
+      "5203500": {
+        "spearman": -0.6079055436800646,
+        "pior_safra": "2015-16",
+        "rendimento_da_pior_kg_ha": 1600.0,
+        "posto_da_pior_na_falta": 1,
+        "pior_entre_as_3_de_maior_falta": true
+      },
+      "5220603": {
+        "spearman": -0.8145934285312865,
+        "pior_safra": "2015-16",
+        "rendimento_da_pior_kg_ha": 5000.0,
+        "posto_da_pior_na_falta": 2,
+        "pior_entre_as_3_de_maior_falta": true
+      },
+      "5209101": {
+        "spearman": -0.6484848484848484,
+        "pior_safra": "2015-16",
+        "rendimento_da_pior_kg_ha": 1500.0,
+        "posto_da_pior_na_falta": 1,
+        "pior_entre_as_3_de_maior_falta": true
+      },
+      "5200134": {
+        "spearman": -0.10942299786241162,
+        "pior_safra": "2015-16",
+        "rendimento_da_pior_kg_ha": 2400.0,
+        "posto_da_pior_na_falta": 2,
+        "pior_entre_as_3_de_maior_falta": true
+      },
+      "5220504": {
+        "spearman": -0.47878787878787876,
+        "pior_safra": "2015-16",
+        "rendimento_da_pior_kg_ha": 4000.0,
+        "posto_da_pior_na_falta": 5,
+        "pior_entre_as_3_de_maior_falta": false
+      },
+      "5200175": {
+        "spearman": -0.23100410659842452,
+        "pior_safra": "2015-16",
+        "rendimento_da_pior_kg_ha": 3000.0,
+        "posto_da_pior_na_falta": 1,
+        "pior_entre_as_3_de_maior_falta": true
+      },
+      "5207253": {
+        "spearman": -0.38181818181818183,
+        "pior_safra": "2015-16",
+        "rendimento_da_pior_kg_ha": 3900.0,
+        "posto_da_pior_na_falta": 2,
+        "pior_entre_as_3_de_maior_falta": true
+      },
+      "5212501": {
+        "spearman": -0.6,
+        "pior_safra": "2015-16",
+        "rendimento_da_pior_kg_ha": 4800.0,
+        "posto_da_pior_na_falta": 2,
+        "pior_entre_as_3_de_maior_falta": true
+      },
+      "5210109": {
+        "spearman": -0.6626170426112704,
+        "pior_safra": "2015-16",
+        "rendimento_da_pior_kg_ha": 2213.0,
+        "posto_da_pior_na_falta": 1,
+        "pior_entre_as_3_de_maior_falta": true
+      },
+      "5211503": {
+        "spearman": -0.6484848484848484,
+        "pior_safra": "2015-16",
+        "rendimento_da_pior_kg_ha": 1922.0,
+        "posto_da_pior_na_falta": 1,
+        "pior_entre_as_3_de_maior_falta": true
+      }
+    },
+    "a_pior_entre_as_3": 16,
+    "a_mediana_das_correlacoes": -0.49696969696969695,
+    "b": {
+      "negativas": 20,
+      "de": 20,
+      "p_um_lado": 9.5367431640625e-07,
+      "p_dois_lados": 1.9073486328125e-06
+    },
+    "c": {
+      "spearman": -0.44477353798768376,
+      "pares": 200,
+      "permutacoes": 10000,
+      "semente": 20261115,
+      "p_um_lado_mesma_ordem_em_todas": 0.0174982501749825,
+      "p_dois_lados_mesma_ordem_em_todas": 0.037396260373962605,
+      "p_um_lado_cada_cidade_por_si": 9.999000099990002e-05,
+      "p_dois_lados_cada_cidade_por_si": 9.999000099990002e-05
+    },
+    "d": {
+      "spearman": -0.7212121212121212,
+      "p_um_lado": 0.011498850114988501,
+      "p_dois_lados": 0.023997600239976002,
+      "pior_safra_regional": "2015-16",
+      "posto_da_pior_na_falta": 2,
+      "por_safra": {
+        "2015-16": {
+          "falta_media_pct": 53.28804517320538,
+          "rendimento_relativo_medio_pct": 54.665894661334924
+        },
+        "2016-17": {
+          "falta_media_pct": 30.859728185528084,
+          "rendimento_relativo_medio_pct": 93.69296397886455
+        },
+        "2017-18": {
+          "falta_media_pct": 35.64251066762511,
+          "rendimento_relativo_medio_pct": 95.77613355124
+        },
+        "2018-19": {
+          "falta_media_pct": 24.807894243156422,
+          "rendimento_relativo_medio_pct": 119.56953946194865
+        },
+        "2019-20": {
+          "falta_media_pct": 35.16587559493182,
+          "rendimento_relativo_medio_pct": 111.90510742744902
+        },
+        "2020-21": {
+          "falta_media_pct": 50.29511952980949,
+          "rendimento_relativo_medio_pct": 83.01590251095574
+        },
+        "2021-22": {
+          "falta_media_pct": 54.80555201943694,
+          "rendimento_relativo_medio_pct": 90.12297887089242
+        },
+        "2022-23": {
+          "falta_media_pct": 42.05978658388165,
+          "rendimento_relativo_medio_pct": 109.8953167483665
+        },
+        "2023-24": {
+          "falta_media_pct": 42.855130071590196,
+          "rendimento_relativo_medio_pct": 93.8947603710436
+        },
+        "2024-25": {
+          "falta_media_pct": 36.446920015525876,
+          "rendimento_relativo_medio_pct": 112.10171164305189
+        }
+      }
+    },
+    "a_as_tres_a_parte": {},
+    "depois_de_ver_sem_2015_16": {
+      "safra_fora": "2015-16",
+      "safras": 9,
+      "negativas": 17,
+      "de": 20,
+      "p_um_lado_do_sinal": 0.0012884140014648438,
+      "mediana_das_correlacoes": -0.4393343895967546,
+      "d_spearman": -0.65,
+      "d_p_um_lado": 0.034396560343965606,
+      "por_cidade": {
+        "5218805": -0.35,
+        "5211909": -0.4184137043778615,
+        "5213756": -0.6950150912113306,
+        "5213103": -0.17573375583870182,
+        "5206206": -0.2833333333333333,
+        "5205471": -0.5666666666666667,
+        "5216403": -0.7833333333333333,
+        "5204409": -0.03347309635022892,
+        "5219308": 0.21757512627648798,
+        "5216452": -0.18333333333333332,
+        "5203500": -0.46025507481564765,
+        "5220603": -0.75,
+        "5209101": -0.5166666666666667,
+        "5200134": 0.12552411131335844,
+        "5220504": -0.48333333333333334,
+        "5200175": 0.05857791861290061,
+        "5207253": -0.21666666666666667,
+        "5212501": -0.55,
+        "5210109": -0.5355695416036628,
+        "5211503": -0.5166666666666667
+      }
+    }
+  },
+  "sensibilidade_soja_15_dias_depois": {
+    "a_por_cidade": {
+      "5218805": {
+        "spearman": -0.503030303030303,
+        "pior_safra": "2015-16",
+        "rendimento_da_pior_kg_ha": 3300.0,
+        "posto_da_pior_na_falta": 3,
+        "pior_entre_as_3_de_maior_falta": true
+      },
+      "5211909": {
+        "spearman": -0.006079055436800646,
+        "pior_safra": "2015-16",
+        "rendimento_da_pior_kg_ha": 4200.0,
+        "posto_da_pior_na_falta": 9,
+        "pior_entre_as_3_de_maior_falta": false
+      },
+      "5213756": {
+        "spearman": -0.7423871741592171,
+        "pior_safra": "2015-16",
+        "rendimento_da_pior_kg_ha": 3600.0,
+        "posto_da_pior_na_falta": 3,
+        "pior_entre_as_3_de_maior_falta": true
+      },
+      "5213103": {
+        "spearman": -0.060790554368006455,
+        "pior_safra": "2015-16",
+        "rendimento_da_pior_kg_ha": 4000.0,
+        "posto_da_pior_na_falta": 7,
+        "pior_entre_as_3_de_maior_falta": false
+      },
+      "5206206": {
+        "spearman": -0.4303030303030303,
+        "pior_safra": "2015-16",
+        "rendimento_da_pior_kg_ha": 3517.0,
+        "posto_da_pior_na_falta": 1,
+        "pior_entre_as_3_de_maior_falta": true
+      },
+      "5205471": {
+        "spearman": -0.006060606060606061,
+        "pior_safra": "2015-16",
+        "rendimento_da_pior_kg_ha": 4200.0,
+        "posto_da_pior_na_falta": 7,
+        "pior_entre_as_3_de_maior_falta": false
+      },
+      "5216403": {
+        "spearman": -0.8545454545454545,
+        "pior_safra": "2015-16",
+        "rendimento_da_pior_kg_ha": 2400.0,
+        "posto_da_pior_na_falta": 1,
+        "pior_entre_as_3_de_maior_falta": true
+      },
+      "5204409": {
+        "spearman": -0.3161108827136336,
+        "pior_safra": "2015-16",
+        "rendimento_da_pior_kg_ha": 4020.0,
+        "posto_da_pior_na_falta": 2,
+        "pior_entre_as_3_de_maior_falta": true
+      },
+      "5219308": {
+        "spearman": -0.11550205329921226,
+        "pior_safra": "2015-16",
+        "rendimento_da_pior_kg_ha": 1800.0,
+        "posto_da_pior_na_falta": 3,
+        "pior_entre_as_3_de_maior_falta": true
+      },
+      "5216452": {
+        "spearman": 0.030303030303030304,
+        "pior_safra": "2015-16",
+        "rendimento_da_pior_kg_ha": 4000.0,
+        "posto_da_pior_na_falta": 8,
+        "pior_entre_as_3_de_maior_falta": false
+      },
+      "5203500": {
+        "spearman": -0.7355657078528781,
+        "pior_safra": "2015-16",
+        "rendimento_da_pior_kg_ha": 1600.0,
+        "posto_da_pior_na_falta": 2,
+        "pior_entre_as_3_de_maior_falta": true
+      },
+      "5220603": {
+        "spearman": -0.7781190959104827,
+        "pior_safra": "2015-16",
+        "rendimento_da_pior_kg_ha": 5000.0,
+        "posto_da_pior_na_falta": 2,
+        "pior_entre_as_3_de_maior_falta": true
+      },
+      "5209101": {
+        "spearman": -0.7333333333333333,
+        "pior_safra": "2015-16",
+        "rendimento_da_pior_kg_ha": 1500.0,
+        "posto_da_pior_na_falta": 1,
+        "pior_entre_as_3_de_maior_falta": true
+      },
+      "5200134": {
+        "spearman": -0.33434804902403553,
+        "pior_safra": "2015-16",
+        "rendimento_da_pior_kg_ha": 2400.0,
+        "posto_da_pior_na_falta": 1,
+        "pior_entre_as_3_de_maior_falta": true
+      },
+      "5220504": {
+        "spearman": -0.06666666666666667,
+        "pior_safra": "2015-16",
+        "rendimento_da_pior_kg_ha": 4000.0,
+        "posto_da_pior_na_falta": 9,
+        "pior_entre_as_3_de_maior_falta": false
+      },
+      "5200175": {
+        "spearman": -0.16413449679361744,
+        "pior_safra": "2015-16",
+        "rendimento_da_pior_kg_ha": 3000.0,
+        "posto_da_pior_na_falta": 1,
+        "pior_entre_as_3_de_maior_falta": true
+      },
+      "5207253": {
+        "spearman": -0.296969696969697,
+        "pior_safra": "2015-16",
+        "rendimento_da_pior_kg_ha": 3900.0,
+        "posto_da_pior_na_falta": 2,
+        "pior_entre_as_3_de_maior_falta": true
+      },
+      "5212501": {
+        "spearman": -0.6,
+        "pior_safra": "2015-16",
+        "rendimento_da_pior_kg_ha": 4800.0,
+        "posto_da_pior_na_falta": 1,
+        "pior_entre_as_3_de_maior_falta": true
+      },
+      "5210109": {
+        "spearman": -0.790277206784084,
+        "pior_safra": "2015-16",
+        "rendimento_da_pior_kg_ha": 2213.0,
+        "posto_da_pior_na_falta": 1,
+        "pior_entre_as_3_de_maior_falta": true
+      },
+      "5211503": {
+        "spearman": -0.7333333333333333,
+        "pior_safra": "2015-16",
+        "rendimento_da_pior_kg_ha": 1922.0,
+        "posto_da_pior_na_falta": 3,
+        "pior_entre_as_3_de_maior_falta": true
+      }
+    },
+    "a_pior_entre_as_3": 15,
+    "a_mediana_das_correlacoes": -0.3823255396635329,
+    "b": {
+      "negativas": 19,
+      "de": 20,
+      "p_um_lado": 2.002716064453125e-05,
+      "p_dois_lados": 4.00543212890625e-05
+    },
+    "c": {
+      "spearman": -0.3964547901056297,
+      "pares": 200,
+      "permutacoes": 10000,
+      "semente": 20261115,
+      "p_um_lado_mesma_ordem_em_todas": 0.0184981501849815,
+      "p_dois_lados_mesma_ordem_em_todas": 0.045495450454954504,
+      "p_um_lado_cada_cidade_por_si": 9.999000099990002e-05,
+      "p_dois_lados_cada_cidade_por_si": 9.999000099990002e-05
+    },
+    "d": {
+      "spearman": -0.6848484848484848,
+      "p_um_lado": 0.0184981501849815,
+      "p_dois_lados": 0.036096390360963904,
+      "pior_safra_regional": "2015-16",
+      "posto_da_pior_na_falta": 3,
+      "por_safra": {
+        "2015-16": {
+          "falta_media_pct": 58.44039138784643,
+          "rendimento_relativo_medio_pct": 54.665894661334924
+        },
+        "2016-17": {
+          "falta_media_pct": 41.58547288033638,
+          "rendimento_relativo_medio_pct": 93.69296397886455
+        },
+        "2017-18": {
+          "falta_media_pct": 50.14802901251713,
+          "rendimento_relativo_medio_pct": 95.77613355124
+        },
+        "2018-19": {
+          "falta_media_pct": 40.858175781748386,
+          "rendimento_relativo_medio_pct": 119.56953946194865
+        },
+        "2019-20": {
+          "falta_media_pct": 47.53032038591769,
+          "rendimento_relativo_medio_pct": 111.90510742744902
+        },
+        "2020-21": {
+          "falta_media_pct": 56.50342330752321,
+          "rendimento_relativo_medio_pct": 83.01590251095574
+        },
+        "2021-22": {
+          "falta_media_pct": 62.709809198339386,
+          "rendimento_relativo_medio_pct": 90.12297887089242
+        },
+        "2022-23": {
+          "falta_media_pct": 50.29365288641868,
+          "rendimento_relativo_medio_pct": 109.8953167483665
+        },
+        "2023-24": {
+          "falta_media_pct": 59.29781817714864,
+          "rendimento_relativo_medio_pct": 93.8947603710436
+        },
+        "2024-25": {
+          "falta_media_pct": 44.442484809865206,
+          "rendimento_relativo_medio_pct": 112.10171164305189
+        }
+      }
+    },
+    "a_as_tres_a_parte": {}
+  },
+  "calculado_em": "2026-11-15T07:16:29-03:00"
+}

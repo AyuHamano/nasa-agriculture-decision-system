@@ -1,0 +1,601 @@
+{
+  "o_que_e": "O endereço e a hora de cada consulta deste teste.",
+  "consultas": [
+    {
+      "o_que": "SIDRA, tabela 839 (milho 2ª safra), todos os municípios de Goiás, área colhida (216) e rendimento (112), 2016 a 2025",
+      "endereco": "https://apisidra.ibge.gov.br/values/t/839/n6/in%20n3%2052/v/216,112/p/2016,2017,2018,2019,2020,2021,2022,2023,2024,2025/c81/114254",
+      "baixado_em": "2026-11-15T07:12:41-03:00",
+      "arquivo": "dados/bruto/sidra-839-goias.json.gz"
+    },
+    {
+      "o_que": "IBGE, Base de Localidades 2022 (shapefile do Brasil): as sedes municipais de Goiás (categoria 'Sede Municipal'), latitude e longitude",
+      "endereco": "https://geoftp.ibge.gov.br/organizacao_do_territorio/estrutura_territorial/localidades/Localidades_do_Brasil/2022/Localidades_Brasil_shp.zip",
+      "baixado_em": "2026-11-15T07:12:45-03:00",
+      "sha256": "1c0bec392891f6f284675e1b72c761f1b4a976599bdd3f0cb87fabf471382ca9",
+      "bytes": 4511488,
+      "arquivo": "dados/sedes-goias-ibge-2022.csv (só Goiás)"
+    }
+  ],
+  "clima": {
+    "5218805": {
+      "power": {
+        "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR,T2M_MAX,T2M_MIN&community=AG&longitude=-50.9081&latitude=-17.7853&start=20140701&end=20251231&format=JSON&time-standard=LST",
+        "baixado_em": "2026-11-15T07:12:47-03:00",
+        "arquivo": "dados/bruto/5218805-power.json.gz",
+        "ponto_devolvido": [
+          -50.908,
+          -17.785,
+          625.31
+        ],
+        "fontes": [
+          "MERRA2",
+          "POWER"
+        ]
+      },
+      "imerg": {
+        "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-50.9081&latitude=-17.7853&start=20140701&end=20251231&format=JSON&time-standard=UTC",
+        "baixado_em": "2026-11-15T07:12:51-03:00",
+        "arquivo": "dados/bruto/5218805-imerg.json.gz",
+        "ponto_devolvido": [
+          -50.908,
+          -17.785,
+          625.31
+        ],
+        "fontes": [
+          "IMERG"
+        ]
+      }
+    },
+    "5211909": {
+      "power": {
+        "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR,T2M_MAX,T2M_MIN&community=AG&longitude=-51.724&latitude=-17.8858&start=20140701&end=20251231&format=JSON&time-standard=LST",
+        "baixado_em": "2026-11-15T07:12:54-03:00",
+        "arquivo": "dados/bruto/5211909-power.json.gz",
+        "ponto_devolvido": [
+          -51.724,
+          -17.886,
+          729.31
+        ],
+        "fontes": [
+          "MERRA2",
+          "POWER"
+        ]
+      },
+      "imerg": {
+        "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-51.724&latitude=-17.8858&start=20140701&end=20251231&format=JSON&time-standard=UTC",
+        "baixado_em": "2026-11-15T07:12:57-03:00",
+        "arquivo": "dados/bruto/5211909-imerg.json.gz",
+        "ponto_devolvido": [
+          -51.724,
+          -17.886,
+          729.31
+        ],
+        "fontes": [
+          "IMERG"
+        ]
+      }
+    },
+    "5213756": {
+      "power": {
+        "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR,T2M_MAX,T2M_MIN&community=AG&longitude=-51.177&latitude=-17.4485&start=20140701&end=20251231&format=JSON&time-standard=LST",
+        "baixado_em": "2026-11-15T07:13:00-03:00",
+        "arquivo": "dados/bruto/5213756-power.json.gz",
+        "ponto_devolvido": [
+          -51.177,
+          -17.448,
+          815.82
+        ],
+        "fontes": [
+          "MERRA2",
+          "POWER"
+        ]
+      },
+      "imerg": {
+        "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-51.177&latitude=-17.4485&start=20140701&end=20251231&format=JSON&time-standard=UTC",
+        "baixado_em": "2026-11-15T07:13:04-03:00",
+        "arquivo": "dados/bruto/5213756-imerg.json.gz",
+        "ponto_devolvido": [
+          -51.177,
+          -17.448,
+          815.82
+        ],
+        "fontes": [
+          "IMERG"
+        ]
+      }
+    },
+    "5213103": {
+      "power": {
+        "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR,T2M_MAX,T2M_MIN&community=AG&longitude=-52.5515&latitude=-17.5703&start=20140701&end=20251231&format=JSON&time-standard=LST",
+        "baixado_em": "2026-11-15T07:13:07-03:00",
+        "arquivo": "dados/bruto/5213103-power.json.gz",
+        "ponto_devolvido": [
+          -52.551,
+          -17.57,
+          759.92
+        ],
+        "fontes": [
+          "MERRA2",
+          "POWER"
+        ]
+      },
+      "imerg": {
+        "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-52.5515&latitude=-17.5703&start=20140701&end=20251231&format=JSON&time-standard=UTC",
+        "baixado_em": "2026-11-15T07:13:10-03:00",
+        "arquivo": "dados/bruto/5213103-imerg.json.gz",
+        "ponto_devolvido": [
+          -52.551,
+          -17.57,
+          759.92
+        ],
+        "fontes": [
+          "IMERG"
+        ]
+      }
+    },
+    "5206206": {
+      "power": {
+        "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR,T2M_MAX,T2M_MIN&community=AG&longitude=-47.6018&latitude=-16.7654&start=20140701&end=20251231&format=JSON&time-standard=LST",
+        "baixado_em": "2026-11-15T07:13:13-03:00",
+        "arquivo": "dados/bruto/5206206-power.json.gz",
+        "ponto_devolvido": [
+          -47.602,
+          -16.765,
+          900.86
+        ],
+        "fontes": [
+          "MERRA2",
+          "POWER"
+        ]
+      },
+      "imerg": {
+        "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-47.6018&latitude=-16.7654&start=20140701&end=20251231&format=JSON&time-standard=UTC",
+        "baixado_em": "2026-11-15T07:13:17-03:00",
+        "arquivo": "dados/bruto/5206206-imerg.json.gz",
+        "ponto_devolvido": [
+          -47.602,
+          -16.765,
+          900.86
+        ],
+        "fontes": [
+          "IMERG"
+        ]
+      }
+    },
+    "5205471": {
+      "power": {
+        "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR,T2M_MAX,T2M_MIN&community=AG&longitude=-52.669&latitude=-18.3967&start=20140701&end=20251231&format=JSON&time-standard=LST",
+        "baixado_em": "2026-11-15T07:13:20-03:00",
+        "arquivo": "dados/bruto/5205471-power.json.gz",
+        "ponto_devolvido": [
+          -52.669,
+          -18.397,
+          760.42
+        ],
+        "fontes": [
+          "MERRA2",
+          "POWER"
+        ]
+      },
+      "imerg": {
+        "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-52.669&latitude=-18.3967&start=20140701&end=20251231&format=JSON&time-standard=UTC",
+        "baixado_em": "2026-11-15T07:13:24-03:00",
+        "arquivo": "dados/bruto/5205471-imerg.json.gz",
+        "ponto_devolvido": [
+          -52.669,
+          -18.397,
+          760.42
+        ],
+        "fontes": [
+          "IMERG"
+        ]
+      }
+    },
+    "5216403": {
+      "power": {
+        "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR,T2M_MAX,T2M_MIN&community=AG&longitude=-50.4486&latitude=-16.9478&start=20140701&end=20251231&format=JSON&time-standard=LST",
+        "baixado_em": "2026-11-15T07:13:27-03:00",
+        "arquivo": "dados/bruto/5216403-power.json.gz",
+        "ponto_devolvido": [
+          -50.449,
+          -16.948,
+          670.41
+        ],
+        "fontes": [
+          "MERRA2",
+          "POWER"
+        ]
+      },
+      "imerg": {
+        "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-50.4486&latitude=-16.9478&start=20140701&end=20251231&format=JSON&time-standard=UTC",
+        "baixado_em": "2026-11-15T07:13:30-03:00",
+        "arquivo": "dados/bruto/5216403-imerg.json.gz",
+        "ponto_devolvido": [
+          -50.449,
+          -16.948,
+          670.41
+        ],
+        "fontes": [
+          "IMERG"
+        ]
+      }
+    },
+    "5204409": {
+      "power": {
+        "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR,T2M_MAX,T2M_MIN&community=AG&longitude=-51.8108&latitude=-16.9567&start=20140701&end=20251231&format=JSON&time-standard=LST",
+        "baixado_em": "2026-11-15T07:13:34-03:00",
+        "arquivo": "dados/bruto/5204409-power.json.gz",
+        "ponto_devolvido": [
+          -51.811,
+          -16.957,
+          751.26
+        ],
+        "fontes": [
+          "MERRA2",
+          "POWER"
+        ]
+      },
+      "imerg": {
+        "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-51.8108&latitude=-16.9567&start=20140701&end=20251231&format=JSON&time-standard=UTC",
+        "baixado_em": "2026-11-15T07:13:37-03:00",
+        "arquivo": "dados/bruto/5204409-imerg.json.gz",
+        "ponto_devolvido": [
+          -51.811,
+          -16.957,
+          751.26
+        ],
+        "fontes": [
+          "IMERG"
+        ]
+      }
+    },
+    "5219308": {
+      "power": {
+        "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR,T2M_MAX,T2M_MIN&community=AG&longitude=-50.5972&latitude=-17.8137&start=20140701&end=20251231&format=JSON&time-standard=LST",
+        "baixado_em": "2026-11-15T07:13:40-03:00",
+        "arquivo": "dados/bruto/5219308-power.json.gz",
+        "ponto_devolvido": [
+          -50.597,
+          -17.814,
+          625.31
+        ],
+        "fontes": [
+          "MERRA2",
+          "POWER"
+        ]
+      },
+      "imerg": {
+        "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-50.5972&latitude=-17.8137&start=20140701&end=20251231&format=JSON&time-standard=UTC",
+        "baixado_em": "2026-11-15T07:13:43-03:00",
+        "arquivo": "dados/bruto/5219308-imerg.json.gz",
+        "ponto_devolvido": [
+          -50.597,
+          -17.814,
+          625.31
+        ],
+        "fontes": [
+          "IMERG"
+        ]
+      }
+    },
+    "5216452": {
+      "power": {
+        "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR,T2M_MAX,T2M_MIN&community=AG&longitude=-52.0653&latitude=-17.5298&start=20140701&end=20251231&format=JSON&time-standard=LST",
+        "baixado_em": "2026-11-15T07:13:47-03:00",
+        "arquivo": "dados/bruto/5216452-power.json.gz",
+        "ponto_devolvido": [
+          -52.065,
+          -17.53,
+          843.93
+        ],
+        "fontes": [
+          "MERRA2",
+          "POWER"
+        ]
+      },
+      "imerg": {
+        "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-52.0653&latitude=-17.5298&start=20140701&end=20251231&format=JSON&time-standard=UTC",
+        "baixado_em": "2026-11-15T07:13:50-03:00",
+        "arquivo": "dados/bruto/5216452-imerg.json.gz",
+        "ponto_devolvido": [
+          -52.065,
+          -17.53,
+          843.93
+        ],
+        "fontes": [
+          "IMERG"
+        ]
+      }
+    },
+    "5203500": {
+      "power": {
+        "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR,T2M_MAX,T2M_MIN&community=AG&longitude=-49.7353&latitude=-18.2175&start=20140701&end=20251231&format=JSON&time-standard=LST",
+        "baixado_em": "2026-11-15T07:13:53-03:00",
+        "arquivo": "dados/bruto/5203500-power.json.gz",
+        "ponto_devolvido": [
+          -49.735,
+          -18.218,
+          524.36
+        ],
+        "fontes": [
+          "MERRA2",
+          "POWER"
+        ]
+      },
+      "imerg": {
+        "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-49.7353&latitude=-18.2175&start=20140701&end=20251231&format=JSON&time-standard=UTC",
+        "baixado_em": "2026-11-15T07:13:56-03:00",
+        "arquivo": "dados/bruto/5203500-imerg.json.gz",
+        "ponto_devolvido": [
+          -49.735,
+          -18.218,
+          524.36
+        ],
+        "fontes": [
+          "IMERG"
+        ]
+      }
+    },
+    "5220603": {
+      "power": {
+        "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR,T2M_MAX,T2M_MIN&community=AG&longitude=-48.6074&latitude=-16.6592&start=20140701&end=20251231&format=JSON&time-standard=LST",
+        "baixado_em": "2026-11-15T07:13:59-03:00",
+        "arquivo": "dados/bruto/5220603-power.json.gz",
+        "ponto_devolvido": [
+          -48.607,
+          -16.659,
+          970.61
+        ],
+        "fontes": [
+          "MERRA2",
+          "POWER"
+        ]
+      },
+      "imerg": {
+        "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-48.6074&latitude=-16.6592&start=20140701&end=20251231&format=JSON&time-standard=UTC",
+        "baixado_em": "2026-11-15T07:14:02-03:00",
+        "arquivo": "dados/bruto/5220603-imerg.json.gz",
+        "ponto_devolvido": [
+          -48.607,
+          -16.659,
+          970.61
+        ],
+        "fontes": [
+          "IMERG"
+        ]
+      }
+    },
+    "5209101": {
+      "power": {
+        "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR,T2M_MAX,T2M_MIN&community=AG&longitude=-49.3581&latitude=-18.0129&start=20140701&end=20251231&format=JSON&time-standard=LST",
+        "baixado_em": "2026-11-15T07:14:05-03:00",
+        "arquivo": "dados/bruto/5209101-power.json.gz",
+        "ponto_devolvido": [
+          -49.358,
+          -18.013,
+          658.33
+        ],
+        "fontes": [
+          "MERRA2",
+          "POWER"
+        ]
+      },
+      "imerg": {
+        "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-49.3581&latitude=-18.0129&start=20140701&end=20251231&format=JSON&time-standard=UTC",
+        "baixado_em": "2026-11-15T07:14:08-03:00",
+        "arquivo": "dados/bruto/5209101-imerg.json.gz",
+        "ponto_devolvido": [
+          -49.358,
+          -18.013,
+          658.33
+        ],
+        "fontes": [
+          "IMERG"
+        ]
+      }
+    },
+    "5200134": {
+      "power": {
+        "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR,T2M_MAX,T2M_MIN&community=AG&longitude=-50.3798&latitude=-17.3972&start=20140701&end=20251231&format=JSON&time-standard=LST",
+        "baixado_em": "2026-11-15T07:14:12-03:00",
+        "arquivo": "dados/bruto/5200134-power.json.gz",
+        "ponto_devolvido": [
+          -50.38,
+          -17.397,
+          616.51
+        ],
+        "fontes": [
+          "MERRA2",
+          "POWER"
+        ]
+      },
+      "imerg": {
+        "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-50.3798&latitude=-17.3972&start=20140701&end=20251231&format=JSON&time-standard=UTC",
+        "baixado_em": "2026-11-15T07:14:15-03:00",
+        "arquivo": "dados/bruto/5200134-imerg.json.gz",
+        "ponto_devolvido": [
+          -50.38,
+          -17.397,
+          616.51
+        ],
+        "fontes": [
+          "IMERG"
+        ]
+      }
+    },
+    "5220504": {
+      "power": {
+        "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR,T2M_MAX,T2M_MIN&community=AG&longitude=-51.9608&latitude=-18.3065&start=20140701&end=20251231&format=JSON&time-standard=LST",
+        "baixado_em": "2026-11-15T07:14:18-03:00",
+        "arquivo": "dados/bruto/5220504-power.json.gz",
+        "ponto_devolvido": [
+          -51.961,
+          -18.306,
+          647.31
+        ],
+        "fontes": [
+          "MERRA2",
+          "POWER"
+        ]
+      },
+      "imerg": {
+        "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-51.9608&latitude=-18.3065&start=20140701&end=20251231&format=JSON&time-standard=UTC",
+        "baixado_em": "2026-11-15T07:14:21-03:00",
+        "arquivo": "dados/bruto/5220504-imerg.json.gz",
+        "ponto_devolvido": [
+          -51.961,
+          -18.306,
+          647.31
+        ],
+        "fontes": [
+          "IMERG"
+        ]
+      }
+    },
+    "5200175": {
+      "power": {
+        "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR,T2M_MAX,T2M_MIN&community=AG&longitude=-47.7847&latitude=-14.9861&start=20140701&end=20251231&format=JSON&time-standard=LST",
+        "baixado_em": "2026-11-15T07:14:25-03:00",
+        "arquivo": "dados/bruto/5200175-power.json.gz",
+        "ponto_devolvido": [
+          -47.785,
+          -14.986,
+          799.69
+        ],
+        "fontes": [
+          "MERRA2",
+          "POWER"
+        ]
+      },
+      "imerg": {
+        "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-47.7847&latitude=-14.9861&start=20140701&end=20251231&format=JSON&time-standard=UTC",
+        "baixado_em": "2026-11-15T07:14:28-03:00",
+        "arquivo": "dados/bruto/5200175-imerg.json.gz",
+        "ponto_devolvido": [
+          -47.785,
+          -14.986,
+          799.69
+        ],
+        "fontes": [
+          "IMERG"
+        ]
+      }
+    },
+    "5207253": {
+      "power": {
+        "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR,T2M_MAX,T2M_MIN&community=AG&longitude=-52.3149&latitude=-16.7211&start=20140701&end=20251231&format=JSON&time-standard=LST",
+        "baixado_em": "2026-11-15T07:14:31-03:00",
+        "arquivo": "dados/bruto/5207253-power.json.gz",
+        "ponto_devolvido": [
+          -52.315,
+          -16.721,
+          565.69
+        ],
+        "fontes": [
+          "MERRA2",
+          "POWER"
+        ]
+      },
+      "imerg": {
+        "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-52.3149&latitude=-16.7211&start=20140701&end=20251231&format=JSON&time-standard=UTC",
+        "baixado_em": "2026-11-15T07:14:34-03:00",
+        "arquivo": "dados/bruto/5207253-imerg.json.gz",
+        "ponto_devolvido": [
+          -52.315,
+          -16.721,
+          565.69
+        ],
+        "fontes": [
+          "IMERG"
+        ]
+      }
+    },
+    "5212501": {
+      "power": {
+        "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR,T2M_MAX,T2M_MIN&community=AG&longitude=-47.95&latitude=-16.2536&start=20140701&end=20251231&format=JSON&time-standard=LST",
+        "baixado_em": "2026-11-15T07:14:38-03:00",
+        "arquivo": "dados/bruto/5212501-power.json.gz",
+        "ponto_devolvido": [
+          -47.95,
+          -16.254,
+          908.39
+        ],
+        "fontes": [
+          "MERRA2",
+          "POWER"
+        ]
+      },
+      "imerg": {
+        "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-47.95&latitude=-16.2536&start=20140701&end=20251231&format=JSON&time-standard=UTC",
+        "baixado_em": "2026-11-15T07:14:41-03:00",
+        "arquivo": "dados/bruto/5212501-imerg.json.gz",
+        "ponto_devolvido": [
+          -47.95,
+          -16.254,
+          908.39
+        ],
+        "fontes": [
+          "IMERG"
+        ]
+      }
+    },
+    "5210109": {
+      "power": {
+        "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR,T2M_MAX,T2M_MIN&community=AG&longitude=-48.1604&latitude=-17.7225&start=20140701&end=20251231&format=JSON&time-standard=LST",
+        "baixado_em": "2026-11-15T07:14:44-03:00",
+        "arquivo": "dados/bruto/5210109-power.json.gz",
+        "ponto_devolvido": [
+          -48.16,
+          -17.723,
+          805.76
+        ],
+        "fontes": [
+          "MERRA2",
+          "POWER"
+        ]
+      },
+      "imerg": {
+        "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-48.1604&latitude=-17.7225&start=20140701&end=20251231&format=JSON&time-standard=UTC",
+        "baixado_em": "2026-11-15T07:14:47-03:00",
+        "arquivo": "dados/bruto/5210109-imerg.json.gz",
+        "ponto_devolvido": [
+          -48.16,
+          -17.723,
+          805.76
+        ],
+        "fontes": [
+          "IMERG"
+        ]
+      }
+    },
+    "5211503": {
+      "power": {
+        "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR,T2M_MAX,T2M_MIN&community=AG&longitude=-49.2162&latitude=-18.4194&start=20140701&end=20251231&format=JSON&time-standard=LST",
+        "baixado_em": "2026-11-15T07:14:50-03:00",
+        "arquivo": "dados/bruto/5211503-power.json.gz",
+        "ponto_devolvido": [
+          -49.216,
+          -18.419,
+          558.77
+        ],
+        "fontes": [
+          "MERRA2",
+          "POWER"
+        ]
+      },
+      "imerg": {
+        "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=IMERG_PRECTOT&community=AG&longitude=-49.2162&latitude=-18.4194&start=20140701&end=20251231&format=JSON&time-standard=UTC",
+        "baixado_em": "2026-11-15T07:14:53-03:00",
+        "arquivo": "dados/bruto/5211503-imerg.json.gz",
+        "ponto_devolvido": [
+          -49.216,
+          -18.419,
+          558.77
+        ],
+        "fontes": [
+          "IMERG"
+        ]
+      }
+    }
+  }
+}

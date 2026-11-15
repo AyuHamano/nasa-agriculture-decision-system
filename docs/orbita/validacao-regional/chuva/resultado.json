@@ -1,0 +1,2334 @@
+{
+ "medidas": {
+  "calculado_em": "2026-11-15T07:14:13-03:00",
+  "gerado_com": "IA (Claude)",
+  "GO": {
+   "estacoes_nos_arquivos": 26,
+   "entram_na_conta": [
+    "A002",
+    "A003",
+    "A005",
+    "A012",
+    "A013",
+    "A014",
+    "A016",
+    "A017",
+    "A023",
+    "A025",
+    "A026",
+    "A027",
+    "A028",
+    "A029",
+    "A031",
+    "A032",
+    "A033",
+    "A034",
+    "A035",
+    "A036",
+    "A037",
+    "A056"
+   ],
+   "nao_entram": [
+    [
+     "A011",
+     4
+    ],
+    [
+     "A015",
+     4
+    ],
+    [
+     "A022",
+     1
+    ],
+    [
+     "A024",
+     4
+    ]
+   ],
+   "medidas": {
+    "n_estacoes": 22,
+    "satelite_mais_perto": 16,
+    "modelo_mais_perto": 6,
+    "empates": 0,
+    "mediana_erro_imerg": 19.029308990768158,
+    "mediana_erro_power": 23.74058399861341,
+    "power": {
+     "mediana_ate_2020": 91.74713473709875,
+     "n_ate_2020": 22,
+     "mediana_2021_em_diante": 77.63711574907823,
+     "n_2021_em_diante": 22,
+     "estacoes_com_os_dois": 22,
+     "caiu_em": 17,
+     "mediana_da_diferenca": -16.41163746662813
+    },
+    "imerg": {
+     "mediana_ate_2020": 102.81293889593842,
+     "n_ate_2020": 22,
+     "mediana_2021_em_diante": 98.87519114122043,
+     "n_2021_em_diante": 22,
+     "estacoes_com_os_dois": 22,
+     "caiu_em": 13,
+     "mediana_da_diferenca": -6.022324047210489
+    }
+   },
+   "medidas_sem_a_lista_a_parte": {
+    "n_estacoes": 20,
+    "satelite_mais_perto": 15,
+    "modelo_mais_perto": 5,
+    "empates": 0,
+    "mediana_erro_imerg": 18.536819614905525,
+    "mediana_erro_power": 23.74058399861341,
+    "power": {
+     "mediana_ate_2020": 88.55707765357141,
+     "n_ate_2020": 20,
+     "mediana_2021_em_diante": 76.3000792712067,
+     "n_2021_em_diante": 20,
+     "estacoes_com_os_dois": 20,
+     "caiu_em": 17,
+     "mediana_da_diferenca": -17.303959908817028
+    },
+    "imerg": {
+     "mediana_ate_2020": 102.28145312404862,
+     "n_ate_2020": 20,
+     "mediana_2021_em_diante": 97.63258756541816,
+     "n_2021_em_diante": 20,
+     "estacoes_com_os_dois": 20,
+     "caiu_em": 13,
+     "mediana_da_diferenca": -6.915030705864517
+    }
+   },
+   "na_lista_a_parte_e_na_conta": [
+    "A005",
+    "A032"
+   ]
+  },
+  "DF": {
+   "estacoes_nos_arquivos": 5,
+   "entram_na_conta": [
+    "A001",
+    "A042",
+    "A045",
+    "A046",
+    "A047"
+   ],
+   "nao_entram": [],
+   "medidas": {
+    "n_estacoes": 5,
+    "satelite_mais_perto": 5,
+    "modelo_mais_perto": 0,
+    "empates": 0,
+    "mediana_erro_imerg": 17.53785223461752,
+    "mediana_erro_power": 27.7233693393499,
+    "power": {
+     "mediana_ate_2020": 82.49047730515032,
+     "n_ate_2020": 5,
+     "mediana_2021_em_diante": 64.10555334504991,
+     "n_2021_em_diante": 5,
+     "estacoes_com_os_dois": 5,
+     "caiu_em": 5,
+     "mediana_da_diferenca": -18.38492396010041
+    },
+    "imerg": {
+     "mediana_ate_2020": 93.94473666990795,
+     "n_ate_2020": 5,
+     "mediana_2021_em_diante": 89.64655603376016,
+     "n_2021_em_diante": 5,
+     "estacoes_com_os_dois": 5,
+     "caiu_em": 2,
+     "mediana_da_diferenca": 0.5833648892788119
+    }
+   },
+   "medidas_sem_a_lista_a_parte": {
+    "n_estacoes": 5,
+    "satelite_mais_perto": 5,
+    "modelo_mais_perto": 0,
+    "empates": 0,
+    "mediana_erro_imerg": 17.53785223461752,
+    "mediana_erro_power": 27.7233693393499,
+    "power": {
+     "mediana_ate_2020": 82.49047730515032,
+     "n_ate_2020": 5,
+     "mediana_2021_em_diante": 64.10555334504991,
+     "n_2021_em_diante": 5,
+     "estacoes_com_os_dois": 5,
+     "caiu_em": 5,
+     "mediana_da_diferenca": -18.38492396010041
+    },
+    "imerg": {
+     "mediana_ate_2020": 93.94473666990795,
+     "n_ate_2020": 5,
+     "mediana_2021_em_diante": 89.64655603376016,
+     "n_2021_em_diante": 5,
+     "estacoes_com_os_dois": 5,
+     "caiu_em": 2,
+     "mediana_da_diferenca": 0.5833648892788119
+    }
+   },
+   "na_lista_a_parte_e_na_conta": []
+  },
+  "conferencia_a025": {
+   "dias_comparados": 3653,
+   "dias_diferentes": 0,
+   "exemplos": []
+  }
+ },
+ "estacoes": [
+  {
+   "codigo": "A001",
+   "nome": "BRASILIA",
+   "uf": "DF",
+   "latitude": -15.78944444,
+   "longitude": -47.92583332,
+   "altitude_m": 1160.96,
+   "anos_com_arquivo": "2016-2025 (10)",
+   "versoes_do_cabecalho": 3,
+   "horas_repetidas_ignoradas": 0,
+   "entra_na_conta": true,
+   "na_lista_a_parte": false,
+   "ponto_power_imerg": [
+    -47.926,
+    -15.789,
+    984.96
+   ],
+   "ponto_power_prectotcorr": [
+    -47.926,
+    -15.789,
+    984.96
+   ],
+   "versoes": [
+    {
+     "latitude": -15.78944444,
+     "longitude": -47.92583332,
+     "altitude_m": 1159.54,
+     "nome": "BRASILIA",
+     "codigo_no_cabecalho": "A001",
+     "anos": [
+      2016,
+      2017,
+      2018
+     ]
+    },
+    {
+     "latitude": -15.789343,
+     "longitude": -47.925756,
+     "altitude_m": 1160.96,
+     "nome": "BRASILIA",
+     "codigo_no_cabecalho": "A001",
+     "anos": [
+      2019,
+      2020
+     ]
+    },
+    {
+     "latitude": -15.78944444,
+     "longitude": -47.92583332,
+     "altitude_m": 1160.96,
+     "nome": "BRASILIA",
+     "codigo_no_cabecalho": "A001",
+     "anos": [
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+     ]
+    }
+   ],
+   "janelas_comparaveis": 10,
+   "erro_imerg": 17.125124252944314,
+   "imerg_pct_medio": 94.23641911454736,
+   "imerg_ate_2020": 93.94473666990795,
+   "imerg_2021_em_diante": 94.52810155918677,
+   "erro_power": 24.434193253751666,
+   "power_pct_medio": 82.62624630668789,
+   "power_ate_2020": 90.10635832338731,
+   "power_2021_em_diante": 75.14613428998848,
+   "n_ate_2020": 5,
+   "n_2021_em_diante": 5
+  },
+  {
+   "codigo": "A002",
+   "nome": "GOIANIA",
+   "uf": "GO",
+   "latitude": -16.64277777,
+   "longitude": -49.22027777,
+   "altitude_m": 727.3,
+   "anos_com_arquivo": "2016-2025 (10)",
+   "versoes_do_cabecalho": 3,
+   "horas_repetidas_ignoradas": 0,
+   "entra_na_conta": true,
+   "na_lista_a_parte": false,
+   "ponto_power_imerg": [
+    -49.22,
+    -16.643,
+    807.47
+   ],
+   "ponto_power_prectotcorr": [
+    -49.22,
+    -16.643,
+    807.47
+   ],
+   "versoes": [
+    {
+     "latitude": -16.64277777,
+     "longitude": -49.21999999,
+     "altitude_m": 770.0,
+     "nome": "GOIANIA",
+     "codigo_no_cabecalho": "A002",
+     "anos": [
+      2016,
+      2017,
+      2018
+     ]
+    },
+    {
+     "latitude": -16.642841,
+     "longitude": -49.220222,
+     "altitude_m": 727.3,
+     "nome": "GOIANIA",
+     "codigo_no_cabecalho": "A002",
+     "anos": [
+      2019,
+      2020,
+      2021,
+      2022
+     ]
+    },
+    {
+     "latitude": -16.64277777,
+     "longitude": -49.22027777,
+     "altitude_m": 727.3,
+     "nome": "GOIANIA",
+     "codigo_no_cabecalho": "A002",
+     "anos": [
+      2023,
+      2024,
+      2025
+     ]
+    }
+   ],
+   "janelas_comparaveis": 9,
+   "erro_imerg": 13.275372506720343,
+   "imerg_pct_medio": 101.30724323971111,
+   "imerg_ate_2020": 108.12810979856536,
+   "imerg_2021_em_diante": 92.78116004114332,
+   "erro_power": 22.81501074613407,
+   "power_pct_medio": 77.63061476490435,
+   "power_ate_2020": 86.3464296004618,
+   "power_2021_em_diante": 66.73584622045755,
+   "n_ate_2020": 5,
+   "n_2021_em_diante": 4
+  },
+  {
+   "codigo": "A003",
+   "nome": "MORRINHOS",
+   "uf": "GO",
+   "latitude": -17.74499999,
+   "longitude": -49.10166666,
+   "altitude_m": 751.09,
+   "anos_com_arquivo": "2016-2025 (10)",
+   "versoes_do_cabecalho": 3,
+   "horas_repetidas_ignoradas": 0,
+   "entra_na_conta": true,
+   "na_lista_a_parte": false,
+   "ponto_power_imerg": [
+    -49.102,
+    -17.745,
+    679.38
+   ],
+   "ponto_power_prectotcorr": [
+    -49.102,
+    -17.745,
+    679.38
+   ],
+   "versoes": [
+    {
+     "latitude": -17.71666667,
+     "longitude": -49.1,
+     "altitude_m": 771.42,
+     "nome": "MORRINHOS",
+     "codigo_no_cabecalho": "A003",
+     "anos": [
+      2016,
+      2017,
+      2018
+     ]
+    },
+    {
+     "latitude": -17.745066,
+     "longitude": -49.101698,
+     "altitude_m": 751.09,
+     "nome": "MORRINHOS",
+     "codigo_no_cabecalho": "A003",
+     "anos": [
+      2019,
+      2020,
+      2021,
+      2022,
+      2023
+     ]
+    },
+    {
+     "latitude": -17.74499999,
+     "longitude": -49.10166666,
+     "altitude_m": 751.09,
+     "nome": "MORRINHOS",
+     "codigo_no_cabecalho": "A003",
+     "anos": [
+      2024,
+      2025
+     ]
+    }
+   ],
+   "janelas_comparaveis": 10,
+   "erro_imerg": 19.1324905197333,
+   "imerg_pct_medio": 110.5101792360822,
+   "imerg_ate_2020": 122.7219553177832,
+   "imerg_2021_em_diante": 98.29840315438118,
+   "erro_power": 19.119542949903767,
+   "power_pct_medio": 95.85224815862503,
+   "power_ate_2020": 106.56118076069814,
+   "power_2021_em_diante": 85.14331555655195,
+   "n_ate_2020": 5,
+   "n_2021_em_diante": 5
+  },
+  {
+   "codigo": "A005",
+   "nome": "PORANGATU",
+   "uf": "GO",
+   "latitude": -13.30944444,
+   "longitude": -49.11749999,
+   "altitude_m": 365.0,
+   "anos_com_arquivo": "2018-2025 (8)",
+   "versoes_do_cabecalho": 3,
+   "horas_repetidas_ignoradas": 0,
+   "entra_na_conta": true,
+   "na_lista_a_parte": true,
+   "ponto_power_imerg": [
+    -49.117,
+    -13.309,
+    357.44
+   ],
+   "ponto_power_prectotcorr": [
+    -49.117,
+    -13.309,
+    357.44
+   ],
+   "versoes": [
+    {
+     "latitude": -13.51444444,
+     "longitude": -49.19833333,
+     "altitude_m": 365.5,
+     "nome": "PORANGATU",
+     "codigo_no_cabecalho": "A005",
+     "anos": [
+      2018
+     ]
+    },
+    {
+     "latitude": -13.309528,
+     "longitude": -49.117478,
+     "altitude_m": 365.0,
+     "nome": "PORANGATU",
+     "codigo_no_cabecalho": "A005",
+     "anos": [
+      2019,
+      2020
+     ]
+    },
+    {
+     "latitude": -13.30944444,
+     "longitude": -49.11749999,
+     "altitude_m": 365.0,
+     "nome": "PORANGATU",
+     "codigo_no_cabecalho": "A005",
+     "anos": [
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+     ]
+    }
+   ],
+   "janelas_comparaveis": 6,
+   "erro_imerg": 19.358309130346512,
+   "imerg_pct_medio": 112.39300470248189,
+   "imerg_ate_2020": 108.4563964153248,
+   "imerg_2021_em_diante": 114.36130884606041,
+   "erro_power": 20.25892850212351,
+   "power_pct_medio": 101.56290453788978,
+   "power_ate_2020": 96.95324476107015,
+   "power_2021_em_diante": 103.86773442629958,
+   "n_ate_2020": 2,
+   "n_2021_em_diante": 4
+  },
+  {
+   "codigo": "A011",
+   "nome": "SAO SIMAO",
+   "uf": "GO",
+   "latitude": -18.96916666,
+   "longitude": -50.63333333,
+   "altitude_m": 492.45,
+   "anos_com_arquivo": "2016-2025 (10)",
+   "versoes_do_cabecalho": 3,
+   "horas_repetidas_ignoradas": 0,
+   "entra_na_conta": false,
+   "na_lista_a_parte": false,
+   "ponto_power_imerg": [
+    -50.633,
+    -18.969,
+    446.79
+   ],
+   "ponto_power_prectotcorr": [
+    -50.633,
+    -18.969,
+    446.79
+   ],
+   "versoes": [
+    {
+     "latitude": -18.96666666,
+     "longitude": -50.61666666,
+     "altitude_m": 488.51,
+     "nome": "SAO SIMAO",
+     "codigo_no_cabecalho": "A011",
+     "anos": [
+      2016,
+      2017,
+      2018
+     ]
+    },
+    {
+     "latitude": -18.969142,
+     "longitude": -50.633449,
+     "altitude_m": 492.45,
+     "nome": "SAO SIMAO",
+     "codigo_no_cabecalho": "A011",
+     "anos": [
+      2019,
+      2020,
+      2021,
+      2022,
+      2023
+     ]
+    },
+    {
+     "latitude": -18.96916666,
+     "longitude": -50.63333333,
+     "altitude_m": 492.45,
+     "nome": "SAO SIMAO",
+     "codigo_no_cabecalho": "A011",
+     "anos": [
+      2024,
+      2025
+     ]
+    }
+   ],
+   "janelas_comparaveis": 4,
+   "erro_imerg": 36.13241150440642,
+   "imerg_pct_medio": 134.66193248472575,
+   "imerg_ate_2020": 97.0590419606387,
+   "imerg_2021_em_diante": 147.19622932608812,
+   "erro_power": 25.80556562520627,
+   "power_pct_medio": 84.75834414922981,
+   "power_ate_2020": 76.73412551058298,
+   "power_2021_em_diante": 87.43308369544542,
+   "n_ate_2020": 1,
+   "n_2021_em_diante": 3
+  },
+  {
+   "codigo": "A012",
+   "nome": "LUZIANIA",
+   "uf": "GO",
+   "latitude": -16.26055555,
+   "longitude": -47.96694443,
+   "altitude_m": 1000.82,
+   "anos_com_arquivo": "2016-2025 (10)",
+   "versoes_do_cabecalho": 3,
+   "horas_repetidas_ignoradas": 0,
+   "entra_na_conta": true,
+   "na_lista_a_parte": false,
+   "ponto_power_imerg": [
+    -47.967,
+    -16.261,
+    908.39
+   ],
+   "ponto_power_prectotcorr": [
+    -47.967,
+    -16.261,
+    908.39
+   ],
+   "versoes": [
+    {
+     "latitude": -16.27222222,
+     "longitude": -47.96638889,
+     "altitude_m": 959.5,
+     "nome": "LUZIANIA",
+     "codigo_no_cabecalho": "A012",
+     "anos": [
+      2016,
+      2017
+     ]
+    },
+    {
+     "latitude": -16.27222221,
+     "longitude": -47.96638888,
+     "altitude_m": 959.5,
+     "nome": "LUZIANIA",
+     "codigo_no_cabecalho": "A012",
+     "anos": [
+      2018
+     ]
+    },
+    {
+     "latitude": -16.26055555,
+     "longitude": -47.96694443,
+     "altitude_m": 1000.82,
+     "nome": "LUZIANIA",
+     "codigo_no_cabecalho": "A012",
+     "anos": [
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+     ]
+    }
+   ],
+   "janelas_comparaveis": 6,
+   "erro_imerg": 14.624688020068923,
+   "imerg_pct_medio": 101.18053635905916,
+   "imerg_ate_2020": 103.47851385055338,
+   "imerg_2021_em_diante": 96.58458137607073,
+   "erro_power": 15.364416655127366,
+   "power_pct_medio": 100.35641705161832,
+   "power_ate_2020": 101.27806846533042,
+   "power_2021_em_diante": 98.51311422419411,
+   "n_ate_2020": 4,
+   "n_2021_em_diante": 2
+  },
+  {
+   "codigo": "A013",
+   "nome": "ARAGARCAS",
+   "uf": "GO",
+   "latitude": -15.90277777,
+   "longitude": -52.24527777,
+   "altitude_m": 327.35,
+   "anos_com_arquivo": "2016-2025 (10)",
+   "versoes_do_cabecalho": 3,
+   "horas_repetidas_ignoradas": 0,
+   "entra_na_conta": true,
+   "na_lista_a_parte": false,
+   "ponto_power_imerg": [
+    -52.245,
+    -15.903,
+    426.35
+   ],
+   "ponto_power_prectotcorr": [
+    -52.245,
+    -15.903,
+    426.35
+   ],
+   "versoes": [
+    {
+     "latitude": -15.90583333,
+     "longitude": -52.24388888,
+     "altitude_m": 347.0,
+     "nome": "ARAGARCAS",
+     "codigo_no_cabecalho": "A013",
+     "anos": [
+      2016,
+      2017,
+      2018
+     ]
+    },
+    {
+     "latitude": -15.902658,
+     "longitude": -52.245172,
+     "altitude_m": 327.35,
+     "nome": "ARAGARCAS",
+     "codigo_no_cabecalho": "A013",
+     "anos": [
+      2019,
+      2020
+     ]
+    },
+    {
+     "latitude": -15.90277777,
+     "longitude": -52.24527777,
+     "altitude_m": 327.35,
+     "nome": "ARAGARCAS",
+     "codigo_no_cabecalho": "A013",
+     "anos": [
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+     ]
+    }
+   ],
+   "janelas_comparaveis": 6,
+   "erro_imerg": 11.24185014305826,
+   "imerg_pct_medio": 94.42889488431153,
+   "imerg_ate_2020": 98.71798546349594,
+   "imerg_2021_em_diante": 85.85071372594271,
+   "erro_power": 21.980151656220176,
+   "power_pct_medio": 78.01984834377983,
+   "power_ate_2020": 78.27980556966673,
+   "power_2021_em_diante": 77.49993389200598,
+   "n_ate_2020": 4,
+   "n_2021_em_diante": 2
+  },
+  {
+   "codigo": "A014",
+   "nome": "GOIAS",
+   "uf": "GO",
+   "latitude": -15.93972221,
+   "longitude": -50.14138888,
+   "altitude_m": 512.86,
+   "anos_com_arquivo": "2016-2025 (10)",
+   "versoes_do_cabecalho": 3,
+   "horas_repetidas_ignoradas": 0,
+   "entra_na_conta": true,
+   "na_lista_a_parte": false,
+   "ponto_power_imerg": [
+    -50.141,
+    -15.94,
+    687.49
+   ],
+   "ponto_power_prectotcorr": [
+    -50.141,
+    -15.94,
+    687.49
+   ],
+   "versoes": [
+    {
+     "latitude": -15.93916666,
+     "longitude": -50.14138888,
+     "altitude_m": 512.0,
+     "nome": "GOIAS",
+     "codigo_no_cabecalho": "A014",
+     "anos": [
+      2016,
+      2017,
+      2018
+     ]
+    },
+    {
+     "latitude": -15.939729,
+     "longitude": -50.141433,
+     "altitude_m": 512.86,
+     "nome": "GOIAS",
+     "codigo_no_cabecalho": "A014",
+     "anos": [
+      2019
+     ]
+    },
+    {
+     "latitude": -15.93972221,
+     "longitude": -50.14138888,
+     "altitude_m": 512.86,
+     "nome": "GOIAS",
+     "codigo_no_cabecalho": "A014",
+     "anos": [
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+     ]
+    }
+   ],
+   "janelas_comparaveis": 6,
+   "erro_imerg": 19.4735429565557,
+   "imerg_pct_medio": 102.8623022202098,
+   "imerg_ate_2020": 98.71932086271096,
+   "imerg_2021_em_diante": 104.93379289895921,
+   "erro_power": 20.492126917325695,
+   "power_pct_medio": 86.40712637607685,
+   "power_ate_2020": 94.6459949943975,
+   "power_2021_em_diante": 82.28769206691652,
+   "n_ate_2020": 2,
+   "n_2021_em_diante": 4
+  },
+  {
+   "codigo": "A015",
+   "nome": "ITAPACI",
+   "uf": "GO",
+   "latitude": -14.97972221,
+   "longitude": -49.53944444,
+   "altitude_m": 551.0,
+   "anos_com_arquivo": "2016-2025 (10)",
+   "versoes_do_cabecalho": 4,
+   "horas_repetidas_ignoradas": 0,
+   "entra_na_conta": false,
+   "na_lista_a_parte": false,
+   "ponto_power_imerg": [
+    -49.539,
+    -14.98,
+    625.36
+   ],
+   "ponto_power_prectotcorr": [
+    -49.539,
+    -14.98,
+    625.36
+   ],
+   "versoes": [
+    {
+     "latitude": -14.98027777,
+     "longitude": -49.53944444,
+     "altitude_m": 522.0,
+     "nome": "ITAPACI",
+     "codigo_no_cabecalho": "A015",
+     "anos": [
+      2016,
+      2017,
+      2018
+     ]
+    },
+    {
+     "latitude": -14.979792,
+     "longitude": -49.539977,
+     "altitude_m": 551.16,
+     "nome": "ITAPACI",
+     "codigo_no_cabecalho": "A015",
+     "anos": [
+      2019
+     ]
+    },
+    {
+     "latitude": -14.97972221,
+     "longitude": -49.53999999,
+     "altitude_m": 551.16,
+     "nome": "ITAPACI",
+     "codigo_no_cabecalho": "A015",
+     "anos": [
+      2020,
+      2021,
+      2022
+     ]
+    },
+    {
+     "latitude": -14.97972221,
+     "longitude": -49.53944444,
+     "altitude_m": 551.0,
+     "nome": "ITAPACI",
+     "codigo_no_cabecalho": "A015",
+     "anos": [
+      2023,
+      2024,
+      2025
+     ]
+    }
+   ],
+   "janelas_comparaveis": 4,
+   "erro_imerg": 19.313458423942645,
+   "imerg_pct_medio": 99.33448542704136,
+   "imerg_ate_2020": 99.33448542704136,
+   "imerg_2021_em_diante": null,
+   "erro_power": 19.615417294668195,
+   "power_pct_medio": 93.3959972084652,
+   "power_ate_2020": 93.3959972084652,
+   "power_2021_em_diante": null,
+   "n_ate_2020": 4,
+   "n_2021_em_diante": 0
+  },
+  {
+   "codigo": "A016",
+   "nome": "JATAI",
+   "uf": "GO",
+   "latitude": -17.9236111,
+   "longitude": -51.71749999,
+   "altitude_m": 670.08,
+   "anos_com_arquivo": "2016-2025 (10)",
+   "versoes_do_cabecalho": 3,
+   "horas_repetidas_ignoradas": 0,
+   "entra_na_conta": true,
+   "na_lista_a_parte": false,
+   "ponto_power_imerg": [
+    -51.718,
+    -17.924,
+    729.31
+   ],
+   "ponto_power_prectotcorr": [
+    -51.718,
+    -17.924,
+    729.31
+   ],
+   "versoes": [
+    {
+     "latitude": -17.92388888,
+     "longitude": -51.71777777,
+     "altitude_m": 582.0,
+     "nome": "JATAI",
+     "codigo_no_cabecalho": "A016",
+     "anos": [
+      2016,
+      2017,
+      2018
+     ]
+    },
+    {
+     "latitude": -17.923622,
+     "longitude": -51.717467,
+     "altitude_m": 670.08,
+     "nome": "JATAI",
+     "codigo_no_cabecalho": "A016",
+     "anos": [
+      2019,
+      2020,
+      2021,
+      2022
+     ]
+    },
+    {
+     "latitude": -17.9236111,
+     "longitude": -51.71749999,
+     "altitude_m": 670.08,
+     "nome": "JATAI",
+     "codigo_no_cabecalho": "A016",
+     "anos": [
+      2023,
+      2024,
+      2025
+     ]
+    }
+   ],
+   "janelas_comparaveis": 8,
+   "erro_imerg": 8.71438253855833,
+   "imerg_pct_medio": 104.60702129757694,
+   "imerg_ate_2020": 102.64115404269046,
+   "imerg_2021_em_diante": 106.5728885524634,
+   "erro_power": 25.447157363108104,
+   "power_pct_medio": 80.4835215017096,
+   "power_ate_2020": 80.50755571443563,
+   "power_2021_em_diante": 80.4594872889836,
+   "n_ate_2020": 4,
+   "n_2021_em_diante": 4
+  },
+  {
+   "codigo": "A017",
+   "nome": "POSSE",
+   "uf": "GO",
+   "latitude": -14.08916666,
+   "longitude": -46.36638888,
+   "altitude_m": 830.0,
+   "anos_com_arquivo": "2016-2025 (10)",
+   "versoes_do_cabecalho": 3,
+   "horas_repetidas_ignoradas": 0,
+   "entra_na_conta": true,
+   "na_lista_a_parte": false,
+   "ponto_power_imerg": [
+    -46.366,
+    -14.089,
+    783.65
+   ],
+   "ponto_power_prectotcorr": [
+    -46.366,
+    -14.089,
+    783.65
+   ],
+   "versoes": [
+    {
+     "latitude": -14.08916666,
+     "longitude": -46.36638888,
+     "altitude_m": 834.0,
+     "nome": "POSSE",
+     "codigo_no_cabecalho": "A017",
+     "anos": [
+      2016,
+      2017,
+      2018
+     ]
+    },
+    {
+     "latitude": -14.08921,
+     "longitude": -46.366497,
+     "altitude_m": 830.0,
+     "nome": "POSSE",
+     "codigo_no_cabecalho": "A017",
+     "anos": [
+      2019
+     ]
+    },
+    {
+     "latitude": -14.08916666,
+     "longitude": -46.36638888,
+     "altitude_m": 830.0,
+     "nome": "POSSE",
+     "codigo_no_cabecalho": "A017",
+     "anos": [
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+     ]
+    }
+   ],
+   "janelas_comparaveis": 6,
+   "erro_imerg": 18.92612746180302,
+   "imerg_pct_medio": 81.07387253819698,
+   "imerg_ate_2020": 86.70393103330255,
+   "imerg_2021_em_diante": 69.81375554798583,
+   "erro_power": 23.586776488274733,
+   "power_pct_medio": 76.41322351172526,
+   "power_ate_2020": 86.25076907501443,
+   "power_2021_em_diante": 56.73813238514695,
+   "n_ate_2020": 4,
+   "n_2021_em_diante": 2
+  },
+  {
+   "codigo": "A022",
+   "nome": "GOIANESIA",
+   "uf": "GO",
+   "latitude": -15.22027777,
+   "longitude": -48.98999999,
+   "altitude_m": 667.01,
+   "anos_com_arquivo": "2016-2025 (10)",
+   "versoes_do_cabecalho": 2,
+   "horas_repetidas_ignoradas": 0,
+   "entra_na_conta": false,
+   "na_lista_a_parte": false,
+   "ponto_power_imerg": [
+    -48.99,
+    -15.22,
+    628.01
+   ],
+   "ponto_power_prectotcorr": [
+    -48.99,
+    -15.22,
+    628.01
+   ],
+   "versoes": [
+    {
+     "latitude": -15.22027777,
+     "longitude": -48.99027777,
+     "altitude_m": 667.0,
+     "nome": "GOIANESIA",
+     "codigo_no_cabecalho": "A022",
+     "anos": [
+      2016,
+      2017,
+      2018
+     ]
+    },
+    {
+     "latitude": -15.22027777,
+     "longitude": -48.98999999,
+     "altitude_m": 667.01,
+     "nome": "GOIANESIA",
+     "codigo_no_cabecalho": "A022",
+     "anos": [
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+     ]
+    }
+   ],
+   "janelas_comparaveis": 1,
+   "erro_imerg": 9.025727541121881,
+   "imerg_pct_medio": 90.97427245887812,
+   "imerg_ate_2020": null,
+   "imerg_2021_em_diante": 90.97427245887812,
+   "erro_power": 29.86081822016027,
+   "power_pct_medio": 70.13918177983973,
+   "power_ate_2020": null,
+   "power_2021_em_diante": 70.13918177983973,
+   "n_ate_2020": 0,
+   "n_2021_em_diante": 1
+  },
+  {
+   "codigo": "A023",
+   "nome": "CAIAPONIA",
+   "uf": "GO",
+   "latitude": -16.96694443,
+   "longitude": -51.81749999,
+   "altitude_m": 740.1,
+   "anos_com_arquivo": "2016-2025 (10)",
+   "versoes_do_cabecalho": 3,
+   "horas_repetidas_ignoradas": 0,
+   "entra_na_conta": true,
+   "na_lista_a_parte": false,
+   "ponto_power_imerg": [
+    -51.818,
+    -16.967,
+    751.26
+   ],
+   "ponto_power_prectotcorr": [
+    -51.818,
+    -16.967,
+    751.26
+   ],
+   "versoes": [
+    {
+     "latitude": -16.96666666,
+     "longitude": -51.81749999,
+     "altitude_m": 737.0,
+     "nome": "CAIAPONIA",
+     "codigo_no_cabecalho": "A023",
+     "anos": [
+      2016,
+      2017,
+      2018
+     ]
+    },
+    {
+     "latitude": -16.966841,
+     "longitude": -51.817567,
+     "altitude_m": 740.1,
+     "nome": "CAIAPONIA",
+     "codigo_no_cabecalho": "A023",
+     "anos": [
+      2019
+     ]
+    },
+    {
+     "latitude": -16.96694443,
+     "longitude": -51.81749999,
+     "altitude_m": 740.1,
+     "nome": "CAIAPONIA",
+     "codigo_no_cabecalho": "A023",
+     "anos": [
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+     ]
+    }
+   ],
+   "janelas_comparaveis": 6,
+   "erro_imerg": 12.993749923017504,
+   "imerg_pct_medio": 107.78077744385797,
+   "imerg_ate_2020": 108.94508147699362,
+   "imerg_2021_em_diante": 105.45216937758667,
+   "erro_power": 21.090297347235023,
+   "power_pct_medio": 86.85110406181343,
+   "power_ate_2020": 92.72654376751646,
+   "power_2021_em_diante": 75.1002246504074,
+   "n_ate_2020": 4,
+   "n_2021_em_diante": 2
+  },
+  {
+   "codigo": "A024",
+   "nome": "ALTO PARAISO DE GOIAS",
+   "uf": "GO",
+   "latitude": -14.13305554,
+   "longitude": -47.52333332,
+   "altitude_m": 1264.7,
+   "anos_com_arquivo": "2016-2025 (10)",
+   "versoes_do_cabecalho": 3,
+   "horas_repetidas_ignoradas": 0,
+   "entra_na_conta": false,
+   "na_lista_a_parte": false,
+   "ponto_power_imerg": [
+    -47.523,
+    -14.133,
+    901.99
+   ],
+   "ponto_power_prectotcorr": [
+    -47.523,
+    -14.133,
+    901.99
+   ],
+   "versoes": [
+    {
+     "latitude": -14.13305554,
+     "longitude": -47.52305554,
+     "altitude_m": 1260.0,
+     "nome": "ALTO PARAISO DE GOIAS",
+     "codigo_no_cabecalho": "A024",
+     "anos": [
+      2016,
+      2017,
+      2018
+     ]
+    },
+    {
+     "latitude": -14.133074,
+     "longitude": -47.523258,
+     "altitude_m": 1264.7,
+     "nome": "ALTO PARAISO DE GOIAS",
+     "codigo_no_cabecalho": "A024",
+     "anos": [
+      2019
+     ]
+    },
+    {
+     "latitude": -14.13305554,
+     "longitude": -47.52333332,
+     "altitude_m": 1264.7,
+     "nome": "ALTO PARAISO DE GOIAS",
+     "codigo_no_cabecalho": "A024",
+     "anos": [
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+     ]
+    }
+   ],
+   "janelas_comparaveis": 4,
+   "erro_imerg": 24.44476099052455,
+   "imerg_pct_medio": 95.41539435890294,
+   "imerg_ate_2020": 82.1051387383612,
+   "imerg_2021_em_diante": 108.72564997944468,
+   "erro_power": 34.40605001569144,
+   "power_pct_medio": 98.44465531346216,
+   "power_ate_2020": 75.23770667378871,
+   "power_2021_em_diante": 121.65160395313563,
+   "n_ate_2020": 2,
+   "n_2021_em_diante": 2
+  },
+  {
+   "codigo": "A025",
+   "nome": "RIO VERDE",
+   "uf": "GO",
+   "latitude": -17.78527777,
+   "longitude": -50.965,
+   "altitude_m": 780.11,
+   "anos_com_arquivo": "2016-2025 (10)",
+   "versoes_do_cabecalho": 3,
+   "horas_repetidas_ignoradas": 0,
+   "entra_na_conta": true,
+   "na_lista_a_parte": false,
+   "ponto_power_imerg": [
+    -50.965,
+    -17.785,
+    731.58
+   ],
+   "ponto_power_prectotcorr": [
+    -50.965,
+    -17.785,
+    731.58
+   ],
+   "versoes": [
+    {
+     "latitude": -17.78583333,
+     "longitude": -50.98138888,
+     "altitude_m": 782.0,
+     "nome": "RIO VERDE",
+     "codigo_no_cabecalho": "A025",
+     "anos": [
+      2016,
+      2017,
+      2018
+     ]
+    },
+    {
+     "latitude": -17.785303,
+     "longitude": -50.964869,
+     "altitude_m": 780.11,
+     "nome": "RIO VERDE",
+     "codigo_no_cabecalho": "A025",
+     "anos": [
+      2019,
+      2020
+     ]
+    },
+    {
+     "latitude": -17.78527777,
+     "longitude": -50.965,
+     "altitude_m": 780.11,
+     "nome": "RIO VERDE",
+     "codigo_no_cabecalho": "A025",
+     "anos": [
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+     ]
+    }
+   ],
+   "janelas_comparaveis": 7,
+   "erro_imerg": 12.673396884456254,
+   "imerg_pct_medio": 94.57677915172272,
+   "imerg_ate_2020": 102.98472374918637,
+   "imerg_2021_em_diante": 83.36618635510452,
+   "erro_power": 28.761355827194752,
+   "power_pct_medio": 73.76674632275613,
+   "power_ate_2020": 90.76772570668103,
+   "power_2021_em_diante": 51.09877381085628,
+   "n_ate_2020": 4,
+   "n_2021_em_diante": 3
+  },
+  {
+   "codigo": "A026",
+   "nome": "MINEIROS",
+   "uf": "GO",
+   "latitude": -17.45472222,
+   "longitude": -52.60111111,
+   "altitude_m": 862.0,
+   "anos_com_arquivo": "2016-2025 (10)",
+   "versoes_do_cabecalho": 1,
+   "horas_repetidas_ignoradas": 0,
+   "entra_na_conta": true,
+   "na_lista_a_parte": false,
+   "ponto_power_imerg": [
+    -52.601,
+    -17.455,
+    759.92
+   ],
+   "ponto_power_prectotcorr": [
+    -52.601,
+    -17.455,
+    759.92
+   ],
+   "versoes": [
+    {
+     "latitude": -17.45472222,
+     "longitude": -52.60111111,
+     "altitude_m": 862.0,
+     "nome": "MINEIROS",
+     "codigo_no_cabecalho": "A026",
+     "anos": [
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+     ]
+    }
+   ],
+   "janelas_comparaveis": 5,
+   "erro_imerg": 25.517934984273698,
+   "imerg_pct_medio": 88.33044046698983,
+   "imerg_ate_2020": 70.8081619537275,
+   "imerg_2021_em_diante": 92.71101009530541,
+   "erro_power": 29.87031712159194,
+   "power_pct_medio": 71.89261909982804,
+   "power_ate_2020": 69.53727506426735,
+   "power_2021_em_diante": 72.48145510871821,
+   "n_ate_2020": 1,
+   "n_2021_em_diante": 4
+  },
+  {
+   "codigo": "A027",
+   "nome": "PARAUNA",
+   "uf": "GO",
+   "latitude": -16.9625,
+   "longitude": -50.42555554,
+   "altitude_m": 678.74,
+   "anos_com_arquivo": "2016-2025 (10)",
+   "versoes_do_cabecalho": 3,
+   "horas_repetidas_ignoradas": 0,
+   "entra_na_conta": true,
+   "na_lista_a_parte": false,
+   "ponto_power_imerg": [
+    -50.426,
+    -16.962,
+    670.41
+   ],
+   "ponto_power_prectotcorr": [
+    -50.426,
+    -16.962,
+    670.41
+   ],
+   "versoes": [
+    {
+     "latitude": -16.94583333,
+     "longitude": -50.42527777,
+     "altitude_m": 678.0,
+     "nome": "PARAUNA",
+     "codigo_no_cabecalho": "A027",
+     "anos": [
+      2016,
+      2017,
+      2018
+     ]
+    },
+    {
+     "latitude": -16.962536,
+     "longitude": -50.42545,
+     "altitude_m": 678.74,
+     "nome": "PARAUNA",
+     "codigo_no_cabecalho": "A027",
+     "anos": [
+      2019,
+      2020,
+      2021
+     ]
+    },
+    {
+     "latitude": -16.9625,
+     "longitude": -50.42555554,
+     "altitude_m": 678.74,
+     "nome": "PARAUNA",
+     "codigo_no_cabecalho": "A027",
+     "anos": [
+      2022,
+      2023,
+      2024,
+      2025
+     ]
+    }
+   ],
+   "janelas_comparaveis": 6,
+   "erro_imerg": 18.142791927304106,
+   "imerg_pct_medio": 107.72987259684129,
+   "imerg_ate_2020": 110.04191557592341,
+   "imerg_2021_em_diante": 103.10578663867703,
+   "erro_power": 15.96318522185795,
+   "power_pct_medio": 90.2970194118173,
+   "power_ate_2020": 94.92987882364594,
+   "power_2021_em_diante": 81.03130058816002,
+   "n_ate_2020": 4,
+   "n_2021_em_diante": 2
+  },
+  {
+   "codigo": "A028",
+   "nome": "IPORA",
+   "uf": "GO",
+   "latitude": -16.42305554,
+   "longitude": -51.14888888,
+   "altitude_m": 610.41,
+   "anos_com_arquivo": "2016-2025 (10)",
+   "versoes_do_cabecalho": 3,
+   "horas_repetidas_ignoradas": 0,
+   "entra_na_conta": true,
+   "na_lista_a_parte": false,
+   "ponto_power_imerg": [
+    -51.149,
+    -16.423,
+    558.82
+   ],
+   "ponto_power_prectotcorr": [
+    -51.149,
+    -16.423,
+    558.82
+   ],
+   "versoes": [
+    {
+     "latitude": -16.42305554,
+     "longitude": -51.14805555,
+     "altitude_m": 625.0,
+     "nome": "IPORA",
+     "codigo_no_cabecalho": "A028",
+     "anos": [
+      2016,
+      2017,
+      2018
+     ]
+    },
+    {
+     "latitude": -16.423059,
+     "longitude": -51.148801,
+     "altitude_m": 610.41,
+     "nome": "IPORA",
+     "codigo_no_cabecalho": "A028",
+     "anos": [
+      2019
+     ]
+    },
+    {
+     "latitude": -16.42305554,
+     "longitude": -51.14888888,
+     "altitude_m": 610.41,
+     "nome": "IPORA",
+     "codigo_no_cabecalho": "A028",
+     "anos": [
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+     ]
+    }
+   ],
+   "janelas_comparaveis": 8,
+   "erro_imerg": 19.281163582107865,
+   "imerg_pct_medio": 99.99023384792991,
+   "imerg_ate_2020": 101.92175220540678,
+   "imerg_2021_em_diante": 96.77103658546845,
+   "erro_power": 26.79496605411569,
+   "power_pct_medio": 79.99367816004666,
+   "power_ate_2020": 85.93430599732088,
+   "power_2021_em_diante": 70.09263176458961,
+   "n_ate_2020": 5,
+   "n_2021_em_diante": 3
+  },
+  {
+   "codigo": "A029",
+   "nome": "EDEIA",
+   "uf": "GO",
+   "latitude": -17.33694444,
+   "longitude": -49.91472222,
+   "altitude_m": 608.0,
+   "anos_com_arquivo": "2017-2025 (9)",
+   "versoes_do_cabecalho": 1,
+   "horas_repetidas_ignoradas": 0,
+   "entra_na_conta": true,
+   "na_lista_a_parte": false,
+   "ponto_power_imerg": [
+    -49.915,
+    -17.337,
+    532.96
+   ],
+   "ponto_power_prectotcorr": [
+    -49.915,
+    -17.337,
+    532.96
+   ],
+   "versoes": [
+    {
+     "latitude": -17.33694444,
+     "longitude": -49.91472222,
+     "altitude_m": 608.0,
+     "nome": "EDEIA",
+     "codigo_no_cabecalho": "A029",
+     "anos": [
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+     ]
+    }
+   ],
+   "janelas_comparaveis": 5,
+   "erro_imerg": 51.42473996595898,
+   "imerg_pct_medio": 151.22371563817407,
+   "imerg_ate_2020": 100.46468628107266,
+   "imerg_2021_em_diante": 185.06306854290835,
+   "erro_power": 47.3409439707173,
+   "power_pct_medio": 110.05245704451113,
+   "power_ate_2020": 79.46836166429159,
+   "power_2021_em_diante": 130.4418539646575,
+   "n_ate_2020": 2,
+   "n_2021_em_diante": 3
+  },
+  {
+   "codigo": "A031",
+   "nome": "SAO MIGUEL DO ARAGUAIA",
+   "uf": "GO",
+   "latitude": -12.82055554,
+   "longitude": -50.33583333,
+   "altitude_m": 210.0,
+   "anos_com_arquivo": "2017-2025 (9)",
+   "versoes_do_cabecalho": 3,
+   "horas_repetidas_ignoradas": 0,
+   "entra_na_conta": true,
+   "na_lista_a_parte": false,
+   "ponto_power_imerg": [
+    -50.336,
+    -12.821,
+    220.97
+   ],
+   "ponto_power_prectotcorr": [
+    -50.336,
+    -12.821,
+    220.97
+   ],
+   "versoes": [
+    {
+     "latitude": -12.81972221,
+     "longitude": -50.34166666,
+     "altitude_m": 340.0,
+     "nome": "SAO MIGUEL DO ARAGUAIA",
+     "codigo_no_cabecalho": "A031",
+     "anos": [
+      2017,
+      2018
+     ]
+    },
+    {
+     "latitude": -12.820489,
+     "longitude": -50.335969,
+     "altitude_m": 210.0,
+     "nome": "SAO MIGUEL DO ARAGUAIA",
+     "codigo_no_cabecalho": "A031",
+     "anos": [
+      2019
+     ]
+    },
+    {
+     "latitude": -12.82055554,
+     "longitude": -50.33583333,
+     "altitude_m": 210.0,
+     "nome": "SAO MIGUEL DO ARAGUAIA",
+     "codigo_no_cabecalho": "A031",
+     "anos": [
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+     ]
+    }
+   ],
+   "janelas_comparaveis": 5,
+   "erro_imerg": 8.419818789769744,
+   "imerg_pct_medio": 94.937735475789,
+   "imerg_ate_2020": 84.78810775963751,
+   "imerg_2021_em_diante": 101.70415395322333,
+   "erro_power": 23.894391508952083,
+   "power_pct_medio": 76.10560849104792,
+   "power_ate_2020": 73.60257481839405,
+   "power_2021_em_diante": 77.77429760615048,
+   "n_ate_2020": 2,
+   "n_2021_em_diante": 3
+  },
+  {
+   "codigo": "A032",
+   "nome": "MONTE ALEGRE DE GOIAS",
+   "uf": "GO",
+   "latitude": -13.25361111,
+   "longitude": -46.89027777,
+   "altitude_m": 552.0,
+   "anos_com_arquivo": "2016-2025 (10)",
+   "versoes_do_cabecalho": 3,
+   "horas_repetidas_ignoradas": 0,
+   "entra_na_conta": true,
+   "na_lista_a_parte": true,
+   "ponto_power_imerg": [
+    -46.89,
+    -13.254,
+    551.21
+   ],
+   "ponto_power_prectotcorr": [
+    -46.89,
+    -13.254,
+    551.21
+   ],
+   "versoes": [
+    {
+     "latitude": -13.24805555,
+     "longitude": -46.88972221,
+     "altitude_m": 1253.0,
+     "nome": "MONTE ALEGRE DE GOIAS",
+     "codigo_no_cabecalho": "A032",
+     "anos": [
+      2016,
+      2017,
+      2018
+     ]
+    },
+    {
+     "latitude": -13.253521,
+     "longitude": -46.890326,
+     "altitude_m": 551.33,
+     "nome": "MONTE ALEGRE DE GOIAS",
+     "codigo_no_cabecalho": "A032",
+     "anos": [
+      2019,
+      2020,
+      2021
+     ]
+    },
+    {
+     "latitude": -13.25361111,
+     "longitude": -46.89027777,
+     "altitude_m": 552.0,
+     "nome": "MONTE ALEGRE DE GOIAS",
+     "codigo_no_cabecalho": "A032",
+     "anos": [
+      2022,
+      2023,
+      2024,
+      2025
+     ]
+    }
+   ],
+   "janelas_comparaveis": 6,
+   "erro_imerg": 131.04446548869927,
+   "imerg_pct_medio": 223.54320462525132,
+   "imerg_ate_2020": 143.04758888996707,
+   "imerg_2021_em_diante": 304.03882036053557,
+   "erro_power": 76.18076932996175,
+   "power_pct_medio": 171.2544819118483,
+   "power_ate_2020": 112.99121697823652,
+   "power_2021_em_diante": 229.5177468454601,
+   "n_ate_2020": 3,
+   "n_2021_em_diante": 3
+  },
+  {
+   "codigo": "A033",
+   "nome": "PIRES DO RIO",
+   "uf": "GO",
+   "latitude": -17.30416666,
+   "longitude": -48.28416666,
+   "altitude_m": 757.27,
+   "anos_com_arquivo": "2016-2025 (10)",
+   "versoes_do_cabecalho": 2,
+   "horas_repetidas_ignoradas": 0,
+   "entra_na_conta": true,
+   "na_lista_a_parte": false,
+   "ponto_power_imerg": [
+    -48.284,
+    -17.304,
+    805.76
+   ],
+   "ponto_power_prectotcorr": [
+    -48.284,
+    -17.304,
+    805.76
+   ],
+   "versoes": [
+    {
+     "latitude": -17.30416666,
+     "longitude": -48.28416666,
+     "altitude_m": 752.0,
+     "nome": "PIRES DO RIO",
+     "codigo_no_cabecalho": "A033",
+     "anos": [
+      2016,
+      2017,
+      2018
+     ]
+    },
+    {
+     "latitude": -17.30416666,
+     "longitude": -48.28416666,
+     "altitude_m": 757.27,
+     "nome": "PIRES DO RIO",
+     "codigo_no_cabecalho": "A033",
+     "anos": [
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+     ]
+    }
+   ],
+   "janelas_comparaveis": 7,
+   "erro_imerg": 36.39118794553723,
+   "imerg_pct_medio": 130.767752444875,
+   "imerg_ate_2020": 191.31030293270777,
+   "imerg_2021_em_diante": 106.55073224974186,
+   "erro_power": 34.66815116603076,
+   "power_pct_medio": 98.69931677037154,
+   "power_ate_2020": 149.45742532434758,
+   "power_2021_em_diante": 78.39607334878113,
+   "n_ate_2020": 2,
+   "n_2021_em_diante": 5
+  },
+  {
+   "codigo": "A034",
+   "nome": "CATALAO",
+   "uf": "GO",
+   "latitude": -18.15472222,
+   "longitude": -47.92749999,
+   "altitude_m": 900.72,
+   "anos_com_arquivo": "2016-2025 (10)",
+   "versoes_do_cabecalho": 3,
+   "horas_repetidas_ignoradas": 0,
+   "entra_na_conta": true,
+   "na_lista_a_parte": false,
+   "ponto_power_imerg": [
+    -47.928,
+    -18.155,
+    744.66
+   ],
+   "ponto_power_prectotcorr": [
+    -47.928,
+    -18.155,
+    744.66
+   ],
+   "versoes": [
+    {
+     "latitude": -18.15777777,
+     "longitude": -47.92638888,
+     "altitude_m": 890.0,
+     "nome": "CATALAO",
+     "codigo_no_cabecalho": "A034",
+     "anos": [
+      2016,
+      2017,
+      2018
+     ]
+    },
+    {
+     "latitude": -18.154779,
+     "longitude": -47.927614,
+     "altitude_m": 900.72,
+     "nome": "CATALAO",
+     "codigo_no_cabecalho": "A034",
+     "anos": [
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024
+     ]
+    },
+    {
+     "latitude": -18.15472222,
+     "longitude": -47.92749999,
+     "altitude_m": 900.72,
+     "nome": "CATALAO",
+     "codigo_no_cabecalho": "A034",
+     "anos": [
+      2025
+     ]
+    }
+   ],
+   "janelas_comparaveis": 9,
+   "erro_imerg": 20.011731038087735,
+   "imerg_pct_medio": 89.47607525708781,
+   "imerg_ate_2020": 94.4393407387663,
+   "imerg_2021_em_diante": 85.50546287174501,
+   "erro_power": 31.80712489501573,
+   "power_pct_medio": 70.75302202876756,
+   "power_ate_2020": 83.74373810209394,
+   "power_2021_em_diante": 60.36044917010645,
+   "n_ate_2020": 4,
+   "n_2021_em_diante": 5
+  },
+  {
+   "codigo": "A035",
+   "nome": "ITUMBIARA",
+   "uf": "GO",
+   "latitude": -18.40972222,
+   "longitude": -49.19194444,
+   "altitude_m": 491.17,
+   "anos_com_arquivo": "2016-2025 (10)",
+   "versoes_do_cabecalho": 3,
+   "horas_repetidas_ignoradas": 0,
+   "entra_na_conta": true,
+   "na_lista_a_parte": false,
+   "ponto_power_imerg": [
+    -49.192,
+    -18.41,
+    558.77
+   ],
+   "ponto_power_prectotcorr": [
+    -49.192,
+    -18.41,
+    558.77
+   ],
+   "versoes": [
+    {
+     "latitude": -18.40972222,
+     "longitude": -49.19194444,
+     "altitude_m": 488.0,
+     "nome": "ITUMBIARA",
+     "codigo_no_cabecalho": "A035",
+     "anos": [
+      2016,
+      2017,
+      2018
+     ]
+    },
+    {
+     "latitude": -18.409761,
+     "longitude": -49.192061,
+     "altitude_m": 491.17,
+     "nome": "ITUMBIARA",
+     "codigo_no_cabecalho": "A035",
+     "anos": [
+      2019,
+      2020
+     ]
+    },
+    {
+     "latitude": -18.40972222,
+     "longitude": -49.19194444,
+     "altitude_m": 491.17,
+     "nome": "ITUMBIARA",
+     "codigo_no_cabecalho": "A035",
+     "anos": [
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+     ]
+    }
+   ],
+   "janelas_comparaveis": 8,
+   "erro_imerg": 19.94576312002034,
+   "imerg_pct_medio": 111.8512403976994,
+   "imerg_ate_2020": 117.61693738180284,
+   "imerg_2021_em_diante": 102.24174542419365,
+   "erro_power": 26.555577514616346,
+   "power_pct_medio": 87.29356801040127,
+   "power_ate_2020": 100.5119234454175,
+   "power_2021_em_diante": 65.26297561870757,
+   "n_ate_2020": 5,
+   "n_2021_em_diante": 3
+  },
+  {
+   "codigo": "A036",
+   "nome": "CRISTALINA",
+   "uf": "GO",
+   "latitude": -16.78499999,
+   "longitude": -47.61305555,
+   "altitude_m": 1211.08,
+   "anos_com_arquivo": "2016-2025 (10)",
+   "versoes_do_cabecalho": 3,
+   "horas_repetidas_ignoradas": 0,
+   "entra_na_conta": true,
+   "na_lista_a_parte": false,
+   "ponto_power_imerg": [
+    -47.613,
+    -16.785,
+    900.86
+   ],
+   "ponto_power_prectotcorr": [
+    -47.613,
+    -16.785,
+    900.86
+   ],
+   "versoes": [
+    {
+     "latitude": -16.78805555,
+     "longitude": -47.61166666,
+     "altitude_m": 1202.0,
+     "nome": "CRISTALINA",
+     "codigo_no_cabecalho": "A036",
+     "anos": [
+      2016,
+      2017,
+      2018
+     ]
+    },
+    {
+     "latitude": -16.784896,
+     "longitude": -47.612966,
+     "altitude_m": 1211.08,
+     "nome": "CRISTALINA",
+     "codigo_no_cabecalho": "A036",
+     "anos": [
+      2019,
+      2020
+     ]
+    },
+    {
+     "latitude": -16.78499999,
+     "longitude": -47.61305555,
+     "altitude_m": 1211.08,
+     "nome": "CRISTALINA",
+     "codigo_no_cabecalho": "A036",
+     "anos": [
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+     ]
+    }
+   ],
+   "janelas_comparaveis": 8,
+   "erro_imerg": 18.14751176800803,
+   "imerg_pct_medio": 91.33578932580257,
+   "imerg_ate_2020": 87.95719973541102,
+   "imerg_2021_em_diante": 96.96677197645515,
+   "erro_power": 28.782470022178824,
+   "power_pct_medio": 71.21752997782117,
+   "power_ate_2020": 78.32781122946955,
+   "power_2021_em_diante": 59.367061225073904,
+   "n_ate_2020": 5,
+   "n_2021_em_diante": 3
+  },
+  {
+   "codigo": "A037",
+   "nome": "SILVANIA",
+   "uf": "GO",
+   "latitude": -16.67972221,
+   "longitude": -48.61805554,
+   "altitude_m": 952.0,
+   "anos_com_arquivo": "2016-2025 (10)",
+   "versoes_do_cabecalho": 3,
+   "horas_repetidas_ignoradas": 0,
+   "entra_na_conta": true,
+   "na_lista_a_parte": false,
+   "ponto_power_imerg": [
+    -48.618,
+    -16.68,
+    970.61
+   ],
+   "ponto_power_prectotcorr": [
+    -48.618,
+    -16.68,
+    970.61
+   ],
+   "versoes": [
+    {
+     "latitude": -16.67694443,
+     "longitude": -48.61805554,
+     "altitude_m": 949.0,
+     "nome": "SILVANIA",
+     "codigo_no_cabecalho": "A037",
+     "anos": [
+      2016,
+      2017,
+      2018
+     ]
+    },
+    {
+     "latitude": -16.679786,
+     "longitude": -48.618171,
+     "altitude_m": 952.0,
+     "nome": "SILVANIA",
+     "codigo_no_cabecalho": "A037",
+     "anos": [
+      2019,
+      2020
+     ]
+    },
+    {
+     "latitude": -16.67972221,
+     "longitude": -48.61805554,
+     "altitude_m": 952.0,
+     "nome": "SILVANIA",
+     "codigo_no_cabecalho": "A037",
+     "anos": [
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+     ]
+    }
+   ],
+   "janelas_comparaveis": 7,
+   "erro_imerg": 26.05562523412485,
+   "imerg_pct_medio": 111.9783427103324,
+   "imerg_ate_2020": 119.58490125583091,
+   "imerg_2021_em_diante": 92.9619463465861,
+   "erro_power": 19.940725547553434,
+   "power_pct_medio": 96.8992884572591,
+   "power_ate_2020": 101.75117437169482,
+   "power_2021_em_diante": 84.76957367116982,
+   "n_ate_2020": 5,
+   "n_2021_em_diante": 2
+  },
+  {
+   "codigo": "A042",
+   "nome": "BRAZLANDIA",
+   "uf": "DF",
+   "latitude": -15.59972221,
+   "longitude": -48.1311111,
+   "altitude_m": 1143.0,
+   "anos_com_arquivo": "2017-2025 (9)",
+   "versoes_do_cabecalho": 1,
+   "horas_repetidas_ignoradas": 0,
+   "entra_na_conta": true,
+   "na_lista_a_parte": false,
+   "ponto_power_imerg": [
+    -48.131,
+    -15.6,
+    886.8
+   ],
+   "ponto_power_prectotcorr": [
+    -48.131,
+    -15.6,
+    886.8
+   ],
+   "versoes": [
+    {
+     "latitude": -15.59972221,
+     "longitude": -48.1311111,
+     "altitude_m": 1143.0,
+     "nome": "BRAZLANDIA",
+     "codigo_no_cabecalho": "A042",
+     "anos": [
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+     ]
+    }
+   ],
+   "janelas_comparaveis": 7,
+   "erro_imerg": 26.335317847859642,
+   "imerg_pct_medio": 73.66468215214036,
+   "imerg_ate_2020": 70.95791730297007,
+   "imerg_2021_em_diante": 75.69475578901807,
+   "erro_power": 38.89814262422277,
+   "power_pct_medio": 61.10185737577723,
+   "power_ate_2020": 63.63701981075203,
+   "power_2021_em_diante": 59.20048554954613,
+   "n_ate_2020": 3,
+   "n_2021_em_diante": 4
+  },
+  {
+   "codigo": "A045",
+   "nome": "AGUAS EMENDADAS",
+   "uf": "DF",
+   "latitude": -15.59638888,
+   "longitude": -47.62583332,
+   "altitude_m": 1030.36,
+   "anos_com_arquivo": "2016-2025 (10)",
+   "versoes_do_cabecalho": 3,
+   "horas_repetidas_ignoradas": 0,
+   "entra_na_conta": true,
+   "na_lista_a_parte": false,
+   "ponto_power_imerg": [
+    -47.626,
+    -15.596,
+    947.71
+   ],
+   "ponto_power_prectotcorr": [
+    -47.626,
+    -15.596,
+    947.71
+   ],
+   "versoes": [
+    {
+     "latitude": -15.59638888,
+     "longitude": -47.62583332,
+     "altitude_m": 1200.0,
+     "nome": "AGUAS EMENDADAS",
+     "codigo_no_cabecalho": "A045",
+     "anos": [
+      2016,
+      2017,
+      2018
+     ]
+    },
+    {
+     "latitude": -15.596491,
+     "longitude": -47.625801,
+     "altitude_m": 1030.36,
+     "nome": "AGUAS EMENDADAS",
+     "codigo_no_cabecalho": "A045",
+     "anos": [
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024
+     ]
+    },
+    {
+     "latitude": -15.59638888,
+     "longitude": -47.62583332,
+     "altitude_m": 1030.36,
+     "nome": "AGUAS EMENDADAS",
+     "codigo_no_cabecalho": "A045",
+     "anos": [
+      2025
+     ]
+    }
+   ],
+   "janelas_comparaveis": 10,
+   "erro_imerg": 17.53785223461752,
+   "imerg_pct_medio": 115.16573783746178,
+   "imerg_ate_2020": 119.11031568373232,
+   "imerg_2021_em_diante": 111.22115999119121,
+   "erro_power": 26.61198380997407,
+   "power_pct_medio": 92.91768910518213,
+   "power_ate_2020": 106.82384273395455,
+   "power_2021_em_diante": 79.01153547640972,
+   "n_ate_2020": 5,
+   "n_2021_em_diante": 5
+  },
+  {
+   "codigo": "A046",
+   "nome": "GAMA (PONTE ALTA)",
+   "uf": "DF",
+   "latitude": -15.93527777,
+   "longitude": -48.13749999,
+   "altitude_m": 990.0,
+   "anos_com_arquivo": "2016-2025 (10)",
+   "versoes_do_cabecalho": 1,
+   "horas_repetidas_ignoradas": 0,
+   "entra_na_conta": true,
+   "na_lista_a_parte": false,
+   "ponto_power_imerg": [
+    -48.138,
+    -15.935,
+    984.96
+   ],
+   "ponto_power_prectotcorr": [
+    -48.138,
+    -15.935,
+    984.96
+   ],
+   "versoes": [
+    {
+     "latitude": -15.93527777,
+     "longitude": -48.13749999,
+     "altitude_m": 990.0,
+     "nome": "GAMA (PONTE ALTA)",
+     "codigo_no_cabecalho": "A046",
+     "anos": [
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+     ]
+    }
+   ],
+   "janelas_comparaveis": 9,
+   "erro_imerg": 16.29174696663208,
+   "imerg_pct_medio": 91.60797182796463,
+   "imerg_ate_2020": 95.62261513307536,
+   "imerg_2021_em_diante": 88.39625718387605,
+   "erro_power": 27.7233693393499,
+   "power_pct_medio": 72.2766306606501,
+   "power_ate_2020": 82.49047730515032,
+   "power_2021_em_diante": 64.10555334504991,
+   "n_ate_2020": 4,
+   "n_2021_em_diante": 5
+  },
+  {
+   "codigo": "A047",
+   "nome": "PARANOA (COOPA-DF)",
+   "uf": "DF",
+   "latitude": -16.01222222,
+   "longitude": -47.5575,
+   "altitude_m": 1043.0,
+   "anos_com_arquivo": "2017-2025 (9)",
+   "versoes_do_cabecalho": 3,
+   "horas_repetidas_ignoradas": 0,
+   "entra_na_conta": true,
+   "na_lista_a_parte": false,
+   "ponto_power_imerg": [
+    -47.557,
+    -16.012,
+    945.25
+   ],
+   "ponto_power_prectotcorr": [
+    -47.557,
+    -16.012,
+    945.25
+   ],
+   "versoes": [
+    {
+     "latitude": -16.01111111,
+     "longitude": -47.5575,
+     "altitude_m": 1043.0,
+     "nome": "PARANOA (COOPA-DF)",
+     "codigo_no_cabecalho": "A047",
+     "anos": [
+      2017,
+      2018
+     ]
+    },
+    {
+     "latitude": -16.012222,
+     "longitude": -47.557417,
+     "altitude_m": 1043.0,
+     "nome": "PARANOA (COOPA-DF)",
+     "codigo_no_cabecalho": "A047",
+     "anos": [
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024
+     ]
+    },
+    {
+     "latitude": -16.01222222,
+     "longitude": -47.5575,
+     "altitude_m": 1043.0,
+     "nome": "PARANOA (COOPA-DF)",
+     "codigo_no_cabecalho": "A047",
+     "anos": [
+      2025
+     ]
+    }
+   ],
+   "janelas_comparaveis": 9,
+   "erro_imerg": 18.576796246678164,
+   "imerg_pct_medio": 87.96748036480275,
+   "imerg_ate_2020": 85.86863577860598,
+   "imerg_2021_em_diante": 89.64655603376016,
+   "erro_power": 30.352456382114376,
+   "power_pct_medio": 69.64754361788562,
+   "power_ate_2020": 79.96573504184265,
+   "power_2021_em_diante": 61.39299047872,
+   "n_ate_2020": 4,
+   "n_2021_em_diante": 5
+  },
+  {
+   "codigo": "A056",
+   "nome": "CRISTALINA (FAZENDA SANTA MONICA)",
+   "uf": "GO",
+   "latitude": -16.39944444,
+   "longitude": -47.62583332,
+   "altitude_m": 932.0,
+   "anos_com_arquivo": "2018-2025 (8)",
+   "versoes_do_cabecalho": 1,
+   "horas_repetidas_ignoradas": 0,
+   "entra_na_conta": true,
+   "na_lista_a_parte": false,
+   "ponto_power_imerg": [
+    -47.626,
+    -16.399,
+    916.35
+   ],
+   "ponto_power_prectotcorr": [
+    -47.626,
+    -16.399,
+    916.35
+   ],
+   "versoes": [
+    {
+     "latitude": -16.39944444,
+     "longitude": -47.62583332,
+     "altitude_m": 932.0,
+     "nome": "CRISTALINA (FAZENDA SANTA MONICA)",
+     "codigo_no_cabecalho": "A056",
+     "anos": [
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+     ]
+    }
+   ],
+   "janelas_comparaveis": 8,
+   "erro_imerg": 18.13663622444765,
+   "imerg_pct_medio": 98.84322502416197,
+   "imerg_ate_2020": 97.82863485099914,
+   "imerg_2021_em_diante": 99.45197912805966,
+   "erro_power": 21.473468880134504,
+   "power_pct_medio": 79.94876372145353,
+   "power_ate_2020": 93.7990551080109,
+   "power_2021_em_diante": 71.63858888951913,
+   "n_ate_2020": 3,
+   "n_2021_em_diante": 5
+  }
+ ]
+}
