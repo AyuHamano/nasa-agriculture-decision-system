@@ -233,3 +233,109 @@ class ALeituraDoProdutor(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ORiscoCurto(unittest.TestCase):
+    """A frase de risco que a tela do produtor mostra (`risco_curto`): o risco do caminho com um número só (o mesmo
+    da tabela do Ensaiar; no milho com capim, o do meio) e a comparação com outro caminho em palavras simples, sem
+    "ficou atrás de" e sem o nome comprido da rotação. A faixa do capim fica na prova (`risco`, `risco_detalhe`)."""
+    FICHAS = [dict(cidade_id=cidade, rotacao_atual=rotacao, **extra)
+              for cidade in motor.CIDADES
+              for rotacao, extra in ((["soja", "milho", "pousio"], {}),
+                                     (["soja", "milho", "pousio"], {"plantio_da_soja": "2026-11-10"}),
+                                     (["soja", "sorgo"], {"plantio_da_soja": "2026-10-28"}))]
+    COMECOS = {"agua": "Num ano ruim, faltam ", "calor": "Num ano ruim, ", "terra_coberta": "A terra fica "}
+    NOMES = {"soja_milho_pousio": ("milho", "milho sem capim"), "soja_milho_braquiaria": ("capim",),
+             "soja_sorgo_pousio": ("sorgo",)}
+
+    @staticmethod
+    def da_tabela(item, perna, resposta):
+        """O número que a tabela do Ensaiar mostra: na água em faixa, o do meio da disputa do capim com o milho."""
+        valor = explicacao._valor_da_perna(item, perna)
+        if isinstance(valor, dict):
+            valor = resposta["comparacao"]["agua"]["pela_faixa"]["por_cenario"]["meio"]["falta_mm"]
+        return explicacao.n(valor)
+
+    def test_as_tres_frases_de_rio_verde(self):
+        curtas = {ident: item["risco_curto"] for ident, item in por_id(RESPOSTA).items()}
+        hoje, capim, sorgo = (por_id(RESPOSTA)[i] for i in ("soja_milho_pousio", "soja_milho_braquiaria",
+                                                              "soja_sorgo_pousio"))
+        do_meio = RESPOSTA["comparacao"]["agua"]["pela_faixa"]["por_cenario"]["meio"]["falta_mm"]
+        do_sorgo = explicacao.n(sorgo["agua"]["falta_no_pior_ano_mm"])
+        self.assertEqual(curtas["soja_milho_pousio"], f"Num ano ruim, faltam "
+                         f"{explicacao.n(hoje['agua']['falta_no_pior_ano_mm'])} mm de água. Com sorgo faltariam "
+                         f"{do_sorgo} mm.")
+        self.assertEqual(curtas["soja_milho_braquiaria"], f"Num ano ruim, faltam {explicacao.n(do_meio)} mm de água. "
+                         f"Com sorgo faltariam {do_sorgo} mm.")
+        self.assertEqual(curtas["soja_sorgo_pousio"], f"A terra fica {sorgo['terra_coberta']['dias_sem_planta_viva']} "
+                         f"dias seguidos sem planta viva. Com capim seriam "
+                         f"{capim['terra_coberta']['dias_sem_planta_viva']}.")
+        faixa = capim["agua"]["falta_no_pior_ano_mm"]
+        self.assertTrue(faixa["de"] <= do_meio <= faixa["ate"])              # o do meio é da conta, dentro da faixa
+
+    def test_nas_tres_cidades_um_numero_so_da_conta_e_palavras_simples(self):
+        for ficha in self.FICHAS:
+            resposta = motor.responder(ficha)
+            itens = por_id(resposta)
+            for item in resposta["comparacao_das_rotacoes"]:
+                frase, onde = item["risco_curto"], (ficha, item["id"])
+                self.assertEqual(conferencia.conferir_texto(frase, resposta), [], onde)
+                self.assertLessEqual(len(frase), 90, onde)                      # cabe em duas linhas no celular
+                self.assertTrue(frase.endswith("."), onde)
+                self.assertNotIn("ficou atrás", frase, onde)
+                self.assertNotRegex(frase, r"\d a \d", onde)                    # sem faixa: um número só
+                for outro in resposta["comparacao_das_rotacoes"]:
+                    self.assertNotIn(outro["apelido"], frase, onde)
+                    self.assertNotIn(outro["nome"], frase, onde)
+                perdas = [(perna, ident) for ident, contra in item["contra_as_outras"].items()
+                          for perna in ("agua", "calor", "terra_coberta") if contra[perna] == "pior"]
+                if not perdas:
+                    self.assertNotRegex(frase, r"\d", onde)
+                    continue
+                perna = next(p for p in self.COMECOS if frase.startswith(self.COMECOS[p]) and (
+                    p != "calor" or "calor forte" in frase))
+                self.assertEqual(perna, next(p for p in ("agua", "calor", "terra_coberta")
+                                             if any(p == de for de, _ in perdas)), onde)      # a 1ª perna em que perde
+                meu = self.da_tabela(item, perna, resposta)
+                self.assertIn(f"{meu} ", frase.split(". ")[0], onde)
+                # a comparação é com o melhor dos caminhos de que este ficou atrás nessa perna
+                melhor = min((ident for de, ident in perdas if de == perna),
+                             key=lambda ident: float(self.da_tabela(itens[ident], perna, resposta).replace(",", ".")))
+                segunda = frase.split(". ")[1]
+                self.assertTrue(any(segunda.startswith(f"Com {nome} ") for nome in self.NOMES[melhor]), onde)
+                do_outro = self.da_tabela(itens[melhor], perna, resposta)
+                self.assertTrue(f" {do_outro}" in segunda or (do_outro == "0" and "nenhum" in segunda), onde)
+
+    def test_segue_a_preocupacao_do_produtor(self):
+        for preocupacao, pedaco in (("calor", "de calor forte"), ("terra", "sem planta viva"), ("agua", "mm de água")):
+            resposta = motor.responder(dict(ENTRADA, preocupacao=preocupacao))
+            hoje = resposta["comparacao_das_rotacoes"][0]
+            self.assertIn(pedaco, hoje["risco_curto"], preocupacao)
+            self.assertEqual(conferencia.conferir_texto(hoje["risco_curto"], resposta), [], preocupacao)
+        calor = por_id(motor.responder(dict(ENTRADA, preocupacao="calor")))["soja_milho_pousio"]
+        dias = calor["calor"]["dias_de_calor_forte_no_pior_ano"]
+        self.assertEqual(calor["risco_curto"], f"Num ano ruim, são {dias} dias de calor forte na fase crítica. "
+                                               "Com sorgo não teria nenhum.")
+
+    def test_a_frase_de_cada_perna_e_a_de_quem_nao_perde(self):
+        curta = explicacao.frase_curta_do_risco
+        self.assertEqual(curta("agua", 225.9, "sorgo", 191.3), "Num ano ruim, faltam 225,9 mm de água. Com sorgo "
+                                                               "faltariam 191,3 mm.")
+        self.assertEqual(curta("calor", 2, "sorgo", 1), "Num ano ruim, são 2 dias de calor forte na fase crítica. "
+                                                        "Com sorgo seria 1.")
+        self.assertEqual(curta("calor", 1, "sorgo", 0), "Num ano ruim, é 1 dia de calor forte na fase crítica. "
+                                                        "Com sorgo não teria nenhum.")
+        self.assertEqual(curta("terra_coberta", 122, "capim", 30), "A terra fica 122 dias seguidos sem planta viva. "
+                                                                   "Com capim seriam 30.")
+        self.assertEqual(curta("terra_coberta", 1, "capim", 0), "A terra fica 1 dia sem planta viva. Com capim não "
+                                                                "teria nenhum.")
+        # quem não fica atrás de ninguém: o risco próprio do capim, ou a frase de que a conta não achou risco
+        sem_perda = dict(por_id(RESPOSTA)["soja_milho_braquiaria"])
+        sem_perda["contra_as_outras"] = {ident: dict.fromkeys(("agua", "calor", "terra_coberta"), "melhor")
+                                         for ident in rotacoes.CARDAPIO}
+        frases = explicacao.frases_da_rotacao(sem_perda, RESPOSTA["comparacao_das_rotacoes"], RESPOSTA)
+        self.assertEqual(frases["risco_curto"], explicacao.RISCOS_PROPRIOS_CURTOS["soja_milho_braquiaria"])
+        self.assertNotRegex(frases["risco_curto"], r"\d")
+        sem_perda["id"] = "soja_sorgo_pousio"
+        frases = explicacao.frases_da_rotacao(sem_perda, RESPOSTA["comparacao_das_rotacoes"], RESPOSTA)
+        self.assertEqual(frases["risco_curto"], explicacao.SEM_RISCO_CURTO)

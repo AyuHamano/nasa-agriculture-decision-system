@@ -179,7 +179,7 @@
           lista.map(function (c) { return "<td" + (melhor(c, m.k) ? ' class="m"' : "") + ">" + esc(m.v(c)) + "</td>"; }).join("") + "</tr>";
       }).join("") + '</tbody></table></div><p class="o-legenda">Em destaque, o melhor número de cada linha. Todas começam com soja.</p>';
     var riscos = '<h2 class="o-sub">O risco de cada caminho</h2><ul class="o-riscos">' + lista.map(function (c) {
-      return "<li><b>" + esc(curto(c)) + (c.de_hoje ? " (a sua)" : "") + "</b>" + esc(c.risco) + "</li>";
+      return "<li><b>" + esc(curto(c)) + (c.de_hoje ? " (a sua)" : "") + "</b>" + esc(c.risco_curto || c.risco) + "</li>";
     }).join("") + "</ul>";
     var prova = '<details class="o-prova"><summary class="o-bt claro">Ver a prova</summary><div class="o-prova-dentro">' +
       lista.map(function (c) {

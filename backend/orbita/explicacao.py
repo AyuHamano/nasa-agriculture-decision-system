@@ -247,6 +247,48 @@ def _valor_da_perna(item, perna):
             "terra_coberta": item["terra_coberta"]["dias_sem_planta_viva"]}[perna]
 
 
+# A frase de risco que a tela do produtor mostra (`risco_curto`): o nome de cada caminho em palavras simples.
+NOMES_SIMPLES = {"soja_milho_pousio": "milho", "soja_milho_braquiaria": "capim", "soja_sorgo_pousio": "sorgo"}
+RISCOS_PROPRIOS_CURTOS = {
+    "soja_milho_braquiaria": "O capim também bebe água: a terra pode chegar mais seca ao plantio da soja.",
+}
+SEM_RISCO_CURTO = "Na conta, este caminho não ficou atrás dos outros em água, calor nem terra coberta."
+
+
+def _um_numero(item, perna, r):
+    """O número só que a tabela da tela mostra. Na água em faixa (o milho com capim), é o do meio da disputa do
+    capim com o milho, que a conta também dá; sem ele, fica a faixa."""
+    valor = _valor_da_perna(item, perna)
+    if perna == "agua" and isinstance(valor, dict):
+        cenarios = ((r.get("comparacao") or {}).get("agua") or {}).get("pela_faixa") or {}
+        meio = ((cenarios.get("por_cenario") or {}).get("meio") or {}).get("falta_mm")
+        if isinstance(meio, (int, float)) and not isinstance(meio, bool) and valor["de"] <= meio <= valor["ate"]:
+            return meio
+    return valor
+
+
+def _nome_simples(item, outro):
+    """O outro caminho em uma palavra: "sorgo", "capim", "milho" (para quem planta com capim, "milho sem capim")."""
+    nome = NOMES_SIMPLES.get(outro["id"], outro["apelido"])
+    return "milho sem capim" if (item["id"], outro["id"]) == ("soja_milho_braquiaria", "soja_milho_pousio") else nome
+
+
+def frase_curta_do_risco(perna, meu, com_quem, do_outro):
+    """O risco de um caminho em duas frases curtas, para o produtor: o número dele e o do outro caminho.
+
+    `meu` e `do_outro` são números da conta (ou a faixa, se a conta não deu o do meio); `com_quem` é o outro caminho
+    em uma palavra. A água e o calor são os do ano ruim; os dias de terra sem planta vêm do calendário.
+    """
+    if perna == "agua":
+        return f"Num ano ruim, faltam {_mm(meu)} mm de água. Com {com_quem} faltariam {_mm(do_outro)} mm."
+    seria = "não teria nenhum" if do_outro == 0 else ("seria 1" if do_outro == 1 else f"seriam {_dias(do_outro)}")
+    if perna == "calor":
+        tem = "é 1 dia" if meu == 1 else f"são {_dias(meu)} dias"
+        return f"Num ano ruim, {tem} de calor forte na fase crítica. Com {com_quem} {seria}."
+    fica = "1 dia" if meu == 1 else f"{_dias(meu)} dias seguidos"
+    return f"A terra fica {fica} sem planta viva. Com {com_quem} {seria}."
+
+
 def _frase_do_calor(item):
     """Os dias de calor forte da rotação no pior ano, cultura por cultura, cada uma com o seu limite."""
     partes = [f"{NOMES_DAS_CULTURAS[c]}, {d['dias']} dias acima de {_grau(d['limite_c'])} °C"
@@ -292,6 +334,7 @@ def frases_da_rotacao(item, itens, r):
                       "entre os pontos medidos).")
     outras = {o["id"]: o for o in itens if o["id"] != item["id"]}
     frente, atras, depende = [], [], []       # atras e depende guardam (a perna, a frase)
+    curtas = []                               # o mesmo de atras, na frase curta do produtor
     for perna, rotulo, unidade, curta in PERNAS:
         rotulo = rotulo.replace("do pior ano", do_pior_ano)
         ganhou = [o for i, o in outras.items() if item["contra_as_outras"][i][perna] == "melhor"]
@@ -304,6 +347,10 @@ def frases_da_rotacao(item, itens, r):
         if perdeu:
             atras.append((perna, f"{rotulo}, ficou atrás de " + _e(
                 f"{o['apelido']} ({_mm(_valor_da_perna(o, perna))} {curta})" for o in perdeu) + f": {meu} {unidade}."))
+            # na frase curta, um número só de cada lado, e a comparação com o melhor dos que ficaram na frente
+            melhor = min(perdeu, key=lambda o: _pontas(_um_numero(o, perna, r)))
+            curtas.append((perna, frase_curta_do_risco(perna, _um_numero(item, perna, r), _nome_simples(item, melhor),
+                                                       _um_numero(melhor, perna, r))))
         if aberto:
             depende.append((perna, f"{rotulo}, a comparação com " + _e(o["apelido"] for o in aberto)
                             + " depende de quanto o capim disputa água com o milho: isso não foi medido, e "
@@ -316,9 +363,13 @@ def frases_da_rotacao(item, itens, r):
     riscos = atras + ([(None, RISCOS_PROPRIOS[item["id"]])] if item["id"] in RISCOS_PROPRIOS else [])
     riscos = riscos or [(None, frase) for frase in SEM_RISCO_NA_CONTA]
     faltas = depende + [(None, frase) for frase in FALTA_SABER.get(item["id"], FALTA_SABER_DE_COSTUME)]
+    # A frase que a tela mostra em "O risco de cada caminho": a mesma escolha de `risco` (a perna que preocupa ou
+    # a primeira), dita curto, com um número só de cada lado e sem o nome comprido das rotações.
+    curtas = curtas or [(None, RISCOS_PROPRIOS_CURTOS.get(item["id"], SEM_RISCO_CURTO))]
     preocupacao = r.get("preocupacao")
     return {"evidencia": evidencia, "beneficio": beneficio,
             "risco": frase_principal(riscos, preocupacao), "falta_saber": frase_principal(faltas, preocupacao),
+            "risco_curto": frase_principal(curtas, preocupacao),
             "risco_detalhe": " ".join(texto for _, texto in riscos),
             "falta_saber_detalhe": " ".join(texto for _, texto in faltas)}
 
