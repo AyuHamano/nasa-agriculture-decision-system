@@ -46,6 +46,39 @@ def ler_chuva_recente(cidade_id, pasta=None):
     return valores, fonte
 
 
+def conferencia_em_mm(cidade_id, chuva_recente, pasta=None):
+    """Confere a chuva lida da cor contra a mesma chuva do satélite em mm, somada de 5 em 5 dias. Sem arquivo: None.
+
+    O arquivo `chuva-5-dias.csv` (inicio,fim,chuva_mm) é o GPM IMERG Late V07 somado por pêntada, baixado por
+    data/orbita/recente/baixar_imerg_5_dias.py. Só entram os períodos em que há o valor em mm e todos os dias da
+    leitura da cor: período com buraco fica de fora, nunca vira zero. Serve de conferência; a conta não usa.
+    """
+    arquivo = (pasta or PASTA_DA_CHUVA_RECENTE) / cidade_id / "chuva-5-dias.csv"
+    if not arquivo.exists():
+        return None
+    pares = []
+    with open(arquivo, encoding="utf-8", newline="") as f:
+        for linha in csv.DictReader(f):
+            texto = (linha.get("chuva_mm") or "").strip()
+            if not texto:
+                continue
+            comeco = datetime.date.fromisoformat(linha["inicio"].strip())
+            fim = datetime.date.fromisoformat(linha["fim"].strip())
+            dias = [chuva_recente.get(comeco + datetime.timedelta(days=n)) for n in range((fim - comeco).days + 1)]
+            if all(valor is not None for valor in dias):
+                pares.append((comeco, fim, float(texto), sum(dias)))
+    if not pares:
+        return None
+    em_mm, da_cor = sum(par[2] for par in pares), sum(par[3] for par in pares)
+    return {"periodos_de_5_dias": len(pares), "de": pares[0][0].isoformat(), "ate": pares[-1][1].isoformat(),
+            "satelite_em_mm": round(em_mm, 1) + 0.0, "satelite_lido_da_cor_mm": round(da_cor, 1) + 0.0,
+            "diferenca_pct": round(100.0 * (da_cor - em_mm) / em_mm, 1) + 0.0 if em_mm else None,
+            "o_que_e": "A soma da chuva lida da cor (a que a conta usa) ao lado da mesma chuva do satélite em mm "
+                       "(GPM IMERG Late V07, somado de 5 em 5 dias), nos períodos em que as duas existem.",
+            "origem": f"data/orbita/recente/{cidade_id}/chuva-5-dias.csv (o endereço e a hora de cada consulta "
+                      "estão em fonte-5-dias.json, na mesma pasta)"}
+
+
 def esticar(dias_guardados, dias_da_temperatura, chuva_recente):
     """Estica a série guardada com os dias recentes. Devolve (a série com a chuva recente, a com a chuva de modelo).
 
@@ -168,5 +201,6 @@ def como_esta_hoje(entrada, par=None, hoje=None, pasta_da_chuva_recente=None):
             "satelite_rapido_mm": soma(com_recente), "modelo_da_nasa_power_mm": soma(com_modelo),
             "fonte": fonte, "origem": f"data/orbita/recente/{entrada['cidade_id']}/chuva-recente.csv (o endereço e "
                                       "a hora de cada consulta estão em fonte.json, na mesma pasta)",
-            "chuva_guardada_ate": guardados[-1].data.isoformat()},
+            "chuva_guardada_ate": guardados[-1].data.isoformat(),
+            "conferencia_em_mm": conferencia_em_mm(entrada["cidade_id"], recente, pasta_da_chuva_recente)},
         "frase": frase, "aviso": AVISO}

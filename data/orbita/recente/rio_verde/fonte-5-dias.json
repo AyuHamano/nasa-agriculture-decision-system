@@ -1,0 +1,518 @@
+{
+ "gerado_com": "IA (Claude)",
+ "o_que_e": "A chuva do satélite GPM IMERG Late V07, somada de 5 em 5 dias (pêntada), em mm.",
+ "de_quem": "NASA (GPM IMERG Late Run V07); a soma por pêntada e o arquivo são do Climate Hazards Center da UC Santa Barbara (dados do Early Warning eXplorer). Não é um servidor da NASA.",
+ "ponto": {
+  "lat": -17.79,
+  "lon": -50.92
+ },
+ "grade": {
+  "largura": 3600,
+  "altura": 1800,
+  "pixel_graus": [
+   0.10000000149011612,
+   0.10000000149011612
+  ],
+  "canto": [
+   -180.0,
+   90.0
+  ],
+  "sem_dado": null
+ },
+ "ultima_pentada_com_dado": "2026-11-10",
+ "consultas": [
+  {
+   "inicio": "2026-02-11",
+   "fim": "2026-02-15",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260211_20260215.tif",
+   "consultado_em_utc": "2026-11-15T05:06:26+00:00",
+   "http": 200,
+   "bytes": 12548332,
+   "chuva_mm": 39.64
+  },
+  {
+   "inicio": "2026-02-16",
+   "fim": "2026-02-20",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260216_20260220.tif",
+   "consultado_em_utc": "2026-11-15T05:06:29+00:00",
+   "http": 200,
+   "bytes": 11888922,
+   "chuva_mm": 11.86
+  },
+  {
+   "inicio": "2026-02-21",
+   "fim": "2026-02-25",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260221_20260225.tif",
+   "consultado_em_utc": "2026-11-15T05:06:32+00:00",
+   "http": 200,
+   "bytes": 12457486,
+   "chuva_mm": 53.83
+  },
+  {
+   "inicio": "2026-02-26",
+   "fim": "2026-02-28",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260226_20260228.tif",
+   "consultado_em_utc": "2026-11-15T05:06:35+00:00",
+   "http": 200,
+   "bytes": 10275324,
+   "chuva_mm": 0.79
+  },
+  {
+   "inicio": "2026-03-01",
+   "fim": "2026-03-05",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260301_20260305.tif",
+   "consultado_em_utc": "2026-11-15T05:06:38+00:00",
+   "http": 200,
+   "bytes": 12326326,
+   "chuva_mm": 0.58
+  },
+  {
+   "inicio": "2026-03-06",
+   "fim": "2026-03-10",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260306_20260310.tif",
+   "consultado_em_utc": "2026-11-15T05:06:41+00:00",
+   "http": 200,
+   "bytes": 13351830,
+   "chuva_mm": 46.23
+  },
+  {
+   "inicio": "2026-03-11",
+   "fim": "2026-03-15",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260311_20260315.tif",
+   "consultado_em_utc": "2026-11-15T05:06:44+00:00",
+   "http": 200,
+   "bytes": 13011130,
+   "chuva_mm": 49.41
+  },
+  {
+   "inicio": "2026-03-16",
+   "fim": "2026-03-20",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260316_20260320.tif",
+   "consultado_em_utc": "2026-11-15T05:06:47+00:00",
+   "http": 200,
+   "bytes": 13777024,
+   "chuva_mm": 96.72
+  },
+  {
+   "inicio": "2026-03-21",
+   "fim": "2026-03-25",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260321_20260325.tif",
+   "consultado_em_utc": "2026-11-15T05:06:51+00:00",
+   "http": 200,
+   "bytes": 14297086,
+   "chuva_mm": 41.39
+  },
+  {
+   "inicio": "2026-03-26",
+   "fim": "2026-03-31",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260326_20260331.tif",
+   "consultado_em_utc": "2026-11-15T05:06:54+00:00",
+   "http": 200,
+   "bytes": 15011116,
+   "chuva_mm": 19.27
+  },
+  {
+   "inicio": "2026-04-01",
+   "fim": "2026-04-05",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260401_20260405.tif",
+   "consultado_em_utc": "2026-11-15T05:06:57+00:00",
+   "http": 200,
+   "bytes": 13436336,
+   "chuva_mm": 45.42
+  },
+  {
+   "inicio": "2026-04-06",
+   "fim": "2026-04-10",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260406_20260410.tif",
+   "consultado_em_utc": "2026-11-15T05:07:01+00:00",
+   "http": 200,
+   "bytes": 13680570,
+   "chuva_mm": 44.42
+  },
+  {
+   "inicio": "2026-04-11",
+   "fim": "2026-04-15",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260411_20260415.tif",
+   "consultado_em_utc": "2026-11-15T05:07:04+00:00",
+   "http": 200,
+   "bytes": 12904622,
+   "chuva_mm": 1.07
+  },
+  {
+   "inicio": "2026-04-16",
+   "fim": "2026-04-20",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260416_20260420.tif",
+   "consultado_em_utc": "2026-11-15T05:07:07+00:00",
+   "http": 200,
+   "bytes": 13634194,
+   "chuva_mm": 0.0
+  },
+  {
+   "inicio": "2026-04-21",
+   "fim": "2026-04-25",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260421_20260425.tif",
+   "consultado_em_utc": "2026-11-15T05:07:10+00:00",
+   "http": 200,
+   "bytes": 13403738,
+   "chuva_mm": 0.0
+  },
+  {
+   "inicio": "2026-04-26",
+   "fim": "2026-04-30",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260426_20260430.tif",
+   "consultado_em_utc": "2026-11-15T05:07:13+00:00",
+   "http": 200,
+   "bytes": 14004000,
+   "chuva_mm": 0.0
+  },
+  {
+   "inicio": "2026-05-01",
+   "fim": "2026-05-05",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260501_20260505.tif",
+   "consultado_em_utc": "2026-11-15T05:07:17+00:00",
+   "http": 200,
+   "bytes": 13903454,
+   "chuva_mm": 0.0
+  },
+  {
+   "inicio": "2026-05-06",
+   "fim": "2026-05-10",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260506_20260510.tif",
+   "consultado_em_utc": "2026-11-15T05:07:20+00:00",
+   "http": 200,
+   "bytes": 13959810,
+   "chuva_mm": 0.0
+  },
+  {
+   "inicio": "2026-05-11",
+   "fim": "2026-05-15",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260511_20260515.tif",
+   "consultado_em_utc": "2026-11-15T05:07:23+00:00",
+   "http": 200,
+   "bytes": 13782170,
+   "chuva_mm": 0.0
+  },
+  {
+   "inicio": "2026-05-16",
+   "fim": "2026-05-20",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260516_20260520.tif",
+   "consultado_em_utc": "2026-11-15T05:07:27+00:00",
+   "http": 200,
+   "bytes": 13719182,
+   "chuva_mm": 0.58
+  },
+  {
+   "inicio": "2026-05-21",
+   "fim": "2026-05-25",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260521_20260525.tif",
+   "consultado_em_utc": "2026-11-15T05:07:30+00:00",
+   "http": 200,
+   "bytes": 14234772,
+   "chuva_mm": 0.51
+  },
+  {
+   "inicio": "2026-05-26",
+   "fim": "2026-05-31",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260526_20260531.tif",
+   "consultado_em_utc": "2026-11-15T05:07:33+00:00",
+   "http": 200,
+   "bytes": 15221030,
+   "chuva_mm": 0.0
+  },
+  {
+   "inicio": "2026-06-01",
+   "fim": "2026-06-05",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260601_20260605.tif",
+   "consultado_em_utc": "2026-11-15T05:07:37+00:00",
+   "http": 200,
+   "bytes": 13877514,
+   "chuva_mm": 0.0
+  },
+  {
+   "inicio": "2026-06-06",
+   "fim": "2026-06-10",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260606_20260610.tif",
+   "consultado_em_utc": "2026-11-15T05:07:40+00:00",
+   "http": 200,
+   "bytes": 14638430,
+   "chuva_mm": 0.0
+  },
+  {
+   "inicio": "2026-06-11",
+   "fim": "2026-06-15",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260611_20260615.tif",
+   "consultado_em_utc": "2026-11-15T05:07:43+00:00",
+   "http": 200,
+   "bytes": 14594580,
+   "chuva_mm": 12.12
+  },
+  {
+   "inicio": "2026-06-16",
+   "fim": "2026-06-20",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260616_20260620.tif",
+   "consultado_em_utc": "2026-11-15T05:07:46+00:00",
+   "http": 200,
+   "bytes": 14953782,
+   "chuva_mm": 0.0
+  },
+  {
+   "inicio": "2026-06-21",
+   "fim": "2026-06-25",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260621_20260625.tif",
+   "consultado_em_utc": "2026-11-15T05:07:50+00:00",
+   "http": 200,
+   "bytes": 14551048,
+   "chuva_mm": 1.31
+  },
+  {
+   "inicio": "2026-06-26",
+   "fim": "2026-06-30",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260626_20260630.tif",
+   "consultado_em_utc": "2026-11-15T05:07:53+00:00",
+   "http": 200,
+   "bytes": 14955962,
+   "chuva_mm": 0.0
+  },
+  {
+   "inicio": "2026-07-01",
+   "fim": "2026-07-05",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260701_20260705.tif",
+   "consultado_em_utc": "2026-11-15T05:07:56+00:00",
+   "http": 200,
+   "bytes": 14556634,
+   "chuva_mm": 0.0
+  },
+  {
+   "inicio": "2026-07-06",
+   "fim": "2026-07-10",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260706_20260710.tif",
+   "consultado_em_utc": "2026-11-15T05:08:00+00:00",
+   "http": 200,
+   "bytes": 14013258,
+   "chuva_mm": 3.0
+  },
+  {
+   "inicio": "2026-07-11",
+   "fim": "2026-07-15",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260711_20260715.tif",
+   "consultado_em_utc": "2026-11-15T05:08:03+00:00",
+   "http": 200,
+   "bytes": 15101804,
+   "chuva_mm": 0.0
+  },
+  {
+   "inicio": "2026-07-16",
+   "fim": "2026-07-20",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260716_20260720.tif",
+   "consultado_em_utc": "2026-11-15T05:08:06+00:00",
+   "http": 200,
+   "bytes": 14925576,
+   "chuva_mm": 0.0
+  },
+  {
+   "inicio": "2026-07-21",
+   "fim": "2026-07-25",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260721_20260725.tif",
+   "consultado_em_utc": "2026-11-15T05:08:10+00:00",
+   "http": 200,
+   "bytes": 15396860,
+   "chuva_mm": 5.05
+  },
+  {
+   "inicio": "2026-07-26",
+   "fim": "2026-07-31",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260726_20260731.tif",
+   "consultado_em_utc": "2026-11-15T05:08:13+00:00",
+   "http": 200,
+   "bytes": 15324878,
+   "chuva_mm": 0.0
+  },
+  {
+   "inicio": "2026-08-01",
+   "fim": "2026-08-05",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260801_20260805.tif",
+   "consultado_em_utc": "2026-11-15T05:08:16+00:00",
+   "http": 200,
+   "bytes": 14913422,
+   "chuva_mm": 1.46
+  },
+  {
+   "inicio": "2026-08-06",
+   "fim": "2026-08-10",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260806_20260810.tif",
+   "consultado_em_utc": "2026-11-15T05:08:19+00:00",
+   "http": 200,
+   "bytes": 14700528,
+   "chuva_mm": 0.0
+  },
+  {
+   "inicio": "2026-08-11",
+   "fim": "2026-08-15",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260811_20260815.tif",
+   "consultado_em_utc": "2026-11-15T05:08:23+00:00",
+   "http": 200,
+   "bytes": 14576956,
+   "chuva_mm": 0.0
+  },
+  {
+   "inicio": "2026-08-16",
+   "fim": "2026-08-20",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260816_20260820.tif",
+   "consultado_em_utc": "2026-11-15T05:08:26+00:00",
+   "http": 200,
+   "bytes": 14755436,
+   "chuva_mm": 0.0
+  },
+  {
+   "inicio": "2026-08-21",
+   "fim": "2026-08-25",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260821_20260825.tif",
+   "consultado_em_utc": "2026-11-15T05:08:30+00:00",
+   "http": 200,
+   "bytes": 14567632,
+   "chuva_mm": 0.0
+  },
+  {
+   "inicio": "2026-08-26",
+   "fim": "2026-08-31",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260826_20260831.tif",
+   "consultado_em_utc": "2026-11-15T05:08:33+00:00",
+   "http": 200,
+   "bytes": 15587206,
+   "chuva_mm": 1.95
+  },
+  {
+   "inicio": "2026-09-01",
+   "fim": "2026-09-05",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260901_20260905.tif",
+   "consultado_em_utc": "2026-11-15T05:08:36+00:00",
+   "http": 200,
+   "bytes": 14523334,
+   "chuva_mm": 28.74
+  },
+  {
+   "inicio": "2026-09-06",
+   "fim": "2026-09-10",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260906_20260910.tif",
+   "consultado_em_utc": "2026-11-15T05:08:40+00:00",
+   "http": 200,
+   "bytes": 14890136,
+   "chuva_mm": 20.76
+  },
+  {
+   "inicio": "2026-09-11",
+   "fim": "2026-09-15",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260911_20260915.tif",
+   "consultado_em_utc": "2026-11-15T05:08:43+00:00",
+   "http": 200,
+   "bytes": 15190608,
+   "chuva_mm": 1.62
+  },
+  {
+   "inicio": "2026-09-16",
+   "fim": "2026-09-20",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260916_20260920.tif",
+   "consultado_em_utc": "2026-11-15T05:08:47+00:00",
+   "http": 200,
+   "bytes": 14502770,
+   "chuva_mm": 1.33
+  },
+  {
+   "inicio": "2026-09-21",
+   "fim": "2026-09-25",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260921_20260925.tif",
+   "consultado_em_utc": "2026-11-15T05:08:50+00:00",
+   "http": 200,
+   "bytes": 14739748,
+   "chuva_mm": 50.56
+  },
+  {
+   "inicio": "2026-09-26",
+   "fim": "2026-09-30",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20260926_20260930.tif",
+   "consultado_em_utc": "2026-11-15T05:08:53+00:00",
+   "http": 200,
+   "bytes": 14468534,
+   "chuva_mm": 17.63
+  },
+  {
+   "inicio": "2026-10-01",
+   "fim": "2026-10-05",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20261001_20261005.tif",
+   "consultado_em_utc": "2026-11-15T05:08:56+00:00",
+   "http": 200,
+   "bytes": 13759038,
+   "chuva_mm": 85.5
+  },
+  {
+   "inicio": "2026-10-06",
+   "fim": "2026-10-10",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20261006_20261010.tif",
+   "consultado_em_utc": "2026-11-15T05:08:59+00:00",
+   "http": 200,
+   "bytes": 12962386,
+   "chuva_mm": 15.75
+  },
+  {
+   "inicio": "2026-10-11",
+   "fim": "2026-10-15",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20261011_20261015.tif",
+   "consultado_em_utc": "2026-11-15T05:09:02+00:00",
+   "http": 404,
+   "chuva_mm": null
+  },
+  {
+   "inicio": "2026-10-16",
+   "fim": "2026-10-20",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20261016_20261020.tif",
+   "consultado_em_utc": "2026-11-15T05:09:03+00:00",
+   "http": 200,
+   "bytes": 13389744,
+   "chuva_mm": 2.66
+  },
+  {
+   "inicio": "2026-10-21",
+   "fim": "2026-10-25",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20261021_20261025.tif",
+   "consultado_em_utc": "2026-11-15T05:09:06+00:00",
+   "http": 200,
+   "bytes": 13397892,
+   "chuva_mm": 54.15
+  },
+  {
+   "inicio": "2026-10-26",
+   "fim": "2026-10-31",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20261026_20261031.tif",
+   "consultado_em_utc": "2026-11-15T05:09:09+00:00",
+   "http": 200,
+   "bytes": 13977912,
+   "chuva_mm": 79.37
+  },
+  {
+   "inicio": "2026-11-01",
+   "fim": "2026-11-05",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20261101_20261105.tif",
+   "consultado_em_utc": "2026-11-15T05:09:12+00:00",
+   "http": 200,
+   "bytes": 12620382,
+   "chuva_mm": 37.83
+  },
+  {
+   "inicio": "2026-11-06",
+   "fim": "2026-11-10",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20261106_20261110.tif",
+   "consultado_em_utc": "2026-11-15T05:09:16+00:00",
+   "http": 200,
+   "bytes": 12706594,
+   "chuva_mm": 41.28
+  },
+  {
+   "inicio": "2026-11-11",
+   "fim": "2026-11-15",
+   "endereco": "https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_20261111_20261115.tif",
+   "consultado_em_utc": "2026-11-15T05:09:19+00:00",
+   "http": 404,
+   "chuva_mm": null
+  }
+ ]
+}

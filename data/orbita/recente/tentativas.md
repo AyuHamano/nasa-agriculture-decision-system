@@ -99,3 +99,11 @@ As ideias 1, 2, 3, 5 e 6 não deram.
 - ClimateSERV, do SERVIR/NASA (`https://climateserv.servirglobal.net/api/submitDataRequest/?datatype=26...`, 26 = IMERG Early de 1 dia): HTTP 200, sem login, e
   devolve a série por ponto para janeiro de 2024 (20 dias, ex.: 2024-01-20 = 33,5 mm). Para outubro e novembro de 2026 devolve lista vazia, e o conjunto de controle
   (CHIRPS, datatype 0) também. O serviço responde, mas parou de receber dado novo. Não serve.
+
+## 7. A segunda rodada (2026-11-15, 02h03 a 02h10, horário de Brasília)
+
+- Planetary Computer (`https://planetarycomputer.microsoft.com/api/stac/v1/collections`): a coleção `gpm-imerg-hhr` existe, mas vai só de 2000-06-01 a 2021-05-31. Não serve para o dia de hoje.
+- Portal do EGIS da NASA (a mesma busca da ideia 3): os mesmos 24 itens e os mesmos dois serviços de meia em meia hora. O defeito das fatias não foi testado de novo.
+- ClimateSERV (`https://climateserv.servirglobal.net/api/getClimateScenarioInfo/`): HTTP 200; o campo das datas diz que as previsões de lá vão de 2025-06-01 a 2025-11-28, o que combina com o achado da ideia 6 (parou de receber dado novo). O pedido do IMERG não foi refeito.
+- Registro de dados abertos da Amazon: a busca no repositório da lista (`api.github.com/search/code`) pede login (HTTP 401). Não foi conferido se há IMERG lá.
+- **Climate Hazards Center, UC Santa Barbara** (`https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/`): HTTP 200, sem login. Tem o IMERG Late V07 somado por pêntada e por mês, em GeoTIFF de 0,1 grau, em mm. Última pêntada em 2026-11-15: 06 a 10 de novembro. **Serve de conferência em mm** (ver o `LEIA-ME.md`); não há arquivo por dia.

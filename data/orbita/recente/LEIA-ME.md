@@ -30,6 +30,41 @@
   as duas e a faixa entre elas. A chuva de modelo ficou bem abaixo da estação em terra de Rio Verde de 2021 para cá.
 - **O dia é o dia UTC.** Dia sem imagem (ainda não publicada) fica em branco e nunca vira zero.
 
-## O caminho para o dado exato (próximo passo)
+## O caminho para o dado exato de cada dia (próximo passo)
 Uma conta Earthdata (grátis), para ler o IMERG diário em mm no GES DISC (o catálogo aberto mostra o dia 2026-11-13 já
 publicado nas versões Early e Late). O que foi tentado e o que cada serviço respondeu está em `tentativas.md`.
+
+## A mesma chuva em mm, de 5 em 5 dias (teste de 2026-11-15, 02h06 a 02h09)
+Achado um caminho sem login com o valor em mm, sem ler cor: o GPM IMERG **Late** V07 somado de 5 em 5 dias (pêntada),
+no servidor de dados do Climate Hazards Center da Universidade da Califórnia em Santa Barbara (o grupo do CHIRPS):
+`https://data.chc.ucsb.edu/products/EWX2/IMERGlatev7/imerglatev7_global_pentad_data/data_AAAAMMDD_AAAAMMDD.tif`.
+**Não é um servidor da NASA: é um espelho do produto da NASA.** O programa é `baixar_imerg_5_dias.py` (usa Pillow e
+numpy para abrir a imagem; é o único daqui com biblioteca de fora, e o motor não depende dele). Ele grava
+`chuva-5-dias.csv` (`inicio,fim,chuva_mm`) e `fonte-5-dias.json` (o endereço e a hora de cada consulta) em cada cidade.
+
+- **O atraso:** em 2026-11-15 a última pêntada publicada era a de 06 a 10 de novembro (5 dias de atraso; no pior dia
+  do ciclo chega a 9). A leitura da cor tem 2 dias. Falta o arquivo de 11 a 15 de outubro de 2026 (HTTP 404).
+- **A unidade foi conferida, não suposta:** em Rio Verde, em 42 pêntadas de 2026-02-11 a 2026-09-10, a soma deu
+  526,1 mm contra 528,2 mm do IMERG guardado da NASA POWER (0,4% de diferença; 0,1 mm de erro médio por pêntada).
+  É a mesma chuva, em mm por pêntada.
+- **A leitura da cor está certa:** de 2026-09-01 a 2026-11-10 (13 pêntadas), a cor somou 397,8 mm e o mm, 437,2 mm
+  em Rio Verde (9,0% a menos); em Jataí, 416,8 contra 397,0 (5,0% a mais); em Silvânia, 398,0 contra 353,4 (12,6% a
+  mais). Ou seja: a chuva rápida dar o dobro da chuva de modelo **não é erro da leitura da cor**.
+- **Contra a estação em terra** (INMET de Rio Verde, A025; 10 pêntadas de 2026-09-01 a 2026-10-25, as em que os
+  quatro têm dado):
+
+  | fonte | soma | contra a estação | erro médio por pêntada |
+  |---|---|---|---|
+  | a estação do INMET | 202,0 mm | | |
+  | o satélite em mm (IMERG Late) | 278,7 mm | 38,0% a mais | 14,8 mm |
+  | o satélite lido da cor (NASA GIBS) | 266,2 mm | 31,8% a mais | 16,7 mm |
+  | a chuva de modelo (NASA POWER, PRECTOTCORR) | 111,6 mm | 44,8% a menos | 16,4 mm |
+
+  A estação fica no meio: o satélite deu mais chuva do que ela e o modelo, menos. É um período curto (50 dias), uma
+  estação só, e a estação mede um ponto enquanto o satélite mede um quadrado de uns 10 km.
+- **A decisão:** a fonte do `como_esta_hoje` **não foi trocada**. O caminho novo não é claramente melhor: vem de 5
+  em 5 dias (a conta precisa da chuva de cada dia), chega mais tarde e discorda da cor em menos de 13%. O que
+  entrou foi a conferência: `chuva_recente.conferencia_em_mm`, na resposta do `como_esta_hoje`, mostra as duas somas
+  lado a lado. A faixa larga continua, e agora se sabe por quê: ela é a distância entre o satélite e o modelo, e a
+  estação caiu entre os dois.
+- **Como baixar de novo:** `python3 -I baixar_imerg_5_dias.py --inicio 2026-02-11 --fim 2026-11-15`.

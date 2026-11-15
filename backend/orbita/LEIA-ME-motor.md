@@ -102,7 +102,7 @@ comparação das rotações, e agora cada um diz de onde vem:
 ## 2. Como rodar
 De dentro de `backend/`:
 ```bash
-python3 -m unittest                                   # 314 testes (os 227 de antes e os novos)
+python3 -m unittest                                   # 324 testes (os 227 de antes e os novos)
 python3 -m orbita.perguntar --cidade jatai --rotacao soja,sorgo --plantio 2026-11-20   # 3 rotações comparadas
 python3 -m orbita.perguntar --cidade jatai --rotacao soja,sorgo --plantio 20/11        # entrada errada: a frase, saída 2
 python3 -m orbita.perguntar --cidade silvania --lugar          # os fatos do clima do lugar
@@ -125,11 +125,15 @@ Tudo o que foi baixado tem o endereço e a hora da consulta ao lado.
 | A chuva do satélite de Jataí e Silvânia | GPM IMERG, pela NASA POWER (`IMERG_PRECTOT`) | `data/orbita/cidades/<id>/chuva/` (`fonte.json`) |
 | A colheita de Jataí e Silvânia | IBGE, Produção Agrícola Municipal (SIDRA) | `data/orbita/cidades/<id>/ibge/` (`fonte.json`) |
 | A chuva recente das três cidades | NASA GIBS, camada diária `IMERG_Precipitation_Rate` | `data/orbita/recente/<id>/` (`fonte.json`, `LEIA-ME.md`) |
+| O verde do satélite de Jataí e Silvânia (6 pontos cada) | MOD13Q1 v061 (NASA LP DAAC), pelo espelho do Planetary Computer | `data/orbita/cidades/<id>/ndvi/` (`fonte.json`; a hora de cada medida no CSV) |
+| A chuva do satélite em mm, de 5 em 5 dias (conferência) | GPM IMERG Late V07, no arquivo do Climate Hazards Center (UC Santa Barbara) | `data/orbita/recente/<id>/chuva-5-dias.csv` (`fonte-5-dias.json`) |
 | Os valores do sorgo | FAO-56, Tabelas 11, 12 e 22; Embrapa Milho e Sorgo | `data/orbita/parametros-com-fonte.json`, `culturas.sorgo_2a_safra` |
 | Os limites de calor | Embrapa Soja, Embrapa Milho e Sorgo, FAO | `data/orbita/parametros-com-fonte.json`, `calor` |
 
 O programa de baixar uma cidade nova é `data/orbita/cidades/baixar_cidade.py`; o da chuva recente,
-`data/orbita/recente/baixar_chuva_recente.py`. O motor não baixa nada na hora da pergunta: lê o que está guardado.
+`data/orbita/recente/baixar_chuva_recente.py`; o do verde do satélite, `data/orbita/ndvi/baixar_ndvi.py`; o da chuva
+em mm de 5 em 5 dias, `data/orbita/recente/baixar_imerg_5_dias.py` (o único que usa biblioteca de fora, Pillow e
+numpy; o motor não depende dele). O motor não baixa nada na hora da pergunta: lê o que está guardado.
 
 ### O sorgo: o que é publicado e o que é hipótese
 - Publicado (FAO-56): o pedido de água no começo e no fim do ciclo (Kc 0,3 e 0,55), as quatro fases (20, 35, 40 e 30
@@ -162,8 +166,8 @@ Deu certo com ressalvas, que estão em `data/orbita/recente/LEIA-ME.md` (o que f
   (`faixa_da_agua_na_terra_mm`), ao lado do mesmo dia do ano normal e do pior ano.
 
 ## 4. Os limites (o que a conta não faz)
-- O verde do satélite e a estação em terra só foram conferidos em Rio Verde. Em Jataí e Silvânia, a terra coberta sai
-  só do calendário, e `terra_coberta.pelo_satelite.leitura` diz `sem_medida`.
+- A estação em terra só existe em Rio Verde. O verde do satélite existe nas três cidades (ver a seção 8), em pontos
+  escolhidos no mapa, que ninguém conferiu em campo. Cidade sem arquivo continua saindo com `sem_medida`.
 - O satélite prova só a rotação de hoje da região (soja, milho e pousio). Nas outras, os dias sem planta viva vêm do
   calendário.
 - O calor é uma contagem à parte: não mexe na conta da água, e dia de calor forte não é perda de safra. A temperatura
@@ -180,8 +184,12 @@ Deu certo com ressalvas, que estão em `data/orbita/recente/LEIA-ME.md` (o que f
 - Continua valendo o aviso de sempre: não é recomendação agronômica; converse com o agrônomo.
 
 ## 5. O que ficou como próximo passo
-- Baixar o verde do satélite (NDVI) de Jataí e de Silvânia, para a prova da terra coberta existir nas três cidades.
-- A chuva recente exata, em mm, pelo GES DISC da NASA (pede uma conta Earthdata, grátis), no lugar da leitura da cor.
+- A chuva recente exata **de cada dia**, em mm, pelo GES DISC da NASA (pede uma conta Earthdata, grátis). Sem login só
+  se achou o valor em mm somado de 5 em 5 dias (seção 8), que serve de conferência e não de entrada da conta.
+- Tapar os buracos do verde do satélite (2024 e 2025 não entram: o espelho não tem as imagens). O serviço do ORNL
+  DAAC, que poderia tapar, estava fora do ar (503) em 2026-11-14 e em 2026-11-15.
+- Conferir em campo, ou com quem planta, os pontos do verde do satélite das três cidades.
+- Comparar a chuva recente com a estação por mais tempo e em mais de uma estação (hoje são 50 dias e uma estação).
 - Abrir a portaria do ZARC do sorgo em vigor e a Tabela 30 do Cultivo do Sorgo da Embrapa, para a janela de plantio
   por município.
 - Fases e ciclo do sorgo de 2ª safra medidos em Goiás, e a raiz do sorgo com número próprio.
@@ -212,3 +220,34 @@ Não houve segunda volta (a coordenação pediu uma só).
   `perguntar.py`, `exportar.py`, `tests/test_motor.py` (um teste mudou de sentido, com o motivo escrito nele) e
   `tests/test_exportar.py`.
 - Dados: `data/orbita/cidades/`, `data/orbita/recente/` e `data/orbita/parametros-com-fonte.json`.
+
+## 8. Os dois dados que faltavam (2026-11-15, trabalho começado às 02h00)
+**1. O verde do satélite de Jataí e de Silvânia entrou.** São 6 pontos por cidade, do mesmo produto e pelo mesmo
+caminho de Rio Verde, de 2018-06-26 a 2026-10-16. Os pontos foram escolhidos no mapa por uma regra escrita antes de
+ver os números (a 15, 20 ou 25 km da cidade, onde o mapa de uso da terra de 10 m diz "lavoura" em 2018 e em 2023):
+**não se sabe de quem são nem o que foi plantado, e ninguém conferiu em campo.** As coordenadas, a regra e os buracos
+estão em `data/orbita/ndvi/LEIA-ME.md`.
+
+| cidade | dias seguidos sem planta verde (a mediana) | de quanto a quanto | medidas | pelo calendário | leitura |
+|---|---|---|---|---|---|
+| Rio Verde (como era) | 96 | 16 a 160 | 36 | 122 | dentro da faixa |
+| Jataí | 80 | 0 a 128 | 30 | 122 | dentro da faixa |
+| Silvânia | 96 | 16 a 192 | 35 | 122 | dentro da faixa |
+
+No código: `motor.verde_do_satelite`, `resposta["ndvi"]`, `terra_coberta.pelo_satelite` e o registro da safra passam
+a responder nas três cidades; o aviso dos pontos cita a cidade certa (`ndvi.aviso_dos_pontos`) e a ficha da fonte sai
+do `fonte.json` da pasta (`ndvi.fonte`). Nenhum nome de antes mudou; Rio Verde responde igual.
+
+**2. A chuva recente: achado o valor em mm, mas só de 5 em 5 dias; a fonte do `como_esta_hoje` não foi trocada.**
+- De onde vem a chuva rápida de hoje: da cor da imagem diária do IMERG no NASA GIBS (2 dias de atraso).
+- O que se achou sem login: o IMERG Late V07 em mm, somado de 5 em 5 dias, no arquivo do Climate Hazards Center da
+  UC Santa Barbara (um espelho, não um servidor da NASA), com 5 a 9 dias de atraso. Por dia, em mm e sem login, nada.
+- O que a comparação mostrou (os números e a tabela estão em `data/orbita/recente/LEIA-ME.md`): a leitura da cor
+  bate com o valor em mm (diferença de 5% a 13% nas três cidades, em 13 períodos). Contra a estação do INMET de Rio
+  Verde, em 50 dias de setembro e outubro de 2026, o satélite deu de 32% a 38% a mais e a chuva de modelo, 45% a
+  menos: a estação caiu entre os dois. A faixa larga do `como_esta_hoje` é a distância entre o satélite e o modelo,
+  não erro de leitura.
+- O que entrou: `chuva_recente.conferencia_em_mm` na resposta do `como_esta_hoje` (as duas somas lado a lado; a conta
+  não usa). Testes: `tests/test_verde_das_cidades.py` e `tests/test_chuva_de_5_dias.py`; dois testes antigos que
+  esperavam "sem medida" em Silvânia mudaram, com o motivo escrito neles.
+- O que foi tentado e não deu (o Planetary Computer, o ClimateSERV, o ORNL, o portal do EGIS): `tentativas.md`, seção 7.
