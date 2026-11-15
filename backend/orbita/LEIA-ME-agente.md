@@ -17,9 +17,10 @@ ferramenta consultar e escreve a explicação. O resto é garantido pelo program
 | a garantia | como o programa garante | o teste |
 |---|---|---|
 | Valor fora da lista não entra na ficha | `ficha.anotar` só aceita valor das listas do motor (as cidades, as rotações, as terras, as preocupações) | `tests/test_ficha.py` |
-| A conta não roda antes de o produtor confirmar | quem lê o "sim" é o programa (`agente._disse_sim`), nunca a IA; ferramenta da conta pedida antes disso devolve erro e não roda | `tests/test_agente.py` |
+| A conta não roda antes de o produtor confirmar | quem lê o "sim" é o programa (`agente._disse_sim`), nunca a IA; ferramenta da conta pedida antes disso devolve erro e não roda; a confirmação leva um selo que só este programa sabe fazer (o estado volta do navegador, e "confirmada" escrito à mão não vale) | `tests/test_agente.py` |
 | Toda resposta, com a ficha confirmada, traz a comparação de 3 rotações ou mais, contando a de hoje | o programa roda o ensaio em toda fala e recusa comparação com menos de 3, sem a de hoje ou sem as 4 frases (a evidência, o benefício, o risco, o que falta saber) | `tests/test_ferramentas.py`, `tests/test_agente.py` |
-| Número inventado pela IA não chega à tela | o texto é conferido por `conferencia.conferir_texto` contra a ficha, a comparação e o que as ferramentas devolveram nesta fala; sem consulta nenhuma, o texto não pode ter número; sobrou número, a IA tenta de novo uma vez; sobrou outra vez, saem as frases prontas do motor | `tests/test_agente.py` |
+| Número inventado pela IA não chega à tela | o texto é conferido por `conferencia.conferir_texto` contra a ficha, a comparação e o que as ferramentas devolveram nesta fala; sem consulta nenhuma, o texto não pode ter número; o que a IA manda como argumento a uma ferramenta não conta como conta; sobrou número, a IA tenta de novo uma vez; sobrou outra vez, saem as frases prontas do motor | `tests/test_agente.py` |
+| Uma troca de sentido conhecida também não passa | "a terra fica coberta 30 dias", quando 30 é o número de dias **sem** planta viva, é barrada como um número de fora (vista no uso de verdade, em 2026-11-15) | `tests/test_agente.py` |
 | O aviso do agrônomo | todo passo sai com `aviso: "Converse com o agrônomo antes de decidir."` | `tests/test_agente.py` |
 | A marca do apoio | `apoio` sai das ferramentas que a IA consultou de fato: `conta`, `dados_do_lugar` ou `conhecimento_geral` (aí o programa põe o aviso na frente do texto) | `tests/test_agente.py` |
 | A chave da IA não vaza | ela só existe na variável de ambiente; não entra em arquivo, erro, registro nem conversa guardada | `tests/test_modelo.py`, `tests/test_exportar_conversas.py` |
@@ -77,7 +78,7 @@ A resposta:
 
 | campo | o que traz |
 |---|---|
-| `estado` | o que guardar e devolver na fala seguinte: a ficha, as últimas 6 falas (cortadas), a pergunta feita antes da ficha e o momento |
+| `estado` | o que guardar e devolver na fala seguinte, sem mexer: a ficha, o selo da confirmação, as últimas 6 falas (cortadas numa palavra inteira), a pergunta feita antes da ficha e o momento |
 | `resposta` | o texto do agente, já conferido |
 | `momento` | `antes`, `durante` ou `depois` |
 | `ficha` | `cidade_id`, `rotacao_atual` (a lista das culturas), `terra`, `plantio_da_soja`, `preocupacao`, `confirmada` e `falta` (os campos que ainda não foram ditos) |
@@ -99,15 +100,21 @@ na ficha. Com a ficha completa, o programa mostra a ficha e pede o "sim". Depois
 responde à pergunta que ele fez (se não fez nenhuma: "vale trocar a minha rotação de hoje por outra?"). Mudou a
 ficha depois de confirmada, ela é mostrada de novo e a conta espera outro "sim". "de novo" recomeça.
 
+**O selo da confirmação.** O estado volta de quem chama, e quem chama pode ser qualquer programa. Por isso a
+confirmação da ficha vai junto com um selo (`estado.selo`), feito com um segredo sorteado quando a API liga e guardado
+só na memória dela. Estado com "confirmada" e sem o selo certo volta a "não confirmada", e a ficha é mostrada de novo.
+A consequência: se a API for desligada e ligada de novo, o produtor confirma a ficha outra vez (um "sim").
+
 ## As 3 ferramentas
 
 | a ferramenta | o que a IA pode pedir | a função do motor |
 |---|---|---|
 | `clima_do_lugar` | o que os satélites registraram no lugar; com `hoje: true`, como está a água da lavoura hoje | `motor.clima_do_lugar`, `motor.como_esta_hoje` |
-| `ensaio_da_rotacao` | a comparação das rotações no ano normal e no pior ano; com `safra`, o replay daquela safra, dia a dia | `motor.responder`, `motor.replay_da_safra` |
+| `ensaio_da_rotacao` | a comparação das rotações no ano normal e no pior ano, e o calendário que a conta usou (com a data de plantio do produtor, se ele disse); com `safra`, o replay daquela safra, dia a dia | `motor.responder`, `motor.replay_da_safra` |
 | `verde_do_satelite` | os dias sem planta viva pelo calendário e pelo satélite (NDVI); com `safra`, o registro daquela safra | `motor.verde_do_satelite`, `motor.registro_da_safra` |
 
-`safra` aceita `"2015-16"`, `"pior_ano"` ou `"ano_normal"`. A ficha é a quarta coisa que a IA pode chamar
+`safra` aceita `"2015-16"`, `"pior_ano"` ou `"ano_normal"`, e `hoje` só aceita `true`; qualquer outro argumento que
+a IA mandar é jogado fora. A ficha é a quarta coisa que a IA pode chamar
 (`anotar_na_ficha`), e não é da conta. Se o motor ainda não tiver o "como está hoje" ou o registro, a ferramenta
 devolve um aviso no lugar, e a IA diz que isso é o próximo passo.
 
@@ -120,15 +127,39 @@ Grava `conversas.js` (`window.ORBITA_CONVERSAS = {...};`, o que a tela lê) e `c
 conversas: `antes-plantei-tarde` (plantei a soja tarde: milho ou sorgo?), `replay-2015-16` (a pior safra, dia a dia,
 com os dias e os marcos em `replay`), `depois-o-que-a-terra-mostrou` e `sem-conta-pragas-e-adubo` (sai com o aviso de
 conhecimento geral). Cada conversa diz em `texto_de` se o texto é da IA ou de frases prontas. Cada texto é conferido
-de novo contra a conta ao gravar; se sobrar número, nada é gravado. Rodar de novo sempre que o motor mudar.
+de novo contra a conta ao gravar; se sobrar número, nada é gravado. Com a IA, cada conversa é tentada até 3 vezes e
+fica a melhor (sem fala barrada e sem replay que o produtor não pediu). Rodar de novo sempre que o motor mudar.
+
+**As que estão guardadas** (`conversas-guardadas/`): gravadas em 2026-11-15, 01h37, com o Claude Haiku 5.5 e o motor
+completo (as 3 cidades, as 3 rotações, o replay, o "como está hoje" e o registro). São 13 falas do agente: 9 com o
+texto da IA e 4 com frases prontas (a ficha para conferir); nenhuma barrada pela conferência. Cada resposta foi lida
+uma a uma contra a conta antes de guardar, e o teste `AsConversasQueEstaoNoRepositorio` confere de novo a cada rodada.
+
+## O uso de verdade (2026-11-15)
+
+- **Pela rota, de ponta a ponta:** a API ligada em `127.0.0.1`, com a chave só no ambiente do processo, o motor de
+  verdade e o Claude Haiku 5.5. Uma conversa inteira por HTTP: "oi", a ficha, "sim", a comparação de 3 rotações, o
+  replay da safra 2015-16 (366 dias), uma pergunta de pragas (saiu com o aviso de conhecimento geral) e "obrigado".
+  Nenhum número barrado ficou no texto. O registro do terminal só tem o método, a rota e o código da resposta.
+- **Os dois modelos, com as mesmas perguntas:** o Claude Haiku 5.5 e o DeepSeek V4.1 Flash responderam às 4 conversas
+  sem nenhuma fala barrada no fim (13 falas cada, 9 com o texto da IA). Empate na conferência dos números: ficou o
+  padrão, o Haiku 5.5; o DeepSeek é a reserva (`ORBITA_MODELO=deepseek/deepseek-v4.1-flash`).
+- **O que o uso de verdade mostrou, e foi consertado:** o texto da IA saía cortado no meio (ela gastava o espaço
+  pensando: agora pensa pouco, tem mais espaço e um texto cortado só vale até a última frase inteira); um "30%" de
+  conhecimento geral passava por haver um 30 na conta (agora, sem consulta, o texto não pode ter número); a IA
+  escreveu "coberta só 30 dias" (agora barrado); a resposta pronta saía longa demais (agora é curta).
+- **O gasto:** 0,17 dólar da chave do hackathon, somando todos os ensaios (o teto era 5). Uma conversa de 4 falas
+  custa perto de meio centavo de dólar.
 
 ## O uso de IA, declarado
 
 - **No produto:** o texto do agente é escrito por um modelo de linguagem, chamado pelo OpenRouter. O padrão é o Claude
   Haiku 5.5, da Anthropic (`anthropic/claude-haiku-5.5`); a reserva testada é o DeepSeek V4.1 Flash
   (`deepseek/deepseek-v4.1-flash`). Os números não são da IA: saem do motor, e o texto é conferido contra eles.
-- **No código:** estes arquivos foram gerados com IA (Claude, da Anthropic), e a parte da conferência dos números foi
-  revisada por outra IA (GPT).
+- **No código:** estes arquivos foram gerados com IA (Claude, da Anthropic) e revisados por outra IA (GPT), em duas
+  voltas: a primeira achou 4 defeitos (a confirmação que quem chama podia forjar, um argumento da IA que liberava um
+  número, uma resposta sem a comparação e um número partido no histórico); os 4 foram consertados, cada um com o teste
+  que falhava antes, e a segunda volta aprovou.
 - **O que é marcado:** cada resposta diz `texto_de` (IA ou frases prontas) e `apoio` (a conta, os dados do lugar ou
   conhecimento geral). O que a conta não mede (nutrientes, pragas, mercado) sai como conhecimento geral, com o aviso.
 
@@ -137,7 +168,9 @@ de novo contra a conta ao gravar; se sobrar número, nada é gravado. Rodar de n
 - A conferência olha se cada número do texto existe na conta; ela não confere a que coisa o número se refere, nem o
   sinal, nem número por extenso (o começo do `conferencia.py` lista tudo). Uma frase que compara errado dois números
   certos ("mais perto de") pode passar: por isso o pedido à IA proíbe conta de cabeça, e a comparação lado a lado
-  sai sempre do motor, não da IA.
+  sai sempre do motor, não da IA. A única troca de sentido que o programa barra sozinho é a dos dias de terra coberta;
+  as outras dependem de alguém ler (as conversas guardadas foram lidas uma a uma).
+- O selo da confirmação vale enquanto a API está ligada: desligou e ligou, o produtor confirma a ficha de novo.
 - O texto de conhecimento geral (pragas, adubo, mercado) não é conferido por conta nenhuma: só não pode ter número, e
   sai marcado.
 - A IA entende português livre, mas a ficha só tem as cidades e as rotações que o motor tem.
