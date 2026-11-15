@@ -84,15 +84,14 @@ heat, days with no living plants).
 The water balance follows **FAO Irrigation and Drainage Paper 56** (reference evapotranspiration, crop coefficients and a
 daily root-zone water balance). Crop calendars come from Brazil's agricultural climate-risk zoning.
 
-## The proof: we tested it across Goiás
-- **20 of 20 municipalities.** In the twenty municipalities of Goiás that plant the most second-crop maize, over ten
-  seasons, the math moved with the official harvest records (IBGE): the more water shortfall in the math, the lower the
-  yield, in all twenty.
+## The proof: can you trust it? We checked it against the past
+- **20 of 20 municipalities.** Ten seasons, in the twenty municipalities of Goiás that plant the most second-crop
+  maize: the more water shortfall the system showed, the lower the official harvest (IBGE). In all twenty.
 - **21 of 27 weather stations.** Against the rain gauges of INMET, Brazil's national weather service, satellite rainfall
   came closer to the rain measured on the ground than model-based rainfall at 21 of 27 stations: 16 of 22 in Goiás and
   5 of 5 in the Federal District.
 
-Here, every number comes with proof: the code and the data are public in the repository.
+The code and the data are public in the repository.
 
 ## Use of artificial intelligence
 - **In the product.** A large language model (Claude Haiku 5.5, by Anthropic, called through OpenRouter) holds the
@@ -106,8 +105,12 @@ Here, every number comes with proof: the code and the data are public in the rep
   is narrated by an AI-generated voice, marked on screen.
 
 ## Who it is for
-Free for the farmer. The cooperative pays, per farmer supported. And NASA data becomes a decision in the hands of those
-who plant.
+For ten thousand years, farmers have looked to the sky, waiting for an answer. Now it arrives on their phone: the
+rehearsal before planting, the field monitored through the season, the lessons learned after harvest.
+
+Free for the farmer; the cooperative pays, per farmer supported.
+
+NASA doesn't fly without mission control. Farms no longer have to.
 
 Órbita Rural uses public NASA data. It is not a NASA product and is not endorsed by NASA.
 
