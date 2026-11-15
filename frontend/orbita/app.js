@@ -31,6 +31,23 @@
   function anoDoPlantio() { var h = new Date(); return h.getMonth() < 7 ? h.getFullYear() - 1 : h.getFullYear(); }
   function doisDigitos(n) { return (n < 10 ? "0" : "") + n; }
 
+  /* ---------- welcome screen: logo, a short text and a start button, shown before the assistant chat ---------- */
+  // Hides the app shell (tabs, farm button, "Perguntar" button, cached-data note) and sets the body class of the screen being opened.
+  function leaveApp(bodyClass) {
+    app.tela = ""; app.vez += 1; fecharTudo();
+    document.body.className = bodyClass;
+    $("nave").hidden = true; $("botaoLavoura").hidden = true; $("perguntar").hidden = true; $("reserva").hidden = true;
+  }
+  function openWelcome() {
+    leaveApp("on-welcome");
+    $("conteudo").innerHTML = '<section class="o-welcome" aria-labelledby="welcomeTitle">' +
+      '<h1 class="o-welcome-logo" id="welcomeTitle"><img src="marca/logo-verde-sem-lema.png" width="546" height="220" alt="Órbita Rural"></h1>' +
+      '<p class="o-welcome-tagline">' + esc(t("rodape.lema")) + "</p>" +
+      '<p class="o-welcome-text">' + esc(t("welcome.text")) + "</p>" +
+      '<button type="button" class="o-bt" data-acao="start">' + esc(t("welcome.button")) + "</button></section>";
+    window.scrollTo(0, 0);
+  }
+
   /* ---------- a entrada: o assistente pergunta, o produtor toca ou escreve ---------- */
   function opcoes(campo) {
     if (campo === "cidade_id") return Object.keys(T.CIDADES).map(function (k) { return { v: k, n: T.CIDADES[k] }; });
@@ -116,9 +133,7 @@
   }
   function abrirEntrada() {
     en = { l: {}, falas: [], campo: "", ocupado: false, estado: null, fichaDaIA: null, outroDia: false };
-    app.tela = ""; app.vez += 1; fecharTudo();
-    document.body.className = "na-entrada";
-    $("nave").hidden = true; $("botaoLavoura").hidden = true; $("perguntar").hidden = true; $("reserva").hidden = true;
+    leaveApp("na-entrada");
     falar("assistente", "Olá! Sou o assistente do Órbita Rural. Acompanho a sua lavoura com os dados dos satélites da NASA.");
     en.campo = faltando(); falar("assistente", PERGUNTAS[en.campo]);
     desenharEntrada(false); window.scrollTo(0, 0);
@@ -381,6 +396,7 @@
 
   /* ---------- os toques ---------- */
   var ACOES = {
+    "start": abrirEntrada,
     "opcao": function (b) { escolher(b.getAttribute("data-campo"), b.getAttribute("data-valor"), b.getAttribute("data-nome")); },
     "outro-dia": function () { en.outroDia = true; desenharEntrada(true); var c = $("diaDoPlantio"); if (c) c.focus(); },
     "usar-dia": function () { var c = $("diaDoPlantio"), v = c ? c.value : ""; if (/^\d{4}-(09|10|11|12)-\d{2}$/.test(v)) escolher("plantio_da_soja", v, T.dataPorExtenso(v)); },
@@ -422,7 +438,7 @@
       if (linkDoChat && /^https?:\/\//.test(apiDoEndereco)) linkDoChat.href = "chatbot.html?v=5&api=" + encodeURIComponent(apiDoEndereco);
       app.pronto = D.saude();
       app.lavoura = ler(CHAVE); if (!valida(app.lavoura)) app.lavoura = null;
-      if (app.lavoura) abrirApp(""); else abrirEntrada();
+      if (app.lavoura) abrirApp(""); else openWelcome();
     } finally { document.documentElement.classList.remove("montando"); }
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", comecar); else comecar();

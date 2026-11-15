@@ -156,6 +156,10 @@ var TEXTOS = {
       titulo: "Para a cooperativa e a assistência técnica",
       texto: "O produtor fica no centro. O técnico da cooperativa confere a mesma conta na leitura do agrônomo, lavoura por lavoura. Um painel para acompanhar vários produtores de uma vez é o próximo passo."
     },
+    welcome: {
+      text: "Seja bem-vindo!\nO futuro do planejamento agrícola começa com decisões inteligentes.",
+      button: "Iniciar"
+    },
     rodape: {
       lema: "Inteligência do espaço. Decisões para a terra.",
       fontes: "De onde vêm os dados: a chuva é do GPM IMERG (a chuva medida por satélite da NASA); a temperatura é do NASA POWER (os dados de clima da NASA); o verde da lavoura é do satélite MODIS, da NASA. A conta da água segue o manual 56 da FAO, a agência da ONU para a agricultura. A colheita é do IBGE e a chuva medida em terra é da estação do INMET, o instituto de meteorologia do Brasil.",
