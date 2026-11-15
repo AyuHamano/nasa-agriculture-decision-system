@@ -167,8 +167,8 @@ def ensaio_da_rotacao(ficha, safra=None):
     if safra is not None:
         qual = _qual_safra(safra, anos)
         replay = _chamar_o_motor("replay_da_safra", entrada_do_motor(ficha), qual)
-        resultado["replay"] = {"safra": qual, "cidade_id": ficha.get("cidade_id"),
-                               "dias": replay.get("dias") or [], "marcos": replay.get("marcos") or []}
+        resultado["replay"] = dict(replay, safra=qual, cidade_id=ficha.get("cidade_id"),      # o que o motor mandou,
+                                   dias=replay.get("dias") or [], marcos=replay.get("marcos") or [])   # inteiro
     return resultado
 
 
