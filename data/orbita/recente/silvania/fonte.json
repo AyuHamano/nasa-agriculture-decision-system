@@ -1,0 +1,1315 @@
+{
+ "o_que_e": "Chuva diária do GPM IMERG (satélite, NASA/JAXA) lida da cor do ponto na camada diária IMERG_Precipitation_Rate do NASA GIBS e traduzida pela tabela de cores oficial. Sem login.",
+ "conta": "chuva do dia (mm) = meio da faixa de mm/hora (média geométrica dos limites) x 24",
+ "ressalvas": [
+  "valor em faixas de uns 6% de largura",
+  "abaixo de 0,1 mm/hora (2,4 mm no dia) a camada é transparente: o dia sai como 0",
+  "dia UTC; dia sem ladrilho ou 'No Data' fica em branco"
+ ],
+ "ponto": {
+  "latitude": -16.66,
+  "longitude": -48.61
+ },
+ "ladrilho": {
+  "conjunto": "2km",
+  "nivel": 5,
+  "linha": 11,
+  "coluna": 14,
+  "pixel_x": 306,
+  "pixel_y": 435
+ },
+ "periodo_pedido": {
+  "inicio": "2026-09-01",
+  "fim": "2026-11-15"
+ },
+ "comecou_em_utc": "2026-11-15T04:09:11Z",
+ "terminou_em_utc": "2026-11-15T04:09:13Z",
+ "tabela_de_cores": {
+  "endereco": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/GPM_Precipitation_Rate.xml",
+  "consultado_em_utc": "2026-11-15T04:09:11Z",
+  "cores": 222
+ },
+ "ultimo_dia_com_dado": "2026-11-13",
+ "dias_com_dado": 74,
+ "dias_pedidos": 76,
+ "consultas": [
+  {
+   "data": "2026-09-01",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-09-01/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:11Z",
+   "http": 200,
+   "cor_rgb": [
+    191,
+    191,
+    191
+   ],
+   "faixa_mm_por_hora": [
+    null,
+    0.1
+   ],
+   "chuva_mm": 0.0,
+   "obs": "abaixo de 0,1 mm/hora (menos de 2,4 mm no dia): sai como 0"
+  },
+  {
+   "data": "2026-09-02",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-09-02/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:11Z",
+   "http": 200,
+   "cor_rgb": [
+    191,
+    191,
+    191
+   ],
+   "faixa_mm_por_hora": [
+    null,
+    0.1
+   ],
+   "chuva_mm": 0.0,
+   "obs": "abaixo de 0,1 mm/hora (menos de 2,4 mm no dia): sai como 0"
+  },
+  {
+   "data": "2026-09-03",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-09-03/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:11Z",
+   "http": 200,
+   "cor_rgb": [
+    0,
+    148,
+    36
+   ],
+   "faixa_mm_por_hora": [
+    0.1884,
+    0.1995
+   ],
+   "chuva_mm": 4.65,
+   "obs": ""
+  },
+  {
+   "data": "2026-09-04",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-09-04/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:11Z",
+   "http": 200,
+   "cor_rgb": [
+    191,
+    191,
+    191
+   ],
+   "faixa_mm_por_hora": [
+    null,
+    0.1
+   ],
+   "chuva_mm": 0.0,
+   "obs": "abaixo de 0,1 mm/hora (menos de 2,4 mm no dia): sai como 0"
+  },
+  {
+   "data": "2026-09-05",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-09-05/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:11Z",
+   "http": 200,
+   "cor_rgb": [
+    191,
+    191,
+    191
+   ],
+   "faixa_mm_por_hora": [
+    null,
+    0.1
+   ],
+   "chuva_mm": 0.0,
+   "obs": "abaixo de 0,1 mm/hora (menos de 2,4 mm no dia): sai como 0"
+  },
+  {
+   "data": "2026-09-06",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-09-06/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:11Z",
+   "http": 200,
+   "cor_rgb": [
+    191,
+    191,
+    191
+   ],
+   "faixa_mm_por_hora": [
+    null,
+    0.1
+   ],
+   "chuva_mm": 0.0,
+   "obs": "abaixo de 0,1 mm/hora (menos de 2,4 mm no dia): sai como 0"
+  },
+  {
+   "data": "2026-09-07",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-09-07/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:11Z",
+   "http": 200,
+   "cor_rgb": [
+    0,
+    123,
+    72
+   ],
+   "faixa_mm_por_hora": [
+    0.1122,
+    0.1189
+   ],
+   "chuva_mm": 2.77,
+   "obs": ""
+  },
+  {
+   "data": "2026-09-08",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-09-08/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:11Z",
+   "http": 200,
+   "cor_rgb": [
+    0,
+    159,
+    15
+   ],
+   "faixa_mm_por_hora": [
+    0.2371,
+    0.2512
+   ],
+   "chuva_mm": 5.86,
+   "obs": ""
+  },
+  {
+   "data": "2026-09-09",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-09-09/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:11Z",
+   "http": 200,
+   "cor_rgb": [
+    45,
+    184,
+    0
+   ],
+   "faixa_mm_por_hora": [
+    0.3981,
+    0.4217
+   ],
+   "chuva_mm": 9.83,
+   "obs": ""
+  },
+  {
+   "data": "2026-09-10",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-09-10/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:11Z",
+   "http": 200,
+   "cor_rgb": [
+    191,
+    191,
+    191
+   ],
+   "faixa_mm_por_hora": [
+    null,
+    0.1
+   ],
+   "chuva_mm": 0.0,
+   "obs": "abaixo de 0,1 mm/hora (menos de 2,4 mm no dia): sai como 0"
+  },
+  {
+   "data": "2026-09-11",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-09-11/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:11Z",
+   "http": 200,
+   "cor_rgb": [
+    191,
+    191,
+    191
+   ],
+   "faixa_mm_por_hora": [
+    null,
+    0.1
+   ],
+   "chuva_mm": 0.0,
+   "obs": "abaixo de 0,1 mm/hora (menos de 2,4 mm no dia): sai como 0"
+  },
+  {
+   "data": "2026-09-12",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-09-12/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:11Z",
+   "http": 200,
+   "cor_rgb": [
+    191,
+    191,
+    191
+   ],
+   "faixa_mm_por_hora": [
+    null,
+    0.1
+   ],
+   "chuva_mm": 0.0,
+   "obs": "abaixo de 0,1 mm/hora (menos de 2,4 mm no dia): sai como 0"
+  },
+  {
+   "data": "2026-09-13",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-09-13/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:11Z",
+   "http": 200,
+   "cor_rgb": [
+    191,
+    191,
+    191
+   ],
+   "faixa_mm_por_hora": [
+    null,
+    0.1
+   ],
+   "chuva_mm": 0.0,
+   "obs": "abaixo de 0,1 mm/hora (menos de 2,4 mm no dia): sai como 0"
+  },
+  {
+   "data": "2026-09-14",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-09-14/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:11Z",
+   "http": 200,
+   "cor_rgb": [
+    191,
+    191,
+    191
+   ],
+   "faixa_mm_por_hora": [
+    null,
+    0.1
+   ],
+   "chuva_mm": 0.0,
+   "obs": "abaixo de 0,1 mm/hora (menos de 2,4 mm no dia): sai como 0"
+  },
+  {
+   "data": "2026-09-15",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-09-15/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:11Z",
+   "http": 200,
+   "cor_rgb": [
+    0,
+    148,
+    36
+   ],
+   "faixa_mm_por_hora": [
+    0.1884,
+    0.1995
+   ],
+   "chuva_mm": 4.65,
+   "obs": ""
+  },
+  {
+   "data": "2026-09-16",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-09-16/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:11Z",
+   "http": 200,
+   "cor_rgb": [
+    191,
+    191,
+    191
+   ],
+   "faixa_mm_por_hora": [
+    null,
+    0.1
+   ],
+   "chuva_mm": 0.0,
+   "obs": "abaixo de 0,1 mm/hora (menos de 2,4 mm no dia): sai como 0"
+  },
+  {
+   "data": "2026-09-17",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-09-17/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:11Z",
+   "http": 200,
+   "cor_rgb": [
+    191,
+    191,
+    191
+   ],
+   "faixa_mm_por_hora": [
+    null,
+    0.1
+   ],
+   "chuva_mm": 0.0,
+   "obs": "abaixo de 0,1 mm/hora (menos de 2,4 mm no dia): sai como 0"
+  },
+  {
+   "data": "2026-09-18",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-09-18/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:11Z",
+   "http": 200,
+   "cor_rgb": [
+    191,
+    191,
+    191
+   ],
+   "faixa_mm_por_hora": [
+    null,
+    0.1
+   ],
+   "chuva_mm": 0.0,
+   "obs": "abaixo de 0,1 mm/hora (menos de 2,4 mm no dia): sai como 0"
+  },
+  {
+   "data": "2026-09-19",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-09-19/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:11Z",
+   "http": 200,
+   "cor_rgb": [
+    191,
+    191,
+    191
+   ],
+   "faixa_mm_por_hora": [
+    null,
+    0.1
+   ],
+   "chuva_mm": 0.0,
+   "obs": "abaixo de 0,1 mm/hora (menos de 2,4 mm no dia): sai como 0"
+  },
+  {
+   "data": "2026-09-20",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-09-20/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:11Z",
+   "http": 200,
+   "cor_rgb": [
+    191,
+    191,
+    191
+   ],
+   "faixa_mm_por_hora": [
+    null,
+    0.1
+   ],
+   "chuva_mm": 0.0,
+   "obs": "abaixo de 0,1 mm/hora (menos de 2,4 mm no dia): sai como 0"
+  },
+  {
+   "data": "2026-09-21",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-09-21/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:11Z",
+   "http": 200,
+   "cor_rgb": [
+    191,
+    191,
+    191
+   ],
+   "faixa_mm_por_hora": [
+    null,
+    0.1
+   ],
+   "chuva_mm": 0.0,
+   "obs": "abaixo de 0,1 mm/hora (menos de 2,4 mm no dia): sai como 0"
+  },
+  {
+   "data": "2026-09-22",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-09-22/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:11Z",
+   "http": 200,
+   "cor_rgb": [
+    153,
+    217,
+    0
+   ],
+   "faixa_mm_por_hora": [
+    0.7943,
+    0.8414
+   ],
+   "chuva_mm": 19.62,
+   "obs": ""
+  },
+  {
+   "data": "2026-09-23",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-09-23/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:11Z",
+   "http": 200,
+   "cor_rgb": [
+    174,
+    223,
+    0
+   ],
+   "faixa_mm_por_hora": [
+    0.8913,
+    0.9441
+   ],
+   "chuva_mm": 22.02,
+   "obs": ""
+  },
+  {
+   "data": "2026-09-24",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-09-24/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:11Z",
+   "http": 200,
+   "cor_rgb": [
+    191,
+    191,
+    191
+   ],
+   "faixa_mm_por_hora": [
+    null,
+    0.1
+   ],
+   "chuva_mm": 0.0,
+   "obs": "abaixo de 0,1 mm/hora (menos de 2,4 mm no dia): sai como 0"
+  },
+  {
+   "data": "2026-09-25",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-09-25/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:12Z",
+   "http": 200,
+   "cor_rgb": [
+    191,
+    191,
+    191
+   ],
+   "faixa_mm_por_hora": [
+    null,
+    0.1
+   ],
+   "chuva_mm": 0.0,
+   "obs": "abaixo de 0,1 mm/hora (menos de 2,4 mm no dia): sai como 0"
+  },
+  {
+   "data": "2026-09-26",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-09-26/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:12Z",
+   "http": 200,
+   "cor_rgb": [
+    78,
+    195,
+    0
+   ],
+   "faixa_mm_por_hora": [
+    0.5012,
+    0.5309
+   ],
+   "chuva_mm": 12.38,
+   "obs": ""
+  },
+  {
+   "data": "2026-09-27",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-09-27/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:12Z",
+   "http": 200,
+   "cor_rgb": [
+    191,
+    191,
+    191
+   ],
+   "faixa_mm_por_hora": [
+    null,
+    0.1
+   ],
+   "chuva_mm": 0.0,
+   "obs": "abaixo de 0,1 mm/hora (menos de 2,4 mm no dia): sai como 0"
+  },
+  {
+   "data": "2026-09-28",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-09-28/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:12Z",
+   "http": 200,
+   "cor_rgb": [
+    191,
+    191,
+    191
+   ],
+   "faixa_mm_por_hora": [
+    null,
+    0.1
+   ],
+   "chuva_mm": 0.0,
+   "obs": "abaixo de 0,1 mm/hora (menos de 2,4 mm no dia): sai como 0"
+  },
+  {
+   "data": "2026-09-29",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-09-29/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:12Z",
+   "http": 200,
+   "cor_rgb": [
+    191,
+    191,
+    191
+   ],
+   "faixa_mm_por_hora": [
+    null,
+    0.1
+   ],
+   "chuva_mm": 0.0,
+   "obs": "abaixo de 0,1 mm/hora (menos de 2,4 mm no dia): sai como 0"
+  },
+  {
+   "data": "2026-09-30",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-09-30/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:12Z",
+   "http": 200,
+   "cor_rgb": [
+    0,
+    156,
+    20
+   ],
+   "faixa_mm_por_hora": [
+    0.2239,
+    0.2371
+   ],
+   "chuva_mm": 5.53,
+   "obs": ""
+  },
+  {
+   "data": "2026-10-01",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-10-01/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:12Z",
+   "http": 200,
+   "cor_rgb": [
+    0,
+    131,
+    62
+   ],
+   "faixa_mm_por_hora": [
+    0.1334,
+    0.1413
+   ],
+   "chuva_mm": 3.3,
+   "obs": ""
+  },
+  {
+   "data": "2026-10-02",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-10-02/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:12Z",
+   "http": 200,
+   "cor_rgb": [
+    86,
+    198,
+    0
+   ],
+   "faixa_mm_por_hora": [
+    0.5309,
+    0.5623
+   ],
+   "chuva_mm": 13.11,
+   "obs": ""
+  },
+  {
+   "data": "2026-10-03",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-10-03/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:12Z",
+   "http": 200,
+   "cor_rgb": [
+    174,
+    223,
+    0
+   ],
+   "faixa_mm_por_hora": [
+    0.8913,
+    0.9441
+   ],
+   "chuva_mm": 22.02,
+   "obs": ""
+  },
+  {
+   "data": "2026-10-04",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-10-04/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:12Z",
+   "http": 200,
+   "cor_rgb": [
+    0,
+    162,
+    9
+   ],
+   "faixa_mm_por_hora": [
+    0.2512,
+    0.2661
+   ],
+   "chuva_mm": 6.21,
+   "obs": ""
+  },
+  {
+   "data": "2026-10-05",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-10-05/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:12Z",
+   "http": 200,
+   "cor_rgb": [
+    242,
+    230,
+    0
+   ],
+   "faixa_mm_por_hora": [
+    1.3335,
+    1.4125
+   ],
+   "chuva_mm": 32.94,
+   "obs": ""
+  },
+  {
+   "data": "2026-10-06",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-10-06/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:12Z",
+   "http": 200,
+   "cor_rgb": [
+    104,
+    203,
+    0
+   ],
+   "faixa_mm_por_hora": [
+    0.5957,
+    0.631
+   ],
+   "chuva_mm": 14.71,
+   "obs": ""
+  },
+  {
+   "data": "2026-10-07",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-10-07/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:12Z",
+   "http": 200,
+   "cor_rgb": [
+    191,
+    191,
+    191
+   ],
+   "faixa_mm_por_hora": [
+    null,
+    0.1
+   ],
+   "chuva_mm": 0.0,
+   "obs": "abaixo de 0,1 mm/hora (menos de 2,4 mm no dia): sai como 0"
+  },
+  {
+   "data": "2026-10-08",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-10-08/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:12Z",
+   "http": 200,
+   "cor_rgb": [
+    191,
+    191,
+    191
+   ],
+   "faixa_mm_por_hora": [
+    null,
+    0.1
+   ],
+   "chuva_mm": 0.0,
+   "obs": "abaixo de 0,1 mm/hora (menos de 2,4 mm no dia): sai como 0"
+  },
+  {
+   "data": "2026-10-09",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-10-09/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:12Z",
+   "http": 200,
+   "cor_rgb": [
+    191,
+    191,
+    191
+   ],
+   "faixa_mm_por_hora": [
+    null,
+    0.1
+   ],
+   "chuva_mm": 0.0,
+   "obs": "abaixo de 0,1 mm/hora (menos de 2,4 mm no dia): sai como 0"
+  },
+  {
+   "data": "2026-10-10",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-10-10/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:12Z",
+   "http": 200,
+   "cor_rgb": [
+    191,
+    191,
+    191
+   ],
+   "faixa_mm_por_hora": [
+    null,
+    0.1
+   ],
+   "chuva_mm": 0.0,
+   "obs": "abaixo de 0,1 mm/hora (menos de 2,4 mm no dia): sai como 0"
+  },
+  {
+   "data": "2026-10-11",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-10-11/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:12Z",
+   "http": 200,
+   "cor_rgb": [
+    191,
+    191,
+    191
+   ],
+   "faixa_mm_por_hora": [
+    null,
+    0.1
+   ],
+   "chuva_mm": 0.0,
+   "obs": "abaixo de 0,1 mm/hora (menos de 2,4 mm no dia): sai como 0"
+  },
+  {
+   "data": "2026-10-12",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-10-12/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:12Z",
+   "http": 200,
+   "cor_rgb": [
+    53,
+    187,
+    0
+   ],
+   "faixa_mm_por_hora": [
+    0.4217,
+    0.4467
+   ],
+   "chuva_mm": 10.42,
+   "obs": ""
+  },
+  {
+   "data": "2026-10-13",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-10-13/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:12Z",
+   "http": 200,
+   "cor_rgb": [
+    0,
+    151,
+    31
+   ],
+   "faixa_mm_por_hora": [
+    0.1995,
+    0.2113
+   ],
+   "chuva_mm": 4.93,
+   "obs": ""
+  },
+  {
+   "data": "2026-10-14",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-10-14/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:12Z",
+   "http": 200,
+   "cor_rgb": [
+    191,
+    191,
+    191
+   ],
+   "faixa_mm_por_hora": [
+    null,
+    0.1
+   ],
+   "chuva_mm": 0.0,
+   "obs": "abaixo de 0,1 mm/hora (menos de 2,4 mm no dia): sai como 0"
+  },
+  {
+   "data": "2026-10-15",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-10-15/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:12Z",
+   "http": 200,
+   "cor_rgb": [
+    61,
+    189,
+    0
+   ],
+   "faixa_mm_por_hora": [
+    0.4467,
+    0.4732
+   ],
+   "chuva_mm": 11.03,
+   "obs": ""
+  },
+  {
+   "data": "2026-10-16",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-10-16/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:12Z",
+   "http": 200,
+   "cor_rgb": [
+    191,
+    191,
+    191
+   ],
+   "faixa_mm_por_hora": [
+    null,
+    0.1
+   ],
+   "chuva_mm": 0.0,
+   "obs": "abaixo de 0,1 mm/hora (menos de 2,4 mm no dia): sai como 0"
+  },
+  {
+   "data": "2026-10-17",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-10-17/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:12Z",
+   "http": 200,
+   "cor_rgb": [
+    191,
+    191,
+    191
+   ],
+   "faixa_mm_por_hora": [
+    null,
+    0.1
+   ],
+   "chuva_mm": 0.0,
+   "obs": "abaixo de 0,1 mm/hora (menos de 2,4 mm no dia): sai como 0"
+  },
+  {
+   "data": "2026-10-18",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-10-18/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:12Z",
+   "http": 200,
+   "cor_rgb": [
+    191,
+    191,
+    191
+   ],
+   "faixa_mm_por_hora": [
+    null,
+    0.1
+   ],
+   "chuva_mm": 0.0,
+   "obs": "abaixo de 0,1 mm/hora (menos de 2,4 mm no dia): sai como 0"
+  },
+  {
+   "data": "2026-10-19",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-10-19/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:12Z",
+   "http": 200,
+   "cor_rgb": [
+    191,
+    191,
+    191
+   ],
+   "faixa_mm_por_hora": [
+    null,
+    0.1
+   ],
+   "chuva_mm": 0.0,
+   "obs": "abaixo de 0,1 mm/hora (menos de 2,4 mm no dia): sai como 0"
+  },
+  {
+   "data": "2026-10-20",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-10-20/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:12Z",
+   "http": 200,
+   "cor_rgb": [
+    191,
+    191,
+    191
+   ],
+   "faixa_mm_por_hora": [
+    null,
+    0.1
+   ],
+   "chuva_mm": 0.0,
+   "obs": "abaixo de 0,1 mm/hora (menos de 2,4 mm no dia): sai como 0"
+  },
+  {
+   "data": "2026-10-21",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-10-21/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:12Z",
+   "http": 200,
+   "cor_rgb": [
+    191,
+    191,
+    191
+   ],
+   "faixa_mm_por_hora": [
+    null,
+    0.1
+   ],
+   "chuva_mm": 0.0,
+   "obs": "abaixo de 0,1 mm/hora (menos de 2,4 mm no dia): sai como 0"
+  },
+  {
+   "data": "2026-10-22",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-10-22/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:12Z",
+   "http": 200,
+   "cor_rgb": [
+    0,
+    162,
+    9
+   ],
+   "faixa_mm_por_hora": [
+    0.2512,
+    0.2661
+   ],
+   "chuva_mm": 6.21,
+   "obs": ""
+  },
+  {
+   "data": "2026-10-23",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-10-23/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:12Z",
+   "http": 200,
+   "cor_rgb": [
+    133,
+    212,
+    0
+   ],
+   "faixa_mm_por_hora": [
+    0.7079,
+    0.7499
+   ],
+   "chuva_mm": 17.49,
+   "obs": ""
+  },
+  {
+   "data": "2026-10-24",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-10-24/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:12Z",
+   "http": 200,
+   "cor_rgb": [
+    239,
+    237,
+    0
+   ],
+   "faixa_mm_por_hora": [
+    1.2589,
+    1.3335
+   ],
+   "chuva_mm": 31.1,
+   "obs": ""
+  },
+  {
+   "data": "2026-10-25",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-10-25/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:12Z",
+   "http": 200,
+   "cor_rgb": [
+    0,
+    131,
+    62
+   ],
+   "faixa_mm_por_hora": [
+    0.1334,
+    0.1413
+   ],
+   "chuva_mm": 3.3,
+   "obs": ""
+  },
+  {
+   "data": "2026-10-26",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-10-26/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:12Z",
+   "http": 200,
+   "cor_rgb": [
+    0,
+    118,
+    78
+   ],
+   "faixa_mm_por_hora": [
+    0.1,
+    0.1059
+   ],
+   "chuva_mm": 2.47,
+   "obs": ""
+  },
+  {
+   "data": "2026-10-27",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-10-27/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:12Z",
+   "http": 200,
+   "cor_rgb": [
+    0,
+    126,
+    69
+   ],
+   "faixa_mm_por_hora": [
+    0.1189,
+    0.1259
+   ],
+   "chuva_mm": 2.94,
+   "obs": ""
+  },
+  {
+   "data": "2026-10-28",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-10-28/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:12Z",
+   "http": 200,
+   "cor_rgb": [
+    133,
+    212,
+    0
+   ],
+   "faixa_mm_por_hora": [
+    0.7079,
+    0.7499
+   ],
+   "chuva_mm": 17.49,
+   "obs": ""
+  },
+  {
+   "data": "2026-10-29",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-10-29/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:12Z",
+   "http": 200,
+   "cor_rgb": [
+    195,
+    228,
+    0
+   ],
+   "faixa_mm_por_hora": [
+    1.0,
+    1.0593
+   ],
+   "chuva_mm": 24.7,
+   "obs": ""
+  },
+  {
+   "data": "2026-10-30",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-10-30/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:12Z",
+   "http": 200,
+   "cor_rgb": [
+    86,
+    198,
+    0
+   ],
+   "faixa_mm_por_hora": [
+    0.5309,
+    0.5623
+   ],
+   "chuva_mm": 13.11,
+   "obs": ""
+  },
+  {
+   "data": "2026-10-31",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-10-31/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:12Z",
+   "http": 200,
+   "cor_rgb": [
+    184,
+    225,
+    0
+   ],
+   "faixa_mm_por_hora": [
+    0.9441,
+    1.0
+   ],
+   "chuva_mm": 23.32,
+   "obs": ""
+  },
+  {
+   "data": "2026-11-01",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-11-01/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:12Z",
+   "http": 200,
+   "cor_rgb": [
+    0,
+    145,
+    41
+   ],
+   "faixa_mm_por_hora": [
+    0.1778,
+    0.1884
+   ],
+   "chuva_mm": 4.39,
+   "obs": ""
+  },
+  {
+   "data": "2026-11-02",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-11-02/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:12Z",
+   "http": 200,
+   "cor_rgb": [
+    0,
+    137,
+    54
+   ],
+   "faixa_mm_por_hora": [
+    0.1496,
+    0.1585
+   ],
+   "chuva_mm": 3.7,
+   "obs": ""
+  },
+  {
+   "data": "2026-11-03",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-11-03/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:13Z",
+   "http": 200,
+   "cor_rgb": [
+    0,
+    156,
+    20
+   ],
+   "faixa_mm_por_hora": [
+    0.2239,
+    0.2371
+   ],
+   "chuva_mm": 5.53,
+   "obs": ""
+  },
+  {
+   "data": "2026-11-04",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-11-04/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:13Z",
+   "http": 200,
+   "cor_rgb": [
+    30,
+    178,
+    0
+   ],
+   "faixa_mm_por_hora": [
+    0.3548,
+    0.3758
+   ],
+   "chuva_mm": 8.76,
+   "obs": ""
+  },
+  {
+   "data": "2026-11-05",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-11-05/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:13Z",
+   "http": 200,
+   "cor_rgb": [
+    143,
+    214,
+    0
+   ],
+   "faixa_mm_por_hora": [
+    0.7499,
+    0.7943
+   ],
+   "chuva_mm": 18.52,
+   "obs": ""
+  },
+  {
+   "data": "2026-11-06",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-11-06/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:13Z",
+   "http": 200,
+   "cor_rgb": [
+    191,
+    191,
+    191
+   ],
+   "faixa_mm_por_hora": [
+    null,
+    0.1
+   ],
+   "chuva_mm": 0.0,
+   "obs": "abaixo de 0,1 mm/hora (menos de 2,4 mm no dia): sai como 0"
+  },
+  {
+   "data": "2026-11-07",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-11-07/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:13Z",
+   "http": 200,
+   "cor_rgb": [
+    104,
+    203,
+    0
+   ],
+   "faixa_mm_por_hora": [
+    0.5957,
+    0.631
+   ],
+   "chuva_mm": 14.71,
+   "obs": ""
+  },
+  {
+   "data": "2026-11-08",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-11-08/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:13Z",
+   "http": 200,
+   "cor_rgb": [
+    123,
+    209,
+    0
+   ],
+   "faixa_mm_por_hora": [
+    0.6683,
+    0.7079
+   ],
+   "chuva_mm": 16.51,
+   "obs": ""
+  },
+  {
+   "data": "2026-11-09",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-11-09/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:13Z",
+   "http": 200,
+   "cor_rgb": [
+    191,
+    191,
+    191
+   ],
+   "faixa_mm_por_hora": [
+    null,
+    0.1
+   ],
+   "chuva_mm": 0.0,
+   "obs": "abaixo de 0,1 mm/hora (menos de 2,4 mm no dia): sai como 0"
+  },
+  {
+   "data": "2026-11-10",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-11-10/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:13Z",
+   "http": 200,
+   "cor_rgb": [
+    0,
+    142,
+    46
+   ],
+   "faixa_mm_por_hora": [
+    0.1679,
+    0.1778
+   ],
+   "chuva_mm": 4.15,
+   "obs": ""
+  },
+  {
+   "data": "2026-11-11",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-11-11/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:13Z",
+   "http": 200,
+   "cor_rgb": [
+    245,
+    224,
+    0
+   ],
+   "faixa_mm_por_hora": [
+    1.4125,
+    1.4962
+   ],
+   "chuva_mm": 34.89,
+   "obs": ""
+  },
+  {
+   "data": "2026-11-12",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-11-12/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:13Z",
+   "http": 200,
+   "cor_rgb": [
+    9,
+    170,
+    0
+   ],
+   "faixa_mm_por_hora": [
+    0.2985,
+    0.3162
+   ],
+   "chuva_mm": 7.37,
+   "obs": ""
+  },
+  {
+   "data": "2026-11-13",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-11-13/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:13Z",
+   "http": 200,
+   "cor_rgb": [
+    0,
+    162,
+    9
+   ],
+   "faixa_mm_por_hora": [
+    0.2512,
+    0.2661
+   ],
+   "chuva_mm": 6.21,
+   "obs": ""
+  },
+  {
+   "data": "2026-11-14",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-11-14/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:13Z",
+   "http": 404,
+   "cor_rgb": null,
+   "faixa_mm_por_hora": null,
+   "chuva_mm": null,
+   "obs": "sem ladrilho para o dia (HTTP 404)"
+  },
+  {
+   "data": "2026-11-15",
+   "endereco": "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate/default/2026-11-15/2km/5/11/14.png",
+   "consultado_em_utc": "2026-11-15T04:09:13Z",
+   "http": 404,
+   "cor_rgb": null,
+   "faixa_mm_por_hora": null,
+   "chuva_mm": null,
+   "obs": "sem ladrilho para o dia (HTTP 404)"
+  }
+ ]
+}

@@ -715,10 +715,12 @@ def replay_da_safra(entrada, safra="2015-16", par=None):
             continue
         nome, primeiro, ultimo = NOMES_NO_REPLAY[tipo], indices[0], indices[-1]
         falta = sum(da_safra[i].pedido - da_safra[i].bebido for i in indices)
+        pedido = sum(da_safra[i].pedido for i in indices)
         sede = [da_safra[i].ks < 1.0 for i in indices]
         quentes = [i for i in indices if linhas[i]["calor_forte"]]
-        resumo[tipo] = {"falta_mm": r1(falta), "dias": len(indices), "dias_de_sede": sum(sede),
-                        "dias_de_calor_forte": len(quentes)}
+        resumo[tipo] = {"falta_mm": r1(falta), "pedido_mm": r1(pedido),
+                        "falta_relativa_pct": r1(100.0 * falta / pedido) if pedido > 0 else 0.0,
+                        "dias": len(indices), "dias_de_sede": sum(sede), "dias_de_calor_forte": len(quentes)}
         marcos.append({"data": linhas[primeiro]["data"], "tipo": "plantio", "cultura": tipo,
                        "frase": f"Plantio: entra {nome}."})
         comeco, tamanho = _maior_sequencia(sede)
@@ -753,14 +755,26 @@ def replay_da_safra(entrada, safra="2015-16", par=None):
             if rotacao["com_braquiaria"] else None)
     return {"safra": safra, "cidade_id": entrada["cidade_id"], "local": dict(CIDADES[entrada["cidade_id"]],
                                                                              id=entrada["cidade_id"]),
-            "rotacao": {"id": rotacao["id"], "nome": rotacao["nome"]}, "terra": entrada["terra"],
-            "plantio_da_soja_informado": entrada["plantio_da_soja"],
+            "rotacao": {"id": rotacao["id"], "nome": rotacao["nome"], "segunda": rotacao["segunda"]},
+            "terra": entrada["terra"], "plantio_da_soja_informado": entrada["plantio_da_soja"],
             "primeiro_dia": linhas[0]["data"] if linhas else None, "ultimo_dia": linhas[-1]["data"] if linhas else None,
             "completa": len(linhas) >= 365, "dias": linhas, "marcos": marcos, "resumo": resumo,
             "limites_de_calor_c": {c: limites[c]["limite_c"] for c in ("soja", rotacao["segunda"]) if c in limites},
             "avisos": list(avisos) + ([nota] if nota else []) + [
                 "A água fácil de tirar acabar não é a terra secar de todo: é o ponto em que a planta começa a passar "
                 "sede (o freio da sede do FAO-56).", calor.AVISO]}
+
+
+def como_esta_hoje(entrada, par=None, hoje=None):
+    """O "durante": como está a água da lavoura no último dia com dado (ver `hoje.py`)."""
+    from orbita import hoje as peca
+    return peca.como_esta_hoje(entrada, par, hoje)
+
+
+def registro_da_safra(entrada, safra, par=None):
+    """O "depois": o registro da safra, depois da colheita (ver `registro.py`)."""
+    from orbita import registro
+    return registro.registro_da_safra(entrada, safra, par)
 
 
 def _plantio_informado(entrada, cal):
