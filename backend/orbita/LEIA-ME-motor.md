@@ -85,7 +85,11 @@ rotação que o produtor faz hoje (qualquer uma do cardápio) aparece em `rotaca
   dias seguidos de sede."); a frase do `agua_no_fundo` é a que diz "a água que a planta alcança acabou".
 - `agua_no_fundo` (acerto de 2026-11-15) é esse dia: o primeiro em que a água na terra chega ao menor valor do ciclo
   da cultura, só quando nesse dia a planta pediu água e não conseguiu beber nada (no mesmo caso, 2016-04-24, com
-  0,1 mm). Campos: `data`, `tipo`, `cultura`, `agua_na_terra_mm`, `frase` e `principal` (sempre `false`). Se a água
+  0,1 mm). Campos: `data`, `tipo`, `cultura`, `agua_na_terra_mm`, `situacao`, `frase` e `principal` (sempre `false`).
+  `situacao` (2026-11-15) diz o que aconteceu, e a frase acompanha: `acabou` (sobrou até 0,1 mm, a última casa que a
+  conta mostra), `perto_do_fundo` (sobrou mais que isso: em Rio Verde, 2018-19, o milho com 0,5 mm a 2 dias do fim do
+  ciclo) ou `seca_no_plantio` (o dia é o do plantio: a terra já chegou seca, como a soja em Silvânia 2015-16 e em Rio
+  Verde 2020-21). Só a frase do `acabou` diz "a água que a planta alcança acabou". Se a água
   não acabou de fato, ou se o ciclo não fechou nos dados guardados, não há esse marco. Os números são os de `dias`.
 
 ### O registro: as mesmas regras da comparação (acerto de 2026-11-15)
@@ -102,7 +106,7 @@ comparação das rotações, e agora cada um diz de onde vem:
 ## 2. Como rodar
 De dentro de `backend/`:
 ```bash
-python3 -m unittest                                   # 324 testes (os 227 de antes e os novos)
+python3 -m unittest                                   # 456 testes (os 227 de antes e os novos)
 python3 -m orbita.perguntar --cidade jatai --rotacao soja,sorgo --plantio 2026-11-20   # 3 rotações comparadas
 python3 -m orbita.perguntar --cidade jatai --rotacao soja,sorgo --plantio 20/11        # entrada errada: a frase, saída 2
 python3 -m orbita.perguntar --cidade silvania --lugar          # os fatos do clima do lugar
@@ -251,3 +255,14 @@ do `fonte.json` da pasta (`ndvi.fonte`). Nenhum nome de antes mudou; Rio Verde r
   não usa). Testes: `tests/test_verde_das_cidades.py` e `tests/test_chuva_de_5_dias.py`; dois testes antigos que
   esperavam "sem medida" em Silvânia mudaram, com o motivo escrito neles.
 - O que foi tentado e não deu (o Planetary Computer, o ClimateSERV, o ORNL, o portal do EGIS): `tentativas.md`, seção 7.
+
+## 9. A leitura do produtor em palavras simples (2026-11-15, 03h10)
+As frases que o motor escreve para o produtor (as 4 frases de cada rotação, o "como está hoje", o registro, o verde
+do satélite, os marcos e os avisos do replay) deixaram as palavras da conta: "mediana" virou "o valor do meio"; "zona
+das raízes", "a camada de terra onde ficam as raízes"; "chuva de modelo", "a chuva estimada por modelo de
+computador"; "faixa da hipótese", "o menor e o maior valor, porque isso não foi medido". O GPM IMERG, o NASA GIBS e a
+FAO vêm com a explicação ao lado ("a chuva medida por satélite da NASA", "o órgão da ONU para a agricultura"). A data
+sai como 11/11/2026 (`explicacao.data_br`), e o "como está hoje" escreve as duas datas, a do último dado e a da
+consulta, no lugar de "4 dias antes de hoje". Os campos (`data`, `ultimo_dia_com_dado`, `hoje`) continuam em
+ano-mês-dia, e o texto inteiro do agrônomo (`explicacao.texto`) mantém os termos técnicos. A falta de água em mm sai
+sempre com uma casa ("252,0 mm"). O teste é `tests/test_fala_simples.py`; a conferência dos números passa em todas.
