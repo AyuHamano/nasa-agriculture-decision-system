@@ -254,6 +254,20 @@ class AResposta(ComODuble):
         estado, saida, _ = self.passo(self.confirmada(), "e aí?", fala("", ENSAIO), fala("São 777."), fala("São 555."))
         self.assertEqual(saida["texto_de"], "frases_prontas")
 
+    def test_a_data_do_plantio_do_produtor_chega_a_ia_pelo_calendario_da_conta(self):
+        tarde = chamada("anotar_na_ficha", cidade_id="jatai", rotacao_atual="soja_milho_pousio", terra="media",
+                        preocupacao="agua", plantio_da_soja="2026-11-10")
+        estado = self.passo(None, "Plantei a soja em 10 de novembro, em Jataí.", fala("", tarde))[0]
+        texto = "Com a soja plantada em 10/11, ela sai em 05/03 e o milho entra em 08/03."
+        estado, saida, modelo = self.passo(estado, "sim", fala("", ENSAIO), fala(texto))
+        self.assertEqual((saida["resposta"], saida["texto_de"]), (texto, "ia"))
+        lido = modelo.pedidos[1][0][-1]["resultado"]
+        self.assertEqual(lido["calendario"]["plantio_da_soja_informado"], "2026-11-10")
+        # uma data que não está no calendário da conta não passa
+        estado, saida, _ = self.passo(estado, "e o sorgo?", fala("", ENSAIO), fala("O sorgo entra em 20/04."),
+                                      fala("O sorgo entra em 20/04."))
+        self.assertEqual(saida["texto_de"], "frases_prontas")
+
     def test_a_marca_de_apoio_e_o_momento_saem_do_que_a_ia_consultou(self):
         casos = (([ENSAIO], "conta", "antes"), ([CLIMA], "dados_do_lugar", "antes"), ([VERDE], "dados_do_lugar", "depois"),
                  ([REPLAY], "conta", "durante"), ([chamada("clima_do_lugar", hoje=True)], "conta", "durante"),

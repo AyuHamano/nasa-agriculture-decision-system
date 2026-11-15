@@ -88,6 +88,9 @@ class Duble:
             item["de_hoje"] = culturas == list(entrada["rotacao_atual"])
         return {"entrada": dict(entrada), "local": dict(self.CIDADES[entrada["cidade_id"]], id=entrada["cidade_id"]),
                 "regra_dos_anos": {"pior_ano": "2015-16", "ano_normal": "2019-20"},
+                "calendario": {"soja": {"plantio": "10/11", "sai_da_terra": "05/03"},
+                               "milho": {"plantio": "08/03", "sai_da_terra": "11/07"},
+                               "plantio_da_soja_informado": entrada.get("plantio_da_soja"), "deslocamento_dias": 26},
                 "comparacao_das_rotacoes": comparacao, "parametros": [{"valor": 777}], "limites": ["um limite, 555"]}
 
     def clima_do_lugar(self, cidade_id):

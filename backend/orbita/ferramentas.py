@@ -162,8 +162,10 @@ def ensaio_da_rotacao(ficha, safra=None):
     anos = resposta.get("regra_dos_anos") if isinstance(resposta.get("regra_dos_anos"), dict) else {}
     local = resposta.get("local") if isinstance(resposta.get("local"), dict) else {}
     resultado = {"lugar": local.get("nome") or ficha.get("cidade_id"),
-                 "pior_ano": anos.get("pior_ano"), "ano_normal": anos.get("ano_normal"),
-                 "rotacoes": conferir_comparacao(resposta.get("comparacao_das_rotacoes"))}
+                 "pior_ano": anos.get("pior_ano"), "ano_normal": anos.get("ano_normal")}
+    if isinstance(resposta.get("calendario"), dict):          # as datas de cada cultura, como o motor mandou: com a
+        resultado["calendario"] = resposta["calendario"]      # data de plantio do produtor, o calendário inteiro anda
+    resultado["rotacoes"] = conferir_comparacao(resposta.get("comparacao_das_rotacoes"))
     if safra is not None:
         qual = _qual_safra(safra, anos)
         replay = _chamar_o_motor("replay_da_safra", entrada_do_motor(ficha), qual)
@@ -217,7 +219,9 @@ def definicoes():
         {"nome": "ensaio_da_rotacao",
          "descricao": "Replanta a rotação de hoje do produtor e as alternativas no ano normal e no pior ano da "
                       "região. Devolve a comparação: de cada rotação, a água que faltou, os dias de calor forte, os "
-                      "dias sem planta viva, a evidência, o benefício, o risco e o que falta saber. Com safra, "
+                      "dias sem planta viva, a evidência, o benefício, o risco e o que falta saber; e o calendário "
+                      "usado na conta (quando cada cultura entra e sai da terra, já com a data de plantio que o "
+                      "produtor informou). Com safra, "
                       "traz também o replay daquela safra: os marcos, com a data (o plantio, o dia em que a água "
                       "acabou, o calor forte, a colheita).",
          "parametros": {"type": "object", "additionalProperties": False, "properties": {"safra": safra}}},

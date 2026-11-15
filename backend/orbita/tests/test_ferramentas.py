@@ -23,7 +23,9 @@ class OEnsaio(unittest.TestCase):
     def test_devolve_a_comparacao_de_3_rotacoes_como_o_motor_mandou(self):
         duble = com_o_duble(self)
         ensaio = ferramentas.ensaio_da_rotacao(FICHA)
-        self.assertEqual(list(ensaio), ["lugar", "pior_ano", "ano_normal", "rotacoes"])
+        self.assertEqual(list(ensaio), ["lugar", "pior_ano", "ano_normal", "calendario", "rotacoes"])
+        self.assertEqual(ensaio["calendario"]["plantio_da_soja_informado"], "2026-11-10")      # repassado do motor
+        self.assertEqual(ensaio["calendario"]["milho"], {"plantio": "08/03", "sai_da_terra": "11/07"})
         self.assertEqual((ensaio["lugar"], ensaio["pior_ano"], ensaio["ano_normal"]), ("Jataí (GO)", "2015-16", "2019-20"))
         self.assertEqual(ensaio["rotacoes"], json.loads(json.dumps(duble.responder(ferramentas.entrada_do_motor(FICHA))
                                                                    ["comparacao_das_rotacoes"])))
