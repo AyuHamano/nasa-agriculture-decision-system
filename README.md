@@ -1,5 +1,7 @@
 # Órbita Rural
 
+https://ayuhamano.github.io/nasa-agriculture-decision-system/
+
 Órbita Rural is a decision-support system for farmers, created by Equipe Agronautas for the NASA Space Apps Challenge 2026 challenge “Field Shift: Adapting Farms with NASA Data.” It brings together a browser-based application and a Python engine to help farmers understand field conditions, compare crop rotations, and review past seasons.
 
 The project uses public Earth-observation and agricultural data. It is not a NASA product or endorsed by NASA, and it does not replace a farmer’s judgment or advice from an agronomist.
