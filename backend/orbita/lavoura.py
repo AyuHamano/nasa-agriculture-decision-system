@@ -44,9 +44,9 @@ PLANTADA = {"soja": "plantada", "milho": "plantado", "sorgo": "plantado"}
 REGRAS = {
     "fase": "Atenção: a cultura está na fase crítica (a floração e o enchimento do grão), quando a falta de água e "
             "o calor mais pesam. Tranquilo: nas outras fases, ou sem cultura na terra.",
-    "agua": "Alerta: a cultura está com sede no último dia com dado, na conta com a chuva do satélite (a água fácil "
-            "de tirar da terra acabou). Atenção: sem sede nessa conta, mas com sede na conta com a chuva estimada "
-            "por modelo de computador. Tranquilo: sem sede nas duas, ou sem cultura na terra.",
+    "agua": "Alerta: a cultura está com sede no último dia com dado (a água fácil de tirar da terra acabou). "
+            "Tranquilo: sem sede, ou sem cultura na terra. A água não tem 'atenção': quem avisa antes é o aviso de "
+            "sede.",
     "calor": "Alerta: já houve dia de calor forte (a máxima acima do limite da cultura) dentro da fase crítica desta "
              "safra. Atenção: sem isso, mas os dias de calor forte desde o plantio passam do valor do meio das "
              "safras guardadas no mesmo dia do ciclo. Tranquilo: o resto, ou sem cultura na terra.",
@@ -57,9 +57,8 @@ REGRAS = {
              "dá alerta sozinho: os pontos são da região, não da lavoura.",
     "terra_coberta": "Tranquilo: a terra está com planta viva pelo calendário. Atenção: a terra está sem planta "
                      "viva.",
-    "aviso_de_sede": "Alerta: a cultura já está com sede. Atenção: sem chuva, a sede chega em até 7 dias, na conta "
-                     "com a chuva do satélite ou na conta com a chuva estimada por modelo de computador. Tranquilo: "
-                     "mais de 7 dias, não chega nos 30 dias da conta, ou sem cultura na terra.",
+    "aviso_de_sede": "Alerta: a cultura já está com sede. Atenção: sem chuva, a sede chega em até 7 dias. "
+                     "Tranquilo: mais de 7 dias, não chega nos 30 dias da conta, ou sem cultura na terra.",
 }
 AVISO = (retrato_de_hoje.AVISO + " A fase vem do calendário e da tabela da FAO, não de visita à lavoura. O verde do "
          "satélite é de pontos da região, escolhidos no mapa, não da lavoura. O aviso de sede não usa previsão do "
@@ -67,8 +66,8 @@ AVISO = (retrato_de_hoje.AVISO + " A fase vem do calendário e da tabela da FAO,
 DE_QUAL_DADO = {
     "fase": "o calendário da rotação e as fases da tabela da FAO (não é medida da lavoura), contados até o último "
             "dia com dado da conta da água",
-    "agua": "a conta da água: o último dia em que há a temperatura (a da NASA POWER) e a chuva rápida do satélite "
-            "(o GPM IMERG, lido no NASA GIBS), as duas",
+    "agua": "a conta da água: o último dia em que há a temperatura (a da NASA POWER) e a chuva do satélite em mm "
+            "de cada dia (o GPM IMERG), as duas",
     "calor": "a temperatura máxima de cada dia, da NASA POWER (um quadrado de uns 50 km), até o último dia com dado "
              "da conta da água",
     "verde": "a imagem mais recente do satélite com medida boa nos pontos da região (o produto MOD13Q1, da NASA, "
@@ -203,18 +202,16 @@ def dias_seguidos(registros, condicao):
     return quantos
 
 
-def situacao_da_agua(ha_cultura, sede, sede_pelo_modelo):
-    if not ha_cultura:
-        return "tranquilo"
-    return "alerta" if sede else ("atencao" if sede_pelo_modelo else "tranquilo")
+def situacao_da_agua(ha_cultura, sede):
+    return "alerta" if ha_cultura and sede else "tranquilo"
 
 
 def _item_da_agua(retrato, contas, ultimo):
     tipo, ha_cultura = retrato["o_que_esta_na_terra"], retrato["o_que_esta_na_terra"] in rotacoes.CULTURAS
     sede = dias_seguidos(contas["registros"], com_sede)
-    sede_pelo_modelo = dias_seguidos(contas["registros_do_modelo"], com_sede)
     pelo_modelo = retrato["com_a_chuva_de_modelo"]
     normal, pior = retrato["no_ano_normal"], retrato["no_pior_ano"]
+    chuva_ate = (retrato["chuva_recente"]["fonte"] or {}).get("ultimo_dia_com_dado")
     onde = "ao alcance da planta" if ha_cultura else "na terra"
     frase = (f"Em {data_br(ultimo)}, a conta dava {_n(retrato['agua_na_terra_mm'])} mm de água {onde}, "
              f"{_n(retrato['agua_na_terra_pct'])}% do que a terra segura: ")
@@ -224,22 +221,21 @@ def _item_da_agua(retrato, contas, ultimo):
         frase += f"{NA_TERRA[tipo]} estava com sede havia {_dias(sede)} seguidos."
     else:
         frase += f"{NA_TERRA[tipo]} não estava com sede."
-    frase += (f" Com a chuva estimada por modelo de computador no lugar da chuva do satélite, a conta dá "
-              f"{_n(pelo_modelo['agua_na_terra_mm'])} mm")
-    if ha_cultura:
-        frase += (f", com sede havia {_dias(sede_pelo_modelo)} seguidos" if sede_pelo_modelo else
-                  (", também sem sede" if not sede else ", sem sede"))
-    frase += (f". No mesmo dia do ano normal (safra {normal['safra']}) havia {_n(normal['agua_na_terra_mm'])} mm; "
+    frase += (f" No mesmo dia do ano normal (safra {normal['safra']}) havia {_n(normal['agua_na_terra_mm'])} mm; "
               f"no do pior ano (safra {pior['safra']}), {_n(pior['agua_na_terra_mm'])} mm.")
+    if chuva_ate:
+        frase += f" A chuva do satélite já guardada vai até {data_br(chuva_ate)}."
     campos = ("data", "safra", "agua_na_terra_mm", "agua_na_terra_pct", "com_sede", "diferenca_mm", "leitura")
-    return {"situacao": situacao_da_agua(ha_cultura, bool(sede), bool(sede_pelo_modelo)), "frase": frase,
+    return {"situacao": situacao_da_agua(ha_cultura, bool(sede)), "frase": frase,
             "o_que_esta_na_terra": tipo, "agua_na_terra_mm": retrato["agua_na_terra_mm"],
             "agua_que_a_terra_segura_mm": retrato["agua_que_a_terra_segura_mm"],
             "agua_na_terra_pct": retrato["agua_na_terra_pct"], "com_sede": retrato["com_sede"],
-            "dias_seguidos_de_sede": sede,
+            "dias_seguidos_de_sede": sede, "chuva_do_satelite_ate": chuva_ate,
             "com_a_chuva_de_modelo": {"agua_na_terra_mm": pelo_modelo["agua_na_terra_mm"],
                                       "agua_na_terra_pct": pelo_modelo["agua_na_terra_pct"],
-                                      "com_sede": pelo_modelo["com_sede"], "dias_seguidos_de_sede": sede_pelo_modelo},
+                                      "com_sede": pelo_modelo["com_sede"],
+                                      "o_que_e": "só para comparar: a mesma conta com a chuva estimada por modelo de "
+                                                 "computador (a da NASA POWER) nos dias recentes"},
             "faixa_da_agua_na_terra_mm": retrato["faixa_da_agua_na_terra_mm"],
             "chuva_desde_1_de_setembro_mm": retrato["chuva_desde_1_de_setembro_mm"],
             "no_ano_normal": {campo: normal[campo] for campo in campos},
@@ -470,13 +466,12 @@ def dias_ate_a_sede(futuros, tipo):
     return None, "nao_chega_no_horizonte"
 
 
-def situacao_do_aviso(ha_cultura, ja_com_sede, dias, sede_pelo_modelo, dias_pelo_modelo):
+def situacao_do_aviso(ha_cultura, ja_com_sede, dias):
     if not ha_cultura:
         return "tranquilo"
     if ja_com_sede:
         return "alerta"
-    perto = [d for d in (dias, dias_pelo_modelo) if d is not None and d <= JANELA_DO_CONSUMO_DIAS]
-    return "atencao" if sede_pelo_modelo or perto else "tranquilo"
+    return "atencao" if dias is not None and dias <= JANELA_DO_CONSUMO_DIAS else "tranquilo"
 
 
 def chuva_depois(chuva_recente, ultimo, hoje):
@@ -503,7 +498,7 @@ def _item_do_aviso(entrada, par, contas, tipo, ultimo, hoje, chuva_recente):
             "sem_chuva_a_partir_de": (ultimo + UM_DIA).isoformat(), "dia_da_consulta": hoje.isoformat(),
             "dias_ja_passados_ate_a_consulta": (hoje - ultimo).days}
     if tipo not in rotacoes.CULTURAS:
-        return dict(base, situacao=situacao_do_aviso(False, False, None, False, None), ja_com_sede=False,
+        return dict(base, situacao=situacao_do_aviso(False, False, None), ja_com_sede=False,
                     dias_seguidos_de_sede=0, dias_ate_a_sede=None, data_da_sede=None,
                     frase=f"Em {data_br(ultimo)} não havia cultura na terra: não há aviso de sede.")
 
@@ -515,7 +510,6 @@ def _item_do_aviso(entrada, par, contas, tipo, ultimo, hoje, chuva_recente):
                 "sem_sede_porque": motivo if dias is None and not sede else None}
 
     satelite = lado(contas["registros"], contas["com_recente"])
-    modelo = lado(contas["registros_do_modelo"], contas["com_modelo"])
     da_cultura = [r for r in contas["registros"][-JANELA_DO_CONSUMO_DIAS:] if r.tipo == tipo]
     consumo = round(sum(r.bebido for r in da_cultura) / len(da_cultura), 1) + 0.0
     nome = NA_TERRA[tipo]
@@ -535,8 +529,7 @@ def _item_do_aviso(entrada, par, contas, tipo, ultimo, hoje, chuva_recente):
     else:
         frase = f"Se não chover nada depois de {data_br(ultimo)}, {em_palavras(satelite)}."
     frase += (f" A conta segue a água da terra para a frente com o tempo dos últimos {JANELA_DO_CONSUMO_DIAS} dias "
-              f"com dado, em que a lavoura bebeu em média {_n(consumo)} mm por dia. Pela chuva estimada por modelo "
-              f"de computador, {em_palavras(modelo)}.")
+              f"com dado, em que a lavoura bebeu em média {_n(consumo)} mm por dia.")
     if hoje > ultimo:
         frase += (f" Até o dia desta consulta ({data_br(hoje)}) já se passaram {_dias((hoje - ultimo).days)} que a "
                   "conta ainda não fechou")
@@ -544,9 +537,8 @@ def _item_do_aviso(entrada, par, contas, tipo, ultimo, hoje, chuva_recente):
             f"; de {data_br(depois['de'])} a {data_br(depois['ate'])} o satélite já marcou "
             f"{_n(depois['satelite_rapido_mm'])} mm de chuva, que ainda não entraram na conta.")
     frase += " Não é previsão do tempo: a chuva que cair muda a conta."
-    return dict(base, situacao=situacao_do_aviso(True, satelite["ja_com_sede"], satelite["dias_ate_a_sede"],
-                                                 modelo["ja_com_sede"], modelo["dias_ate_a_sede"]),
-                frase=frase, **satelite, com_a_chuva_de_modelo=modelo, consumo_medio_mm_por_dia=consumo,
+    return dict(base, situacao=situacao_do_aviso(True, satelite["ja_com_sede"], satelite["dias_ate_a_sede"]),
+                frase=frase, **satelite, consumo_medio_mm_por_dia=consumo,
                 dias_do_consumo=len(da_cultura), agua_na_terra_mm=round(contas["registros"][-1].agua_na_terra, 1) + 0.0,
                 nivel_de_sede="o dia em que a água fácil de tirar da terra acaba e a planta começa a passar sede "
                               "(a mesma regra dos dias de sede do motor)")

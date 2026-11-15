@@ -57,7 +57,13 @@ class ChuvaDe5Dias(unittest.TestCase):
         rio_verde = motor.como_esta_hoje(ENTRADA, hoje=datetime.date(2026, 11, 15))
         self.assertEqual(rio_verde["chuva_recente"]["conferencia_em_mm"]["satelite_em_mm"], 437.2)
         self.assertEqual(rio_verde["chuva_recente"]["conferencia_em_mm"]["satelite_lido_da_cor_mm"], 397.8)
-        self.assertEqual(rio_verde["chuva_recente"]["satelite_rapido_mm"], 411.0)   # a conta segue com a mesma chuva
+        # Desde 2026-11-15 a conta usa a chuva em mm de cada dia (data/orbita/chuva-do-dia/), não mais a lida da cor
+        # (que dava 411,0 mm): a conferência da cor fica como registro (os dois números de cima não mudam) e a soma
+        # que a conta mostra é a da chuva do dia, do primeiro dia recente ao último dia da conta.
+        chuva, _ = hoje.ler_chuva_recente("rio_verde")
+        de, ate = (datetime.date.fromisoformat(rio_verde["chuva_recente"][ponta]) for ponta in ("de", "ate"))
+        self.assertEqual(rio_verde["chuva_recente"]["satelite_rapido_mm"],
+                         round(sum(mm for dia, mm in chuva.items() if de <= dia <= ate), 1))
 
 
 if __name__ == "__main__":

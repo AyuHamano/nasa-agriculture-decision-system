@@ -106,7 +106,7 @@ comparação das rotações, e agora cada um diz de onde vem:
 ## 2. Como rodar
 De dentro de `backend/`:
 ```bash
-python3 -m unittest                                   # 488 testes (os 227 de antes e os novos)
+python3 -m unittest                                   # 489 testes (os 227 de antes e os novos)
 python3 -m orbita.perguntar --cidade jatai --rotacao soja,sorgo --plantio 2026-11-20   # 3 rotações comparadas
 python3 -m orbita.perguntar --cidade jatai --rotacao soja,sorgo --plantio 20/11        # entrada errada: a frase, saída 2
 python3 -m orbita.perguntar --cidade silvania --lugar          # os fatos do clima do lugar
@@ -297,9 +297,10 @@ que resume e a `situacao`, que é a pior dos itens.
 - **A fase.** Atenção: a cultura está na fase crítica (a floração e o enchimento do grão). Tranquilo: nas outras fases
   ou sem cultura na terra. Os nomes das fases para o produtor: no começo do ciclo, em crescimento, na fase crítica, no
   fim do ciclo (a maturação).
-- **A água.** Alerta: com sede no último dia com dado, na conta com a chuva do satélite. Atenção: sem sede nessa
-  conta, mas com sede na conta com a chuva estimada por modelo de computador. Tranquilo: o resto. A comparação com o
-  ano normal e o pior ano vai na frase, mas não muda a situação (em Jataí o pior ano tinha a terra cheia nessa data).
+- **A água.** Alerta: com sede no último dia com dado. Tranquilo: sem sede, ou sem cultura na terra. A água não tem
+  "atenção" (quem avisa antes é o aviso de sede); até a troca da seção 11, "atenção" era ter sede só na conta com a
+  chuva de modelo. A comparação com o ano normal e o pior ano vai na frase, mas não muda a situação (em Jataí o pior
+  ano tinha a terra quase cheia nessa data).
 - **O calor.** "Dia de calor forte", aqui, é o dia com a máxima acima do limite da cultura em qualquer fase (na
   comparação das rotações o motor conta só os da fase crítica; esse número vai ao lado, em
   `dias_de_calor_forte_na_fase_critica`). Alerta: já houve dia de calor forte dentro da fase crítica desta safra.
@@ -314,7 +315,8 @@ que resume e a `situacao`, que é a pior dos itens.
 - **O aviso de sede.** A conta segue para a frente por 30 dias, sem chuva, com o tempo dos últimos 7 dias com dado (a
   média da temperatura e da evaporação de referência); o pedido da cultura em cada dia segue o calendário e as fases.
   O nível de sede é o dos dias de sede do motor (a água fácil de tirar acabou). Alerta: já com sede. Atenção: a sede
-  chega em até 7 dias, na conta com a chuva do satélite ou na da chuva de modelo. Tranquilo: o resto. Os 7 e os 30
+  chega em até 7 dias. Tranquilo: o resto. A frase diz também quanta chuva o satélite já marcou depois do último dia
+  da conta (`chuva_depois_do_ultimo_dia`), que ainda não entrou por faltar a temperatura desses dias. Os 7 e os 30
   dias são escolha desta versão, não número de fonte. Não há previsão do tempo.
 
 ### Como rodar e o que ficou de fora
@@ -325,3 +327,31 @@ que resume e a `situacao`, que é a pior dos itens.
   16/10/2026 (a de 01/11/2026 não tinha saído). O painel diz a data da imagem.
 - Ficou de fora: a ferramenta do agente (`ferramentas.py`) e o arquivo da tela (`exportar --tudo`) ainda não levam o
   painel; a fase vem do calendário, não de visita à lavoura; o verde é da região, não do talhão do produtor.
+
+## 11. A chuva do dia no lugar da chuva lida da cor, e a temperatura um dia mais perto (2026-11-15, 08h20)
+A pedido da coordenação, num commit à parte do painel:
+- **A chuva recente mudou de fonte.** O `como_esta_hoje` e o painel passam a ler `data/orbita/chuva-do-dia/<cidade>/
+  chuva-do-dia.csv`: o GPM IMERG V07 em mm, por dia de Brasília, na versão Late e, onde ela ainda não chegou, na
+  Early (`hoje.ler_chuva_recente`). Vem da cópia dos arquivos da NASA que a dynamical.org mantém (não é servidor da
+  NASA; licença CC BY 4.0, citação "NASA IMERG from dynamical.org"); o programa, a regra do dia e a conferência estão
+  no `LEIA-ME.md` daquela pasta. A leitura da cor da imagem do NASA GIBS (`data/orbita/recente/`) não entra mais na
+  conta: fica em `hoje.ler_chuva_da_cor` e no registro `chuva_recente.conferencia_em_mm`.
+- **A água sai como um número só.** A frase do `como_esta_hoje` dá a água da conta com essa chuva e diz até que dia a
+  chuva vai; `faixa_da_agua_na_terra_mm` continua existindo, com as duas pontas iguais, e `com_a_chuva_de_modelo`
+  continua ao lado, só para comparar (nenhum nome de antes saiu). No painel, a chuva de modelo saiu das frases e das
+  regras.
+- **A temperatura guardada ganhou um dia.** `data/orbita/nasa-power/acrescentar_dias.py` (novo, só a biblioteca
+  padrão) pergunta de novo os últimos dias à NASA POWER e troca o -999 pelo valor só onde os três parâmetros já
+  chegaram; dia que já tinha valor não muda. Em 2026-11-15, 08h18, entrou o dia 12/11/2026 nas três cidades (o
+  endereço e a hora estão em `acrescimos.json`, em cada pasta); 13/11 em diante a NASA POWER ainda não tinha.
+- **A data de cada dado, na consulta de 2026-11-15:** a conta da água, a fase, o calor, a terra coberta e o aviso de
+  sede, até 12/11/2026 (o último dia com a temperatura); a chuva do satélite, até 14/11/2026 (Late até 13/11, Early no
+  dia 14); o verde do satélite, a imagem de 16/10/2026.
+- **O que saber:** o dia da chuva nova é o de Brasília e o da temperatura e da chuva guardada é o da NASA POWER (na
+  emenda de 14 para 15/09/2026 ficam 3 horas sem entrar em nenhuma das duas); em Rio Verde, de 15/09 a 12/11/2026, a
+  chuva nova soma 431,8 mm (a lida da cor dava 411,0 mm até 11/11).
+- **O que não acompanhou** (fora das pastas desta parte, ou sem tempo): os números gravados da tela (`motor.js`,
+  `respostas.js`) e as conversas guardadas ainda trazem a água com a chuva lida da cor e a faixa; o pedido à IA do
+  agente (`agente.py`) ainda manda dar "os dois valores da água"; os documentos de `docs/orbita/` e a seção 3 deste
+  arquivo ainda descrevem a leitura da cor como a fonte da conta. Nenhuma rotina agendada baixa a chuva ou a
+  temperatura: é rodar os dois programas à mão.

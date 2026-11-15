@@ -100,7 +100,7 @@ class OPainel(unittest.TestCase):
         with tempfile.TemporaryDirectory() as pasta:
             vazio = lavoura.lavoura_hoje(ENTRADA, hoje=DIA_DO_TESTE, pasta_da_chuva_recente=pathlib.Path(pasta))
         self.assertFalse(vazio["disponivel"])
-        self.assertIn("baixar_chuva_recente.py", vazio["aviso"])
+        self.assertIn("baixar_chuva_do_dia.py", vazio["aviso"])
 
     def test_entrada_errada_e_erro_em_portugues(self):
         with self.assertRaises(ValueError) as erro:
@@ -179,10 +179,13 @@ class AAgua(unittest.TestCase):
         self.assertEqual(lavoura.dias_seguidos([registro(dia, "sem_planta", ks=0.1)], lavoura.com_sede), 0)
 
     def test_a_regra_da_situacao_da_agua(self):
-        self.assertEqual(lavoura.situacao_da_agua(True, True, False), "alerta")
-        self.assertEqual(lavoura.situacao_da_agua(True, False, True), "atencao")
-        self.assertEqual(lavoura.situacao_da_agua(True, False, False), "tranquilo")
-        self.assertEqual(lavoura.situacao_da_agua(False, False, False), "tranquilo")      # sem cultura na terra
+        self.assertEqual(lavoura.situacao_da_agua(True, True), "alerta")
+        self.assertEqual(lavoura.situacao_da_agua(True, False), "tranquilo")
+        self.assertEqual(lavoura.situacao_da_agua(False, False), "tranquilo")             # sem cultura na terra
+        self.assertEqual(ITENS["agua"]["faixa_da_agua_na_terra_mm"],                      # um número só
+                         {"de": ITENS["agua"]["agua_na_terra_mm"], "ate": ITENS["agua"]["agua_na_terra_mm"]})
+        self.assertEqual(ITENS["agua"]["chuva_do_satelite_ate"], RETRATO["chuva_recente"]["fonte"]["ultimo_dia_com_dado"])
+        self.assertIn(lavoura.data_br(ITENS["agua"]["chuva_do_satelite_ate"]), ITENS["agua"]["frase"])
 
 
 class OCalor(unittest.TestCase):
@@ -337,7 +340,7 @@ class OAvisoDeSede(unittest.TestCase):
             self.assertTrue(1 <= item["dias_ate_a_sede"] <= 30)
             self.assertEqual(item["data_da_sede"], (ULTIMO + item["dias_ate_a_sede"] * UM_DIA).isoformat())
         self.assertGreater(item["consumo_medio_mm_por_dia"], 0)
-        self.assertIn("com_a_chuva_de_modelo", item)
+        self.assertNotIn("modelo", item["frase"])
         self.assertNotIn("previsão do tempo é", item["frase"])
         self.assertIn("Não é previsão do tempo", item["frase"])
 
@@ -357,18 +360,11 @@ class OAvisoDeSede(unittest.TestCase):
 
     def test_a_regra_da_situacao_do_aviso(self):
         s = lavoura.situacao_do_aviso
-        self.assertEqual(s(ha_cultura=True, ja_com_sede=True, dias=None, sede_pelo_modelo=False, dias_pelo_modelo=None),
-                         "alerta")
-        self.assertEqual(s(ha_cultura=True, ja_com_sede=False, dias=7, sede_pelo_modelo=False, dias_pelo_modelo=20),
-                         "atencao")
-        self.assertEqual(s(ha_cultura=True, ja_com_sede=False, dias=20, sede_pelo_modelo=False, dias_pelo_modelo=3),
-                         "atencao")
-        self.assertEqual(s(ha_cultura=True, ja_com_sede=False, dias=20, sede_pelo_modelo=True, dias_pelo_modelo=None),
-                         "atencao")
-        self.assertEqual(s(ha_cultura=True, ja_com_sede=False, dias=8, sede_pelo_modelo=False, dias_pelo_modelo=None),
-                         "tranquilo")
-        self.assertEqual(s(ha_cultura=False, ja_com_sede=False, dias=None, sede_pelo_modelo=False,
-                           dias_pelo_modelo=None), "tranquilo")
+        self.assertEqual(s(ha_cultura=True, ja_com_sede=True, dias=None), "alerta")
+        self.assertEqual(s(ha_cultura=True, ja_com_sede=False, dias=7), "atencao")
+        self.assertEqual(s(ha_cultura=True, ja_com_sede=False, dias=8), "tranquilo")
+        self.assertEqual(s(ha_cultura=True, ja_com_sede=False, dias=None), "tranquilo")
+        self.assertEqual(s(ha_cultura=False, ja_com_sede=False, dias=None), "tranquilo")
 
 
 class ALinhaDeComandoEARota(unittest.TestCase):

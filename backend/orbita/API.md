@@ -296,8 +296,12 @@ A resposta (`motor.lavoura_hoje`; os números mudam com o dado guardado, e aqui 
   `maior`, `por_ano`).
 - `terra_coberta`: `com_planta_viva`, `desde`, `dias_seguidos`, `antes` (a sequência anterior) e `na_safra`.
 - `aviso_de_sede`: `ja_com_sede`, `dias_seguidos_de_sede`, `dias_ate_a_sede`, `data_da_sede`, `sem_chuva_a_partir_de`,
-  `consumo_medio_mm_por_dia`, `janela_dias` (7), `horizonte_dias` (30), `com_a_chuva_de_modelo` (os mesmos campos) e
-  `chuva_depois_do_ultimo_dia` (a chuva que o satélite já marcou depois do último dia da conta, se houver).
+  `consumo_medio_mm_por_dia`, `janela_dias` (7), `horizonte_dias` (30) e `chuva_depois_do_ultimo_dia` (a chuva que
+  o satélite já marcou depois do último dia da conta, se houver).
+- Desde 2026-11-15 a chuva dos dias recentes é a chuva do satélite em mm de cada dia (`data/orbita/chuva-do-dia/`), e
+  não mais a lida da cor da imagem: a água sai como um número só (`faixa_da_agua_na_terra_mm` fica com as duas pontas
+  iguais, `com_a_chuva_de_modelo` fica só para comparar), no painel e no "como está hoje". O exemplo acima foi escrito
+  antes dessa troca: com ela e com a temperatura até 12/11/2026, o `ultimo_dia_com_dado` é `2026-11-12`.
 - Sem a chuva recente guardada: `{"disponivel": false, "aviso": ...}`. Entrada errada: 400, com a frase do motor.
 - As regras de cada situação, a janela de 7 dias e os 30 dias estão no `LEIA-ME-motor.md`, seção 10. Na linha de
   comando: `python3 -m orbita.perguntar --lavoura-hoje --cidade jatai --plantio 2026-10-20` (com `--json`, a estrutura).

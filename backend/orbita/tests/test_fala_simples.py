@@ -70,8 +70,10 @@ class AsFrasesDoProdutor(unittest.TestCase):
                       "(15/11/2026).", agora["frase"])
         self.assertNotIn("antes de hoje", agora["frase"])
         self.assertIn("na camada de terra onde ficam as raízes", agora["frase"])
-        self.assertIn("a chuva estimada por modelo de computador", agora["frase"])
-        self.assertIn("a chuva estimada por modelo de computador", hoje.AVISO)
+        # Desde 2026-11-15 a água sai como um número só, com a chuva do satélite em mm de cada dia: a frase diz até
+        # onde vai essa chuva e não cita mais a conta com a chuva de modelo (que fica ao lado, só para comparar).
+        self.assertIn("a chuva do satélite, em mm de cada dia, vai até", agora["frase"])
+        self.assertIn("a chuva medida por satélite da NASA (o GPM IMERG)", hoje.AVISO)
 
     def test_o_mesmo_numero_sai_escrito_do_mesmo_jeito(self):
         # A falta de água em mm sai sempre com uma casa ("252,0", nunca "252"), nas 4 frases de cada rotação.

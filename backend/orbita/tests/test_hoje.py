@@ -19,12 +19,27 @@ class ChuvaRecente(unittest.TestCase):
         for cidade in motor.CIDADES:
             valores, fonte = hoje.ler_chuva_recente(cidade)
             self.assertGreater(len(valores), 30, cidade)
-            bruto = json.loads((hoje.PASTA_DA_CHUVA_RECENTE / cidade / "fonte.json").read_text(encoding="utf-8"))
+            # Desde 2026-11-15 a chuva recente é a chuva do dia: o GPM IMERG em mm (o Late e, onde falta, o Early).
+            bruto = json.loads((hoje.PASTA_DA_CHUVA_DO_DIA / cidade / "fonte.json").read_text(encoding="utf-8"))
             self.assertAlmostEqual(bruto["ponto"]["latitude"], motor.CIDADES[cidade]["latitude"])
             for consulta in bruto["consultas"]:
-                self.assertTrue(consulta["endereco"].startswith("https://gibs.earthdata.nasa.gov/"), cidade)
-                self.assertTrue(consulta["consultado_em_utc"])
-            self.assertTrue(fonte["ressalvas"])
+                self.assertTrue(consulta["endereco"].startswith("https://dynamical-nasa-imerg.s3"), cidade)
+                self.assertTrue(consulta["hora_utc"])
+            self.assertEqual((fonte["licenca"], fonte["citacao"]), ("CC BY 4.0", "NASA IMERG from dynamical.org"))
+            self.assertIn(fonte["versao_do_ultimo_dia"], ("late", "early"))
+            self.assertGreater(len(hoje.ler_chuva_da_cor(cidade)[0]), 30, cidade)      # a leitura da cor fica guardada
+
+    def test_a_chuva_do_dia_vale_o_late_e_onde_falta_o_early_e_dia_em_branco_nao_vira_zero(self):
+        with tempfile.TemporaryDirectory() as pasta:
+            (pathlib.Path(pasta) / "x").mkdir()
+            (pathlib.Path(pasta) / "x" / "chuva-do-dia.csv").write_text(
+                "data,chuva_early_mm,chuva_late_mm\n2026-11-12,2.87,3.22\n2026-11-13,0.00,0.00\n"
+                "2026-11-14,23.67,\n2026-11-15,,\n", encoding="utf-8")
+            valores, fonte = hoje.ler_chuva_recente("x", pathlib.Path(pasta))
+        self.assertEqual(valores, {D(2026, 11, 12): 3.22, D(2026, 11, 13): 0.0, D(2026, 11, 14): 23.67,
+                                   D(2026, 11, 15): None})
+        self.assertEqual((fonte["ultimo_dia_com_dado"], fonte["versao_do_ultimo_dia"],
+                          fonte["ultimo_dia_da_versao_late"]), ("2026-11-14", "early", "2026-11-13"))
 
     def test_esticar_para_no_primeiro_dia_sem_dado_e_nunca_poe_zero(self):
         dia = lambda data, chuva: clima.Dia(data, chuva, 30.0, 20.0, 4.0)  # noqa: E731
@@ -66,9 +81,13 @@ class Retrato(unittest.TestCase):
         self.assertEqual(chuva["ate"], RETRATO["ultimo_dia_com_dado"])
         self.assertGreater(chuva["satelite_rapido_mm"], 0)
         self.assertGreater(chuva["modelo_da_nasa_power_mm"], 0)
-        self.assertEqual({faixa["de"], faixa["ate"]},
-                         {RETRATO["agua_na_terra_mm"], RETRATO["com_a_chuva_de_modelo"]["agua_na_terra_mm"]})
-        self.assertLessEqual(faixa["de"], faixa["ate"])
+        # Desde 2026-11-15 a água sai como um número só (a conta com a chuva do dia): a faixa tem as duas pontas
+        # iguais, a conta com a chuva de modelo fica ao lado só para comparar, e a frase diz até onde vai a chuva.
+        self.assertEqual(faixa, {"de": RETRATO["agua_na_terra_mm"], "ate": RETRATO["agua_na_terra_mm"]})
+        self.assertIn("agua_na_terra_mm", RETRATO["com_a_chuva_de_modelo"])
+        self.assertNotIn("modelo", RETRATO["frase"])
+        self.assertIn(hoje.data_br(chuva["fonte"]["ultimo_dia_com_dado"]), RETRATO["frase"])
+        self.assertIn("chuva-do-dia", chuva["origem"])
 
     def test_cada_ultimo_dia_com_dado_diz_de_qual_dado_e(self):
         # Na mesma resposta há duas datas com esse nome: a da conta (precisa da temperatura e da chuva) e a da chuva
@@ -101,7 +120,7 @@ class Retrato(unittest.TestCase):
         with tempfile.TemporaryDirectory() as pasta:
             vazio = hoje.como_esta_hoje(ENTRADA, hoje=DIA_DO_TESTE, pasta_da_chuva_recente=pathlib.Path(pasta))
         self.assertFalse(vazio["disponivel"])
-        self.assertIn("baixar_chuva_recente.py", vazio["aviso"])
+        self.assertIn("baixar_chuva_do_dia.py", vazio["aviso"])
 
     def test_entrada_errada_e_erro_em_portugues(self):
         with self.assertRaises(ValueError) as erro:

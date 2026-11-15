@@ -1,17 +1,19 @@
 # Gerado com IA (Claude)
 """O "durante": como está a água da lavoura hoje, perto do ano normal e do pior ano no mesmo dia do calendário.
 
-O problema: a chuva do satélite GPM IMERG entregue pela NASA POWER (a que o motor usa) chega com cerca de 2 meses de
-atraso. O caminho rápido, testado em 2026-11-15: a camada diária IMERG_Precipitation_Rate do NASA GIBS (o serviço de
-imagens da NASA), sem login, com 2 dias de atraso. O GIBS só entrega imagem; o programa
-`data/orbita/recente/baixar_chuva_recente.py` lê a cor do ponto e traduz pela tabela de cores oficial.
+O problema: a chuva do satélite GPM IMERG entregue pela NASA POWER (a que o motor usa nas safras guardadas) chega
+com cerca de 2 meses de atraso. Desde 2026-11-15 os dias recentes vêm da chuva do dia: o GPM IMERG V07 em mm, somado
+no dia de Brasília, na versão Late e, nos dias em que ela ainda não chegou, na Early (as duas rápidas; a NASA ainda
+corrige). Os arquivos ficam em `data/orbita/chuva-do-dia/<cidade>/chuva-do-dia.csv`, baixados por
+`data/orbita/chuva-do-dia/baixar_chuva_do_dia.py` da cópia dos arquivos da NASA que a dynamical.org mantém (licença
+CC BY 4.0, "NASA IMERG from dynamical.org"; o `LEIA-ME.md` de lá conta a regra do dia e a conferência).
 
-O que isso quer dizer para a conta (está tudo em `data/orbita/recente/LEIA-ME.md`):
-- a chuva recente é APROXIMADA: vem em faixas de cor, e dia com menos de 2,4 mm sai como zero;
-- os dias recentes do GIBS são da versão rápida do IMERG (Early), que a NASA corrige depois; nos 213 dias em que deu
-  para comparar com a chuva guardada, a soma ficou 7% abaixo;
-- por isso a resposta traz também a mesma conta com a chuva de modelo da NASA POWER (PRECTOTCORR) nos dias recentes:
-  os dois números dão a faixa. A chuva de modelo ficou bem abaixo da estação em terra em Rio Verde de 2021 para cá.
+O que isso quer dizer para a conta:
+- a água na terra sai como um número só, o da conta com essa chuva; a mesma conta com a chuva de modelo da NASA POWER
+  (PRECTOTCORR) continua ao lado, em `com_a_chuva_de_modelo`, só para comparar;
+- o dia do retrato continua preso à temperatura guardada da NASA POWER: a chuva chegar a ontem não basta;
+- antes disso a chuva recente era lida da cor da imagem diária do NASA GIBS (`data/orbita/recente/`): essa leitura
+  não entra mais na conta e fica só no registro da conferência (`conferencia_em_mm`).
 O motor não baixa nada na hora da pergunta: lê o que está guardado. Para atualizar, rodar o programa de baixar.
 """
 import csv
@@ -21,12 +23,13 @@ import json
 from orbita import balanco, clima, parametros, rotacoes
 from orbita.explicacao import data_br
 
-PASTA_DA_CHUVA_RECENTE = clima.PASTA_DOS_DADOS / "recente"
-AVISO = ("A chuva dos dias recentes é aproximada: é a chuva medida por satélite da NASA (o GPM IMERG), na versão "
-         "rápida, lida da cor da imagem que a NASA publica todo dia (o serviço NASA GIBS; dia com menos de 2,4 mm "
-         "sai como zero), e a NASA ainda corrige esse dado. Ao lado vai a mesma conta com a chuva estimada por "
-         "modelo de computador (a da NASA POWER), para dar o menor e o maior valor. A temperatura é a de um quadrado "
-         "de uns 50 km. É um retrato para conversar com o agrônomo, não uma medida da lavoura.")
+PASTA_DA_CHUVA_RECENTE = clima.PASTA_DOS_DADOS / "recente"          # a leitura da cor (só a conferência)
+PASTA_DA_CHUVA_DO_DIA = clima.PASTA_DOS_DADOS / "chuva-do-dia"      # a chuva do satélite por dia, em mm
+AVISO = ("A chuva dos dias recentes é a chuva medida por satélite da NASA (o GPM IMERG), em mm de cada dia, nas "
+         "versões rápidas (a Late e, nos dias em que ela ainda não chegou, a Early), que a NASA ainda corrige; vem da "
+         "cópia dos arquivos da NASA que a dynamical.org mantém. A temperatura é a da NASA POWER, de um quadrado de "
+         "uns 50 km, e chega com uns 3 dias de atraso: por isso o último dia da conta fica antes do último dia de "
+         "chuva. É um retrato para conversar com o agrônomo, não uma medida da lavoura.")
 
 # As duas datas que se chamam "último dia com dado" são de dados diferentes: cada uma diz de qual, ao lado.
 DIA_DA_CONTA = ("da conta: o último dia em que há a temperatura (a da NASA POWER) e a chuva rápida do satélite, as "
@@ -36,8 +39,11 @@ DIA_DA_CHUVA_RAPIDA = ("só da chuva rápida do satélite: o último dia com chu
                        "dia do retrato, que também precisa da temperatura.")
 
 
-def ler_chuva_recente(cidade_id, pasta=None):
-    """A chuva recente guardada da cidade: (data -> mm ou None, a ficha da fonte). Sem arquivo: (None, None)."""
+def ler_chuva_da_cor(cidade_id, pasta=None):
+    """A chuva lida da cor da imagem do NASA GIBS (a que a conta usou até 2026-11-15): (data -> mm ou None, a ficha).
+
+    Fica só para a conferência (`conferencia_em_mm`). Sem arquivo: (None, None).
+    """
     pasta = (pasta or PASTA_DA_CHUVA_RECENTE) / cidade_id
     arquivo = pasta / "chuva-recente.csv"
     if not arquivo.exists():
@@ -54,6 +60,38 @@ def ler_chuva_recente(cidade_id, pasta=None):
                                                         "comecou_em_utc", "terminou_em_utc", "ultimo_dia_com_dado")}
         if fonte.get("ultimo_dia_com_dado"):
             fonte["ultimo_dia_com_dado_de"] = DIA_DA_CHUVA_RAPIDA
+    return valores, fonte
+
+
+def ler_chuva_recente(cidade_id, pasta=None):
+    """A chuva do dia guardada da cidade: (data -> mm ou None, a ficha da fonte). Sem arquivo: (None, None).
+
+    É a chuva do satélite GPM IMERG em mm, por dia de Brasília: vale a versão Late e, onde ela ainda não chegou, a
+    Early. Dia em branco no arquivo vira None, nunca zero. `pasta` é onde ficam as pastas das cidades.
+    """
+    pasta = (pasta or PASTA_DA_CHUVA_DO_DIA) / cidade_id
+    arquivo = pasta / "chuva-do-dia.csv"
+    if not arquivo.exists():
+        return None, None
+    valores, versoes = {}, {}
+    with open(arquivo, encoding="utf-8", newline="") as f:
+        for linha in csv.DictReader(f):
+            late, early = (linha.get("chuva_late_mm") or "").strip(), (linha.get("chuva_early_mm") or "").strip()
+            dia = datetime.date.fromisoformat(linha["data"].strip())
+            valores[dia] = float(late or early) if (late or early) else None
+            versoes[dia] = "late" if late else ("early" if early else None)
+    fonte = {}
+    if (pasta / "fonte.json").exists():
+        bruto = json.loads((pasta / "fonte.json").read_text(encoding="utf-8"))
+        fonte = {chave: bruto.get(chave) for chave in ("o_que_e", "de_onde_vem", "licenca", "citacao", "versao_do_dado",
+                                                        "conta", "regra_do_dia", "ponto", "ultima_rodada_utc")}
+    com_dado = [dia for dia, mm in valores.items() if mm is not None]
+    if com_dado:
+        fonte["ultimo_dia_com_dado"] = max(com_dado).isoformat()
+        fonte["ultimo_dia_com_dado_de"] = DIA_DA_CHUVA_RAPIDA
+        fonte["versao_do_ultimo_dia"] = versoes[max(com_dado)]
+        do_late = [dia for dia in com_dado if versoes[dia] == "late"]
+        fonte["ultimo_dia_da_versao_late"] = max(do_late).isoformat() if do_late else None
     return valores, fonte
 
 
@@ -84,8 +122,10 @@ def conferencia_em_mm(cidade_id, chuva_recente, pasta=None):
     return {"periodos_de_5_dias": len(pares), "de": pares[0][0].isoformat(), "ate": pares[-1][1].isoformat(),
             "satelite_em_mm": round(em_mm, 1) + 0.0, "satelite_lido_da_cor_mm": round(da_cor, 1) + 0.0,
             "diferenca_pct": round(100.0 * (da_cor - em_mm) / em_mm, 1) + 0.0 if em_mm else None,
-            "o_que_e": "A soma da chuva lida da cor (a que a conta usa) ao lado da mesma chuva do satélite em mm "
-                       "(GPM IMERG Late V07, somado de 5 em 5 dias), nos períodos em que as duas existem.",
+            "o_que_e": "A soma da chuva lida da cor da imagem do NASA GIBS (a que a conta usou até 2026-11-15) ao "
+                       "lado da mesma chuva do satélite em mm (GPM IMERG Late V07, somado de 5 em 5 dias), nos "
+                       "períodos em que as duas existem. Fica como registro: a conta hoje usa a chuva em mm de cada "
+                       "dia.",
             "origem": f"data/orbita/recente/{cidade_id}/chuva-5-dias.csv (o endereço e a hora de cada consulta "
                       "estão em fonte-5-dias.json, na mesma pasta)"}
 
@@ -180,8 +220,8 @@ def como_esta_hoje(entrada, par=None, hoje=None, pasta_da_chuva_recente=None):
     recente, fonte = ler_chuva_recente(entrada["cidade_id"], pasta_da_chuva_recente)
     if recente is None:
         return {"disponivel": False, "local": dict(cidade, id=entrada["cidade_id"]),
-                "aviso": f"A chuva recente de {cidade['nome']} não está guardada: rode data/orbita/recente/"
-                         "baixar_chuva_recente.py para o ponto da cidade."}
+                "aviso": f"A chuva do dia de {cidade['nome']} não está guardada: rode data/orbita/chuva-do-dia/"
+                         "baixar_chuva_do_dia.py para o ponto da cidade."}
     contas = contas_de_hoje(entrada, par, recente)
     guardados, com_recente, com_modelo = contas["guardados"], contas["com_recente"], contas["com_modelo"]
     registros, registros_do_modelo = contas["registros"], contas["registros_do_modelo"]
@@ -193,7 +233,7 @@ def como_esta_hoje(entrada, par=None, hoje=None, pasta_da_chuva_recente=None):
     pior = _retrato(registros, _mesmo_dia(ultimo, regra["pior_ano"]))
     primeiro_recente = guardados[-1].data + datetime.timedelta(days=1)
     soma = lambda dias: round(sum(d.chuva for d in dias if d.data >= primeiro_recente), 1) + 0.0  # noqa: E731
-    pontas = sorted((agora["agua_na_terra_mm"], pelo_modelo["agua_na_terra_mm"]))
+    pontas = (agora["agua_na_terra_mm"], agora["agua_na_terra_mm"])     # um número só: a conta com a chuva do dia
 
     def contra(outro):
         diferenca = round(agora["agua_na_terra_mm"] - outro["agua_na_terra_mm"], 1) + 0.0
@@ -206,8 +246,8 @@ def como_esta_hoje(entrada, par=None, hoje=None, pasta_da_chuva_recente=None):
     frase = (f"Em {cidade['nome']}, o último dia com dado é {data_br(ultimo)}, {(hoje - ultimo).days} dias antes "
              f"do dia desta consulta ({data_br(hoje)}). {na_terra} A conta dá "
              f"{_n(agora['agua_na_terra_mm'])} mm de água na camada de terra onde ficam as raízes, "
-             f"{_n(agora['agua_na_terra_pct'])}% do que a terra segura (com a chuva estimada por modelo de "
-             f"computador no lugar da chuva rápida do satélite, {_n(pelo_modelo['agua_na_terra_mm'])} mm). No mesmo dia do ano normal (safra {regra['ano_normal']}) "
+             f"{_n(agora['agua_na_terra_pct'])}% do que a terra segura (a chuva do satélite, em mm de cada dia, "
+             f"vai até {data_br(fonte['ultimo_dia_com_dado'])}). No mesmo dia do ano normal (safra {regra['ano_normal']}) "
              f"havia {_n(normal['agua_na_terra_mm'])} mm; no do pior ano (safra {regra['pior_ano']}), "
              f"{_n(pior['agua_na_terra_mm'])} mm.")
     return {
@@ -228,8 +268,9 @@ def como_esta_hoje(entrada, par=None, hoje=None, pasta_da_chuva_recente=None):
         "chuva_recente": {
             "de": primeiro_recente.isoformat(), "ate": ultimo.isoformat(), "dias": (ultimo - primeiro_recente).days + 1,
             "satelite_rapido_mm": soma(com_recente), "modelo_da_nasa_power_mm": soma(com_modelo),
-            "fonte": fonte, "origem": f"data/orbita/recente/{entrada['cidade_id']}/chuva-recente.csv (o endereço e "
-                                      "a hora de cada consulta estão em fonte.json, na mesma pasta)",
+            "fonte": fonte, "origem": f"data/orbita/chuva-do-dia/{entrada['cidade_id']}/chuva-do-dia.csv (o endereço "
+                                      "e a hora de cada consulta estão em fonte.json, na mesma pasta)",
             "chuva_guardada_ate": guardados[-1].data.isoformat(),
-            "conferencia_em_mm": conferencia_em_mm(entrada["cidade_id"], recente, pasta_da_chuva_recente)},
+            "conferencia_em_mm": conferencia_em_mm(entrada["cidade_id"],
+                                                   ler_chuva_da_cor(entrada["cidade_id"])[0] or {})},
         "frase": frase, "aviso": AVISO}

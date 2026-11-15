@@ -1,0 +1,17 @@
+{
+  "o_que_e": "Os dias do fim da série que foram acrescentados depois do primeiro download (o -999 trocado pelo valor que a NASA POWER soltou depois). O programa é data/orbita/nasa-power/acrescentar_dias.py.",
+  "rodadas": [
+    {
+      "endereco": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR,T2M_MAX,T2M_MIN&community=AG&longitude=-51.71&latitude=-17.88&start=20261103&end=20261115&format=JSON&time-standard=LST",
+      "consultado_em_utc": "2026-11-15T11:18:43Z",
+      "dias_acrescentados": [
+        {
+          "dia": "2026-11-12",
+          "PRECTOTCORR": 2.33,
+          "T2M_MAX": 31.88,
+          "T2M_MIN": 22.22
+        }
+      ]
+    }
+  ]
+}
