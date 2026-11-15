@@ -27,6 +27,7 @@ main:focus { outline: none; }
 .o-pe p { max-width: 62ch; }
 .o-pe-lema { font-weight: 800; color: var(--tinta); }
 .o-pe a { display: inline-block; padding: 12px 6px; margin: -12px 0; color: var(--tinta); }
+body.no-app main { padding-bottom: 20px; }      /* folga para o botão "Perguntar" não cobrir o fim dos números */
 body.no-app .o-pe { padding-bottom: 156px; }
 body.na-entrada .o-pe { display: none; }
 
@@ -116,6 +117,7 @@ body.na-entrada .o-pe { display: none; }
 .o-ficha .linha { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--linha); }
 .o-ficha dt { font-size: .86rem; font-weight: 600; color: var(--tinta-leve); }
 .o-ficha dd { font-weight: 800; }
+.o-dito { display: block; font-size: .84rem; font-weight: 600; color: var(--tinta-leve); }
 .o-ficha .o-bt { margin-top: 14px; }
 .o-trocar { flex: none; min-height: 44px; padding: 0 10px; border: 0; background: none; color: var(--agua); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
 .o-bt { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 54px; padding: 8px 20px; border: 1.5px solid var(--folha); border-radius: 14px; background: var(--folha); color: #fff; font-weight: 800; font-size: 1rem; text-align: center; cursor: pointer; }
@@ -192,7 +194,8 @@ body.na-entrada .o-pe { display: none; }
   .o-nave a:hover { background: var(--folha-clara); }
   .o-nave a[aria-current="page"] { background: var(--tinta); color: #fff; box-shadow: none; }
   .o-perguntar { right: max(24px, calc((100% - 1080px) / 2)); bottom: 28px; }
-  body.no-app .o-pe { padding-bottom: 36px; }
+  body.no-app main { padding-bottom: 40px; }
+  body.no-app .o-pe { padding-bottom: 104px; }
   .o-tela { padding-block: 22px 30px; gap: 18px; }
   .o-missao { padding: 26px 30px 22px; }
   .o-missao::before { width: 520px; height: 520px; right: -200px; top: -330px; }

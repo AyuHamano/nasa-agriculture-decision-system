@@ -56,7 +56,8 @@
     if (en.campo) falar("assistente", PERGUNTAS[en.campo]); else { en.campo = "ficha"; falar("assistente", "Anotei a sua lavoura. Está certo?"); }
     desenharEntrada(true);
   }
-  function escolher(campo, valor, nome) { en.l[campo] = valor; falar("produtor", nome); perguntarOProximo(); }
+  var DITO = { cidade_id: "lugar_dito", rotacao_id: "rotacao_dita" };      // o que o produtor disse e a ficha guarda ao lado da cidade e da rotação da conta
+  function escolher(campo, valor, nome) { en.l[campo] = valor; if (DITO[campo]) delete en.l[DITO[campo]]; falar("produtor", nome); perguntarOProximo(); }
   function anotar(achou, respostaDaIA) {
     var novos = CAMPOS.filter(function (c) { return achou[c] && achou[c] !== en.l[c]; });
     novos.forEach(function (c) { en.l[c] = achou[c]; });
@@ -83,6 +84,9 @@
       if (mudou("terra") && T.TERRAS[f.terra]) achou.terra = f.terra;
       if (mudou("plantio_da_soja") && /^\d{4}-(09|10|11|12)-\d{2}$/.test(f.plantio_da_soja)) achou.plantio_da_soja = f.plantio_da_soja;
       if (f.preocupacao) en.l.preocupacao = f.preocupacao;
+      [["lugar_dito", "cidade_id"], ["rotacao_dita", "rotacao_atual"]].forEach(function (d) {      // o que ele disse com as palavras dele (o lugar fora da lista, a rotação)
+        if (f[d[0]]) en.l[d[0]] = String(f[d[0]]); else if (mudou(d[1])) delete en.l[d[0]];
+      });
       en.estado = s.estado || en.estado; en.fichaDaIA = f; en.ocupado = false; anotar(achou, s.resposta || "");
     }, function () { en.ocupado = false; anotar(lerTexto(txt), ""); });
   }
@@ -95,12 +99,12 @@
       h += en.outroDia ? '<span class="o-dia"><input type="date" id="diaDoPlantio" min="' + a + '-09-01" max="' + a + '-12-31" value="' + a + '-10-15" aria-label="O dia do plantio da soja"><button type="button" class="o-opcao cheia" data-acao="usar-dia">Usar este dia</button></span>'
         : '<button type="button" class="o-opcao" data-acao="outro-dia">Escolher o dia</button>';
     }
-    return '<div class="o-opcoes" role="group" aria-label="' + esc(PERGUNTAS[campo]) + '">' + h + "</div>" + (campo === "cidade_id" ? '<p class="o-legenda">Por enquanto, três cidades de Goiás.</p>' : "");
+    return '<div class="o-opcoes" role="group" aria-label="' + esc(PERGUNTAS[campo]) + '">' + h + "</div>" + (campo === "cidade_id" ? '<p class="o-legenda">Três cidades de Goiás.</p>' : "");
   }
   function valorNaFicha(l, c) { return c === "cidade_id" ? T.CIDADES[l[c]] : c === "rotacao_id" ? T.ROTACOES[l[c]].nome : c === "terra" ? T.TERRAS[l[c]].nome : T.dataPorExtenso(l[c]); }
   function fichaHtml(l, trocavel) {
     return "<dl>" + CAMPOS.map(function (c) {
-      return '<div class="linha"><div><dt>' + NOMES[c] + "</dt><dd>" + esc(valorNaFicha(l, c)) + "</dd></div>" + (trocavel ? '<button type="button" class="o-trocar" data-acao="trocar-campo" data-campo="' + c + '">Trocar</button>' : "") + "</div>";
+      return '<div class="linha"><div><dt>' + NOMES[c] + "</dt><dd>" + esc(valorNaFicha(l, c)) + (DITO[c] && l[DITO[c]] ? '<small class="o-dito">Você disse: ' + esc(l[DITO[c]]) + "</small>" : "") + "</dd></div>" + (trocavel ? '<button type="button" class="o-trocar" data-acao="trocar-campo" data-campo="' + c + '">Trocar</button>' : "") + "</div>";
     }).join("") + "</dl>";
   }
   function desenharEntrada(descer) {
@@ -122,7 +126,7 @@
   function confirmarLavoura() {
     if (faltando()) return;
     app.lavoura = { cidade_id: en.l.cidade_id, rotacao_id: en.l.rotacao_id, terra: en.l.terra, plantio_da_soja: en.l.plantio_da_soja };
-    if (en.l.preocupacao) app.lavoura.preocupacao = en.l.preocupacao;
+    ["preocupacao", "lugar_dito", "rotacao_dita"].forEach(function (k) { if (en.l[k]) app.lavoura[k] = en.l[k]; });
     gravar(CHAVE, app.lavoura); app.cache = {}; app.safra = ""; ag = { estado: null, confirmada: false, falas: [], ocupado: false };
     abrirApp("hoje");
   }
@@ -136,7 +140,7 @@
   function mostrarReserva(r) {
     var el = $("reserva");
     if (!r || !r.reserva) { el.hidden = true; return; }
-    el.textContent = "Sem resposta do servidor: estes são os números guardados" + (r.gerado_em ? " em " + T.dataCurta(r.gerado_em) : "") + (/-10-15$/.test(app.lavoura.plantio_da_soja || "") ? "" : ", para a soja plantada em 15/10") + ".";
+    el.textContent = "Dados guardados" + (r.gerado_em ? " em " + T.dataCurta(r.gerado_em) : "") + (/-10-15$/.test(app.lavoura.plantio_da_soja || "") ? "" : ", para a soja plantada em 15/10") + ".";
     el.hidden = false;
   }
   function marcarNave() {
@@ -201,7 +205,7 @@
     busca("replay", safra).then(function (r) {
       if (vez !== app.vez || $("folha").hidden) return;
       window.ORBITA_REPLAY.montar(el, r.dados, T.CIDADES[app.lavoura.cidade_id]);
-      $("folhaNota").textContent = r.reserva ? "Sem resposta do servidor: esta é a safra guardada, em terra média." : "";
+      $("folhaNota").textContent = r.reserva ? "Dados guardados" + (r.gerado_em ? " em " + T.dataCurta(r.gerado_em) : "") + ", em terra média." : "";
     }, function () { el.innerHTML = '<p class="o-espera">Não deu para buscar a safra agora.</p>'; });
     $("fecharFolha").focus();
   }
@@ -209,7 +213,7 @@
 
   /* ---------- a lavoura guardada ---------- */
   function abrirLavoura() {
-    $("janelaCorpo").innerHTML = fichaHtml(app.lavoura, false) + '<p class="o-legenda">A lavoura fica guardada só neste aparelho.</p>';
+    $("janelaCorpo").innerHTML = fichaHtml(app.lavoura, false) + '<p class="o-legenda">A lavoura fica guardada neste aparelho.</p>';
     $("janela").hidden = false; $("fecharJanela").focus();
   }
   function trocarDeLavoura() {
@@ -223,7 +227,10 @@
   /* ---------- o assistente à mão ---------- */
   function estadoDaFicha(pergunta) {
     var l = app.lavoura;      // a ficha que o produtor confirmou na entrada; o "sim" dela vai no texto, e o servidor põe o selo
-    return { v: 1, ficha: { cidade_id: l.cidade_id, rotacao_atual: D.culturas[l.rotacao_id], terra: l.terra, plantio_da_soja: l.plantio_da_soja || null, preocupacao: l.preocupacao || "agua", confirmada: false },
+    var ficha = { cidade_id: l.cidade_id, rotacao_atual: D.culturas[l.rotacao_id], terra: l.terra, plantio_da_soja: l.plantio_da_soja || null, preocupacao: l.preocupacao || "agua", confirmada: false };
+    if (l.lugar_dito) ficha.lugar_dito = l.lugar_dito;
+    if (l.rotacao_dita) ficha.rotacao_dita = l.rotacao_dita;
+    return { v: 1, ficha: ficha,
              selo: null, pergunta: pergunta, momento: MOMENTO[app.tela] || "durante", falas: [] };
   }
   function desenharGaveta() {
@@ -303,7 +310,7 @@
     "opcao": function (b) { escolher(b.getAttribute("data-campo"), b.getAttribute("data-valor"), b.getAttribute("data-nome")); },
     "outro-dia": function () { en.outroDia = true; desenharEntrada(true); var c = $("diaDoPlantio"); if (c) c.focus(); },
     "usar-dia": function () { var c = $("diaDoPlantio"), v = c ? c.value : ""; if (/^\d{4}-(09|10|11|12)-\d{2}$/.test(v)) escolher("plantio_da_soja", v, T.dataPorExtenso(v)); },
-    "trocar-campo": function (b) { var c = b.getAttribute("data-campo"); delete en.l[c]; en.campo = c; en.outroDia = false; falar("assistente", PERGUNTAS[c]); desenharEntrada(true); },
+    "trocar-campo": function (b) { var c = b.getAttribute("data-campo"); delete en.l[c]; if (DITO[c]) delete en.l[DITO[c]]; en.campo = c; en.outroDia = false; falar("assistente", PERGUNTAS[c]); desenharEntrada(true); },
     "confirmar-lavoura": confirmarLavoura,
     "ano-ruim": abrirAnoRuim, "fechar-folha": fecharFolha,
     "abrir-lavoura": abrirLavoura, "fechar-janela": function () { $("janela").hidden = true; $("botaoLavoura").focus(); }, "trocar-lavoura": trocarDeLavoura,

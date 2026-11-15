@@ -1,6 +1,9 @@
 /* Gerado com IA (Claude). */
-/* De onde a tela tira os números: da API do motor (o endereço vem de "?api=..." no fim do endereço da página, ou de
-   API_BASE em js/textos.js) e, quando ela não responde, dos dados guardados em dados/ (gerados pelo gerar-dados.py).
+/* De onde a tela tira os números: da API do motor e, quando ela não responde, dos dados guardados em dados/ (gerados
+   pelo gerar-dados.py). O endereço da API: o de "?api=..." no fim do endereço da página (ou API_BASE, em
+   js/textos.js); sem nenhum dos dois, e com a página aberta por http(s), a tela procura a API em "/api" do mesmo
+   endereço. Aberta como arquivo, não procura nada. A pergunta "a API está de pé?" (GET /saude) é feita uma vez só, e
+   todo pedido espera por ela antes de escolher entre a API e os guardados.
    A tela não faz conta: mostra o que o motor devolve. Os arquivos guardados só são baixados quando fazem falta. */
 (function () {
   "use strict";
@@ -12,7 +15,8 @@
     var daPagina = "";
     try { daPagina = new URLSearchParams(window.location.search).get("api") || ""; } catch (erro) { daPagina = ""; }
     var b = String(daPagina || (typeof API_BASE === "string" ? API_BASE : "") || "").replace(/\/+$/, "");
-    return /^https?:\/\//.test(b) ? b : "";
+    if (/^https?:\/\//.test(b)) return b;
+    try { return /^https?:$/.test(window.location.protocol) ? window.location.origin + "/api" : ""; } catch (erro) { return ""; }
   }
   var D = { api: base(), ia: false, culturas: CULTURAS };
 
@@ -26,19 +30,26 @@
       return j;
     });
   }
-  function post(rota, corpo, ms) {
-    if (!D.api) return Promise.reject(new Error("sem_api"));
-    var p = comPrazo(ms || 15000);
-    return fetch(D.api + rota, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(corpo), signal: p.sinal })
-      .then(lerResposta).then(function (j) { clearTimeout(p.relogio); return j; }, function (e) { clearTimeout(p.relogio); throw e; });
-  }
-  // Pergunta à API se ela está de pé e se a IA do assistente está ligada. Sem resposta, a tela segue só com os guardados.
+  // Pergunta à API, uma vez só, se ela está de pé (a resposta tem de ser a do motor: um JSON com as rotas) e se a IA
+  // do assistente está ligada. Sem resposta (404, erro, demora), a tela segue só com os guardados.
+  var pronta = null;
   function saude() {
-    if (!D.api) return Promise.resolve(false);
+    if (pronta) return pronta;
+    if (!D.api) return (pronta = Promise.resolve(false));
     var p = comPrazo(6000);
-    return fetch(D.api + "/saude", { signal: p.sinal }).then(lerResposta).then(function (j) {
+    pronta = fetch(D.api + "/saude", { signal: p.sinal }).then(lerResposta).then(function (j) {
+      if (!j || !Array.isArray(j.rotas)) throw new Error("nao_e_a_api");
       clearTimeout(p.relogio); D.ia = !!(j.ia_do_agente && j.ia_do_agente.ligada); return true;
-    }, function () { clearTimeout(p.relogio); D.api = ""; D.ia = false; return false; });
+    }).catch(function () { clearTimeout(p.relogio); D.api = ""; D.ia = false; return false; });
+    return pronta;
+  }
+  function post(rota, corpo, ms) {
+    return saude().then(function () {
+      if (!D.api) throw new Error("sem_api");
+      var p = comPrazo(ms || 15000);
+      return fetch(D.api + rota, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(corpo), signal: p.sinal })
+        .then(lerResposta).then(function (j) { clearTimeout(p.relogio); return j; }, function (e) { clearTimeout(p.relogio); throw e; });
+    });
   }
 
   var pedidos = {};

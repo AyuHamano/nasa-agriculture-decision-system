@@ -15,6 +15,7 @@
   var MESES = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
   var CULTURA = { soja: "soja", milho: "milho", sorgo: "sorgo", braquiaria: "capim", sem_planta: "terra sem planta" };
   var ITEM = { fase: "a fase da cultura", agua: "a água", calor: "o calor", verde: "o verde do satélite", terra_coberta: "a terra coberta", aviso_de_sede: "o aviso de sede" };
+  var AGRONOMO = "Converse com o agrônomo antes de decidir.";      // só quando a resposta não traz o aviso curto do motor
   var MAIS = {
     fechar: '<path d="M6 6l12 12M18 6 6 18"/>',
     pino: '<path d="M12 21s6.500-5.800 6.500-11a6.500 6.500 0 0 0-13 0c0 5.200 6.500 11 6.500 11z"/><circle cx="12" cy="10" r="2.300"/>',
@@ -29,6 +30,15 @@
   }
   function num(x, casas) { return typeof x === "number" && isFinite(x) ? x.toLocaleString("pt-BR", { minimumFractionDigits: casas, maximumFractionDigits: casas }) : ""; }
   function faixa(v, casas) { return v && typeof v === "object" ? num(v.de, casas) + " a " + num(v.ate, casas) : num(v, casas); }
+  // A falta de água do milho com capim vem do motor como faixa (do menor ao maior efeito do capim). Na tabela vai um
+  // número só: o do meio, que o motor também devolve (o cenário "meio" da disputa do capim com o milho). Nada é
+  // calculado aqui: se o motor não mandar o do meio, fica a faixa.
+  function doMeio(e, v) {
+    if (!v || typeof v !== "object") return v;
+    if (typeof v.meio === "number") return v.meio;
+    var m = (((((e.comparacao || {}).agua || {}).pela_faixa || {}).por_cenario || {}).meio || {}).falta_mm;
+    return typeof m === "number" && m >= v.de && m <= v.ate ? m : v;
+  }
   function partes(iso) { return /^(\d{4})-(\d{2})-(\d{2})/.exec(String(iso || "")); }
   function dataCurta(iso) { var m = partes(iso); return m ? m[3] + "/" + m[2] : String(iso || ""); }
   function dataBR(iso) { var m = partes(iso); return m ? m[3] + "/" + m[2] + "/" + m[1] : String(iso || ""); }
@@ -117,7 +127,7 @@
     var itens = Array.isArray(p && p.itens) ? p.itens : [], porId = {};
     itens.forEach(function (i) { porId[i.id] = i; });
     if (!p || p.disponivel === false || !itens.length) {
-      return '<div class="o-tela"><header class="o-missao s-sem_dado"><p class="o-missao-onde">' + esc(ondeEOQue(l)) + '</p><h1>Minha lavoura hoje</h1><p class="o-missao-frase">Ainda não há dado recente para esta lavoura.</p></header>' +
+      return '<div class="o-tela"><header class="o-missao s-sem_dado"><p class="o-missao-onde">' + esc(ondeEOQue(l)) + '</p><h1>Minha lavoura hoje</h1><p class="o-missao-frase">Sem dado novo desta lavoura agora.</p></header>' +
         (p && p.aviso ? '<p class="o-nota">' + esc(p.aviso) + "</p>" : "") + "</div>";
     }
     var naTerra = (porId.fase || {}).o_que_esta_na_terra || (porId.agua || {}).o_que_esta_na_terra || "", fase = porId.fase || {};
@@ -130,7 +140,7 @@
     return '<div class="o-tela"><header class="o-missao s-' + esc(p.situacao) + '"><p class="o-missao-onde">' + esc(ondeEOQue(l)) + "</p><h1>Minha lavoura hoje</h1>" +
       '<p class="o-missao-sit"><i></i>' + esc(p.situacao_nome || p.situacao) + '</p><p class="o-missao-frase">' + esc(fraseDoTopo(itens)) + (agora ? " <span>" + esc(agora) + "</span>" : "") + "</p>" +
       '<p class="o-missao-data">Dado de ' + esc(dataBR(p.ultimo_dia_com_dado)) + "</p></header>" +
-      '<div class="o-cartoes">' + cartoes + '</div><p class="o-agronomo">Converse com o agrônomo antes de decidir.</p></div>';
+      '<div class="o-cartoes">' + cartoes + '</div><p class="o-agronomo">' + esc(p.aviso || AGRONOMO) + "</p></div>";
   }
 
   /* ---------- Ensaiar ---------- */
@@ -153,7 +163,7 @@
     if (!lista.length) return '<div class="o-tela estreita"><header class="o-cab"><h1>Ensaiar</h1></header><p class="o-nota">O ensaio desta lavoura não está disponível agora.</p></div>';
     var cal = e.calendario || {}, ano = anoRuim(e), segunda = /sorgo/.test(l.rotacao_id) ? cal.sorgo : cal.milho;
     var MEDIDAS = [
-      { k: "agua", nome: "Água que falta", sub: "mm no ano ruim", v: function (c) { return faixa((c.agua || {}).falta_no_pior_ano_mm, 1); } },
+      { k: "agua", nome: "Água que falta", sub: "mm no ano ruim", v: function (c) { return faixa(doMeio(e, (c.agua || {}).falta_no_pior_ano_mm), 1); } },
       { k: "calor", nome: "Calor forte", sub: "dias na fase crítica", v: function (c) { return faixa((c.calor || {}).dias_de_calor_forte_no_pior_ano, 0); } },
       { k: "terra_coberta", nome: "Terra sem planta", sub: "dias seguidos", v: function (c) { return faixa((c.terra_coberta || {}).dias_sem_planta_viva, 0); } }
     ];
@@ -169,14 +179,18 @@
           lista.map(function (c) { return "<td" + (melhor(c, m.k) ? ' class="m"' : "") + ">" + esc(m.v(c)) + "</td>"; }).join("") + "</tr>";
       }).join("") + '</tbody></table></div><p class="o-legenda">Em destaque, o melhor número de cada linha. Todas começam com soja.</p>';
     var riscos = '<h2 class="o-sub">O risco de cada caminho</h2><ul class="o-riscos">' + lista.map(function (c) {
-      return "<li><b>" + esc(curto(c)) + (c.de_hoje ? " (a sua)" : "") + "</b>" + esc(primeiraFrase(c.risco)) + "</li>";
+      return "<li><b>" + esc(curto(c)) + (c.de_hoje ? " (a sua)" : "") + "</b>" + esc(c.risco) + "</li>";
     }).join("") + "</ul>";
     var prova = '<details class="o-prova"><summary class="o-bt claro">Ver a prova</summary><div class="o-prova-dentro">' +
-      lista.map(function (c) { return "<h3>" + esc(maiuscula(c.nome || c.apelido)) + "</h3><p>" + esc(c.evidencia) + "</p>" + (c.falta_saber ? "<p><b>O que falta saber.</b> " + esc(c.falta_saber) + "</p>" : ""); }).join("") +
+      lista.map(function (c) {
+        var falta = (c.agua || {}).falta_no_pior_ano_mm;
+        return "<h3>" + esc(maiuscula(c.nome || c.apelido)) + "</h3><p>" + esc(c.evidencia) + "</p>" +
+          (falta && typeof falta === "object" ? "<p>A água que falta no ano ruim vai de " + esc(faixa(falta, 1)) + " mm, conforme o capim disputa água com o milho.</p>" : "") + (c.falta_saber ? "<p><b>O que falta saber.</b> " + esc(c.falta_saber) + "</p>" : "");
+      }).join("") +
       "<h3>De onde vêm os números</h3><p>A chuva é a medida por satélite da NASA (GPM IMERG). A temperatura é a da NASA POWER. O verde da lavoura vem do satélite MODIS, da NASA. A conta da água segue o manual da FAO. O ano ruim (" + esc(String((e.regra_dos_anos || {}).pior_ano || "")) + ") e o ano normal (" + esc(String((e.regra_dos_anos || {}).ano_normal || "")) + ') são os da colheita do IBGE na cidade.</p><p><a href="#agronomo">Ver as contas completas, para o agrônomo</a></p></div></details>';
     return '<div class="o-tela estreita"><header class="o-cab"><h1>Ensaiar</h1><p>' + esc(CIDADES[l.cidade_id] || "") + (cal.soja && cal.soja.plantio ? ". Soja em " + esc(cal.soja.plantio) + (segunda && segunda.plantio ? ", a 2ª safra entra em " + esc(segunda.plantio) : "") : "") + ".</p></header>" +
       '<p class="o-resp">' + esc(respostaDoEnsaio(lista, ano)) + "</p>" + tabela + riscos +
-      '<p class="o-agronomo">Converse com o agrônomo antes de decidir.</p>' +
+      '<p class="o-agronomo">' + esc(e.aviso || AGRONOMO) + "</p>" +
       '<div class="o-acoes">' + prova + '<button type="button" class="o-bt" data-acao="ano-ruim">' + ic("tocar") + "Ver um ano ruim: " + esc(ano) + "</button></div></div>";
   }
 

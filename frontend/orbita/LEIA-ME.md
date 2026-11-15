@@ -7,12 +7,15 @@ colher). A tela **não faz conta**: mostra o que o motor e o agente (em `backend
 
 ## Como abrir
 
-- **Com a API** (o jeito de uso): `index.html?api=http://127.0.0.1:8000` (ou o endereço em `API_BASE`, no
-  `js/textos.js`). Para ligar a API, de dentro de `backend/`: `python3 -m orbita.api` (a IA do assistente precisa da
-  chave no ambiente; veja o `LEIA-ME-agente.md`).
+- **No servidor** (o jeito de uso): a tela acha a API sozinha. Aberta por `http(s)` sem nenhum parâmetro, ela procura
+  a API em `/api` do mesmo endereço (`GET /api/saude`): se a resposta é a do motor, usa; se não (404, erro, demora),
+  usa os dados guardados, sem aviso de erro. A pergunta é feita uma vez só, e toda tela espera por ela.
+- **Com a API em outro endereço:** `index.html?api=http://127.0.0.1:8000` (ou o endereço em `API_BASE`, no
+  `js/textos.js`); tem prioridade sobre o `/api`. Para ligar a API, de dentro de `backend/`: `python3 -m orbita.api`
+  (a IA do assistente precisa da chave no ambiente; veja o `LEIA-ME-agente.md`).
 - **Sem a API:** dois cliques em `index.html`. Não precisa de servidor nem de internet: as letras, o logo e os ícones
-  estão nesta pasta, e os números vêm dos dados guardados em `dados/`. Uma linha discreta no topo diz isso
-  ("Sem resposta do servidor: estes são os números guardados em ...").
+  estão nesta pasta, e os números vêm dos dados guardados em `dados/` (aberta como arquivo, a tela não procura a
+  API). Uma linha discreta no topo diz isso ("Dados guardados em 15/11.").
 
 ## O que tem na tela
 
@@ -20,7 +23,9 @@ colher). A tela **não faz conta**: mostra o que o motor e o agente (em `backend
   produtor planta (soja e depois milho, milho com capim ou sorgo), em que mês planta a soja (de setembro a dezembro,
   no dia 15, ou "Escolher o dia") e como é a terra (arenosa, média ou argilosa). Cada pergunta tem botões; os toques
   montam a ficha sem IA. Quem prefere escrever, escreve: o texto vai ao assistente (`POST /agente`), e o que ele
-  anotar entra na ficha. Sem a IA, a tela lê as palavras mais simples do texto (o nome da cidade, da cultura, da
+  anotar entra na ficha. Quando ele diz um lugar ou uma rotação fora da lista, a resposta traz `lugar_dito` e
+  `rotacao_dita`: a ficha mostra a cidade e a rotação da conta e, embaixo, "Você disse: ..."; os dois ficam guardados
+  com a lavoura e vão junto nas perguntas ao assistente. Sem a IA, a tela lê as palavras mais simples do texto (o nome da cidade, da cultura, da
   terra, o mês) e pede o toque no que faltar. No fim o produtor confere a ficha e confirma.
 - **A lavoura fica guardada no aparelho** (no armazenamento do navegador, chave `orbita.lavoura.v1`). Ao voltar, o
   aplicativo abre direto em "Minha lavoura hoje". O botão com o nome da cidade, no topo, mostra a ficha e tem
@@ -31,7 +36,9 @@ colher). A tela **não faz conta**: mostra o que o motor e o agente (em `backend
   da cultura, o calor, o verde do satélite e a terra coberta. "Entender" abre a frase inteira do motor.
 - **Ensaiar** (`POST /recomendacao`): a resposta em uma frase, os 3 caminhos lado a lado com 3 medidas (a água que
   falta, o calor forte na fase crítica, os dias seguidos de terra sem planta viva; o melhor número de cada linha vem
-  marcado), uma linha de risco por caminho, "Converse com o agrônomo antes de decidir", o botão "Ver a prova" (as
+  marcado; a falta de água do milho com capim, que o motor dá em faixa, aparece com o número do meio, o do cenário
+  `meio` em `comparacao.agua.pela_faixa.por_cenario`, e a faixa inteira fica em "Ver a prova"), uma linha de risco
+  por caminho (o `risco` curto do motor), o aviso curto do motor (`aviso`), o botão "Ver a prova" (as
   frases de prova do motor, o que falta saber e as fontes, recolhidas) e o botão "Ver um ano ruim".
 - **O ano ruim, dia a dia** (`POST /replay`; só atrás do botão do ensaio): a safra do pior ano da cidade, com a
   chuva, a água na terra descendo, os dias de sede e de calor forte e os marcos. Tem tocar, pausar, voltar,
@@ -57,7 +64,6 @@ chave da IA, avisa que está sem conexão; o resto funciona.
 | `dados/guardados-replay.js` | `gerar-dados.py` | a safra dia a dia do pior ano de cada cidade e rotação, em terra média |
 | `dados/respostas.js` e `respostas.json` | o motor (`orbita.exportar`), chamado pelo `gerar-dados.py` | a resposta inteira do motor para os três tipos de terra (a leitura do agrônomo) |
 | `dados/complementos.js` e `validacao.js` | `gerar-dados.py` | o calendário do ano e a validação cruzada (a leitura do agrônomo) |
-| `dados/conversas.js` | o agente (cópia de `backend/orbita/conversas-guardadas/conversas.js`) | as 4 conversas gravadas de Rio Verde. **A página não carrega mais este arquivo**: fica de reserva |
 
 Os guardados valem para a soja no dia de costume (15/10) e são do dia em que o programa rodou: a linha discreta
 diz a data e, se o plantio do produtor for outro, que o guardado é o de 15/10. Os arquivos guardados só são
@@ -79,7 +85,8 @@ terra é da estação do INMET. O caminho de cada dado está em `data/orbita/`.
   campos da resposta (a situação de cada item, os números, e quem ficou `melhor` em `contra_as_outras`): nenhuma
   conta, nenhum número novo. A frase inteira do motor está em "Entender" e em "Ver a prova". A linha de risco é a
   primeira frase do `risco` do motor.
-- **O atraso do dado** não vira aviso: aparece só a data do dado.
+- **A data do dado** aparece só como "Dado de DD/MM/AAAA", discreto. O aviso é o curto do motor (`aviso`); o texto
+  técnico (`aviso_tecnico`, `detalhe_tecnico`, `risco_detalhe`, `falta_saber_detalhe`) não aparece para o produtor.
 - **Letras e dedos:** nenhuma letra abaixo de 13 px; botões com 44 px ou mais; nenhuma rolagem de lado.
 
 ## A rodada do alinhamento (2026-11-15)
@@ -96,14 +103,13 @@ sem ela (aberta como arquivo).
     app.css                 o estilo do aplicativo (a casca, os cartões, a conversa, o ensaio, o registro)
     styles.css              as cores e as letras da marca, a safra dia a dia e a leitura do agrônomo
     app.js                  liga as peças: a entrada, a lavoura guardada, as telas, o assistente, o agrônomo
-    js/dados.js             busca na API e, se ela não responde, nos dados guardados
+    js/dados.js             acha a API (o "?api=", ou "/api" do mesmo endereço), busca nela e, se ela não responde, nos dados guardados
     js/telas.js             desenha "Minha lavoura hoje", "Ensaiar" e "Registrar"
     js/replay.js            a safra dia a dia
     js/comparacao.js        funções de escrita (números, datas) que a safra dia a dia usa
     js/textos.js            os textos da safra dia a dia e da leitura do agrônomo (e o endereço da API, em API_BASE)
     js/icones.js            os ícones, desenhados aqui mesmo
     js/adaptar.js, js/resultado.js, js/textos-agronomo.js   a leitura do agrônomo (só carregam quando ela abre)
-    js/conversa.js          a conversa da tela de antes: a página não usa mais; fica de reserva
     dados/                  os dados guardados (tabela acima) e o gerar-dados.py
     marca/                  o logo do time
     fontes/                 as letras (Anton e Montserrat), com a licença de cada uma
@@ -140,5 +146,8 @@ logo da NASA.
   não ter de confirmar duas vezes; o selo da confirmação continua sendo posto pelo servidor.
 - A colheita que o produtor escreve no Registrar fica só no aparelho: não vai ao servidor nem entra em conta.
 - A leitura do agrônomo mostra a conta guardada de Rio Verde (GO), com a rotação de hoje e a rotação com capim.
-- O `styles.css` ainda traz os estilos da tela de antes (os três momentos, a conversa, a mesa), que a página não usa.
+- Saíram em 2026-11-15, por não ter mais quem os lesse: `js/conversa.js`, `dados/conversas.js` (as conversas gravadas
+  continuam em `backend/orbita/conversas-guardadas/`) e 46 regras do `styles.css` cujas classes nenhum `.js` nem o
+  `index.html` usa. O `styles.css` ainda pode ter regra da tela de antes: na dúvida, a regra ficou.
+- A linha de risco do milho com capim é a frase do motor e ainda cita a faixa da água.
 - O painel da cooperativa (acompanhar vários produtores) é um próximo passo e não aparece na tela.

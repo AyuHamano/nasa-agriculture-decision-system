@@ -182,7 +182,9 @@ def da_terra(resposta):
     if nivel is not None:
         saida["sede_forte_recebido_pct"] = _r(100 - nivel)
     saida["mensagem"] = mensagem.texto(resposta)
-    saida["notas_da_mensagem"] = resposta["entrada"]["prioridades"]
+    notas = (resposta.get("entrada") or {}).get("prioridades")      # as notas de prioridade saíram do motor: só entram se ele ainda as mandar
+    if notas is not None:
+        saida["notas_da_mensagem"] = notas
     return saida
 
 
@@ -342,7 +344,11 @@ def _ensaio(resposta):
             "regra_dos_anos": {chave: regra.get(chave) for chave in ("pior_ano", "ano_normal",
                                                                      "rendimento_por_safra_kg_ha")},
             "safra_2025_26": {"safra": resposta["safra_2025_26"]["safra"]},
-            "comparacao_das_rotacoes": resposta["comparacao_das_rotacoes"]}
+            "comparacao_das_rotacoes": resposta["comparacao_das_rotacoes"],
+            # o aviso curto e o número do meio da faixa do capim (o cenário "meio" da água no pior ano), que a tabela mostra
+            "aviso": resposta.get("aviso"),
+            "comparacao": {"agua": {"pela_faixa": {"por_cenario": (((resposta.get("comparacao") or {}).get("agua") or {})
+                                                                   .get("pela_faixa") or {}).get("por_cenario")}}}}
 
 
 def montar_guardados(agora):
