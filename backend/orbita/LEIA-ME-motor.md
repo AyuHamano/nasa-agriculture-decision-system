@@ -42,7 +42,7 @@ resposta de antes continua lendo igual.
 - Erro de entrada: `ValueError` com a frase em português que começa por "Entrada fora do formato:".
 
 ### As chaves de sempre e a rotação de hoje
-As chaves `rotacoes.atual`, `rotacoes.alternativa`, `comparacao`, `veredito`, `prioridades`, `destaque` e `sede_forte`
+As chaves `rotacoes.atual`, `rotacoes.alternativa`, `comparacao`, `veredito`, `pontos_medidos`, `destaque` e `sede_forte`
 continuam comparando soja-milho-pousio com soja-milho-braquiária, agora no lugar, na terra e na data do produtor. A
 rotação que o produtor faz hoje (qualquer uma do cardápio) aparece em `rotacao_de_hoje` e vem marcada em
 `comparacao_das_rotacoes`. O replay, o "como está hoje" e o registro seguem a rotação de hoje dele.
@@ -395,6 +395,7 @@ alerta) mudou, e nenhum campo de antes saiu. Cada resposta passa a ter duas leit
 | onde | o que mudou | campo novo |
 |---|---|---|
 | `comparacao_das_rotacoes[*]` | `risco` e `falta_saber` saem em UMA frase só | `risco_detalhe` e `falta_saber_detalhe`: o texto de antes, igual |
+| `comparacao_das_rotacoes[*]` | `risco_curto`: o risco em frase curta, a que a tela mostra em "O risco de cada caminho" (um número só de cada lado; no milho com capim, o do meio; a comparação com o melhor dos caminhos de que ele ficou atrás) | `risco` e `risco_detalhe`: a frase de sempre, com a faixa |
 | `motor.lavoura_hoje`, o topo | a `frase` sem "(o último dia com dado)"; o `aviso` é a linha curta | `aviso_tecnico` (o aviso longo de antes) e `detalhe_tecnico` (de qual dado é a data) |
 | `motor.lavoura_hoje`, cada item | a `frase` leva só a data do dado | `detalhe_tecnico`: o que saiu da frase (até onde vai cada dado, o dia da consulta, os pontos da região) |
 | `motor.como_esta_hoje` | a `frase` leva só a data do dado; o `aviso` é a linha curta | `aviso_tecnico` e `detalhe_tecnico` |
@@ -412,8 +413,9 @@ outras em água, calor nem terra coberta."
 **As notas de 1 a 5 saíram do motor.** `motor.responder` ainda aceita a entrada que traz `prioridades` (as rotas
 antigas não quebram), mas ignora o campo: não confere as notas e não ordena por elas. A resposta é sempre a de sem
 notas, na ordem de costume, com a preocupação na frente; e as chaves que ficavam vazias saíram da resposta:
-`entrada.prioridades`, `prioridades[*].nota` e `destaque.nota` (a lista `prioridades` continua, com `id`, `nome`,
-`melhor` e `medida`). Do texto (`explicacao.py`) saíram "(nota N)" e "DA MAIOR NOTA PARA A MENOR". Os 4 campos
+`entrada.prioridades`, `prioridades[*].nota` e `destaque.nota` (a lista continua, com `id`, `nome`,
+`melhor` e `medida`, e com o nome que diz o que ela é: `pontos_medidos`, os quatro pontos de sempre, água, solo,
+erosão e renda, na ordem da preocupação; pelo mesmo motivo, `destaque.prioridade` virou `destaque.ponto`). Do texto (`explicacao.py`) saíram "(nota N)" e "DA MAIOR NOTA PARA A MENOR". Os 4 campos
 `entrada.prioridades.*`, o `prioridades.[].nota` e o `destaque.nota` de `tests/campos_de_antes.json` são os únicos
 de antes que já não aparecem (o teste diz por quê).
 

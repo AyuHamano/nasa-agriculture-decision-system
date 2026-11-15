@@ -21,9 +21,9 @@ def erro_de(entrada):
 
 class SemAsNotas(unittest.TestCase):
     def test_a_entrada_sem_notas_vale_e_sai_na_ordem_de_costume(self):
-        self.assertEqual([p["id"] for p in RESPOSTA["prioridades"]], ["agua", "solo", "erosao", "renda"])
-        self.assertEqual([p for p in RESPOSTA["prioridades"] if "nota" in p], [])     # a chave `nota` saiu
-        self.assertEqual(RESPOSTA["destaque"]["prioridade"], "agua")
+        self.assertEqual([p["id"] for p in RESPOSTA["pontos_medidos"]], ["agua", "solo", "erosao", "renda"])
+        self.assertEqual([p for p in RESPOSTA["pontos_medidos"] if "nota" in p], [])     # a chave `nota` saiu
+        self.assertEqual(RESPOSTA["destaque"]["ponto"], "agua")
         self.assertNotIn("nota", RESPOSTA["destaque"])
         self.assertNotIn("prioridades", RESPOSTA["entrada"])
         self.assertIsNone(RESPOSTA["preocupacao"])
@@ -32,8 +32,8 @@ class SemAsNotas(unittest.TestCase):
     def test_nenhum_numero_muda_sem_as_notas(self):
         for chave in ("rotacoes", "comparacao", "veredito", "regra_dos_anos", "safra_2025_26", "sede_forte"):
             self.assertEqual(RESPOSTA[chave], ANTIGA[chave], chave)
-        self.assertEqual({p["id"]: p["melhor"] for p in RESPOSTA["prioridades"]},
-                         {p["id"]: p["melhor"] for p in ANTIGA["prioridades"]})
+        self.assertEqual({p["id"]: p["melhor"] for p in RESPOSTA["pontos_medidos"]},
+                         {p["id"]: p["melhor"] for p in ANTIGA["pontos_medidos"]})
 
     def test_notas_pela_metade_ou_fora_do_formato_sao_ignoradas(self):
         # Mudou em 2026-11-15 (decisão do dono: as notas de 1 a 5 saem): o motor não confere mais o campo.
@@ -60,8 +60,8 @@ class SemAsNotas(unittest.TestCase):
 
 class Preocupacao(unittest.TestCase):
     def test_a_preocupacao_so_muda_a_ordem_e_o_destaque(self):
-        self.assertEqual([p["id"] for p in TERRA["prioridades"]], ["solo", "erosao", "agua", "renda"])
-        self.assertEqual(TERRA["destaque"]["prioridade"], "solo")
+        self.assertEqual([p["id"] for p in TERRA["pontos_medidos"]], ["solo", "erosao", "agua", "renda"])
+        self.assertEqual(TERRA["destaque"]["ponto"], "solo")
         self.assertEqual(TERRA["preocupacao"], "terra")
         self.assertEqual(TERRA["ordem_das_pernas"], ["terra", "agua", "calor"])
         for chave in ("rotacoes", "comparacao", "veredito", "regra_dos_anos", "safra_2025_26", "sede_forte"):
@@ -71,9 +71,9 @@ class Preocupacao(unittest.TestCase):
         # Mudou em 2026-11-15 (decisão do dono: as notas saem): antes a nota mandava e a preocupação desempatava.
         iguais = motor.responder(dict(SEM_NOTAS, prioridades={"agua": 3, "solo": 3, "renda": 3, "erosao": 3},
                                       preocupacao="terra"))
-        self.assertEqual([p["id"] for p in iguais["prioridades"]], ["solo", "erosao", "agua", "renda"])
+        self.assertEqual([p["id"] for p in iguais["pontos_medidos"]], ["solo", "erosao", "agua", "renda"])
         com_notas = motor.responder(dict(COM_NOTAS, preocupacao="terra"))
-        self.assertEqual([p["id"] for p in com_notas["prioridades"]], [p["id"] for p in TERRA["prioridades"]])
+        self.assertEqual([p["id"] for p in com_notas["pontos_medidos"]], [p["id"] for p in TERRA["pontos_medidos"]])
         self.assertEqual(com_notas, TERRA)
 
     def test_preocupacao_que_nao_existe_e_erro_em_portugues(self):

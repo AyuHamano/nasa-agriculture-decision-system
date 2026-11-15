@@ -409,7 +409,7 @@ def texto(r):
          _linha_do_destaque(r),
          "",
          "O QUE FOI MEDIDO, COM O QUE MAIS PREOCUPA NA FRENTE (a ordem não muda nenhum número)"]
-    for i, p in enumerate(r["prioridades"], start=1):
+    for i, p in enumerate(r["pontos_medidos"], start=1):
         linhas = _prioridade(p, r)
         t.append(f"{i}. {linhas[0]}")
         t.extend(linhas[1:])

@@ -159,7 +159,7 @@ class Calor(unittest.TestCase):
                            RESPOSTA["calor"]["por_cultura"]["milho"]["soma_das_safras"])
 
     def test_a_preocupacao_com_o_calor_vira_o_destaque(self):
-        self.assertEqual(COM_SORGO["destaque"]["prioridade"], "calor")
+        self.assertEqual(COM_SORGO["destaque"]["ponto"], "calor")
         self.assertEqual(COM_SORGO["ordem_das_pernas"][0], "calor")
         self.assertIn("calor", explicacao.texto(COM_SORGO).lower())
 

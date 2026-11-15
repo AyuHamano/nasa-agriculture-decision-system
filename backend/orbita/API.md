@@ -124,8 +124,8 @@ alguns pedaços:
      "rotacao_de_hoje": {"id": "soja_sorgo_pousio", "nome": "soja → sorgo safrinha → pousio (terra parada)",
                          "chave": "com_sorgo", "nota": "..."},
      "regra_dos_anos": {...}, "rotacoes": {"atual": {...}, "alternativa": {...}, "com_sorgo": {...}},
-     "comparacao": {...}, "prioridades": [...], "preocupacao": ..., "ordem_das_pernas": ..., "sede_forte": {...},
-     "destaque": {"prioridade": "agua", "nome": "Água", "melhor": "atual",
+     "comparacao": {...}, "pontos_medidos": [...], "preocupacao": ..., "ordem_das_pernas": ..., "sede_forte": {...},
+     "destaque": {"ponto": "agua", "nome": "Água", "melhor": "atual",
                   "veredito_pela_faixa": "depende_da_hipotese"},
      "veredito": {"codigo": "depende", "frase": "...", "a_favor_da_troca": ["solo", "erosao"], "contra_a_troca": []},
      "safra_2025_26": {...}, "ndvi": {...}, "parametros": [...], "hipoteses": 30, "limites": [...],
@@ -134,7 +134,7 @@ alguns pedaços:
 O motor pode ganhar campos novos; os nomes de hoje não mudam. Os campos que entraram em 2026-11-15 estão descritos
 na seção "A resposta do motor: os campos novos".
 
-**Atenção às chaves de sempre.** `rotacoes.atual`, `rotacoes.alternativa`, `comparacao`, `veredito`, `prioridades`,
+**Atenção às chaves de sempre.** `rotacoes.atual`, `rotacoes.alternativa`, `comparacao`, `veredito`, `pontos_medidos`,
 `destaque` e `sede_forte` continuam comparando soja-milho-pousio com soja-milho-braquiária, agora no lugar, na terra e
 na data do produtor. A rotação que o produtor faz hoje (qualquer uma das três) está em `rotacao_de_hoje` e vem marcada
 em `comparacao_das_rotacoes`. Quem mostra as três rotações deve ler `comparacao_das_rotacoes`.

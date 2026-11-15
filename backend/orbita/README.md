@@ -119,7 +119,7 @@ O campo a campo, com exemplos, está no `API.md`.
 6. **O veredito da água** sai das duas pontas da faixa, pela falta de água da soja e do milho no pior ano: "a
    alternativa se saiu melhor", "pior", "empate" (menos de 5 mm nas duas pontas) ou "depende da hipótese" (muda
    dentro da faixa). Nenhuma vencedora está escrita no código. Está em `comparacao.agua.pela_faixa` e em
-   `prioridades[].veredito_pela_faixa`, e é ele que entra no `veredito` geral. Os campos antigos (`comparacao.agua.melhor`
+   `pontos_medidos[].veredito_pela_faixa`, e é ele que entra no `veredito` geral. Os campos antigos (`comparacao.agua.melhor`
    e o `melhor` de cada prioridade) continuam com o sentido de antes: comparam a rotação de hoje com a alternativa
    num cenário só, que agora é o da hipótese do meio. Quem mostra a água deve ler o campo novo.
 
@@ -197,7 +197,7 @@ continuam, para comparar.
 ## Os limites
 - Três cidades e três rotações, com um calendário de costume que só anda com a data do plantio da soja. Não mede
   renda, preço, custo nem produtividade: falta de água não é quebra de safra.
-- As chaves de sempre (`veredito`, `comparacao`, `prioridades`) e o texto curto comparam sempre soja-milho-pousio com
+- As chaves de sempre (`veredito`, `comparacao`, `pontos_medidos`) e o texto curto comparam sempre soja-milho-pousio com
   soja-milho-braquiária. A rotação de hoje do produtor, quando é outra, está em `comparacao_das_rotacoes`.
 - Os pontos do verde do satélite foram escolhidos no mapa, nas três cidades: ninguém conferiu em campo, e o satélite
   prova só a rotação soja-milho-pousio. O calor não mexe na conta da água, e a temperatura é a de um quadrado de uns

@@ -169,16 +169,16 @@ class Prioridades(unittest.TestCase):
         self.assertEqual(outra, sem)
         self.assertEqual(RESPOSTA, sem)
         self.assertNotIn("prioridades", RESPOSTA["entrada"])
-        self.assertEqual([sorted(p) for p in RESPOSTA["prioridades"]],          # a da água leva também o veredito
+        self.assertEqual([sorted(p) for p in RESPOSTA["pontos_medidos"]],          # a da água leva também o veredito
                          [["id", "medida", "melhor", "nome", "veredito_pela_faixa"]]
                          + [["id", "medida", "melhor", "nome"]] * 3)
         self.assertNotIn("nota", RESPOSTA["destaque"])
         for palavra in ("(nota", "MAIOR NOTA"):
             self.assertNotIn(palavra, explicacao.texto(RESPOSTA))
-        self.assertEqual([p["id"] for p in RESPOSTA["prioridades"]], ["agua", "solo", "erosao", "renda"])
-        self.assertEqual([p["id"] for p in outra["prioridades"]], ["agua", "solo", "erosao", "renda"])
-        self.assertEqual({p["id"]: p["melhor"] for p in outra["prioridades"]},
-                         {p["id"]: p["melhor"] for p in RESPOSTA["prioridades"]})
+        self.assertEqual([p["id"] for p in RESPOSTA["pontos_medidos"]], ["agua", "solo", "erosao", "renda"])
+        self.assertEqual([p["id"] for p in outra["pontos_medidos"]], ["agua", "solo", "erosao", "renda"])
+        self.assertEqual({p["id"]: p["melhor"] for p in outra["pontos_medidos"]},
+                         {p["id"]: p["melhor"] for p in RESPOSTA["pontos_medidos"]})
 
     def test_o_aviso_do_topo_e_a_linha_curta_do_produtor(self):
         # Mudou em 2026-11-15 (decisão do dono): saiu "Motor provisório, sem site. Não é recomendação agronômica..."
@@ -186,7 +186,7 @@ class Prioridades(unittest.TestCase):
         self.assertTrue(RESPOSTA["limites"] and RESPOSTA["hipoteses"])       # a leitura do agrônomo continua
 
     def test_cada_prioridade_diz_quem_se_saiu_melhor(self):
-        por_id = {p["id"]: p for p in RESPOSTA["prioridades"]}
+        por_id = {p["id"]: p for p in RESPOSTA["pontos_medidos"]}
         for p in por_id.values():
             self.assertIn(p["melhor"], ("atual", "alternativa", "empate", "não medido"))
         self.assertEqual(por_id["renda"]["melhor"], "não medido")

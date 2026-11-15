@@ -178,9 +178,17 @@ class Faixa(unittest.TestCase):
         self.assertNotIn("prioridades", RESPOSTA["entrada"])
         for campo in das_notas:
             self.assertNotIn(campo, agora)
-        self.assertEqual([campo for campo in antigos["campos"] if campo not in agora and campo not in das_notas
-                          and not campo.startswith("entrada.prioridades.")], [])
-        for p in RESPOSTA["prioridades"]:   # o vocabulário antigo do campo "melhor" continua o mesmo
+        # A lista dos quatro pontos medidos e o ponto do destaque continuam, com o nome que diz o que são (2026-11-15):
+        # `prioridades` virou `pontos_medidos` e `destaque.prioridade` virou `destaque.ponto`, com o mesmo conteúdo.
+        def de_agora(campo):
+            if campo == "destaque.prioridade":
+                return "destaque.ponto"
+            return re.sub(r"^prioridades(?=$|\.)", "pontos_medidos", campo)
+        self.assertNotIn("prioridades", RESPOSTA)
+        self.assertNotIn("prioridade", RESPOSTA["destaque"])
+        self.assertEqual([campo for campo in antigos["campos"] if de_agora(campo) not in agora
+                          and campo not in das_notas and not campo.startswith("entrada.prioridades.")], [])
+        for p in RESPOSTA["pontos_medidos"]:   # o vocabulário antigo do campo "melhor" continua o mesmo
             self.assertIn(p["melhor"], ("atual", "alternativa", "empate", "não medido"))
 
 
@@ -230,7 +238,7 @@ class VereditoDaAgua(unittest.TestCase):
         self.assertEqual(agua["pela_falta_no_pior_ano"], "atual")
         self.assertEqual(agua["melhor"], "atual")
         self.assertAlmostEqual(agua["diferenca_mm"], meio, delta=0.11)
-        por_id = {p["id"]: p for p in r["prioridades"]}
+        por_id = {p["id"]: p for p in r["pontos_medidos"]}
         self.assertEqual(por_id["agua"]["melhor"], "atual")
         self.assertEqual(por_id["agua"]["veredito_pela_faixa"], "depende_da_hipotese")
 
@@ -390,7 +398,7 @@ class MensagemCurta(unittest.TestCase):
         from orbita import mensagem
         r = copy.deepcopy(RESPOSTA)
         del r["rotacoes"]["alternativa"]["faixa"]
-        for p in r["prioridades"]:
+        for p in r["pontos_medidos"]:
             p.pop("veredito_pela_faixa", None)
         texto = mensagem.texto(r)
         self.assertIn(mensagem.QUEM[RESPOSTA["comparacao"]["agua"]["melhor"]], texto)

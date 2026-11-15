@@ -63,18 +63,18 @@ class OTexto(unittest.TestCase):
             texto = mensagem.texto(resposta)
             self.assertIn(titulo, texto)
             self.assertNotIn("nota", texto.lower())
-            for p in resposta["prioridades"][:2]:              # o resultado vem da conta, não do teste
+            for p in resposta["pontos_medidos"][:2]:              # o resultado vem da conta, não do teste
                 quem = mensagem.PELA_FAIXA.get(p.get("veredito_pela_faixa")) or mensagem.QUEM[p["melhor"]]
                 self.assertIn(f"{p['nome']}: {quem}.", texto)
-            for p in resposta["prioridades"][2:]:
+            for p in resposta["pontos_medidos"][2:]:
                 self.assertNotIn(f"{p['nome']}:", texto)
-            ids = [p["id"] for p in resposta["prioridades"][:2]]
+            ids = [p["id"] for p in resposta["pontos_medidos"][:2]]
             self.assertEqual("mm de água" in texto, "agua" in ids)
             self.assertEqual("dias por ano sem planta viva" in texto, "solo" in ids or "erosao" in ids)
 
     def test_resposta_antiga_que_ainda_traz_nota_da_o_mesmo_texto_sem_nota_e_na_mesma_ordem(self):
         antiga = copy.deepcopy(RESPOSTA)
-        for nota, p in enumerate(antiga["prioridades"], start=1):
+        for nota, p in enumerate(antiga["pontos_medidos"], start=1):
             p["nota"] = nota                                   # a última teria a maior nota: a ordem não muda
         self.assertEqual(mensagem.texto(antiga), mensagem.texto(RESPOSTA))
 
@@ -128,8 +128,8 @@ class CampoQueFalta(unittest.TestCase):
     def test_cada_trecho_some_com_o_campo_dele(self):
         sem = lambda *campos: mensagem.texto({k: v for k, v in RESPOSTA.items() if k not in campos})  # noqa: E731
         self.assertNotIn("Resposta:", sem("veredito"))
-        self.assertNotIn("No que foi medido:", sem("prioridades"))
-        self.assertIn("A prova:", sem("prioridades"))          # sem as prioridades, a prova ainda vai
+        self.assertNotIn("No que foi medido:", sem("pontos_medidos"))
+        self.assertIn("A prova:", sem("pontos_medidos"))          # sem as prioridades, a prova ainda vai
         self.assertNotIn("A prova:", sem("rotacoes", "comparacao"))
         self.assertNotIn("O risco:", sem("rotacoes"))
         self.assertIn("Pergunta: " + RESPOSTA["pergunta"], sem("rotacoes"))
@@ -146,7 +146,7 @@ class CampoQueFalta(unittest.TestCase):
         resposta = copy.deepcopy(RESPOSTA)
         resposta["campo_novo"] = {"numero": 123456}
         resposta["veredito"]["outro"] = "texto novo 987"
-        resposta["prioridades"][0]["peso"] = 0.77
+        resposta["pontos_medidos"][0]["peso"] = 0.77
         resposta["rotacoes"]["atual"]["safras"][RESPOSTA["comparacao"]["pior_ano"]]["total"]["novo_mm"] = 55.5
         self.assertEqual(mensagem.texto(resposta), mensagem.texto(RESPOSTA))
 

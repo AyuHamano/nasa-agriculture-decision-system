@@ -103,7 +103,7 @@ def validar_entrada(entrada):
             problemas.append(f"rotacao_atual {rotacao!r} ainda não existe: o motor conhece {cardapio}")
     # As notas de 1 a 5 saíram do motor (decisão do dono, 2026-11-15: "tira isso"). A entrada que ainda traz
     # `prioridades` é aceita, para as rotas antigas não quebrarem, mas o campo é ignorado: não se confere, não se usa
-    # e não volta na resposta (nem `entrada.prioridades`, nem `nota` na lista `prioridades` e no `destaque`).
+    # e não volta na resposta (nem `entrada.prioridades`, nem `nota` na lista dos pontos medidos e no `destaque`).
     terra = entrada.get("terra") or "media"
     if terra not in TERRAS:
         problemas.append(f'terra "{terra}" não existe: use pouca, media ou muita (quanta água a terra segura)')
@@ -964,11 +964,12 @@ def responder(entrada, par=None, dias=None, rendimentos=None):
                "solo": "os dias do ano sem planta viva na terra (o mesmo número da erosão)",
                "erosao": "os dias do ano sem planta viva na terra (o mesmo número do solo)",
                "renda": "não medido: o motor não tem preço, custo nem produtividade"}
-    prioridades = [{"id": p, "nome": NOMES[p], "melhor": melhores[p], "medida": medidas[p]} for p in ordem]
-    for p in prioridades:
+    # Os quatro pontos de sempre (água, solo, erosão e renda), com quem se sai melhor em cada um, na ordem acima.
+    pontos_medidos = [{"id": p, "nome": NOMES[p], "melhor": melhores[p], "medida": medidas[p]} for p in ordem]
+    for p in pontos_medidos:
         if p["id"] == "agua":
             p["veredito_pela_faixa"] = agua_pela_faixa["codigo"]
-    primeira_medida = next(p for p in prioridades if p["melhor"] != NAO_MEDIDO)
+    primeira_medida = next(p for p in pontos_medidos if p["melhor"] != NAO_MEDIDO)
     safras_do_calor = balanco.SAFRAS_DO_ESTUDO + (SAFRA_A_PARTE,)
     bloco_do_calor = calor.bloco(dias, cal, par, safras_do_calor, pior, normal, {
         rotacao["id"]: ["soja", rotacao["segunda"]] for chave, rotacao in rotacoes.ROTACOES.items() if chave in rot})
@@ -1013,7 +1014,7 @@ def responder(entrada, par=None, dias=None, rendimentos=None):
         "rotacao_de_hoje": {"id": entrada["rotacao_id"], "nome": rotacoes.CARDAPIO[entrada["rotacao_id"]]["nome"],
                             "chave": rotacoes.CARDAPIO[entrada["rotacao_id"]]["chave"],
                             "nota": "As chaves de sempre (rotacoes.atual, rotacoes.alternativa, comparacao, veredito, "
-                                    "prioridades e destaque) comparam soja-milho-pousio com soja-milho-braquiária, "
+                                    "pontos_medidos e destaque) comparam soja-milho-pousio com soja-milho-braquiária, "
                                     "no lugar, na terra e na data do produtor; a rotação que ele faz hoje é esta, e "
                                     "a comparação das três está em comparacao_das_rotacoes."},
         "regra_dos_anos": regra,
@@ -1021,12 +1022,12 @@ def responder(entrada, par=None, dias=None, rendimentos=None):
         "comparacao": {"ano_normal": normal, "pior_ano": pior, "agua": comparacao_da_agua,
                        "solo_e_erosao": {"melhor": solo, "dias_sem_planta_viva_hoje": dias_hoje,
                                          "dias_sem_planta_viva_alternativa": dias_alternativa}},
-        "prioridades": prioridades,
+        "pontos_medidos": pontos_medidos,
         "preocupacao": entrada["preocupacao"],
         "ordem_das_pernas": [p for p in PERNAS if p == entrada["preocupacao"]] + [
             p for p in PERNAS if p != entrada["preocupacao"]],
         "sede_forte": sede_forte,
-        "destaque": dict({"prioridade": primeira_medida["id"], "nome": primeira_medida["nome"],
+        "destaque": dict({"ponto": primeira_medida["id"], "nome": primeira_medida["nome"],
                           "melhor": primeira_medida["melhor"]},
                          **({"veredito_pela_faixa": agua_pela_faixa["codigo"]} if primeira_medida["id"] == "agua"
                             else {})),

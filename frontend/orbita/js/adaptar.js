@@ -98,16 +98,15 @@
       bruto: r,
       aviso: r.aviso || "", pergunta: r.pergunta || "",
       cidade: obj(r.local).nome || "",
-      notasDaResposta: obj(obj(r.entrada).prioridades),
       terra: { opcao: opcao, classe: terra.classe || "", porMetro: primeiro(terra.agua_por_metro_mm),
                soja: primeiro(obj(terra.agua_que_segura_mm).soja), milho: primeiro(obj(terra.agua_que_segura_mm).milho),
                raizSoja: primeiro(obj(terra.raizes_m).soja), raizMilho: primeiro(obj(terra.raizes_m).milho) },
       nomes: { atual: atual.nome || "", alternativa: alternativa.nome || "" },
       veredito: { codigo: ver.codigo || "", frase: ver.frase || "" },
-      prioridades: lista(r.prioridades).map(function (p) {
+      pontosMedidos: lista(r.pontos_medidos).map(function (p) {
         p = obj(p);
         var faixaDaAgua = p.id === "agua" ? primeiro(p.veredito_pela_faixa, pf.codigo) : p.veredito_pela_faixa;
-        return { id: p.id, nome: p.nome || p.id, nota: primeiro(p.nota), veredito: veredito(p.melhor, faixaDaAgua), medida: p.medida || "" };
+        return { id: p.id, nome: p.nome || p.id, veredito: veredito(p.melhor, faixaDaAgua), medida: p.medida || "" };
       }),
       anos: { normal: primeiro(comp.ano_normal, regra.ano_normal), pior: primeiro(comp.pior_ano, regra.pior_ano) },
       safras: safras, porSafra: porSafra, aParte: aParte,

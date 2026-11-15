@@ -67,7 +67,7 @@ def _pergunta(r):
 
 def _prioridades(r, quantas):
     """As primeiras prioridades, na ordem do motor: [(o id, a linha)]. A sem nome ou sem resultado fica de fora."""
-    lista = _pega(r, "prioridades")
+    lista = _pega(r, "pontos_medidos")
     validas = []
     for p in lista if isinstance(lista, list) else []:
         nome, quem = _frase(_pega(p, "nome")), _frase(_pega(p, "melhor"))
@@ -123,7 +123,7 @@ def _prova_do_calendario(r):
 
 def _prova(r, ids):
     """Um número de prova de cada medida mostrada, com a fonte em palavras. Sem prioridade medida, vai a do destaque."""
-    medidas = [i for i in ids if i in ("agua", "solo", "erosao")] or [_frase(_pega(r, "destaque", "prioridade"))]
+    medidas = [i for i in ids if i in ("agua", "solo", "erosao")] or [_frase(_pega(r, "destaque", "ponto"))]
     frases = [_prova_da_agua(r) if "agua" in medidas else None,
               _prova_do_calendario(r) if "solo" in medidas or "erosao" in medidas else None]
     frases = [f for f in frases if f] or [f for f in (_prova_da_agua(r), _prova_do_calendario(r)) if f][:1]
