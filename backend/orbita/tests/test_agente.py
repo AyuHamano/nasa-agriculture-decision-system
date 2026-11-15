@@ -535,5 +535,23 @@ class OsAchadosDaRevisao(ComODuble):
             agente._sair(self.confirmada(), "oi", "Não entendi.", HOJE)
 
 
+class OsMarcosDoReplayNasFrasesProntas(unittest.TestCase):
+    """O replay do motor de verdade chega a 9 marcos numa safra (com o marco da água no fundo): nenhum fica de fora."""
+
+    def test_o_replay_mais_cheio_do_motor_sai_inteiro_ate_a_colheita(self):
+        from orbita import motor
+        entrada = {"cidade_id": "rio_verde", "rotacao_atual": ["soja", "milho", "pousio"], "terra": "media"}
+        replay = motor.replay_da_safra(entrada, "2020-21")
+        marcos = replay["marcos"]
+        self.assertEqual(len(marcos), 9)                                # a safra com mais marcos, na conta de hoje
+        self.assertEqual(marcos[-1]["tipo"], "colheita")
+        consultas = [{"ferramenta": "ensaio_da_rotacao", "argumentos": {"safra": "2020-21"},
+                      "resultado": {"replay": replay}}]
+        texto = agente._frases_prontas(consultas, [{}, {}, {}], "Rio Verde (GO)")
+        for marco in marcos:
+            self.assertIn(marco["frase"], texto)
+        self.assertGreaterEqual(agente.QUANTOS_MARCOS, len(marcos))
+
+
 if __name__ == "__main__":
     unittest.main()
