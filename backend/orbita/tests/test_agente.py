@@ -263,10 +263,31 @@ class AResposta(ComODuble):
         self.assertEqual((saida["resposta"], saida["texto_de"]), (texto, "ia"))
         lido = modelo.pedidos[1][0][-1]["resultado"]
         self.assertEqual(lido["calendario"]["plantio_da_soja_informado"], "2026-11-10")
+        self.assertIn("comece pelo que o calendário da conta mostra", modelo.pedidos[0][0][-1]["texto"])
         # uma data que não está no calendário da conta não passa
         estado, saida, _ = self.passo(estado, "e o sorgo?", fala("", ENSAIO), fala("O sorgo entra em 20/04."),
                                       fala("O sorgo entra em 20/04."))
         self.assertEqual(saida["texto_de"], "frases_prontas")
+
+    def test_numero_certo_com_o_sentido_trocado_tambem_e_barrado(self):
+        # visto no uso de verdade (2026-11-15): a IA escreveu "coberta só 30 dias"; 30 é o número de dias SEM planta viva
+        trocados = ("Com a braquiária, a terra fica coberta só 30 dias por ano.", "A terra fica coberta 30 dias.",
+                    "Com o capim a terra fica coberta por 30 dias.", "Terra coberta apenas 30 dias com o capim.")
+        for trocado in trocados:
+            estado, saida, modelo = self.passo(self.confirmada(), "e a braquiária?", fala("", ENSAIO), fala(trocado),
+                                               fala(trocado))
+            self.assertNotIn("coberta", saida["resposta"].split("comparei")[0], trocado)
+            self.assertEqual((saida["texto_de"], saida["conferencia"]["passou"]), ("frases_prontas", False))
+            self.assertIn("SEM planta viva", modelo.pedidos[2][0][-1]["texto"])      # a IA é avisada do porquê
+        certos = ("Com a braquiária, a terra fica 30 dias por ano sem planta viva.",
+                  "A terra fica coberta quase o ano inteiro: são 30 dias sem planta viva.",
+                  "A terra fica coberta, e só 30 dias sem planta viva.")
+        for certo in certos:
+            estado, saida, _ = self.passo(self.confirmada(), "e a braquiária?", fala("", ENSAIO), fala(certo))
+            self.assertEqual((saida["resposta"], saida["texto_de"]), (certo, "ia"))
+        # quem confere uma saída guardada também vê a troca
+        adulterada = dict(saida, resposta=trocados[0])
+        self.assertEqual(len(agente.conferir_saida(adulterada, HOJE)), 1)
 
     def test_a_marca_de_apoio_e_o_momento_saem_do_que_a_ia_consultou(self):
         casos = (([ENSAIO], "conta", "antes"), ([CLIMA], "dados_do_lugar", "antes"), ([VERDE], "dados_do_lugar", "depois"),

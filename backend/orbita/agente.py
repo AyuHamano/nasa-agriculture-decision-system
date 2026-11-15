@@ -21,7 +21,8 @@ escreve a explicação. O que o PROGRAMA garante, sem depender do pedido à IA:
 - A trava dos números: o texto da IA é conferido por `conferencia.conferir_texto` contra a ficha, a comparação e
   o que as ferramentas devolveram nesta fala; se ela não consultou nada nesta fala, o texto não pode ter número
   nenhum. Sobrou número, a IA tenta uma vez de novo; sobrou outra vez, o texto dela não sai: saem as frases
-  prontas, feitas só com as frases do motor (`texto_de` diz qual dos dois foi).
+  prontas, feitas só com as frases do motor (`texto_de` diz qual dos dois foi). Uma troca de sentido também é
+  barrada: "a terra fica coberta 30 dias", quando 30 é o número de dias SEM planta viva.
 - A marca `apoio` sai das ferramentas que a IA consultou de fato: `conta` (o ensaio, o replay, o registro, o
   "como está hoje"), `dados_do_lugar` (só o clima ou o verde do satélite) ou `conhecimento_geral` (nenhuma; aí o
   programa põe o aviso na frente do texto). Antes de a ficha ser confirmada, `apoio` e `comparacao` são vazios.
@@ -75,9 +76,14 @@ SEM_CONTA = ("Sobre isso eu não tenho conta, e por isso não dou número. O que
 SEM_NUMERO = "Fiz a conta. O resultado de cada rotação está na comparação aqui embaixo."
 FALA_LONGA = "(Resposta longa: o resultado de cada rotação está na comparação.)"
 CONTA_RECUSADA = "Não consegui fazer a conta com essa ficha. {motivo} Diga o que corrigir."
-AVISO_DA_TRAVA = ("A conferência achou números que não estão no que as ferramentas devolveram nesta fala: {sobras}. "
-                  "Escreva a resposta inteira de novo sem esses números. Se o número é da conta, consulte a "
-                  "ferramenta nesta fala e use o número exato dela. Não peça desculpa nem fale da correção.")
+AVISO_DA_TRAVA = ("A conferência barrou o seu texto por causa disto: {sobras}. Cada item é um número que não está "
+                  "no que as ferramentas devolveram nesta fala, ou um número dito com o sentido trocado. Escreva a "
+                  "resposta inteira de novo sem isso. Se o número é da conta, consulte a ferramenta nesta fala e use "
+                  "o número exato dela, com o sentido que ela dá. Não peça desculpa nem fale da correção.")
+# A troca de sentido que o programa barra: a conta só tem "dias SEM planta viva"; "coberta 30 dias" diz o contrário.
+COBERTA_TANTOS_DIAS = re.compile(r"\bcobert[ao]s?\s+(?:só\s+|somente\s+|apenas\s+|por\s+|durante\s+|em\s+)*"
+                                 r"(?:uns\s+|cerca\s+de\s+)?\d+\s+dias\b(?!\s+(?:por\s+ano\s+)?sem\b)", re.IGNORECASE)
+SENTIDO_TROCADO = " (a conta só tem os dias SEM planta viva: esse número não é de dias de terra coberta)"
 
 OLA = ("oi", "ola", "oie", "opa", "alo", "bom dia", "boa tarde", "boa noite", "e ai", "eai", "oi tudo bem",
        "ola tudo bem", "oi bom dia", "oi boa tarde", "oi boa noite", "comecar", "inicio")
@@ -119,6 +125,8 @@ ferramenta. Não tem o número? Diga sem número.
 - Diga cada rotação como ela é. No milho com braquiária, o capim é plantado junto com o milho e fica cobrindo a \
 terra depois da colheita dele: a braquiária não entra no lugar do milho. No sorgo, é o sorgo que entra no lugar do \
 milho, na segunda safra.
+- O número de "dias sem planta viva" é o tempo em que a terra fica descoberta: quanto menos dias, mais coberta \
+ela fica. Nunca escreva que a terra fica "coberta" esse número de dias.
 - Você não escolhe a rotação pelo produtor. Você mostra o que a conta diz de cada rotação (a evidência, o \
 benefício, o risco e o que falta saber) e ajuda a comparar. A decisão é dele, com o agrônomo.
 - Pergunta sobre o que a conta não mede (adubo e nutrientes, pragas e doenças, preço e mercado, máquinas, \
@@ -258,6 +266,11 @@ def _conversa(estado, fch, hoje, fala_do_produtor):
             + [{"de": "produtor", "texto": fala_do_produtor}])
 
 
+def _sentido_trocado(texto):
+    """Os trechos em que um número de "dias sem planta viva" foi dito como dias de terra coberta (o contrário)."""
+    return [achado.group(0) + SENTIDO_TROCADO for achado in COBERTA_TANTOS_DIAS.finditer(texto or "")]
+
+
 def _conta(fch, comparacao, consultas):
     """A conta contra a qual o texto é conferido: a ficha, a comparação e o que as ferramentas devolveram.
 
@@ -279,7 +292,7 @@ def conferir_saida(saida, hoje):
     """
     return conferencia.conferir_texto(saida["resposta"],
                                       _conta(saida["ficha"], saida["comparacao"], saida["consultas"]),
-                                      _permitidos(hoje, saida["comparacao"]))
+                                      _permitidos(hoje, saida["comparacao"])) + _sentido_trocado(saida["resposta"])
 
 
 def _sair(estado, texto, resposta, hoje, *, comparacao=None, apoio=None, momento=None,
@@ -290,7 +303,7 @@ def _sair(estado, texto, resposta, hoje, *, comparacao=None, apoio=None, momento
         raise RuntimeError("Erro de dentro do agente: com a ficha confirmada, toda resposta leva a comparação das "
                            "rotações.")
     conta, permitidos = _conta(ficha.publica(estado["ficha"]), comparacao, consultas), _permitidos(hoje, comparacao)
-    if conferencia.conferir_texto(resposta, conta, permitidos):
+    if conferencia.conferir_texto(resposta, conta, permitidos) or _sentido_trocado(resposta):
         resposta, texto_de, passou = (SEM_NUMERO if comparacao else NAO_ENTENDI), "frases_prontas", False
     momento = momento or estado["momento"]
     falas = estado["falas"] + [{"de": "produtor", "texto": _cortar(texto, TAMANHO_DA_FALA) or "…"},
@@ -537,6 +550,7 @@ def _responder(estado, texto, pergunta, modelo, listas, hoje, pronto=None):
             sobras = conferencia.conferir_texto(texto_da_ia, conta(), permitidos)
         else:                                         # sem consulta nesta fala, o texto não pode ter número nenhum
             sobras = conferencia.conferir_texto(texto_da_ia, {})
+        sobras = sobras + _sentido_trocado(texto_da_ia)
         if not sobras:
             break
         sobras_da_ia, falhou, texto_da_ia = sobras, texto_da_ia, ""
@@ -595,8 +609,12 @@ def passo(estado, texto, modelo, hoje=None):
     if ficha.completa(fch) and not fch["confirmada"] and _disse_sim(fala):
         pergunta = texto if "?" in texto else (estado["pergunta"] or PERGUNTA_PADRAO)
         estado = dict(estado, ficha=ficha.confirmar(fch))
-        return _responder(estado, texto, f"{texto}\n\n[Aviso do programa; o produtor não vê] O produtor confirmou a "
-                          f"ficha. Responda agora à pergunta dele: «{pergunta}»", modelo, listas, hoje)
+        aviso = f"O produtor confirmou a ficha. Responda agora à pergunta dele: «{pergunta}»"
+        if fch.get("plantio_da_soja"):
+            aviso += (" Ele disse o dia em que plantou a soja: comece pelo que o calendário da conta mostra com essa "
+                      "data (quando a soja sai da terra e quando a segunda safra entra).")
+        return _responder(estado, texto, f"{texto}\n\n[Aviso do programa; o produtor não vê] {aviso}", modelo, listas,
+                          hoje)
     if not fch["confirmada"]:
         return _colher(estado, texto, modelo, listas, hoje)
     return _responder(estado, texto, None if fala in CORTESIAS else texto, modelo, listas, hoje)

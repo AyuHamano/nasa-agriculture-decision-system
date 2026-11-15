@@ -208,7 +208,8 @@ def verde_do_satelite(ficha, safra=None):
 def definicoes():
     """O que a IA lê de cada ferramenta: o nome, para que serve e o que ela pode pedir."""
     safra = {"type": "string", "description": 'Uma safra, como "2015-16". Também vale "pior_ano" (a pior safra da '
-                                              'região) ou "ano_normal".'}
+                                              'região) ou "ano_normal". Use só quando o produtor pedir para ver '
+                                              'uma safra (o dia a dia dela, ou o registro dela).'}
     return [
         {"nome": "clima_do_lugar",
          "descricao": "O que os satélites da NASA registraram no lugar da ficha: de onde vêm a chuva e a "
