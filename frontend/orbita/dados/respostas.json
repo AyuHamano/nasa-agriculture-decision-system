@@ -1,5 +1,5 @@
 {
- "gerado_em": "2026-11-15T03:20:00-03:00",
+ "gerado_em": "2026-11-15T08:47:54-03:00",
  "gerado_por": "python3 -m orbita.exportar <pasta> (Gerado com IA (Claude))",
  "parametros_usados": {
   "cidade_id": "rio_verde",
@@ -66,7 +66,7 @@
     "primeiro_dia": "2014-07-01",
     "ultimo_dia": "2026-09-14",
     "avisos": [
-     "A chuva desta fonte vai até 14/09/2026: os 58 dias seguintes da série, sem dado de chuva, ficaram fora da conta (dia sem dado nunca vira zero).",
+     "A chuva desta fonte vai até 14/09/2026: os 59 dias seguintes da série, sem dado de chuva, ficaram fora da conta (dia sem dado nunca vira zero).",
      "O dia do IMERG (a chuva medida por satélite da NASA) é o UTC (começa 3 horas antes do dia de Rio Verde); a temperatura é do dia local. A chuva de um fim de tarde pode cair no dia seguinte da conta."
     ],
     "conta": "FAO-56: ETo de Hargreaves (eq. 52), Kc por fase, balanço diário da água (cap. 8)"
@@ -4147,7 +4147,7 @@
     "primeiro_dia": "2014-07-01",
     "ultimo_dia": "2026-09-14",
     "avisos": [
-     "A chuva desta fonte vai até 14/09/2026: os 58 dias seguintes da série, sem dado de chuva, ficaram fora da conta (dia sem dado nunca vira zero).",
+     "A chuva desta fonte vai até 14/09/2026: os 59 dias seguintes da série, sem dado de chuva, ficaram fora da conta (dia sem dado nunca vira zero).",
      "O dia do IMERG (a chuva medida por satélite da NASA) é o UTC (começa 3 horas antes do dia de Rio Verde); a temperatura é do dia local. A chuva de um fim de tarde pode cair no dia seguinte da conta."
     ],
     "conta": "FAO-56: ETo de Hargreaves (eq. 52), Kc por fase, balanço diário da água (cap. 8)"
@@ -8211,7 +8211,7 @@
     "primeiro_dia": "2014-07-01",
     "ultimo_dia": "2026-09-14",
     "avisos": [
-     "A chuva desta fonte vai até 14/09/2026: os 58 dias seguintes da série, sem dado de chuva, ficaram fora da conta (dia sem dado nunca vira zero).",
+     "A chuva desta fonte vai até 14/09/2026: os 59 dias seguintes da série, sem dado de chuva, ficaram fora da conta (dia sem dado nunca vira zero).",
      "O dia do IMERG (a chuva medida por satélite da NASA) é o UTC (começa 3 horas antes do dia de Rio Verde); a temperatura é do dia local. A chuva de um fim de tarde pode cair no dia seguinte da conta."
     ],
     "conta": "FAO-56: ETo de Hargreaves (eq. 52), Kc por fase, balanço diário da água (cap. 8)"

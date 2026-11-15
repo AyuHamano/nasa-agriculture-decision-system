@@ -1,6 +1,6 @@
 # Gerado com IA (Claude)
 """Gera os dados do site do Órbita Rural, ao lado deste programa: dados/respostas.js (e respostas.json),
-dados/complementos.js e dados/validacao.js.
+dados/complementos.js, dados/validacao.js, dados/guardados.js e dados/guardados-replay.js.
 
 O site só desenha: não faz conta nenhuma. Tudo o que ele mostra está nesses arquivos, e tudo o que está
 neles sai do motor (backend/orbita, importado daqui) ou dos arquivos de dados dele (data/orbita/).
@@ -20,6 +20,11 @@ O que sai:
   do milho na alternativa), o nível da sede forte em água recebida e o texto curto (orbita.mensagem.texto).
 - validacao.js: window.ORBITA_VALIDACAO = {...}, com os mesmos números que `python3 -B -m orbita.validar` imprime
   (a chuva contra a estação do INMET, a ETo contra o Open-Meteo e a falta do milho contra a colheita do IBGE).
+
+- guardados.js e guardados-replay.js: window.ORBITA_GUARDADOS e window.ORBITA_GUARDADOS_REPLAY, o que a tela mostra
+  quando a API não responde: o painel "Minha lavoura hoje" (motor.lavoura_hoje), o ensaio (os campos do
+  motor.responder que a tela lê), o registro (motor.registro_da_safra) e a safra dia a dia do pior ano
+  (motor.replay_da_safra), das 3 cidades (ver montar_guardados). O painel é o do dia em que o programa rodou.
 
 Dia sem dado nunca vira zero: fica fora da soma e é contado à parte; número que não existe sai como null.
 Os arquivos são montados numa pasta provisória e trocados no fim: se algo falhar, os de antes ficam como estavam.
@@ -320,6 +325,55 @@ def montar_validacao(agora):
             "eto": eto_contra_o_open_meteo(), "falta_contra_a_colheita": falta_contra_a_colheita()}
 
 
+# ---------------------------------------------------------------- guardados.js: o que a tela mostra sem a API
+
+CIDADES = ("rio_verde", "jatai", "silvania")
+ROTACOES_DA_TELA = (("soja_milho_pousio", ["soja", "milho", "pousio"]),
+                    ("soja_milho_braquiaria", ["soja", "milho", "braquiaria"]),
+                    ("soja_sorgo_pousio", ["soja", "sorgo", "pousio"]))
+TERRAS_DA_TELA = ("pouca", "media", "muita")
+
+
+def _ensaio(resposta):
+    """O que a tela "Ensaiar" lê da resposta do /recomendacao, com os mesmos nomes de campo (nada é refeito aqui)."""
+    regra = resposta["regra_dos_anos"]
+    return {"local": resposta["local"], "calendario": resposta["calendario"],
+            "rotacao_de_hoje": resposta["rotacao_de_hoje"],
+            "regra_dos_anos": {chave: regra.get(chave) for chave in ("pior_ano", "ano_normal",
+                                                                     "rendimento_por_safra_kg_ha")},
+            "safra_2025_26": {"safra": resposta["safra_2025_26"]["safra"]},
+            "comparacao_das_rotacoes": resposta["comparacao_das_rotacoes"]}
+
+
+def montar_guardados(agora):
+    """As respostas guardadas para a tela funcionar sem a API (aberta como arquivo, ou com o servidor fora do ar).
+
+    O painel (a mesma resposta do POST /lavoura-hoje) e o ensaio (os campos do POST /recomendacao que a tela lê)
+    saem para as 3 cidades, as 3 rotações e os 3 tipos de terra, com a soja no dia de costume do calendário. O
+    registro (motor.registro_da_safra) e a safra dia a dia (motor.replay_da_safra) saem para as 3 cidades e as 3
+    rotações, na terra média: o registro da safra mais recente e do pior ano; a safra dia a dia, do pior ano.
+    """
+    painel, ensaio, registro, replay = {}, {}, {}, {}
+    for cidade in CIDADES:
+        painel[cidade], ensaio[cidade], registro[cidade], replay[cidade] = {}, {}, {}, {}
+        for rotacao_id, culturas in ROTACOES_DA_TELA:
+            painel[cidade][rotacao_id], ensaio[cidade][rotacao_id] = {}, {}
+            for terra in TERRAS_DA_TELA:
+                entrada = {"cidade_id": cidade, "rotacao_atual": culturas, "terra": terra}
+                painel[cidade][rotacao_id][terra] = motor.lavoura_hoje(dict(entrada))
+                ensaio[cidade][rotacao_id][terra] = _ensaio(motor.responder(dict(entrada)))
+            entrada = {"cidade_id": cidade, "rotacao_atual": culturas, "terra": "media"}
+            do_meio = ensaio[cidade][rotacao_id]["media"]
+            pior = do_meio["regra_dos_anos"]["pior_ano"]
+            registro[cidade][rotacao_id] = {safra: motor.registro_da_safra(dict(entrada), safra)
+                                            for safra in dict.fromkeys((do_meio["safra_2025_26"]["safra"], pior))}
+            replay[cidade][rotacao_id] = motor.replay_da_safra(dict(entrada), pior)
+    limpo = lambda coisa: json.loads(json.dumps(coisa, ensure_ascii=False, default=str))
+    cabeca = {"gerado_por": GERADO_POR, "gerado_em": agora}
+    return (dict(cabeca, painel=limpo(painel), ensaio=limpo(ensaio), registro=limpo(registro)),
+            dict(cabeca, replay=limpo(replay)))
+
+
 # ---------------------------------------------------------------- gravar
 
 def texto_do_js(variavel, dados, o_que_e, agora, comando):
@@ -361,6 +415,18 @@ def main():
             (provisoria / "validacao.js").write_text(texto_do_js(
                 "ORBITA_VALIDACAO", validacao,
                 "Os números da validação cruzada, os mesmos que `python3 -B -m orbita.validar` imprime.",
+                agora, comando), encoding="utf-8")
+            guardados, guardados_replay = montar_guardados(agora)
+            (provisoria / "guardados.js").write_text(texto_do_js(
+                "ORBITA_GUARDADOS", guardados,
+                "O que a tela mostra quando a API não responde: o painel da lavoura hoje (a resposta do POST "
+                "/lavoura-hoje),\n   o ensaio (os campos do POST /recomendacao que a tela lê) e o registro da safra, "
+                "das 3 cidades.",
+                agora, comando), encoding="utf-8")
+            (provisoria / "guardados-replay.js").write_text(texto_do_js(
+                "ORBITA_GUARDADOS_REPLAY", guardados_replay,
+                "A safra dia a dia do pior ano de cada cidade (motor.replay_da_safra), para o botão do ano ruim "
+                "funcionar sem a API.",
                 agora, comando), encoding="utf-8")
             gravados = sorted(arquivo.name for arquivo in provisoria.iterdir())
             for nome in gravados:  # só agora, com tudo pronto, os arquivos novos tomam o lugar dos de antes
