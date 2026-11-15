@@ -152,7 +152,19 @@ assunto, sem repetir esse aviso.
 satélite viu.
 - Ao comparar, ponha os dois números lado a lado. Não diga a diferença entre eles, nem "o dobro", nem "metade", nem \
 de qual dos dois um terceiro número está mais perto.
-- Escreva as datas no jeito brasileiro, dia/mês/ano, como 14/03/2016.
+- Escreva as datas no jeito brasileiro, dia/mês/ano, como 14/03/2016. Nunca escreva só "hoje" ou "tantos dias \
+antes de hoje": escreva a data do dia da consulta e a data do último dia com dado, as duas, como a ferramenta dá.
+- Escreva cada número igual ao da conta, com a mesma casa depois da vírgula: se a conta diz 252,0 mm, escreva \
+252,0 mm (não 252 mm); se diz 96 dias, escreva 96 dias.
+- O produtor não conhece as palavras da conta. Não escreva "mediana": diga "o valor do meio". Não escreva "zona das \
+raízes": diga "a camada de terra onde ficam as raízes". Não escreva "faixa da hipótese": diga "do menor ao maior \
+valor, porque isso não foi medido". Não escreva "chuva de modelo": diga "a chuva estimada por modelo de \
+computador". Não escreva "GPM IMERG" nem "NASA GIBS" sozinhos: diga "a chuva medida por satélite da NASA". Não \
+escreva "FAO" sozinho: diga "a FAO, o órgão da ONU para a agricultura". Não escreva "franco-arenosa": diga "terra \
+de textura média".
+- No marco da água no fundo, a frase da conta diz o que aconteceu: a água acabou, ficou perto do fundo sem acabar, \
+ou a terra já estava seca no dia do plantio. Conte como a frase conta; não diga que a água acabou nos outros dois \
+casos.
 - Não peça nome, telefone, CPF nem endereço. Não prometa lucro nem produtividade.
 - Embaixo da sua resposta o programa mostra a comparação das rotações lado a lado e o aviso de conversar com o \
 agrônomo. Não repita a tabela inteira: explique o que ela mostra para a pergunta dele.
@@ -529,9 +541,12 @@ def _frases_prontas(consultas, comparacao, lugar):
             hoje = resultado.get("hoje") if isinstance(resultado.get("hoje"), dict) else {}
             partes += _frases_de(hoje) + ([hoje["aviso"]] if isinstance(hoje.get("aviso"), str) else [])
         elif consulta["ferramenta"] == "verde_do_satelite":
-            partes += _frases_de(resultado) + ([resultado["aviso"]] if isinstance(resultado.get("aviso"), str) else [])
+            # Pergunta de uma safra: a resposta começa pelo registro dela (o retrato geral do satélite já foi a
+            # resposta da pergunta sem safra, e duas respostas seguidas não podem começar igual).
             registro = resultado.get("registro") if isinstance(resultado.get("registro"), dict) else {}
-            partes += _frases_de(registro) + ([registro["aviso"]] if isinstance(registro.get("aviso"), str) else [])
+            do_registro = _frases_de(registro) + ([registro["aviso"]] if isinstance(registro.get("aviso"), str) else [])
+            geral = _frases_de(resultado) + ([resultado["aviso"]] if isinstance(resultado.get("aviso"), str) else [])
+            partes += do_registro or geral
         elif isinstance(resultado.get("replay"), dict):
             replay = resultado["replay"]
             marcos = [m for m in replay.get("marcos") or [] if isinstance(m, dict) and isinstance(m.get("frase"), str)]

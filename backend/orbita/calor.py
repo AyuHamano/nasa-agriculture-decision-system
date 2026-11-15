@@ -22,7 +22,7 @@ O_QUE_E = ("dia de calor forte = dia da fase crítica da cultura com a temperatu
            "publicado da cultura")
 AVISO = ("A temperatura é a da NASA POWER (um quadrado de uns 50 km), não a da lavoura. As fontes dos limites dizem "
          "'temperaturas acima de' e não dizem se é a máxima ou a média do dia; e a fase crítica, na conta, é a fase "
-         "do meio do FAO-56. Dia de calor forte não é perda de safra: é sinal para olhar com o agrônomo.")
+         "do meio da tabela da FAO (o órgão da ONU para a agricultura). Dia de calor forte não é perda de safra: é sinal para olhar com o agrônomo.")
 
 
 def limites(par):

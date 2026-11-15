@@ -104,18 +104,18 @@ def registro_da_safra(entrada, safra, par=None):
         frase += f" A terra ficou {sem_planta} dias sem planta viva."
     if posicao is not None and not a_parte:
         frase += (f" A falta de água do {NOMES[segunda]} foi de {_n(motor.r1(desta))}% do que ele pediu: entre as "
-                  f"{len(faltas)} safras do estudo (as mesmas da comparação das rotações), a {posicao}ª maior (a "
-                  f"mediana é {_n(mediana)}%).")
+                  f"{len(faltas)} safras do estudo (as mesmas da comparação das rotações), a {posicao}ª maior (o "
+                  f"valor do meio dessas safras é {_n(mediana)}%).")
     elif posicao is not None:
         frase += (f" A falta de água do {NOMES[segunda]} foi de {_n(motor.r1(desta))}% do que ele pediu. Esta safra "
                   "fica à parte, como na conta (é a mais recente, com o dado ainda provisório): ao lado das "
-                  f"{len(faltas)} safras do estudo, seria a {posicao}ª maior falta (a mediana delas é {_n(mediana)}%).")
+                  f"{len(faltas)} safras do estudo, seria a {posicao}ª maior falta (o valor do meio delas é {_n(mediana)}%).")
     else:
         frase += (f" O {NOMES[segunda]} ainda não fechou o ciclo nos dados guardados desta safra: ela fica fora da "
                   "comparação com as outras.")
     if verde is not None:
         frase += (f" Em {verde['ano']}, o satélite viu {verde['dias_sem_planta_verde']} dias seguidos sem planta "
-                  "verde na região (a mediana dos pontos medidos).")
+                  "verde na região (o valor do meio entre os pontos medidos).")
     return {
         "safra": safra, "local": replay["local"], "rotacao": replay["rotacao"], "terra": replay["terra"],
         "plantio_da_soja_informado": replay["plantio_da_soja_informado"],

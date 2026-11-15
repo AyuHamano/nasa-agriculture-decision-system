@@ -4,6 +4,8 @@
 Não há IA aqui (não há chave ligada). Todo número que aparece no texto vem de `motor.responder`.
 """
 
+import datetime
+
 QUEM = {"atual": "a rotação de hoje se saiu melhor", "alternativa": "a alternativa se saiu melhor",
         "empate": "empate", "não medido": "não medido"}
 PELA_FAIXA = {"alternativa_melhor": "a alternativa se saiu melhor", "alternativa_pior": "a alternativa se saiu pior",
@@ -54,6 +56,13 @@ def n(numero):
     if isinstance(numero, int):
         return str(numero)
     return f"{numero:.1f}".replace(".", ",")
+
+
+def data_br(dia):
+    """A data no jeito brasileiro, para as frases que o produtor lê: "2026-11-11" (ou a data) vira "11/11/2026"."""
+    if isinstance(dia, str):
+        dia = datetime.date.fromisoformat(dia[:10])
+    return f"{dia.day:02d}/{dia.month:02d}/{dia.year}"
 
 
 def _prioridade(p, r):
@@ -208,7 +217,8 @@ FALTA_SABER = {
     "soja_milho_braquiaria": "Quanto o capim disputa água com o milho não foi medido: por isso os números desta "
                              "rotação saem em faixa. O satélite não prova esta rotação, e a conta não mede renda "
                              "nem o custo da semente do capim.",
-    "soja_sorgo_pousio": "As fases e o ciclo do sorgo vêm da tabela geral da FAO, que não tem linha de 2ª safra em "
+    "soja_sorgo_pousio": "As fases e o ciclo do sorgo vêm da tabela geral da FAO (o órgão da ONU para a "
+                         "agricultura), que não tem linha de 2ª safra em "
                          "Goiás, e a raiz do sorgo vale igual à do milho. A conta não mede renda nem o preço do "
                          "sorgo contra o do milho, e o satélite não prova esta rotação.",
 }
@@ -263,8 +273,8 @@ def frases_da_rotacao(item, itens, r):
                  f"plantio da soja ({terra['dias_sem_planta_viva_no_ano']} dias no ano, contando o intervalo entre "
                  "a soja e a 2ª safra).")
     if terra["pelo_satelite"] is not None:
-        evidencia += (f" O satélite viu {n(terra['pelo_satelite'])} dias seguidos sem planta verde (a mediana dos "
-                      "pontos medidos).")
+        evidencia += (f" O satélite viu {n(terra['pelo_satelite'])} dias seguidos sem planta verde (o valor do meio "
+                      "entre os pontos medidos).")
     outras = {o["id"]: o for o in itens if o["id"] != item["id"]}
     frente, atras, depende = [], [], []
     for perna, rotulo, unidade, curta in PERNAS:
@@ -281,7 +291,8 @@ def frases_da_rotacao(item, itens, r):
                 f"{o['apelido']} ({_mm(_valor_da_perna(o, perna))} {curta})" for o in perdeu) + f": {meu} {unidade}.")
         if aberto:
             depende.append(f"{rotulo}, a comparação com " + _e(o["apelido"] for o in aberto)
-                           + " muda dentro da faixa da hipótese.")
+                           + " depende de quanto o capim disputa água com o milho: isso não foi medido, e "
+                             "por isso a conta dá o menor e o maior valor.")
     beneficio = " ".join(frente) or ("Na conta, esta rotação não ficou na frente das outras em água, calor nem "
                                      "terra coberta.")
     risco = " ".join(atras + ([RISCOS_PROPRIOS[item["id"]]] if item["id"] in RISCOS_PROPRIOS else [])) or (

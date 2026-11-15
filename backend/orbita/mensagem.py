@@ -90,7 +90,8 @@ def _fonte_da_agua(r):
     """De onde vem o número da água, em palavras (sem link): a chuva e a conta."""
     chuva = _frase(_pega(r, "clima", "chuva", "fonte"))
     chuva = _frase(chuva.split(" (")[0]) if chuva else None             # sem o detalhe técnico entre parênteses
-    return f"Fontes: {chuva} (a chuva) e a FAO (a conta de água)." if chuva else "Fonte: a conta de água da FAO."
+    return (f"Fontes: {chuva} (a chuva) e a FAO, da ONU (a conta de água)." if chuva
+            else "Fonte: a conta de água da FAO, da ONU.")
 
 
 def _prova_da_agua(r):

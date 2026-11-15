@@ -273,16 +273,18 @@ def comparar_com_calendario(dias_pelo_calendario, resumo_ndvi=None):
         fecho = "Os dois números batem: a diferença cabe em uma medida do satélite (%d dias)." % DIAS_POR_MEDIDA
     elif r["menor"] <= n <= r["maior"]:
         saida["leitura"] = "dentro_da_faixa"
-        fecho = "O número do calendário é diferente da mediana, mas cabe na faixa que o satélite viu."
+        fecho = ("O número do calendário é diferente do valor do meio, mas cabe entre o menor e o maior que o "
+                 "satélite viu.")
     else:
         saida["leitura"] = "fora_da_faixa"
-        fecho = "O número do calendário fica fora da faixa que o satélite viu: vale conferir o calendário."
+        fecho = ("O número do calendário fica fora do que o satélite viu (do menor ao maior): vale conferir o "
+                 "calendário.")
     lado = "a mais" if diferenca > 0 else "a menos"
     quanto = ("não há diferença" if diferenca == 0
               else "a diferença é de %s dias %s no calendário" % (_br(abs(diferenca)), lado))
     saida["frase"] = (
         "Pelo calendário, a terra fica %s dias sem planta. O satélite viu %s dias seguidos sem planta verde "
-        "(a mediana de %s medidas, que vão de %s a %s dias): %s. %s"
+        "(o valor do meio de %s medidas, que vão de %s a %s dias): %s. %s"
         % (_br(n), _br(r["mediana"]), _br(r["quantos"]), _br(r["menor"]), _br(r["maior"]), quanto, fecho))
     return saida
 

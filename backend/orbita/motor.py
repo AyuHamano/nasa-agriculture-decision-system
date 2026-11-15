@@ -699,6 +699,9 @@ def simular_a_rotacao_de_hoje(entrada, par, dias, cal=None):
                            segunda=rotacao["segunda"]), rotacao
 
 
+AGUA_QUE_CONTA_COMO_ACABADA_MM = 0.1     # a última casa que a conta mostra: até aqui o marco diz "a água acabou"
+
+
 def replay_da_safra(entrada, safra="2015-16", par=None):
     """A safra dia a dia, na rotação de hoje do produtor: os dias e os marcos, para a tela passar como um filme.
 
@@ -708,7 +711,9 @@ def replay_da_safra(entrada, safra="2015-16", par=None):
 
     "agua_acabou" é o começo da maior sequência de sede (a água fácil de tirar acabou). "agua_no_fundo" é o dia em
     que a água acabou de fato: o primeiro dia em que a água na terra chega ao menor valor do ciclo da cultura, só
-    quando nesse dia a planta não conseguiu beber nada (e só com o ciclo completo nos dados guardados).
+    quando nesse dia a planta não conseguiu beber nada (e só com o ciclo completo nos dados guardados). A
+    `situacao` dele diz o que aconteceu: "acabou" (sobrou até 0,1 mm), "perto_do_fundo" (sobrou mais que isso) ou
+    "seca_no_plantio" (o dia é o do plantio: a terra já chegou seca).
     """
     entrada = validar_entrada(entrada)
     conferir_safra(safra)
@@ -762,9 +767,25 @@ def replay_da_safra(entrada, safra="2015-16", par=None):
         menor = min(linhas[i]["agua_na_terra_mm"] for i in indices)
         fundo = next(linhas[i] for i in indices if linhas[i]["agua_na_terra_mm"] == menor)
         if resumo[tipo]["ciclo_completo"] and fundo["bebido_mm"] == 0.0 and fundo["pedido_mm"] > 0:
+            # A frase diz o que aconteceu (`situacao`): no dia do plantio, a terra já chegou seca (não foi a cultura
+            # que secou a terra); com até 0,1 mm (a última casa que a conta mostra), a água acabou; com mais que
+            # isso, a água ficou perto do fundo, sem acabar.
+            if fundo is linhas[primeiro]:
+                situacao = "seca_no_plantio"
+                frase = (f"No dia do plantio d{nome} a terra já estava seca: havia {_n(menor)} mm de água ao alcance "
+                         "da planta, o menor valor do ciclo, e nesse dia ela não conseguiu beber nada. A terra "
+                         "chegou assim ao plantio; depois deste dia a água não ficou abaixo disso.")
+            elif menor <= AGUA_QUE_CONTA_COMO_ACABADA_MM:
+                situacao = "acabou"
+                frase = (f"Neste dia a água que a planta alcança acabou para {nome}: sobrou {_n(menor)} mm na terra, "
+                         "o menor valor do ciclo, e a planta não conseguiu beber nada.")
+            else:
+                situacao = "perto_do_fundo"
+                frase = (f"Neste dia a água que a planta alcança ficou perto do fundo para {nome}, sem acabar: "
+                         f"sobraram {_n(menor)} mm na terra, o menor valor do ciclo, e a planta não conseguiu beber "
+                         "nada.")
             marcos.append({"data": fundo["data"], "tipo": "agua_no_fundo", "cultura": tipo, "agua_na_terra_mm": menor,
-                           "frase": f"Neste dia a água que a planta alcança acabou para {nome}: sobrou {_n(menor)} "
-                                    "mm na terra, o menor valor do ciclo, e a planta não conseguiu beber nada."})
+                           "situacao": situacao, "frase": frase})
         if quentes:
             dia = linhas[quentes[0]]
             marcos.append({"data": dia["data"], "tipo": "calor_forte", "cultura": tipo, "tmax_c": dia["tmax_c"],
@@ -774,7 +795,7 @@ def replay_da_safra(entrada, safra="2015-16", par=None):
                                     f"{explicacao._grau(limites[tipo]['limite_c'])} °C. Foram {len(quentes)} dias de "
                                     "calor forte nesta safra."})
         if not resumo[tipo]["ciclo_completo"]:      # os dados acabam com a cultura ainda na terra: sem colheita
-            incompletas.append(f"Os dados guardados acabam em {linhas[-1]['data']}, antes do fim do ciclo d{nome}: "
+            incompletas.append(f"Os dados guardados acabam em {explicacao.data_br(linhas[-1]['data'])}, antes do fim do ciclo d{nome}: "
                                "os números desta cultura são só até esse dia, e não há marco de colheita.")
             continue
         marcos.append({"data": linhas[ultimo]["data"], "tipo": "colheita", "cultura": tipo,
@@ -801,7 +822,7 @@ def replay_da_safra(entrada, safra="2015-16", par=None):
             "limites_de_calor_c": {c: limites[c]["limite_c"] for c in ("soja", rotacao["segunda"]) if c in limites},
             "avisos": list(avisos) + ([nota] if nota else []) + incompletas + [
                 "A água fácil de tirar acabar não é a terra secar de todo: é o ponto em que a planta começa a passar "
-                "sede (o freio da sede do FAO-56).", calor.AVISO]}
+                "sede (a regra é a do manual de irrigação da FAO, o órgão da ONU para a agricultura).", calor.AVISO]}
 
 
 def como_esta_hoje(entrada, par=None, hoje=None):

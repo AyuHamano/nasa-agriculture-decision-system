@@ -19,12 +19,14 @@ import datetime
 import json
 
 from orbita import balanco, clima, parametros, rotacoes
+from orbita.explicacao import data_br
 
 PASTA_DA_CHUVA_RECENTE = clima.PASTA_DOS_DADOS / "recente"
-AVISO = ("A chuva dos dias recentes é aproximada: é a versão rápida do satélite GPM IMERG, lida da cor da imagem "
-         "diária do NASA GIBS (dia com menos de 2,4 mm sai como zero), e a NASA ainda corrige esse dado. Ao lado vai "
-         "a mesma conta com a chuva de modelo da NASA POWER, para dar a faixa. A temperatura é a de um quadrado de "
-         "uns 50 km. É um retrato para conversar com o agrônomo, não uma medida da lavoura.")
+AVISO = ("A chuva dos dias recentes é aproximada: é a chuva medida por satélite da NASA (o GPM IMERG), na versão "
+         "rápida, lida da cor da imagem que a NASA publica todo dia (o serviço NASA GIBS; dia com menos de 2,4 mm "
+         "sai como zero), e a NASA ainda corrige esse dado. Ao lado vai a mesma conta com a chuva estimada por "
+         "modelo de computador (a da NASA POWER), para dar o menor e o maior valor. A temperatura é a de um quadrado "
+         "de uns 50 km. É um retrato para conversar com o agrônomo, não uma medida da lavoura.")
 
 
 def ler_chuva_recente(cidade_id, pasta=None):
@@ -175,11 +177,12 @@ def como_esta_hoje(entrada, par=None, hoje=None, pasta_da_chuva_recente=None):
 
     na_terra = ("A terra está sem planta viva." if agora["o_que_esta_na_terra"] == "sem_planta"
                 else f"Na terra está {NA_TERRA[agora['o_que_esta_na_terra']]}.")
-    frase = (f"Em {cidade['nome']}, o último dia com dado é {ultimo.isoformat()}, {(hoje - ultimo).days} dias antes "
-             f"de hoje. {na_terra} A conta dá "
-             f"{_n(agora['agua_na_terra_mm'])} mm de água na zona das raízes, {_n(agora['agua_na_terra_pct'])}% do "
-             f"que a terra segura (com a chuva de modelo no lugar da chuva rápida do satélite, "
-             f"{_n(pelo_modelo['agua_na_terra_mm'])} mm). No mesmo dia do ano normal (safra {regra['ano_normal']}) "
+    # As duas datas vão escritas: a frase continua verdadeira quando é lida depois (numa conversa guardada).
+    frase = (f"Em {cidade['nome']}, o último dia com dado é {data_br(ultimo)}, {(hoje - ultimo).days} dias antes "
+             f"do dia desta consulta ({data_br(hoje)}). {na_terra} A conta dá "
+             f"{_n(agora['agua_na_terra_mm'])} mm de água na camada de terra onde ficam as raízes, "
+             f"{_n(agora['agua_na_terra_pct'])}% do que a terra segura (com a chuva estimada por modelo de "
+             f"computador no lugar da chuva rápida do satélite, {_n(pelo_modelo['agua_na_terra_mm'])} mm). No mesmo dia do ano normal (safra {regra['ano_normal']}) "
              f"havia {_n(normal['agua_na_terra_mm'])} mm; no do pior ano (safra {regra['pior_ano']}), "
              f"{_n(pior['agua_na_terra_mm'])} mm.")
     return {

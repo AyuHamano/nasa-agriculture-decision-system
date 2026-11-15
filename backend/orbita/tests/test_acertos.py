@@ -146,6 +146,11 @@ class OTetoIgualDaFaixaECoincidencia(unittest.TestCase):
         self.assertEqual((agua["falta_no_ano_normal_mm"]["ate"], agua["falta_no_pior_ano_mm"]["ate"]), (266.8, 266.8))
 
 
+COMECOS_DO_FUNDO = {"acabou": "Neste dia a água que a planta alcança acabou",
+                    "perto_do_fundo": "Neste dia a água que a planta alcança ficou perto do fundo",
+                    "seca_no_plantio": "No dia do plantio d"}
+
+
 class OMarcoDaAguaNoFundo(unittest.TestCase):
     """O marco "agua_acabou" é o começo da sede (a água fácil de tirar acabou), não o dia em que a água acabou de
     fato. O replay ganha o marco "agua_no_fundo": o primeiro dia em que a água na terra chega ao menor valor do
@@ -174,9 +179,10 @@ class OMarcoDaAguaNoFundo(unittest.TestCase):
         novos = [m for m in marcos if m["tipo"] == "agua_no_fundo"]
         self.assertEqual(novos, [{
             "data": "2016-04-24", "tipo": "agua_no_fundo", "cultura": "milho", "agua_na_terra_mm": 0.1,
+            "situacao": "acabou",       # campo novo (2026-11-15): diz o que aconteceu; a frase deste caso não mudou
             "frase": "Neste dia a água que a planta alcança acabou para o milho de 2ª safra: sobrou 0,1 mm na "
                      "terra, o menor valor do ciclo, e a planta não conseguiu beber nada.", "principal": False}])
-        self.assertEqual(list(novos[0]), ["data", "tipo", "cultura", "agua_na_terra_mm", "frase", "principal"])
+        self.assertEqual(list(novos[0]), ["data", "tipo", "cultura", "agua_na_terra_mm", "situacao", "frase", "principal"])
         self.assertEqual([m["data"] for m in marcos], sorted(m["data"] for m in marcos))     # em ordem de data
         self.assertEqual(sum(1 for m in marcos if m["principal"]), 1)
         self.assertEqual(conferencia.conferir_texto(novos[0]["frase"], self.replay), [])
@@ -190,9 +196,44 @@ class OMarcoDaAguaNoFundo(unittest.TestCase):
                     if marco["tipo"] == "agua_acabou":                  # o começo da sede: "acabou" só a água fácil
                         self.assertTrue(marco["frase"].startswith("Neste dia começou a sede mais longa d"), marco)
                         self.assertNotIn("alcança acabou", marco["frase"])
-                    if marco["tipo"] == "agua_no_fundo":                # o dia em que a água acabou de fato
-                        self.assertTrue(marco["frase"].startswith("Neste dia a água que a planta alcança acabou"), marco)
+                    # Este teste mudou de sentido em 2026-11-15: a frase só diz "acabou" quando sobrou até 0,1 mm;
+                    # no dia do plantio ela diz que a terra já estava seca, e com mais água, que ficou perto do fundo.
+                    if marco["tipo"] == "agua_no_fundo":
+                        self.assertTrue(marco["frase"].startswith(COMECOS_DO_FUNDO[marco["situacao"]]), marco)
+                        self.assertEqual("alcança acabou" in marco["frase"], marco["situacao"] == "acabou", marco)
                     self.assertEqual(conferencia.conferir_texto(marco["frase"], replay), [], marco)
+
+    def test_a_terra_que_ja_chega_seca_ao_plantio_nao_sai_como_agua_que_acabou(self):
+        # Silvânia 2015-16 e Rio Verde 2020-21: o marco caía no dia do plantio da soja e dizia "a água acabou".
+        for cidade, safra, sobrou in (("silvania", "2015-16", "0,0"), ("rio_verde", "2020-21", "0,5")):
+            replay = motor.replay_da_safra(dict(RIO_VERDE, cidade_id=cidade), safra)
+            marco = next(m for m in replay["marcos"] if m["tipo"] == "agua_no_fundo" and m["cultura"] == "soja")
+            plantio = next(m for m in replay["marcos"] if m["tipo"] == "plantio" and m["cultura"] == "soja")
+            self.assertEqual((marco["data"], marco["situacao"]), (plantio["data"], "seca_no_plantio"))
+            self.assertTrue(marco["frase"].startswith("No dia do plantio da soja a terra já estava seca: havia "
+                                                      f"{sobrou} mm"), marco["frase"])
+            self.assertNotIn("acabou", marco["frase"])
+            self.assertEqual(conferencia.conferir_texto(marco["frase"], replay), [])
+
+    def test_com_mais_de_um_decimo_de_mm_a_frase_diz_perto_do_fundo(self):
+        # Rio Verde 2018-19: o menor valor do milho é 0,5 mm, a 2 dias do fim do ciclo. Não é "a água acabou".
+        replay = motor.replay_da_safra(RIO_VERDE, "2018-19")
+        marco = next(m for m in replay["marcos"] if m["tipo"] == "agua_no_fundo" and m["cultura"] == "milho")
+        self.assertEqual((marco["data"], marco["agua_na_terra_mm"], marco["situacao"]),
+                         ("2019-06-13", 0.5, "perto_do_fundo"))
+        self.assertIn("ficou perto do fundo para o milho de 2ª safra, sem acabar: sobraram 0,5 mm", marco["frase"])
+        self.assertNotIn("alcança acabou", marco["frase"])
+        self.assertEqual(conferencia.conferir_texto(marco["frase"], replay), [])
+
+    def test_a_situacao_sai_da_agua_que_sobrou_e_do_dia_em_todas_as_safras(self):
+        for cidade in motor.CIDADES:
+            for safra in balanco.SAFRAS_DO_ESTUDO:
+                replay = motor.replay_da_safra(dict(RIO_VERDE, cidade_id=cidade), safra)
+                plantios = {m["cultura"]: m["data"] for m in replay["marcos"] if m["tipo"] == "plantio"}
+                for marco in (m for m in replay["marcos"] if m["tipo"] == "agua_no_fundo"):
+                    esperada = ("seca_no_plantio" if marco["data"] == plantios[marco["cultura"]] else
+                                "acabou" if marco["agua_na_terra_mm"] <= 0.1 else "perto_do_fundo")
+                    self.assertEqual(marco["situacao"], esperada, marco)
 
     def test_em_qualquer_cidade_e_safra_o_marco_so_sai_quando_a_agua_acabou_de_fato(self):
         vistos = 0

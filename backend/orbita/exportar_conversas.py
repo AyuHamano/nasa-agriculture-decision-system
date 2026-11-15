@@ -27,6 +27,7 @@ que não teve fala barrada pela conferência nem replay que o produtor não pedi
 import datetime
 import json
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -44,18 +45,20 @@ TENTATIVAS_COM_A_IA = 3
 CONVERSAS = (
     {"id": "antes-plantei-tarde", "momento": "antes", "titulo": "Plantei a soja tarde: ainda vale o milho ou vou de sorgo?",
      "falas": (
-         ("Plantei a soja tarde, dia 10 de novembro, em Jataí. Planto soja e milho safrinha, depois a terra fica "
+         # A conversa que abre a tela é de Rio Verde, o caso provado: a safra 2015-16 é a pior colheita do IBGE e
+         # tem mais falta de água que o ano normal na conta (em Jataí o "pior ano" tem menos falta que o normal).
+         ("Plantei a soja tarde, dia 10 de novembro, em Rio Verde. Planto soja e milho safrinha, depois a terra fica "
           "parada. A terra é de textura média. Meu medo é faltar água. Ainda vale o milho ou vou de sorgo?",
-          [chamada("anotar_na_ficha", cidade_id="jatai", rotacao_atual="soja_milho_pousio", terra="media",
+          [chamada("anotar_na_ficha", cidade_id="rio_verde", rotacao_atual="soja_milho_pousio", terra="media",
                    plantio_da_soja="{ano}-11-10", preocupacao="agua")]),
          ("sim", [ENSAIO]),
          ("E a braquiária, o que muda para a minha terra?", [ENSAIO]))},
-    {"id": "replay-2015-16", "momento": "durante", "titulo": "Como foi a pior safra aqui, dia a dia?",
+    {"id": "replay-2015-16", "momento": "durante", "titulo": "Como está a lavoura hoje? E a pior safra, dia a dia?",
      "falas": (
-         (FICHA_DE_RIO_VERDE, [chamada("anotar_na_ficha", **RIO_VERDE)]),
-         ("sim", [ENSAIO]),
-         ("Como foi a pior safra aqui, dia a dia?", [chamada("ensaio_da_rotacao", safra="pior_ano")]),
-         ("E como está a minha lavoura hoje?", [chamada("clima_do_lugar", hoje=True)]))},
+         # O "como está hoje" vem logo depois da ficha (é a pergunta do momento); o replay da pior safra vem depois.
+         (FICHA_DE_RIO_VERDE + " Como está a minha lavoura hoje?", [chamada("anotar_na_ficha", **RIO_VERDE)]),
+         ("sim", [chamada("clima_do_lugar", hoje=True)]),
+         ("E como foi a pior safra aqui, dia a dia?", [chamada("ensaio_da_rotacao", safra="pior_ano")]))},
     {"id": "depois-o-que-a-terra-mostrou", "momento": "depois", "titulo": "Depois da colheita: o que a terra mostrou?",
      "falas": (
          (FICHA_DE_RIO_VERDE + " O que a terra mostrou depois da colheita?", [chamada("anotar_na_ficha", **RIO_VERDE)]),
@@ -105,11 +108,47 @@ def _barradas(gravada):
     return sum(1 for p in gravada["passos"] if p["de"] == "agente" and not p["saida"]["conferencia"]["passou"])
 
 
+COMECO = 60                                         # as letras do começo de uma resposta que não podem se repetir
+HOJE_SOLTO = re.compile(r"\b(?:antes de hoje|dias? atrás|até hoje)\b", re.IGNORECASE)
+DATA_ESCRITA = re.compile(r"\b\d{1,2}/\d{1,2}/\d{4}\b")
+PALAVRAS_DA_CONTA = ("mediana", "zona das raízes", "faixa da hipótese", "chuva de modelo", "franco-arenosa")
+
+
+def _respostas(gravada):
+    return [p["saida"]["resposta"] for p in gravada["passos"] if p["de"] == "agente"]
+
+
+def comecos_repetidos(gravada):
+    """Quantas respostas começam igual a uma resposta de antes, na mesma conversa (a ficha para conferir não conta)."""
+    vistos, repetidos = set(), 0
+    for texto in _respostas(gravada):
+        comeco = " ".join(texto.split())[:COMECO].lower()
+        if not comeco or comeco.startswith("confira a sua ficha"):
+            continue
+        repetidos += comeco in vistos
+        vistos.add(comeco)
+    return repetidos
+
+
+def hoje_sem_data(gravada):
+    """Quantas frases dizem "antes de hoje" (ou "dias atrás") sem uma data escrita ao lado: guardada, a frase
+    envelhece, e só a data diz de que dia ela fala."""
+    frases = [frase for texto in _respostas(gravada) for frase in re.split(r"(?<=[.!?])\s+|\n", texto)]
+    return sum(1 for frase in frases if HOJE_SOLTO.search(frase) and not DATA_ESCRITA.search(frase))
+
+
+def palavras_da_conta(gravada):
+    """Quantas respostas trazem uma palavra da conta que o produtor não conhece (a lista: PALAVRAS_DA_CONTA)."""
+    return sum(1 for texto in _respostas(gravada) if any(palavra in texto.lower() for palavra in PALAVRAS_DA_CONTA))
+
+
 def _falhas(conversa, gravada):
     """O que desabona uma conversa gravada com a IA: cada fala barrada pela conferência (ali saíram as frases
-    prontas) e um replay que a conversa não pediu (só a conversa do replay leva os dias de uma safra)."""
+    prontas), um replay que a conversa não pediu (só a conversa do replay leva os dias de uma safra), duas respostas
+    com o mesmo começo, um "antes de hoje" sem a data ao lado e uma palavra da conta sem explicação."""
     replay_a_mais = 0 if conversa["id"].startswith("replay-") or not gravada["replay"] else 1
-    return _barradas(gravada) + replay_a_mais
+    return (_barradas(gravada) + replay_a_mais + comecos_repetidos(gravada) + hoje_sem_data(gravada)
+            + palavras_da_conta(gravada))
 
 
 def _com_a_ia(conversa, ia, hoje):

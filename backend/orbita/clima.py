@@ -194,10 +194,11 @@ def _serie_com_aviso(chuva, pasta_da_chuva, pasta_power=None, lugar=None, marca=
                          "zero: escolha outra fonte de chuva ou baixe a série de novo.")
     avisos = []
     if cortados:
-        avisos.append(f"A chuva desta fonte vai até {pares[-1][0].data.isoformat()}: os {cortados} dias seguintes da "
+        ultimo = pares[-1][0].data
+        avisos.append(f"A chuva desta fonte vai até {ultimo.day:02d}/{ultimo.month:02d}/{ultimo.year}: os {cortados} dias seguintes da "
                       "série, sem dado de chuva, ficaram fora da conta (dia sem dado nunca vira zero).")
     if chuva == "imerg":
-        avisos.append(f"O dia do IMERG é o UTC (começa 3 horas antes do dia de {lugar or 'Rio Verde'}); a "
+        avisos.append(f"O dia do IMERG (a chuva medida por satélite da NASA) é o UTC (começa 3 horas antes do dia de {lugar or 'Rio Verde'}); a "
                       "temperatura é do dia local. A chuva de um fim de tarde pode cair no dia seguinte da conta.")
     return tuple(dia._replace(chuva=valor) for dia, valor in pares), tuple(avisos)
 
