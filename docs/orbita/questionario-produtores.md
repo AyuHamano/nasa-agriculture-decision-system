@@ -183,4 +183,4 @@ poucas respostas, mostrar a contagem ("7 de 10"), não a porcentagem.
 | 9 (a pergunta dele) | "O produtor pergunta do jeito dele": perguntas de verdade, que também servem para a demonstração |
 | 10 (por onde receber) | O formato da ferramenta: uma conversa, um painel ou pela mão do técnico |
 | 11 (o que faz confiar) | "Cada número tem prova": se a comparação com a estação e a conferência do agrônomo pesam mais do que só o nome da NASA |
-| 12 (testar numa safra) | O próximo passo: há quem tope o teste numa safra de verdade |
+| 12 (testar numa safra) | A continuidade: há quem tope o teste numa safra de verdade |

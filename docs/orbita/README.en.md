@@ -1,163 +1,150 @@
 <!-- Generated with AI (Claude) -->
-# Órbita Rural · the whole project, for newcomers
+# Órbita Rural · mission control for the field
 
 Versão em português: [LEIA-ME.md](LEIA-ME.md)
 
-## 1. What it is, in 5 lines
+## 1. What it is
 
-- Órbita Rural is the tool built by team **Equipe Agronautas** for the NASA Space Apps Challenge 2026, challenge "Field Shift: Adapting Farms with NASA Data".
-- The farmer says where they plant and what they plant. The system runs the calculation with what NASA satellites recorded at that place and puts the farmer's crop rotation next to two others.
-- It looks at three things: the water the crop lacked, the days of strong heat, and the days the soil had no living plant.
-- An AI talks with the farmer in plain Portuguese. It does not create numbers: every number comes from the calculation and is checked before it is shown.
-- The tool supports the decision. It does not replace the agronomist, does not promise profit and does not promise a bigger harvest.
+Órbita Rural is the app built by team **Equipe Agronautas** for the NASA Space Apps Challenge 2026, challenge "Field Shift: Adapting Farms with NASA Data". It follows the field all year round with open NASA data:
+
+- **Before planting, the farmer rehearses.** "I planted my soybeans late: is maize still worth it, or should I go with sorghum?" The app puts the farmer's crop rotation next to two others and shows how each one came through ten seasons of real weather: the water the crop lacked, the strong heat, and the days the soil had no living plants.
+- **During the season, the farmer keeps watch.** The "My field today" screen shows the crop stage, the water in the soil, the heat, the greenness seen from orbit, the soil cover, and an alert: if it doesn't rain, in how many days the crop starts running short of water.
+- **After harvest, the farmer logs the season.** The season is kept: what was planted and what the land showed.
+
+An AI assistant talks with the farmer in plain Portuguese. It never creates a number: every figure comes from the calculation and is checked before it is shown. The decision stays with the farmer and their agronomist.
 
 This project uses public NASA data. It is not a NASA product and is not endorsed by NASA.
 
-## 2. The story
+## 2. The story: mission control for the field
 
-"Órbita Rural follows the farm all year round with NASA data: it rehearses before planting, follows the crop during the season and keeps the record afterwards. And every number comes with proof."
+NASA doesn't fly without a rehearsal, without mission control, or without a mission report. Farmers plant with none of the three. Órbita Rural brings all three to the field.
 
-| the moment | the farmer's question | what the tool does |
+| the moment | in a mission | in the field | in the app |
+|---|---|---|---|
+| before planting | the rehearsal | the farmer's rotation and two others, against ten seasons of real weather | the **Ensaiar** (Rehearse) tab |
+| during the season | mission control | the farmer's field, today, on screen, with the water-stress alert | the **Hoje** (Today) tab, "My field today" |
+| after harvest | the mission report | the season's log, which becomes a record from one year to the next | the **Registrar** (Log) tab |
+
+Mission control is the heart of the project. In Rio Verde, in the 2016 season, the calculation shows the maize's water stress starting on April 4 and the water running out on April 24. That is 20 days between one and the other: the time the water-stress alert puts in the farmer's hands.
+
+**The pain we started from.** Planning the season under a changing climate, water shortage at the crop's critical stage, extreme heat and soil losing organic matter are all in the "Dores do Agro 2026" assessment by IFAG: pain points listed by field technicians and validated by 80 farmers in Goiás, Brazil.
+
+## 3. How the farmer uses it, in 5 steps
+
+1. **Tell the app about the field.** On first open, the assistant asks where the field is, what the farmer plants, when the soybeans go in and what the soil is like. Every question has buttons; those who prefer can type. At the end the farmer checks the summary and confirms.
+2. **The field is saved on the device.** Next time, the app opens straight on "My field today".
+3. **Today.** The farmer sees how the field is doing: the status (calm, attention or alert), the water-stress alert and the other five indicators, each with the date of its data. "Entender" (Understand) opens the full explanation.
+4. **Rehearse.** Before planting, the farmer sees the answer in one sentence, the 3 paths side by side on 3 measures (water shortfall, strong heat at the critical stage, days in a row with no living plants on the soil) and one line of risk per path. "Ver a prova" (See the proof) opens the sources; "Ver um ano ruim" (See a bad year) plays the city's bad season day by day.
+5. **Log and ask.** After harvest, the farmer sees the season's log and can note how much was harvested. The "Perguntar" (Ask) button, on any screen, opens the assistant, which already knows the field and says where each answer came from: the calculation, NASA data for the place, or general knowledge.
+
+## 4. "My field today": a real example
+
+Rio Verde (Goiás), soybeans planted on October 15, 2026, medium soil. The query was run on 2026-11-15 (`python3 -m orbita.perguntar --lavoura-hoje`); each row carries the date of its data.
+
+| indicator | what the screen showed | date of the data |
 |---|---|---|
-| before planting | "What do I plant now?" | compares 3 rotations (the farmer's and two others) in a normal year and in the region's worst year |
-| during the season | "How is my crop doing?" | shows the water in the soil on the last day with data, next to the same day of the normal year and of the worst year |
-| after harvest | "What did the soil show?" | keeps the record of the season: what was planted, the water, the heat and the days with no living plant |
+| the field today | **attention**: the soybeans were 30 days old, growing, with no water stress; heat and the water-stress alert call for attention | Nov 14, 2026 |
+| water-stress alert | if it doesn't rain, the soybeans start running short of water in 7 days, on Nov 21, 2026 (over the last 7 days the crop drank 4.1 mm a day on average) | Nov 14, 2026 |
+| water | 66.0 mm within reach of the plant, 100% of what the soil holds; on the same day of the normal year (2019-20 season) there were 58.4 mm, and in the worst year (2015-16 season), 63.4 mm | Nov 14, 2026 |
+| crop stage | 30 days after planting, growing; the critical stage (flowering and grain filling) starts on Nov 24, 2026 | Nov 14, 2026 |
+| heat | 2 days of strong heat since planting (daily maximum above 40 °C, the limit for soybeans); across the 10 stored seasons, up to the same day of the cycle, the middle value was 0 (from 0 to 6); the highest maximum was 40.7 °C, on Nov 7, 2026 | Nov 12, 2026 |
+| greenness from orbit | 0.41, on a scale from 0 to 1, within the normal range for the time of year (middle value of the other years: 0.38; from 0.26 to 0.46) | image of Oct 16, 2026 (a 16-day composite) |
+| soil cover | living plants for 31 days in a row; before that, 122 days in a row with no living plants | Nov 14, 2026 |
 
-The worst year (the 2015-16 season in Rio Verde, Goiás, Brazil) is the proof that the calculation works. It is not the product.
+Every answer ends with "Converse com o agrônomo antes de decidir." (Talk to your agronomist before deciding.) The water-stress alert is not a weather forecast: it is the water balance carried forward with no rain at all; any rain that falls changes the result.
 
-**The pain we started from.** Planning the season under an unstable climate, water shortage in the crop's critical phase, extreme heat and soil losing organic matter appear in the assessment "Dores do Agro 2026" by IFAG (pains listed by technicians and validated by 80 farmers in Goiás). Public citation of that document still awaits confirmation by the team.
+**And the rehearsal, in the same place.** A farmer in Rio Verde planted his soybeans on November 10 and asks: maize or sorghum? (`python3 -m orbita.perguntar --cidade rio_verde --rotacao soja,milho --plantio 2026-11-10`)
 
-## 3. The challenge and how the project answers it
+| in the worst year (2015-16 season) | soybeans and maize | soybeans and maize with cover grass | soybeans and sorghum |
+|---|---|---|---|
+| water shortfall (mm) | 252.7 | 252.7 to 263.5 | **220.3** |
+| days of strong heat at the critical stage | 9 | 9 | **0** |
+| days in a row with no living plants on the soil | 122 | **30** | 122 |
 
-The challenge asks for a decision-support tool that brings together NASA Earth observations, local soil data, crop characteristics and farmer priorities, so the farmer can explore crop rotations. It supports and does not replace farmer judgment or local agricultural expertise.
+## 5. How the project answers the challenge
+
+The challenge asks for a decision-support tool that brings together NASA Earth observations, local soil data, crop characteristics and farmer priorities, so farmers can explore crop rotations, without replacing their judgment or local agricultural knowledge.
 
 | what the challenge asks for | how Órbita Rural answers |
 |---|---|
-| NASA data | three of the datasets the challenge names: satellite rainfall (GPM IMERG), temperature (NASA POWER) and crop greenness (MODIS) |
-| local soil data | the soil type from the farm form (sandy, medium texture, clay) becomes the water the soil holds, using the values of ZARC (the Brazilian agricultural climate-risk zoning) |
-| crop characteristics | the calendar, water demand and heat limit of soybean, maize, sorghum and brachiaria grass, each value with its source and the label "published" or "hypothesis" |
-| farmer priorities | in the conversation the farmer says what worries them most (water, heat or soil); this changes the order and the emphasis, never the numbers |
-| compare at least 3 rotations, including the current one | every answer with a confirmed form brings 3 rotations: soybean, maize and fallow; soybean, maize with brachiaria; soybean and sorghum |
-| evidence, benefit, risk and information gap for each | four sentences per rotation, built only with numbers from the calculation |
-| compare satellite with ground measurements | satellite rainfall against the INMET weather station in Rio Verde (section 7) |
-| flag bare-soil periods and crop stress | the days with no living plant (by the calendar and by the satellite), the days of water stress and the days of strong heat |
-| communicate uncertainty | the rotation with grass is given as a range; today's soil water is given as a range; 30 values of the calculation are labeled as hypotheses |
-| explain technical terms | answers use farm words ("water shortage", "days of thirst", "no green plant") and say what each one means; the "Agrônomo" tab of the screen shows how the calculation was made |
-| understandable by non-experts; human judgment | conversation in plain Portuguese; every answer ends with "Talk to your agronomist before deciding." |
+| NASA data | satellite rainfall (GPM IMERG), temperature (NASA POWER) and field greenness (MODIS), three of the datasets the challenge names |
+| local soil data | the soil type in the farmer's profile (sandy, medium, clay) becomes the water the soil can hold, using the values of ZARC, Brazil's agricultural climate-risk zoning |
+| crop characteristics | the calendar, water demand and heat limit of soybeans, maize, sorghum and brachiaria grass, each value with its source and the label "published" or "hypothesis" |
+| farmer priorities | the calculation runs on the farmer's own field (place, rotation, planting date, soil); what worries them most (water, heat or soil) changes the order and the emphasis, never the numbers |
+| compare at least 3 rotations, including the current one | every rehearsal shows 3 paths: soybeans, maize and fallow; soybeans and maize with brachiaria; soybeans and sorghum |
+| evidence, benefit, risk and gap for each one | four sentences per rotation, built only from numbers in the calculation; on screen, one line of risk per path and the rest under "See the proof" |
+| compare satellite data with ground measurements | satellite rainfall against 27 INMET weather stations in Goiás and the Federal District (section 7) |
+| flag bare soil and crop stress | days with no living plants (from the calendar and from the satellite), days of water stress, days of strong heat, and the water-stress alert |
+| communicate uncertainty | the rotation with cover grass is given as a range; every indicator on the panel carries the date of its data; values that are hypotheses are labelled |
+| understandable to non-experts; human judgment | farm words ("water shortfall", "days of thirst", "soil with no living plants"), buttons instead of a form, "Understand" on every card and a technical view for the agronomist in the footer; every answer ends with "Talk to your agronomist before deciding." |
 
-What the challenge mentions and the calculation does not measure: nutrients, pests and markets. On these the agent answers as general knowledge, with a notice, and with no numbers.
+## 6. NASA data behind each indicator
 
-## 4. The three legs
-
-| the leg | what it measures | what data feeds it |
+| indicator | NASA data | what else goes in |
 |---|---|---|
-| water | the water shortage day by day, per season (what the plant asked for minus what it managed to drink) | satellite rainfall from NASA's GPM IMERG; temperature from NASA POWER; the method of the FAO-56 manual |
-| heat | the days of strong heat in the critical phase of each crop | maximum temperature from NASA POWER; each crop's limit from a published source (Embrapa and FAO) |
-| covered soil | the consecutive days with no living plant | the crop calendar and the greenness seen by the MODIS satellite (NDVI, an index of leaf greenness) |
+| water in the soil and the water-stress alert | GPM IMERG satellite rainfall (the ten-season series and each day's rain up to yesterday) and NASA POWER temperature, which gives the crop's water demand | the FAO-56 water balance |
+| heat | each day's maximum temperature, from NASA POWER | each crop's limit, from published sources (Embrapa and FAO) |
+| greenness from orbit | MODIS NDVI (MOD13Q1 product, 250 m, one image every 16 days) | 6 cropland points per city |
+| soil cover | MODIS greenness checks the calendar | the rotation's calendar |
+| crop stage | (comes from the calendar) | the rotation's calendar and the FAO stage tables |
+| water shortfall in the rehearsal and the log | GPM IMERG rainfall and NASA POWER temperature, day by day, over 10 seasons | the FAO-56 water balance |
 
-Addresses, periods and where each dataset is stored: [DADOS-E-FONTES.md](DADOS-E-FONTES.md) (in Portuguese).
+The address of each query, the period, the licence and where each dataset is stored: [DADOS-E-FONTES.md](DADOS-E-FONTES.md) (in Portuguese).
 
-## 5. The pieces and where each one lives
+## 7. The proof: we tested it across Goiás
 
-| the piece | what it is | where it is |
-|---|---|---|
-| the engine | the program that runs the calculation (no AI, no key, no internet at question time) | `backend/orbita/` (start with `README.md` and `LEIA-ME-motor.md`) |
-| the agent | the AI that talks with the farmer, with the safeguards that check the numbers | `backend/orbita/` (`LEIA-ME-agente.md`; the web API is described in `API.md`) |
-| the screen | what the farmer sees: the conversation, the form, the rotations side by side and the replay of the bad season. Millimetres always show one decimal place ("252,7 mm"), and in the replay the sentence "Neste dia a água acabou." ("On this day the water ran out.") only appears when the calculation's `agua_no_fundo` milestone comes with `situacao: "acabou"` | `frontend/orbita/` (`LEIA-ME.md`) |
-| the data | everything that was downloaded, with the address and time of each query | `data/orbita/` |
-| the documents | this file, the AI use statement, data and sources, validation and the questionnaire | `docs/orbita/` |
-| the pitch | the 7 slides as PDF and PPTX, in Portuguese and in English, and the 30-second video | `docs/orbita/pitch/` (`LEIA-ME.md`) |
+- **20 of 20 municipalities.** In the 20 municipalities of Goiás that plant the most second-crop maize, over ten seasons, where the calculation showed more water shortfall the harvest recorded by IBGE (Brazil's statistics office) was lower. In all 20. For the region as a whole, year by year, the relationship between the two is −0.72 (on a scale where 0 means no relationship and −1 means the harvest falls every time the water shortfall rises).
+- **21 of 27 weather stations.** Satellite rainfall came closer to the rain measured on the ground than model-based rainfall at 21 of 27 stations of INMET, Brazil's national weather service: 16 of 22 in Goiás and 5 of 5 in the Federal District.
 
-The Órbita Rural work lives only in these four folders. The rest of the repository belongs to the other team members and was not changed.
+The method, the numbers for each municipality and each station, and how to rerun both tests: [VALIDACAO.md](VALIDACAO.md) and the [validacao-regional/](validacao-regional/) folder (in Portuguese).
 
-## 6. How to run
+## 8. How to run it
 
-Only Python 3 is needed (standard library). The commands below were run on 2026-11-15 on branch `jose` (commit `278c709`), and all of them worked.
+All you need is Python 3 (standard library). The commands below were run on 2026-11-15 and worked.
 
 **The tests**, from inside `backend/`:
 
     python3 -m unittest
 
-Result: 458 tests, no failures, in about 45 seconds.
+More than 500 automated tests, no failures, in about a minute.
 
-**A question to the engine**, from inside `backend/` (the output is in Portuguese):
+**The panel, the rehearsal, the bad year and the log**, from inside `backend/`:
 
-    python3 -m orbita.perguntar --cidade jatai --rotacao soja,sorgo --plantio 2026-11-20   # the 3 rotations compared
-    python3 -m orbita.perguntar --cidade jatai --verde                                     # what the satellite saw of the soil
-    python3 -m orbita.perguntar --hoje                                                     # how the soil water is today (Rio Verde)
-    python3 -m orbita.perguntar --replay 2015-16                                           # the bad season, day by day
-    python3 -m orbita.perguntar --registro 2015-16                                         # the record of the season
-    python3 -m orbita.validar                                                              # the proofs of section 7
+    python3 -m orbita.perguntar --lavoura-hoje                                               # "My field today" (Rio Verde)
+    python3 -m orbita.perguntar --cidade rio_verde --rotacao soja,milho --plantio 2026-11-10 # the 3-rotation rehearsal
+    python3 -m orbita.perguntar --replay 2015-16                                             # the bad year, day by day
+    python3 -m orbita.perguntar --registro 2015-16                                           # the season's log
+    python3 -m orbita.validar                                                                # the Rio Verde checks
 
-The cities: `rio_verde`, `jatai`, `silvania`. With `--json`, each command returns the full structure. In `--hoje --json`, each `ultimo_dia_com_dado` (last day with data) has next to it the field `ultimo_dia_com_dado_de`, which says which data the date belongs to: the calculation's (the last day with both NASA POWER temperature and the fast satellite rainfall; 2026-11-11 in this check) and the one of the fast satellite rainfall alone (2026-11-13).
+The cities: `rio_verde`, `jatai`, `silvania`. With `--json`, each command returns the full structure.
 
-**The API**, from inside `backend/`:
+**The API** (the door the screen uses to ask), from inside `backend/`:
 
-    python3 -m orbita.api                              # starts at http://127.0.0.1:8000 (this machine only)
+    python3 -m orbita.api                              # starts on http://127.0.0.1:8000 (this machine only)
     curl -s http://127.0.0.1:8000/saude                # lists the routes and says whether the AI is on
+    curl -s -X POST http://127.0.0.1:8000/lavoura-hoje -H 'Content-Type: application/json' \
+      -d '{"cidade_id": "rio_verde", "rotacao_atual": ["soja", "milho", "pousio"], "terra": "media", "plantio_da_soja": "2026-10-15"}'
 
-The routes: `GET /saude`, `POST /recomendacao`, `POST /mensagem`, `POST /conversa` and `POST /agente`. `/conversa` (ready-made sentences, no AI) works only for Rio Verde and for the two earlier rotations (soybean, maize and fallow against soybean and maize with brachiaria). `/mensagem` accepts the three cities, but its text always talks about the two earlier rotations. The 3 rotations, the replay, "how it is today" and the season record come from `/recomendacao` and `/agente` (`backend/orbita/README.md`).
+The screen uses four calculation routes, which answer with no key at all: `POST /lavoura-hoje` (the panel), `POST /recomendacao` (the rehearsal), `POST /replay` (the bad year) and `POST /registro` (the season's log). Free-form questions go to the assistant, on `POST /agente`, which needs the OpenRouter key in the terminal environment, never in a file: `export OPENROUTER_API_KEY=...` before starting the API. All routes, with examples: `backend/orbita/API.md`.
 
-Without an AI key the API starts all the same; only the route `POST /agente` answers 503 (checked). For the live agent, the OpenRouter key goes only in the terminal environment, never in a file: `export OPENROUTER_API_KEY=...` before starting the API. Checked with the key on 2026-11-15: a 3-turn conversation through `POST /agente` (the Rio Verde form, the "sim" (yes) and "vale trocar o milho pelo sorgo?" (is it worth swapping maize for sorghum?)) ended with the comparison of 3 rotations, the AI text and the number check passed. The route format and the real use are in `LEIA-ME-agente.md`.
+**The screen** (as described in `frontend/orbita/LEIA-ME.md`): with the API running, open `frontend/orbita/index.html?api=http://127.0.0.1:8000`. Without the API, double-click `frontend/orbita/index.html`: the app opens with the stored numbers and says what day they are from.
 
-**The screen with the saved answers:** double-click `frontend/orbita/index.html`. No server or internet needed. There are 4 conversations, all of Rio Verde. Checked on 2026-11-15 in a headless Chrome, at 1440 and at 390 px wide, with no console errors.
+**Each day's rain** is downloaded by `data/orbita/chuva-do-dia/baixar_chuva_do_dia.py` (the commands are in that folder's LEIA-ME).
 
-**The live screen:** start the API (above, with the key) and open `frontend/orbita/index.html?api=http://127.0.0.1:8000`. If the API does not answer, the screen says so and goes back to the saved conversations. Checked on 2026-11-15 in a headless Chrome: the screen entered the "Assistente ao vivo" (live assistant) mode and a message sent from it received the API's answer. Both modes are described in the screen's `LEIA-ME.md`.
+## 9. The parts and where each one lives
 
-**Regenerating what the screen reads** (after changing the engine or the agent):
+| the part | what it is | where it is |
+|---|---|---|
+| the engine | the program that does the calculation (no AI, no key, no internet at question time) | `backend/orbita/` (`README.md`, `LEIA-ME-motor.md`, `API.md`) |
+| the assistant | the AI that talks with the farmer, with the guardrails that check the numbers | `backend/orbita/` (`LEIA-ME-agente.md`) |
+| the screen | the farmer's app: onboarding through the assistant and the Today, Rehearse and Log tabs | `frontend/orbita/` (`LEIA-ME.md`) |
+| the data | everything that was downloaded, with the address and time of each query | `data/orbita/` |
+| the documents | this file, the AI-use statement, data and sources, the validation, the Goiás tests and the farmer questionnaire | `docs/orbita/` |
+| the pitch | the 7 slides in Portuguese and in English, the spoken script, the project-page text and the 30-second video | `docs/orbita/pitch/` (`LEIA-ME.md`) |
 
-    python3 -m orbita.exportar_conversas ../frontend/orbita/dados --sem-ia    # from inside backend/; no key, ready-made sentences
-    python3 -B frontend/orbita/dados/gerar-dados.py                           # from the repository root
+Órbita Rural's work lives in these four folders. The rest of the repository belongs to the other team members.
 
-Both were run on a copy of the repository and worked (4 conversations, 12 agent turns). The saved conversations in the repository were recorded with the AI on 2026-11-15: 12 agent turns, 8 with AI text and 4 with ready-made sentences, with the caveats written in `LEIA-ME-agente.md`. The first command replaces the saved conversations written by the AI with ready-made sentences: run it without `--sem-ia`, with the key, to keep the AI text.
-
-## 7. The proofs
-
-The numbers below come from `python3 -m orbita.validar` and from the files in `data/orbita/validacao/`. Details: [VALIDACAO.md](VALIDACAO.md) (in Portuguese).
-
-**The satellite against the ground station** (INMET station A025, 4.79 km from the Rio Verde point; February to June window; 8 seasons compared):
-
-| rainfall source | mean error against the station |
-|---|---|
-| GPM IMERG (NASA's satellite, the engine's default) | 12.1% |
-| CHIRPS | 17.6% |
-| ERA5 | 26.7% |
-| NASA POWER (model rainfall) | 33.2% |
-
-NASA POWER model rainfall gave, on average, 86% of the station's rainfall in the 4 seasons compared up to 2020, and 51% in the 4 from 2021 on. In the year 2025: 678.4 mm in the model against 1,548.0 mm in the rain gauge. That is why the engine uses satellite rainfall.
-
-**The calculation against the IBGE harvest** (second-season maize in Rio Verde, IBGE Municipal Agricultural Production survey, 10 seasons, medium soil):
-
-- The 2 seasons with the largest maize water shortage in the calculation (2021-22, with 54.8% of demand, and 2015-16, with 49.6%) are the 2 worst harvests in IBGE (5,100 and 3,300 kg/ha). The median of the 10 seasons is 6,725 kg/ha.
-- The third largest shortage is 2020-21 (45.9%), which was not a bad harvest in Rio Verde (7,200 kg/ha).
-- The rank correlation between water shortage and yield is -0.52. These are only 10 seasons: it is a sign, not proof.
-
-**Satellite greenness against the calendar.** The calendar gives 122 consecutive days with no living plant in the rotation with fallow. The satellite saw, at the median, 96 consecutive days with no green plant in Rio Verde (36 measurements, from 16 to 160 days), 80 in Jataí (30 measurements, from 0 to 128) and 96 in Silvânia (35 measurements, from 16 to 192). The calendar number fits inside the satellite range in all three cities.
-
-**The bad season, day by day** (Rio Verde, 2015-16, by the calculation): maize goes in on February 10, 2016; water stress starts on April 4 and lasts 60 consecutive days; on April 24 the water the plant can reach drops to 0.1 mm; 220.6 mm were missing, 49.6% of what the maize asked for. The 0.1 mm value comes from the calculation, fed by satellite rainfall. Nobody measured the soil.
-
-## 8. The limits, stated plainly
-
-- **No test on a real farm.** The calculation uses the climate of the city point, not of the farm. No farmer has used the tool through a season, and the validation questionnaire has no answers yet.
-- **What holds only for Rio Verde:** the comparison with the ground station (the only checked station is there), the match with the 2 worst harvests and the screen's 4 saved conversations. In Jataí the "strong thirst" level flags all 10 seasons and only one was a bad harvest in IBGE; in Silvânia no season fell below the cut, and the level comes out empty. Jataí's worst year by harvest had less water shortage in the calculation than the normal year, and the answer says so.
-- **The satellite's "12%" error holds for the long series** (8 seasons, February to June). It does not hold for recent rainfall.
-- **Recent rainfall comes as a wide range.** The fast path (2 days of delay) reads rainfall from the color of a NASA image. Over 50 days of September and October 2026, against the Rio Verde station, the satellite gave 32% to 38% more and the model rainfall 45% less. So "how it is today" shows the calculation with both rainfalls and the range between them.
-- **The satellite greenness points were chosen on the map.** We do not know whose they are or what was planted, and nobody checked them in the field. The years 2024 and 2025 were left out (images are missing in the service we queried). The satellite measures leaf greenness and does not see crop residue (straw).
-- **What is a hypothesis:** 30 values of the calculation, listed in the engine's answer. Among them: how much the grass competes with the maize for water (hence the range), the residue cover, the sorghum's mid-season water demand, the sorghum root depth, the critical phase of each crop and the use of the day's maximum temperature for heat.
-- **A day of strong heat is not a crop loss, and water shortage is not a crop failure.** The calculation does not measure income, price, cost or yield. The temperature is that of a square of about 50 km.
-- **The AI.** The check looks at whether each number in the text exists in the calculation. It does not check what the number refers to. That is why the saved conversations were read one by one.
-- The screen is in Portuguese only. The API has no password and should only run on the local machine.
-
-## 9. Next steps
-
-- Take the questionnaire to farmers and publish the count of answers.
-- Test with farmers and agronomists through a real season, and check the satellite greenness points in the field.
-- Exact recent rainfall for each day, in mm, from NASA's GES DISC (needs a free Earthdata account).
-- Compare with more ground stations, also in Jataí and Silvânia.
-- Phases, cycle and root depth of second-season sorghum measured in Goiás.
-- The screen in English, the cooperative dashboard (following several farmers) and the conversation over WhatsApp.
-
-## 10. AI use
+## 10. Use of AI
 
 Declared in [AI-USE.en.md](AI-USE.en.md) (in Portuguese: [USO-DE-IA.md](USO-DE-IA.md)).
 
@@ -167,9 +154,16 @@ Declared in [AI-USE.en.md](AI-USE.en.md) (in Portuguese: [USO-DE-IA.md](USO-DE-I
 - **Members:** to be filled in.
 - **The visual base of the screen:** the first version started from the dashboard on the team's `nat` branch, as recorded in `frontend/orbita/LEIA-ME.md`. The logo and visual identity belong to the team.
 - **The typefaces:** Anton and Montserrat, under the SIL Open Font License 1.1 (`frontend/orbita/fontes/OFL-Anton.txt` and `OFL-Montserrat.txt`).
-- **The data:** NASA (GPM IMERG, NASA POWER, MODIS), INMET, IBGE, FAO, Embrapa, ZARC, CHIRPS and ERA5. Full list in [DADOS-E-FONTES.md](DADOS-E-FONTES.md).
+- **The data:** NASA (GPM IMERG, NASA POWER, MODIS), INMET, IBGE, FAO, Embrapa, ZARC, CHIRPS and ERA5. Each day's rain comes from the open copy of IMERG kept by dynamical.org ("NASA IMERG from dynamical.org", CC BY 4.0). The full list is in [DADOS-E-FONTES.md](DADOS-E-FONTES.md).
 - There is no NASA logo in this project.
 
 ## 12. License
 
-To be defined by the team. On 2026-11-15 there was no license file on any branch of the repository.
+To be defined by the team. On 2026-11-15 there was no license file in the repository.
+
+## 13. The scope of this version
+
+- The app has stored data for three cities in Goiás (Rio Verde, Jataí and Silvânia) and three rotations, all starting with soybeans.
+- The data is for the region (the city's point), not for the individual plot.
+- The tool supports the decision and does not replace the agronomist.
+- When the assistant answers from general knowledge (pests, fertiliser, markets), it says so.
