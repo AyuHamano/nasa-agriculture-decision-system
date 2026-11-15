@@ -1,5 +1,5 @@
 {
- "gerado_em": "2026-11-15T01:21:02-03:00",
+ "gerado_em": "2026-11-15T02:46:57-03:00",
  "gerado_por": "python3 -m orbita.exportar <pasta> (Gerado com IA (Claude))",
  "parametros_usados": {
   "cidade_id": "rio_verde",
@@ -3874,25 +3874,28 @@
     "aviso": "A temperatura é a da NASA POWER (um quadrado de uns 50 km), não a da lavoura. As fontes dos limites dizem 'temperaturas acima de' e não dizem se é a máxima ou a média do dia; e a fase crítica, na conta, é a fase do meio do FAO-56. Dia de calor forte não é perda de safra: é sinal para olhar com o agrônomo."
    },
    "terra_coberta": {
-    "o_que_e": "os dias do ano sem planta viva na terra, pelo calendário de cada rotação; e, onde há medida, os dias sem planta verde vistos pelo satélite",
+    "o_que_e": "dias_sem_planta_viva: os dias seguidos sem planta viva antes do plantio da soja, pelo calendário de cada rotação (o número de sempre, o que se compara com o satélite); dias_sem_planta_viva_no_ano: o ano inteiro, contando também o intervalo entre a soja e a 2ª safra; e, onde há medida, os dias seguidos sem planta verde vistos pelo satélite",
     "por_rotacao": {
      "soja_milho_pousio": {
       "dias_sem_planta_viva": 122,
       "meses_sem_planta_viva": 4.0,
       "de": "15/06",
-      "ate": "15/10"
+      "ate": "15/10",
+      "dias_sem_planta_viva_no_ano": 125
      },
      "soja_milho_braquiaria": {
       "dias_sem_planta_viva": 30,
       "meses_sem_planta_viva": 1.0,
       "de": "15/09",
-      "ate": "15/10"
+      "ate": "15/10",
+      "dias_sem_planta_viva_no_ano": 33
      },
      "soja_sorgo_pousio": {
       "dias_sem_planta_viva": 122,
       "meses_sem_planta_viva": 4.0,
       "de": "15/06",
-      "ate": "15/10"
+      "ate": "15/10",
+      "dias_sem_planta_viva_no_ano": 125
      }
     },
     "pelo_satelite": {
@@ -3934,7 +3937,8 @@
       "falta_no_ano_normal_mm": 174.9,
       "falta_no_pior_ano_mm": 258.4,
       "dias_de_sede_no_pior_ano": 78,
-      "em_faixa": false
+      "em_faixa": false,
+      "pior_ano_contra_o_normal": "maior"
      },
      "calor": {
       "dias_de_calor_forte_no_pior_ano": 19,
@@ -3959,6 +3963,7 @@
      },
      "terra_coberta": {
       "dias_sem_planta_viva": 122,
+      "dias_sem_planta_viva_no_ano": 125,
       "pelo_satelite": 96
      },
      "contra_as_outras": {
@@ -3973,9 +3978,9 @@
        "terra_coberta": "empate"
       }
      },
-     "evidencia": "Em Rio Verde (GO), no pior ano (safra 2015-16) faltaram 258,4 mm de água para as culturas, com 78 dias de sede; no ano normal (safra 2019-20), 174,9 mm. Na fase crítica das culturas, 19 dias de calor forte no pior ano (soja, 0 dias acima de 40 °C; milho, 19 dias acima de 33 °C). Pelo calendário, a terra fica 122 dias por ano sem planta viva. O satélite viu 96 dias seguidos sem planta verde (a mediana dos pontos medidos).",
+     "evidencia": "Em Rio Verde (GO), no pior ano (safra 2015-16) faltaram 258,4 mm de água para as culturas, com 78 dias de sede; no ano normal (safra 2019-20), 174,9 mm. Na fase crítica das culturas, 19 dias de calor forte no pior ano (soja, 0 dias acima de 40 °C; milho, 19 dias acima de 33 °C). Pelo calendário, a terra fica 122 dias seguidos sem planta viva antes do plantio da soja (125 dias no ano, contando o intervalo entre a soja e a 2ª safra). O satélite viu 96 dias seguidos sem planta verde (a mediana dos pontos medidos).",
      "beneficio": "Na conta, esta rotação não ficou na frente das outras em água, calor nem terra coberta.",
-     "risco": "Na água do pior ano, ficou atrás de soja, sorgo e pousio (221,6 mm): 258,4 mm de falta. No calor do pior ano, ficou atrás de soja, sorgo e pousio (0 dias): 19 dias de calor forte. Na terra coberta, ficou atrás de soja, milho e braquiária (30 dias): 122 dias por ano sem planta viva.",
+     "risco": "Na água do pior ano, ficou atrás de soja, sorgo e pousio (221,6 mm): 258,4 mm de falta. No calor do pior ano, ficou atrás de soja, sorgo e pousio (0 dias): 19 dias de calor forte. Na terra coberta, ficou atrás de soja, milho e braquiária (30 dias): 122 dias seguidos sem planta viva.",
      "falta_saber": "Na água do pior ano, a comparação com soja, milho e braquiária muda dentro da faixa da hipótese. A conta não mede renda, preço, custo nem produtividade, e a palha entra só pelo lado da evaporação. O quanto de terra a palha do milho cobre é hipótese."
     },
     {
@@ -3996,7 +4001,8 @@
        "de": 78,
        "ate": 81
       },
-      "em_faixa": true
+      "em_faixa": true,
+      "pior_ano_contra_o_normal": "maior"
      },
      "calor": {
       "dias_de_calor_forte_no_pior_ano": 19,
@@ -4021,6 +4027,7 @@
      },
      "terra_coberta": {
       "dias_sem_planta_viva": 30,
+      "dias_sem_planta_viva_no_ano": 33,
       "pelo_satelite": null
      },
      "contra_as_outras": {
@@ -4035,8 +4042,8 @@
        "terra_coberta": "melhor"
       }
      },
-     "evidencia": "Em Rio Verde (GO), no pior ano (safra 2015-16) faltaram de 257,5 a 267,1 mm de água para as culturas, com 78 a 81 dias de sede; no ano normal (safra 2019-20), de 172,5 a 186,1 mm. Na fase crítica das culturas, 19 dias de calor forte no pior ano (soja, 0 dias acima de 40 °C; milho, 19 dias acima de 33 °C). Pelo calendário, a terra fica 30 dias por ano sem planta viva.",
-     "beneficio": "Na terra coberta, ficou na frente de soja, milho e pousio (122 dias) e soja, sorgo e pousio (122 dias): 30 dias por ano sem planta viva.",
+     "evidencia": "Em Rio Verde (GO), no pior ano (safra 2015-16) faltaram de 257,5 a 267,1 mm de água para as culturas, com 78 a 81 dias de sede; no ano normal (safra 2019-20), de 172,5 a 186,1 mm. Na fase crítica das culturas, 19 dias de calor forte no pior ano (soja, 0 dias acima de 40 °C; milho, 19 dias acima de 33 °C). Pelo calendário, a terra fica 30 dias seguidos sem planta viva antes do plantio da soja (33 dias no ano, contando o intervalo entre a soja e a 2ª safra).",
+     "beneficio": "Na terra coberta, ficou na frente de soja, milho e pousio (122 dias) e soja, sorgo e pousio (122 dias): 30 dias seguidos sem planta viva.",
      "risco": "Na água do pior ano, ficou atrás de soja, sorgo e pousio (221,6 mm): de 257,5 a 267,1 mm de falta. No calor do pior ano, ficou atrás de soja, sorgo e pousio (0 dias): 19 dias de calor forte. A braquiária bebe água junto com o milho e depois dele: a terra pode chegar mais seca ao plantio da soja.",
      "falta_saber": "Na água do pior ano, a comparação com soja, milho e pousio muda dentro da faixa da hipótese. Quanto o capim disputa água com o milho não foi medido: por isso os números desta rotação saem em faixa. O satélite não prova esta rotação, e a conta não mede renda nem o custo da semente do capim."
     },
@@ -4049,7 +4056,8 @@
       "falta_no_ano_normal_mm": 148.1,
       "falta_no_pior_ano_mm": 221.6,
       "dias_de_sede_no_pior_ano": 76,
-      "em_faixa": false
+      "em_faixa": false,
+      "pior_ano_contra_o_normal": "maior"
      },
      "calor": {
       "dias_de_calor_forte_no_pior_ano": 0,
@@ -4074,6 +4082,7 @@
      },
      "terra_coberta": {
       "dias_sem_planta_viva": 122,
+      "dias_sem_planta_viva_no_ano": 125,
       "pelo_satelite": null
      },
      "contra_as_outras": {
@@ -4088,9 +4097,9 @@
        "terra_coberta": "pior"
       }
      },
-     "evidencia": "Em Rio Verde (GO), no pior ano (safra 2015-16) faltaram 221,6 mm de água para as culturas, com 76 dias de sede; no ano normal (safra 2019-20), 148,1 mm. Na fase crítica das culturas, 0 dias de calor forte no pior ano (soja, 0 dias acima de 40 °C; sorgo, 0 dias acima de 35 °C). Pelo calendário, a terra fica 122 dias por ano sem planta viva.",
+     "evidencia": "Em Rio Verde (GO), no pior ano (safra 2015-16) faltaram 221,6 mm de água para as culturas, com 76 dias de sede; no ano normal (safra 2019-20), 148,1 mm. Na fase crítica das culturas, 0 dias de calor forte no pior ano (soja, 0 dias acima de 40 °C; sorgo, 0 dias acima de 35 °C). Pelo calendário, a terra fica 122 dias seguidos sem planta viva antes do plantio da soja (125 dias no ano, contando o intervalo entre a soja e a 2ª safra).",
      "beneficio": "Na água do pior ano, ficou na frente de soja, milho e pousio (258,4 mm) e soja, milho e braquiária (de 257,5 a 267,1 mm): 221,6 mm de falta. No calor do pior ano, ficou na frente de soja, milho e pousio (19 dias) e soja, milho e braquiária (19 dias): 0 dias de calor forte.",
-     "risco": "Na terra coberta, ficou atrás de soja, milho e braquiária (30 dias): 122 dias por ano sem planta viva.",
+     "risco": "Na terra coberta, ficou atrás de soja, milho e braquiária (30 dias): 122 dias seguidos sem planta viva.",
      "falta_saber": "As fases e o ciclo do sorgo vêm da tabela geral da FAO, que não tem linha de 2ª safra em Goiás, e a raiz do sorgo vale igual à do milho. A conta não mede renda nem o preço do sorgo contra o do milho, e o satélite não prova esta rotação."
     }
    ]
@@ -7929,25 +7938,28 @@
     "aviso": "A temperatura é a da NASA POWER (um quadrado de uns 50 km), não a da lavoura. As fontes dos limites dizem 'temperaturas acima de' e não dizem se é a máxima ou a média do dia; e a fase crítica, na conta, é a fase do meio do FAO-56. Dia de calor forte não é perda de safra: é sinal para olhar com o agrônomo."
    },
    "terra_coberta": {
-    "o_que_e": "os dias do ano sem planta viva na terra, pelo calendário de cada rotação; e, onde há medida, os dias sem planta verde vistos pelo satélite",
+    "o_que_e": "dias_sem_planta_viva: os dias seguidos sem planta viva antes do plantio da soja, pelo calendário de cada rotação (o número de sempre, o que se compara com o satélite); dias_sem_planta_viva_no_ano: o ano inteiro, contando também o intervalo entre a soja e a 2ª safra; e, onde há medida, os dias seguidos sem planta verde vistos pelo satélite",
     "por_rotacao": {
      "soja_milho_pousio": {
       "dias_sem_planta_viva": 122,
       "meses_sem_planta_viva": 4.0,
       "de": "15/06",
-      "ate": "15/10"
+      "ate": "15/10",
+      "dias_sem_planta_viva_no_ano": 125
      },
      "soja_milho_braquiaria": {
       "dias_sem_planta_viva": 30,
       "meses_sem_planta_viva": 1.0,
       "de": "15/09",
-      "ate": "15/10"
+      "ate": "15/10",
+      "dias_sem_planta_viva_no_ano": 33
      },
      "soja_sorgo_pousio": {
       "dias_sem_planta_viva": 122,
       "meses_sem_planta_viva": 4.0,
       "de": "15/06",
-      "ate": "15/10"
+      "ate": "15/10",
+      "dias_sem_planta_viva_no_ano": 125
      }
     },
     "pelo_satelite": {
@@ -7989,7 +8001,8 @@
       "falta_no_ano_normal_mm": 152.8,
       "falta_no_pior_ano_mm": 225.9,
       "dias_de_sede_no_pior_ano": 73,
-      "em_faixa": false
+      "em_faixa": false,
+      "pior_ano_contra_o_normal": "maior"
      },
      "calor": {
       "dias_de_calor_forte_no_pior_ano": 19,
@@ -8014,6 +8027,7 @@
      },
      "terra_coberta": {
       "dias_sem_planta_viva": 122,
+      "dias_sem_planta_viva_no_ano": 125,
       "pelo_satelite": 96
      },
      "contra_as_outras": {
@@ -8028,9 +8042,9 @@
        "terra_coberta": "empate"
       }
      },
-     "evidencia": "Em Rio Verde (GO), no pior ano (safra 2015-16) faltaram 225,9 mm de água para as culturas, com 73 dias de sede; no ano normal (safra 2019-20), 152,8 mm. Na fase crítica das culturas, 19 dias de calor forte no pior ano (soja, 0 dias acima de 40 °C; milho, 19 dias acima de 33 °C). Pelo calendário, a terra fica 122 dias por ano sem planta viva. O satélite viu 96 dias seguidos sem planta verde (a mediana dos pontos medidos).",
+     "evidencia": "Em Rio Verde (GO), no pior ano (safra 2015-16) faltaram 225,9 mm de água para as culturas, com 73 dias de sede; no ano normal (safra 2019-20), 152,8 mm. Na fase crítica das culturas, 19 dias de calor forte no pior ano (soja, 0 dias acima de 40 °C; milho, 19 dias acima de 33 °C). Pelo calendário, a terra fica 122 dias seguidos sem planta viva antes do plantio da soja (125 dias no ano, contando o intervalo entre a soja e a 2ª safra). O satélite viu 96 dias seguidos sem planta verde (a mediana dos pontos medidos).",
      "beneficio": "Na conta, esta rotação não ficou na frente das outras em água, calor nem terra coberta.",
-     "risco": "Na água do pior ano, ficou atrás de soja, sorgo e pousio (191,3 mm): 225,9 mm de falta. No calor do pior ano, ficou atrás de soja, sorgo e pousio (0 dias): 19 dias de calor forte. Na terra coberta, ficou atrás de soja, milho e braquiária (30 dias): 122 dias por ano sem planta viva.",
+     "risco": "Na água do pior ano, ficou atrás de soja, sorgo e pousio (191,3 mm): 225,9 mm de falta. No calor do pior ano, ficou atrás de soja, sorgo e pousio (0 dias): 19 dias de calor forte. Na terra coberta, ficou atrás de soja, milho e braquiária (30 dias): 122 dias seguidos sem planta viva.",
      "falta_saber": "Na água do pior ano, a comparação com soja, milho e braquiária muda dentro da faixa da hipótese. A conta não mede renda, preço, custo nem produtividade, e a palha entra só pelo lado da evaporação. O quanto de terra a palha do milho cobre é hipótese."
     },
     {
@@ -8051,7 +8065,8 @@
        "de": 76,
        "ate": 77
       },
-      "em_faixa": true
+      "em_faixa": true,
+      "pior_ano_contra_o_normal": "maior"
      },
      "calor": {
       "dias_de_calor_forte_no_pior_ano": 19,
@@ -8076,6 +8091,7 @@
      },
      "terra_coberta": {
       "dias_sem_planta_viva": 30,
+      "dias_sem_planta_viva_no_ano": 33,
       "pelo_satelite": null
      },
      "contra_as_outras": {
@@ -8090,8 +8106,8 @@
        "terra_coberta": "melhor"
       }
      },
-     "evidencia": "Em Rio Verde (GO), no pior ano (safra 2015-16) faltaram de 229,8 a 241,2 mm de água para as culturas, com 76 a 77 dias de sede; no ano normal (safra 2019-20), de 149,9 a 163,2 mm. Na fase crítica das culturas, 19 dias de calor forte no pior ano (soja, 0 dias acima de 40 °C; milho, 19 dias acima de 33 °C). Pelo calendário, a terra fica 30 dias por ano sem planta viva.",
-     "beneficio": "Na terra coberta, ficou na frente de soja, milho e pousio (122 dias) e soja, sorgo e pousio (122 dias): 30 dias por ano sem planta viva.",
+     "evidencia": "Em Rio Verde (GO), no pior ano (safra 2015-16) faltaram de 229,8 a 241,2 mm de água para as culturas, com 76 a 77 dias de sede; no ano normal (safra 2019-20), de 149,9 a 163,2 mm. Na fase crítica das culturas, 19 dias de calor forte no pior ano (soja, 0 dias acima de 40 °C; milho, 19 dias acima de 33 °C). Pelo calendário, a terra fica 30 dias seguidos sem planta viva antes do plantio da soja (33 dias no ano, contando o intervalo entre a soja e a 2ª safra).",
+     "beneficio": "Na terra coberta, ficou na frente de soja, milho e pousio (122 dias) e soja, sorgo e pousio (122 dias): 30 dias seguidos sem planta viva.",
      "risco": "Na água do pior ano, ficou atrás de soja, sorgo e pousio (191,3 mm): de 229,8 a 241,2 mm de falta. No calor do pior ano, ficou atrás de soja, sorgo e pousio (0 dias): 19 dias de calor forte. A braquiária bebe água junto com o milho e depois dele: a terra pode chegar mais seca ao plantio da soja.",
      "falta_saber": "Na água do pior ano, a comparação com soja, milho e pousio muda dentro da faixa da hipótese. Quanto o capim disputa água com o milho não foi medido: por isso os números desta rotação saem em faixa. O satélite não prova esta rotação, e a conta não mede renda nem o custo da semente do capim."
     },
@@ -8104,7 +8120,8 @@
       "falta_no_ano_normal_mm": 126.5,
       "falta_no_pior_ano_mm": 191.3,
       "dias_de_sede_no_pior_ano": 75,
-      "em_faixa": false
+      "em_faixa": false,
+      "pior_ano_contra_o_normal": "maior"
      },
      "calor": {
       "dias_de_calor_forte_no_pior_ano": 0,
@@ -8129,6 +8146,7 @@
      },
      "terra_coberta": {
       "dias_sem_planta_viva": 122,
+      "dias_sem_planta_viva_no_ano": 125,
       "pelo_satelite": null
      },
      "contra_as_outras": {
@@ -8143,9 +8161,9 @@
        "terra_coberta": "pior"
       }
      },
-     "evidencia": "Em Rio Verde (GO), no pior ano (safra 2015-16) faltaram 191,3 mm de água para as culturas, com 75 dias de sede; no ano normal (safra 2019-20), 126,5 mm. Na fase crítica das culturas, 0 dias de calor forte no pior ano (soja, 0 dias acima de 40 °C; sorgo, 0 dias acima de 35 °C). Pelo calendário, a terra fica 122 dias por ano sem planta viva.",
+     "evidencia": "Em Rio Verde (GO), no pior ano (safra 2015-16) faltaram 191,3 mm de água para as culturas, com 75 dias de sede; no ano normal (safra 2019-20), 126,5 mm. Na fase crítica das culturas, 0 dias de calor forte no pior ano (soja, 0 dias acima de 40 °C; sorgo, 0 dias acima de 35 °C). Pelo calendário, a terra fica 122 dias seguidos sem planta viva antes do plantio da soja (125 dias no ano, contando o intervalo entre a soja e a 2ª safra).",
      "beneficio": "Na água do pior ano, ficou na frente de soja, milho e pousio (225,9 mm) e soja, milho e braquiária (de 229,8 a 241,2 mm): 191,3 mm de falta. No calor do pior ano, ficou na frente de soja, milho e pousio (19 dias) e soja, milho e braquiária (19 dias): 0 dias de calor forte.",
-     "risco": "Na terra coberta, ficou atrás de soja, milho e braquiária (30 dias): 122 dias por ano sem planta viva.",
+     "risco": "Na terra coberta, ficou atrás de soja, milho e braquiária (30 dias): 122 dias seguidos sem planta viva.",
      "falta_saber": "As fases e o ciclo do sorgo vêm da tabela geral da FAO, que não tem linha de 2ª safra em Goiás, e a raiz do sorgo vale igual à do milho. A conta não mede renda nem o preço do sorgo contra o do milho, e o satélite não prova esta rotação."
     }
    ]
@@ -11990,25 +12008,28 @@
     "aviso": "A temperatura é a da NASA POWER (um quadrado de uns 50 km), não a da lavoura. As fontes dos limites dizem 'temperaturas acima de' e não dizem se é a máxima ou a média do dia; e a fase crítica, na conta, é a fase do meio do FAO-56. Dia de calor forte não é perda de safra: é sinal para olhar com o agrônomo."
    },
    "terra_coberta": {
-    "o_que_e": "os dias do ano sem planta viva na terra, pelo calendário de cada rotação; e, onde há medida, os dias sem planta verde vistos pelo satélite",
+    "o_que_e": "dias_sem_planta_viva: os dias seguidos sem planta viva antes do plantio da soja, pelo calendário de cada rotação (o número de sempre, o que se compara com o satélite); dias_sem_planta_viva_no_ano: o ano inteiro, contando também o intervalo entre a soja e a 2ª safra; e, onde há medida, os dias seguidos sem planta verde vistos pelo satélite",
     "por_rotacao": {
      "soja_milho_pousio": {
       "dias_sem_planta_viva": 122,
       "meses_sem_planta_viva": 4.0,
       "de": "15/06",
-      "ate": "15/10"
+      "ate": "15/10",
+      "dias_sem_planta_viva_no_ano": 125
      },
      "soja_milho_braquiaria": {
       "dias_sem_planta_viva": 30,
       "meses_sem_planta_viva": 1.0,
       "de": "15/09",
-      "ate": "15/10"
+      "ate": "15/10",
+      "dias_sem_planta_viva_no_ano": 33
      },
      "soja_sorgo_pousio": {
       "dias_sem_planta_viva": 122,
       "meses_sem_planta_viva": 4.0,
       "de": "15/06",
-      "ate": "15/10"
+      "ate": "15/10",
+      "dias_sem_planta_viva_no_ano": 125
      }
     },
     "pelo_satelite": {
@@ -12050,7 +12071,8 @@
       "falta_no_ano_normal_mm": 135.1,
       "falta_no_pior_ano_mm": 203.0,
       "dias_de_sede_no_pior_ano": 62,
-      "em_faixa": false
+      "em_faixa": false,
+      "pior_ano_contra_o_normal": "maior"
      },
      "calor": {
       "dias_de_calor_forte_no_pior_ano": 19,
@@ -12075,6 +12097,7 @@
      },
      "terra_coberta": {
       "dias_sem_planta_viva": 122,
+      "dias_sem_planta_viva_no_ano": 125,
       "pelo_satelite": 96
      },
      "contra_as_outras": {
@@ -12089,9 +12112,9 @@
        "terra_coberta": "empate"
       }
      },
-     "evidencia": "Em Rio Verde (GO), no pior ano (safra 2015-16) faltaram 203,0 mm de água para as culturas, com 62 dias de sede; no ano normal (safra 2019-20), 135,1 mm. Na fase crítica das culturas, 19 dias de calor forte no pior ano (soja, 0 dias acima de 40 °C; milho, 19 dias acima de 33 °C). Pelo calendário, a terra fica 122 dias por ano sem planta viva. O satélite viu 96 dias seguidos sem planta verde (a mediana dos pontos medidos).",
+     "evidencia": "Em Rio Verde (GO), no pior ano (safra 2015-16) faltaram 203,0 mm de água para as culturas, com 62 dias de sede; no ano normal (safra 2019-20), 135,1 mm. Na fase crítica das culturas, 19 dias de calor forte no pior ano (soja, 0 dias acima de 40 °C; milho, 19 dias acima de 33 °C). Pelo calendário, a terra fica 122 dias seguidos sem planta viva antes do plantio da soja (125 dias no ano, contando o intervalo entre a soja e a 2ª safra). O satélite viu 96 dias seguidos sem planta verde (a mediana dos pontos medidos).",
      "beneficio": "Na água do pior ano, ficou na frente de soja, milho e braquiária (de 211,8 a 224,4 mm): 203,0 mm de falta.",
-     "risco": "Na água do pior ano, ficou atrás de soja, sorgo e pousio (168,5 mm): 203,0 mm de falta. No calor do pior ano, ficou atrás de soja, sorgo e pousio (0 dias): 19 dias de calor forte. Na terra coberta, ficou atrás de soja, milho e braquiária (30 dias): 122 dias por ano sem planta viva.",
+     "risco": "Na água do pior ano, ficou atrás de soja, sorgo e pousio (168,5 mm): 203,0 mm de falta. No calor do pior ano, ficou atrás de soja, sorgo e pousio (0 dias): 19 dias de calor forte. Na terra coberta, ficou atrás de soja, milho e braquiária (30 dias): 122 dias seguidos sem planta viva.",
      "falta_saber": "A conta não mede renda, preço, custo nem produtividade, e a palha entra só pelo lado da evaporação. O quanto de terra a palha do milho cobre é hipótese."
     },
     {
@@ -12112,7 +12135,8 @@
        "de": 68,
        "ate": 70
       },
-      "em_faixa": true
+      "em_faixa": true,
+      "pior_ano_contra_o_normal": "maior"
      },
      "calor": {
       "dias_de_calor_forte_no_pior_ano": 19,
@@ -12137,6 +12161,7 @@
      },
      "terra_coberta": {
       "dias_sem_planta_viva": 30,
+      "dias_sem_planta_viva_no_ano": 33,
       "pelo_satelite": null
      },
      "contra_as_outras": {
@@ -12151,8 +12176,8 @@
        "terra_coberta": "melhor"
       }
      },
-     "evidencia": "Em Rio Verde (GO), no pior ano (safra 2015-16) faltaram de 211,8 a 224,4 mm de água para as culturas, com 68 a 70 dias de sede; no ano normal (safra 2019-20), de 132,4 a 147,0 mm. Na fase crítica das culturas, 19 dias de calor forte no pior ano (soja, 0 dias acima de 40 °C; milho, 19 dias acima de 33 °C). Pelo calendário, a terra fica 30 dias por ano sem planta viva.",
-     "beneficio": "Na terra coberta, ficou na frente de soja, milho e pousio (122 dias) e soja, sorgo e pousio (122 dias): 30 dias por ano sem planta viva.",
+     "evidencia": "Em Rio Verde (GO), no pior ano (safra 2015-16) faltaram de 211,8 a 224,4 mm de água para as culturas, com 68 a 70 dias de sede; no ano normal (safra 2019-20), de 132,4 a 147,0 mm. Na fase crítica das culturas, 19 dias de calor forte no pior ano (soja, 0 dias acima de 40 °C; milho, 19 dias acima de 33 °C). Pelo calendário, a terra fica 30 dias seguidos sem planta viva antes do plantio da soja (33 dias no ano, contando o intervalo entre a soja e a 2ª safra).",
+     "beneficio": "Na terra coberta, ficou na frente de soja, milho e pousio (122 dias) e soja, sorgo e pousio (122 dias): 30 dias seguidos sem planta viva.",
      "risco": "Na água do pior ano, ficou atrás de soja, milho e pousio (203,0 mm) e soja, sorgo e pousio (168,5 mm): de 211,8 a 224,4 mm de falta. No calor do pior ano, ficou atrás de soja, sorgo e pousio (0 dias): 19 dias de calor forte. A braquiária bebe água junto com o milho e depois dele: a terra pode chegar mais seca ao plantio da soja.",
      "falta_saber": "Quanto o capim disputa água com o milho não foi medido: por isso os números desta rotação saem em faixa. O satélite não prova esta rotação, e a conta não mede renda nem o custo da semente do capim."
     },
@@ -12165,7 +12190,8 @@
       "falta_no_ano_normal_mm": 108.7,
       "falta_no_pior_ano_mm": 168.5,
       "dias_de_sede_no_pior_ano": 67,
-      "em_faixa": false
+      "em_faixa": false,
+      "pior_ano_contra_o_normal": "maior"
      },
      "calor": {
       "dias_de_calor_forte_no_pior_ano": 0,
@@ -12190,6 +12216,7 @@
      },
      "terra_coberta": {
       "dias_sem_planta_viva": 122,
+      "dias_sem_planta_viva_no_ano": 125,
       "pelo_satelite": null
      },
      "contra_as_outras": {
@@ -12204,9 +12231,9 @@
        "terra_coberta": "pior"
       }
      },
-     "evidencia": "Em Rio Verde (GO), no pior ano (safra 2015-16) faltaram 168,5 mm de água para as culturas, com 67 dias de sede; no ano normal (safra 2019-20), 108,7 mm. Na fase crítica das culturas, 0 dias de calor forte no pior ano (soja, 0 dias acima de 40 °C; sorgo, 0 dias acima de 35 °C). Pelo calendário, a terra fica 122 dias por ano sem planta viva.",
+     "evidencia": "Em Rio Verde (GO), no pior ano (safra 2015-16) faltaram 168,5 mm de água para as culturas, com 67 dias de sede; no ano normal (safra 2019-20), 108,7 mm. Na fase crítica das culturas, 0 dias de calor forte no pior ano (soja, 0 dias acima de 40 °C; sorgo, 0 dias acima de 35 °C). Pelo calendário, a terra fica 122 dias seguidos sem planta viva antes do plantio da soja (125 dias no ano, contando o intervalo entre a soja e a 2ª safra).",
      "beneficio": "Na água do pior ano, ficou na frente de soja, milho e pousio (203,0 mm) e soja, milho e braquiária (de 211,8 a 224,4 mm): 168,5 mm de falta. No calor do pior ano, ficou na frente de soja, milho e pousio (19 dias) e soja, milho e braquiária (19 dias): 0 dias de calor forte.",
-     "risco": "Na terra coberta, ficou atrás de soja, milho e braquiária (30 dias): 122 dias por ano sem planta viva.",
+     "risco": "Na terra coberta, ficou atrás de soja, milho e braquiária (30 dias): 122 dias seguidos sem planta viva.",
      "falta_saber": "As fases e o ciclo do sorgo vêm da tabela geral da FAO, que não tem linha de 2ª safra em Goiás, e a raiz do sorgo vale igual à do milho. A conta não mede renda nem o preço do sorgo contra o do milho, e o satélite não prova esta rotação."
     }
    ]

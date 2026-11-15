@@ -21,6 +21,7 @@ ferramenta consultar e escreve a explicação. O resto é garantido pelo program
 | Toda resposta, com a ficha confirmada, traz a comparação de 3 rotações ou mais, contando a de hoje | o programa roda o ensaio em toda fala e recusa comparação com menos de 3, sem a de hoje ou sem as 4 frases (a evidência, o benefício, o risco, o que falta saber) | `tests/test_ferramentas.py`, `tests/test_agente.py` |
 | Número inventado pela IA não chega à tela | o texto é conferido por `conferencia.conferir_texto` contra a ficha, a comparação e o que as ferramentas devolveram nesta fala; sem consulta nenhuma, o texto não pode ter número; o que a IA manda como argumento a uma ferramenta não conta como conta; sobrou número, a IA tenta de novo uma vez; sobrou outra vez, saem as frases prontas do motor | `tests/test_agente.py` |
 | Uma troca de sentido conhecida também não passa | "a terra fica coberta 30 dias", quando 30 é o número de dias **sem** planta viva, é barrada como um número de fora (vista no uso de verdade, em 2026-11-15) | `tests/test_agente.py` |
+| "A água acabou" só no dia em que a conta diz | no replay de uma safra, o marco `agua_acabou` é o dia em que a sede começa (acabou só a água fácil de tirar) e o marco `agua_no_fundo` é o dia em que a água acabou; "a água acabou em 04/04/2016", dito do dia em que a sede começou, é barrado do mesmo jeito (visto nas conversas gravadas, em 2026-11-15) | `tests/test_agente.py` |
 | O aviso do agrônomo | todo passo sai com `aviso: "Converse com o agrônomo antes de decidir."` | `tests/test_agente.py` |
 | A marca do apoio | `apoio` sai das ferramentas que a IA consultou de fato: `conta`, `dados_do_lugar` ou `conhecimento_geral` (aí o programa põe o aviso na frente do texto) | `tests/test_agente.py` |
 | A chave da IA não vaza | ela só existe na variável de ambiente; não entra em arquivo, erro, registro nem conversa guardada | `tests/test_modelo.py`, `tests/test_exportar_conversas.py` |
@@ -130,7 +131,8 @@ conhecimento geral). Cada conversa diz em `texto_de` se o texto é da IA ou de f
 de novo contra a conta ao gravar; se sobrar número, nada é gravado. Com a IA, cada conversa é tentada até 3 vezes e
 fica a melhor (sem fala barrada e sem replay que o produtor não pediu). Rodar de novo sempre que o motor mudar.
 
-**As que estão guardadas** (`conversas-guardadas/`): gravadas em 2026-11-15, 01h37, com o Claude Haiku 5.5 e o motor
+**As que estão guardadas** (`conversas-guardadas/`): gravadas de novo em 2026-11-15, 02h46, depois dos acertos do
+motor (a frase do pior ano, o registro e o marco da água no fundo), com o Claude Haiku 5.5 e o motor
 completo (as 3 cidades, as 3 rotações, o replay, o "como está hoje" e o registro). São 13 falas do agente: 9 com o
 texto da IA e 4 com frases prontas (a ficha para conferir); nenhuma barrada pela conferência. Cada resposta foi lida
 uma a uma contra a conta antes de guardar, e o teste `AsConversasQueEstaoNoRepositorio` confere de novo a cada rodada.
@@ -148,7 +150,7 @@ uma a uma contra a conta antes de guardar, e o teste `AsConversasQueEstaoNoRepos
   pensando: agora pensa pouco, tem mais espaço e um texto cortado só vale até a última frase inteira); um "30%" de
   conhecimento geral passava por haver um 30 na conta (agora, sem consulta, o texto não pode ter número); a IA
   escreveu "coberta só 30 dias" (agora barrado); a resposta pronta saía longa demais (agora é curta).
-- **O gasto:** 0,17 dólar da chave do hackathon, somando todos os ensaios (o teto era 5). Uma conversa de 4 falas
+- **O gasto:** 0,27 dólar da chave do hackathon, somando todos os ensaios e as gravações (o teto era 5). Uma conversa de 4 falas
   custa perto de meio centavo de dólar.
 
 ## O uso de IA, declarado
@@ -168,8 +170,8 @@ uma a uma contra a conta antes de guardar, e o teste `AsConversasQueEstaoNoRepos
 - A conferência olha se cada número do texto existe na conta; ela não confere a que coisa o número se refere, nem o
   sinal, nem número por extenso (o começo do `conferencia.py` lista tudo). Uma frase que compara errado dois números
   certos ("mais perto de") pode passar: por isso o pedido à IA proíbe conta de cabeça, e a comparação lado a lado
-  sai sempre do motor, não da IA. A única troca de sentido que o programa barra sozinho é a dos dias de terra coberta;
-  as outras dependem de alguém ler (as conversas guardadas foram lidas uma a uma).
+  sai sempre do motor, não da IA. As únicas trocas de sentido que o programa barra sozinho são a dos dias de terra coberta e a
+  de "a água acabou" dito do dia em que a sede começou; as outras dependem de alguém ler (as conversas guardadas foram lidas uma a uma).
 - O selo da confirmação vale enquanto a API está ligada: desligou e ligou, o produtor confirma a ficha de novo.
 - O texto de conhecimento geral (pragas, adubo, mercado) não é conferido por conta nenhuma: só não pode ter número, e
   sai marcado.
