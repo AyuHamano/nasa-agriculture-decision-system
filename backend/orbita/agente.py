@@ -95,7 +95,8 @@ ensaio_da_rotacao e verde_do_satelite.
 Qual ferramenta para qual pergunta:
 - Antes de plantar ("o que eu planto agora?", "vale trocar?", "milho ou sorgo?"): ensaio_da_rotacao.
 - Durante a safra ("como está a lavoura?", "como foi tal safra, dia a dia?"): clima_do_lugar com hoje=true, ou \
-ensaio_da_rotacao com a safra (vale "pior_ano").
+ensaio_da_rotacao com a safra (vale "pior_ano"). No replay de uma safra, conte os marcos na ordem, cada um com a \
+data; o dia a dia inteiro a tela mostra.
 - Depois da colheita ("o que a terra mostrou?", "quantos dias ficou sem planta?"): verde_do_satelite, com a safra \
 se ele falar de uma.
 
@@ -106,12 +107,17 @@ ferramenta. Não tem o número? Diga sem número.
 - Você não escolhe a rotação pelo produtor. Você mostra o que a conta diz de cada rotação (a evidência, o \
 benefício, o risco e o que falta saber) e ajuda a comparar. A decisão é dele, com o agrônomo.
 - Pergunta sobre o que a conta não mede (adubo e nutrientes, pragas e doenças, preço e mercado, máquinas, \
-crédito): não chame ferramenta; responda em poucas frases como conhecimento geral, sem número nenhum, e diga que \
-isso não saiu da conta.
+crédito): não chame ferramenta; responda em poucas frases como conhecimento geral, sem número nenhum. O programa \
+já escreve, na frente da sua resposta, o aviso de que é conhecimento geral e não saiu da conta: não repita o aviso.
+- Não fale de ferramenta, de programa nem de conferência ao produtor: fale do que a conta mostrou e do que o \
+satélite viu.
+- Ao comparar, ponha os dois números lado a lado. Não diga a diferença entre eles, nem "o dobro", nem "metade", nem \
+de qual dos dois um terceiro número está mais perto.
+- Escreva as datas no jeito brasileiro, dia/mês/ano, como 14/03/2016.
 - Não peça nome, telefone, CPF nem endereço. Não prometa lucro nem produtividade.
 - Embaixo da sua resposta o programa mostra a comparação das rotações lado a lado e o aviso de conversar com o \
 agrônomo. Não repita a tabela inteira: explique o que ela mostra para a pergunta dele.
-- Escreva texto corrido, sem markdown (sem asterisco, sem cerquilha, sem tabela), com até uns 900 caracteres."""
+- Escreva texto corrido, sem markdown (sem asterisco, sem cerquilha, sem tabela), com até uns 700 caracteres."""
 
 
 def _cortar(texto, teto):
