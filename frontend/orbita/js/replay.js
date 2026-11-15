@@ -94,7 +94,7 @@
 
     el.innerHTML = '<div class="palco-dentro"><header class="palco-topo"><h2 id="tituloDoReplay">' + esc(t("replay.titulo", { safra: replay.safra || "" })) + "</h2><p>" + esc(t(cidade ? "replay.texto" : "replay.textoSemLugar", { cidade: cidade })) + (replay.rotacao && replay.rotacao.nome ? " " + esc(t("replay.rotacao", { nome: replay.rotacao.nome })) : "") + "</p></header>" +
       '<div class="replay" id="replay">' +
-        '<div class="rp-leitura"><p class="rp-data"><span class="rp-dia" id="rpDia"></span><span class="rp-mes" id="rpMes"></span></p>' +
+        '<div class="rp-leitura"><button class="rp-botao principal rp-tocar-topo" id="rpTocar" type="button"></button><p class="rp-data"><span class="rp-dia" id="rpDia"></span><span class="rp-mes" id="rpMes"></span></p>' +
           '<p class="rp-cultura" id="rpCultura"></p><p class="rp-conta" id="rpConta"></p>' +
           '<dl class="rp-numeros"><div class="rp-caixa-linha"><dt>' + esc(t("replay.agua")) + '</dt><dd><span class="rp-caixa" aria-hidden="true"><i id="rpNivel"></i></span><b id="rpAgua"></b> mm</dd></div>' +
             "<div><dt>" + esc(t("replay.chuva")) + '</dt><dd><b id="rpChuva"></b> mm</dd></div>' +
@@ -105,7 +105,7 @@
           '<div class="rp-culturas" aria-hidden="true">' + culturas(dias) + "</div>" +
           '<p class="rp-legenda"><span class="l-chuva">' + esc(t("replay.legenda.chuva")) + '</span><span class="l-agua">' + esc(t("replay.legenda.agua")) + '</span><span class="l-sede">' + esc(t("replay.legenda.sede")) + '</span><span class="l-calor">' + esc(t("replay.legenda.calor")) + "</span></p></div>" +
         '<p class="rp-frase" id="rpFrase" aria-live="polite"></p>' +
-        '<div class="rp-controles"><button class="rp-botao principal" id="rpTocar" type="button"></button>' +
+        '<div class="rp-controles">' +
           '<button class="rp-botao" id="rpVoltar" type="button" aria-label="' + esc(t("replay.voltar")) + '" title="' + esc(t("replay.voltar")) + '">' + ic("voltar") + "</button>" +
           '<input type="range" id="rpLinha" min="0" max="' + (n - 1) + '" step="1" value="0" aria-label="' + esc(t("replay.linha")) + '">' +
           '<button class="rp-botao texto" id="rpVelocidade" type="button" aria-label="' + esc(t("replay.velocidade")) + ': 1×">1×</button>' +
