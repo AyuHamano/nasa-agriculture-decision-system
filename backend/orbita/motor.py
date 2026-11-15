@@ -831,6 +831,13 @@ def como_esta_hoje(entrada, par=None, hoje=None):
     return peca.como_esta_hoje(entrada, par, hoje)
 
 
+def lavoura_hoje(entrada, par=None, hoje=None):
+    """O "durante" inteiro: a lavoura hoje em seis itens (a fase, a água, o calor, o verde, a terra coberta e o aviso
+    de sede), cada um com a situação, a frase e a data do último dado (ver `lavoura.py`)."""
+    from orbita import lavoura
+    return lavoura.lavoura_hoje(entrada, par, hoje)
+
+
 def registro_da_safra(entrada, safra, par=None):
     """O "depois": o registro da safra, depois da colheita (ver `registro.py`)."""
     from orbita import registro

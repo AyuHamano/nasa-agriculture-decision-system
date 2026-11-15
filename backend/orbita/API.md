@@ -41,6 +41,7 @@ podem chegar devagar.
 | `POST /mensagem` | a mesma pergunta | `{"texto": o texto curto, pronto para mensagem}` |
 | `POST /conversa` | `{"estado": ..., "texto": ...}` | `{"estado": ..., "resposta": ...}` (a conversa em passos, sem IA) |
 | `POST /agente` | `{"estado": ..., "texto": ...}` | `{"estado": ..., "resposta": ..., "comparacao": [...], ...}` (a conversa com a IA) |
+| `POST /lavoura-hoje` | `{"cidade_id", "rotacao_atual", "terra", "plantio_da_soja"}` | a lavoura hoje: a situação, a frase do topo e os seis itens (a fase, a água, o calor, o verde, a terra coberta e o aviso de sede) |
 
 O replay de uma safra, o "como está hoje" e o registro da safra **não têm rota própria**. Eles chegam por três
 caminhos: pela rota `/agente` (a IA consulta e a resposta traz em `consultas` e em `replay`), pelo comando
@@ -253,6 +254,53 @@ rotação de hoje, a terra e a preocupação (a data do plantio é opcional e n�
 Nesse passo o estado inteiro tem 1.753 bytes. Na conversa `replay-2015-16`, guardada no mesmo arquivo, o passo do
 replay traz `replay` com 366 dias e 8 marcos (Rio Verde, safra 2015-16), pedido pela IA com
 `{"ferramenta": "ensaio_da_rotacao", "argumentos": {"safra": "pior_ano"}}`.
+
+### POST /lavoura-hoje (a lavoura hoje: o acompanhamento durante a safra)
+O pedido (só estes campos; `cidade_id` e `rotacao_atual` são obrigatórios, `terra` vale `media` se faltar, e sem
+`plantio_da_soja` vale o calendário de costume, com a soja em 15 de outubro):
+
+    curl -s -X POST http://127.0.0.1:8000/lavoura-hoje -H 'Content-Type: application/json' \
+      -d '{"cidade_id": "rio_verde", "rotacao_atual": ["soja", "milho", "pousio"], "terra": "media", "plantio_da_soja": "2026-10-15"}'
+
+A resposta (`motor.lavoura_hoje`; os números mudam com o dado guardado, e aqui vão só os campos principais):
+
+    {"disponivel": true, "local": {"nome": "Rio Verde (GO)", "id": "rio_verde", ...},
+     "rotacao": {"id": "soja_milho_pousio", "nome": "..."}, "terra": "media", "plantio_da_soja_informado": "2026-10-15",
+     "hoje": "2026-11-15", "ultimo_dia_com_dado": "2026-11-11", "ultimo_dia_com_dado_de": "...", "atraso_dias": 4,
+     "safra": "2026-27", "situacao": "atencao", "situacao_nome": "atenção",
+     "frase": "Em Rio Verde (GO), em 11/11/2026 (o último dia com dado), a soja tinha 27 dias e estava em crescimento, sem sede, com ... mm de água ao alcance da planta. Pedem atenção: ...",
+     "itens": [
+       {"id": "fase", "titulo": "A fase da cultura", "situacao": "tranquilo", "situacao_nome": "tranquilo",
+        "frase": "Na terra está a soja, plantada em 15/10/2026. Em 11/11/2026, o último dia com dado, fazia 27 dias do plantio e a lavoura estava em crescimento, no dia 8 dos 20 dessa fase. ...",
+        "ultimo_dado": {"data": "2026-11-11", "de": "o calendário da rotação e as fases da tabela da FAO ..."},
+        "regra_da_situacao": "Atenção: a cultura está na fase crítica ...",
+        "o_que_esta_na_terra": "soja", "cultura": "soja", "plantio": "2026-10-15", "dias_desde_o_plantio": 27,
+        "fase": "crescimento", "dia_da_fase": 8, "dias_da_fase": 20, "fase_critica": false,
+        "fase_critica_de": "2026-11-24", "fase_critica_ate": "2027-01-17", "dias_para_a_fase_critica": 13,
+        "no_dia_da_consulta": {"data": "2026-11-15", "dias_desde_o_plantio": 31, "fase": "crescimento", "fase_critica": false}},
+       {"id": "agua", ...}, {"id": "calor", ...}, {"id": "verde", ...}, {"id": "terra_coberta", ...},
+       {"id": "aviso_de_sede", ...}],
+     "regras": {"fase": "...", "agua": "...", "calor": "...", "verde": "...", "terra_coberta": "...", "aviso_de_sede": "..."},
+     "janela_do_consumo_dias": 7, "horizonte_sem_chuva_dias": 30, "aviso": "..."}
+
+- Todo item traz `id`, `titulo`, `situacao` (`tranquilo`, `atencao`, `alerta` ou `sem_dado`), `situacao_nome`, `frase`
+  (pronta para o produtor, só com números da conta), `ultimo_dado` (`data`, em ano-mês-dia, e `de`, que diz de qual
+  dado é) e `regra_da_situacao`. A `situacao` do topo é a pior dos itens; "sem dado" não conta.
+- `agua`: os campos do "como está hoje" (`agua_na_terra_mm`, `agua_na_terra_pct`, `com_sede`,
+  `faixa_da_agua_na_terra_mm`, `no_ano_normal`, `no_pior_ano`, `com_a_chuva_de_modelo`), mais `dias_seguidos_de_sede`.
+- `calor`: `limite_c` e `fonte_do_limite`, `dias_de_calor_forte_desde_o_plantio`, `dias_de_calor_forte_na_fase_atual`,
+  `dias_de_calor_forte_na_fase_critica`, `maxima_desde_o_plantio_c`, `dia_da_maxima` e `nas_safras_guardadas`
+  (`safras`, `desde_o_plantio` e `na_fase_atual`, cada um com `valor_do_meio`, `menor` e `maior`, e `por_safra`).
+- `verde`: `imagem` e `imagem_ate` (os 16 dias da imagem), `verde` (de 0 a 1), `pontos_com_medida`, `pontos`, `leitura`
+  (`acima`, `dentro`, `abaixo` ou `sem_comparacao`) e `outros_anos` (`anos`, `quantos`, `valor_do_meio`, `menor`,
+  `maior`, `por_ano`).
+- `terra_coberta`: `com_planta_viva`, `desde`, `dias_seguidos`, `antes` (a sequência anterior) e `na_safra`.
+- `aviso_de_sede`: `ja_com_sede`, `dias_seguidos_de_sede`, `dias_ate_a_sede`, `data_da_sede`, `sem_chuva_a_partir_de`,
+  `consumo_medio_mm_por_dia`, `janela_dias` (7), `horizonte_dias` (30), `com_a_chuva_de_modelo` (os mesmos campos) e
+  `chuva_depois_do_ultimo_dia` (a chuva que o satélite já marcou depois do último dia da conta, se houver).
+- Sem a chuva recente guardada: `{"disponivel": false, "aviso": ...}`. Entrada errada: 400, com a frase do motor.
+- As regras de cada situação, a janela de 7 dias e os 30 dias estão no `LEIA-ME-motor.md`, seção 10. Na linha de
+  comando: `python3 -m orbita.perguntar --lavoura-hoje --cidade jatai --plantio 2026-10-20` (com `--json`, a estrutura).
 
 ### Um erro, como exemplo
 

@@ -106,13 +106,14 @@ comparação das rotações, e agora cada um diz de onde vem:
 ## 2. Como rodar
 De dentro de `backend/`:
 ```bash
-python3 -m unittest                                   # 456 testes (os 227 de antes e os novos)
+python3 -m unittest                                   # 488 testes (os 227 de antes e os novos)
 python3 -m orbita.perguntar --cidade jatai --rotacao soja,sorgo --plantio 2026-11-20   # 3 rotações comparadas
 python3 -m orbita.perguntar --cidade jatai --rotacao soja,sorgo --plantio 20/11        # entrada errada: a frase, saída 2
 python3 -m orbita.perguntar --cidade silvania --lugar          # os fatos do clima do lugar
 python3 -m orbita.perguntar --verde                            # o que o satélite viu da terra
 python3 -m orbita.perguntar --replay 2015-16                   # a safra dia a dia: os marcos
 python3 -m orbita.perguntar --hoje                             # como está a água hoje
+python3 -m orbita.perguntar --lavoura-hoje --cidade jatai      # a lavoura hoje: os 6 itens (seção 10)
 python3 -m orbita.perguntar --registro 2015-16                 # o registro da safra
 python3 -m orbita.exportar <pasta> --sem-notas --tudo          # grava também motor.js e motor.json
 ```
@@ -274,3 +275,53 @@ sai como 11/11/2026 (`explicacao.data_br`), e o "como está hoje" escreve as dua
 consulta, no lugar de "4 dias antes de hoje". Os campos (`data`, `ultimo_dia_com_dado`, `hoje`) continuam em
 ano-mês-dia, e o texto inteiro do agrônomo (`explicacao.texto`) mantém os termos técnicos. A falta de água em mm sai
 sempre com uma casa ("252,0 mm"). O teste é `tests/test_fala_simples.py`; a conferência dos números passa em todas.
+
+## 10. A lavoura hoje: o acompanhamento com todos os indicadores (2026-11-15, 08h00)
+O dono do projeto aprovou o painel "a lavoura hoje" como o centro do produto: o acompanhamento durante a safra não
+pode usar só a chuva. `motor.lavoura_hoje(entrada, hoje=None)` (a peça é o `lavoura.py`) devolve seis itens, no
+último dia com dado, na rotação e na data de plantio do produtor. O `como_esta_hoje` continua com os campos de sempre.
+
+| item | o que diz | de onde sai (nada novo) |
+|---|---|---|
+| a fase da cultura | o que está na terra, os dias desde o plantio, a fase e se é a fase crítica | o calendário e as 4 fases da tabela da FAO, as mesmas do consumo de água; a crítica é a do meio, como no calor |
+| a água | a água na terra, a sede, o ano normal e o pior ano, e os dias seguidos de sede | o `como_esta_hoje` e os registros da mesma conta |
+| o calor | os dias com a máxima acima do limite da cultura desde o plantio, na fase atual e na fase crítica, ao lado do valor do meio das 10 safras guardadas no mesmo dia do ciclo | a temperatura da NASA POWER e os limites publicados (seção 3) |
+| o verde do satélite | o valor da imagem mais recente, com a data, contra a mesma época dos outros anos guardados | os CSV do verde (MOD13Q1), com a mesma regra de medida boa do `ndvi.py` |
+| a terra coberta | há quantos dias seguidos a terra está com planta viva (ou sem), a sequência de antes e os dias da safra | o calendário da rotação |
+| o aviso de sede | sem chuva, em quantos dias a água chega ao nível de sede; se já há sede, há quantos dias | a mesma conta da água, seguida para a frente com chuva zero |
+
+Cada item leva `situacao`, `frase`, `ultimo_dado` (a data e de qual dado é) e `regra_da_situacao`. No topo, a `frase`
+que resume e a `situacao`, que é a pior dos itens.
+
+### As regras (escolhas desta peça, escritas antes de ver os números; estão em `lavoura.REGRAS`)
+- **A fase.** Atenção: a cultura está na fase crítica (a floração e o enchimento do grão). Tranquilo: nas outras fases
+  ou sem cultura na terra. Os nomes das fases para o produtor: no começo do ciclo, em crescimento, na fase crítica, no
+  fim do ciclo (a maturação).
+- **A água.** Alerta: com sede no último dia com dado, na conta com a chuva do satélite. Atenção: sem sede nessa
+  conta, mas com sede na conta com a chuva estimada por modelo de computador. Tranquilo: o resto. A comparação com o
+  ano normal e o pior ano vai na frase, mas não muda a situação (em Jataí o pior ano tinha a terra cheia nessa data).
+- **O calor.** "Dia de calor forte", aqui, é o dia com a máxima acima do limite da cultura em qualquer fase (na
+  comparação das rotações o motor conta só os da fase crítica; esse número vai ao lado, em
+  `dias_de_calor_forte_na_fase_critica`). Alerta: já houve dia de calor forte dentro da fase crítica desta safra.
+  Atenção: sem isso, mas os dias desde o plantio passam do valor do meio das safras guardadas no mesmo dia do ciclo.
+  Tranquilo: o resto.
+- **O verde.** O valor de cada imagem é o valor do meio dos pontos com medida boa. A mesma época é a mesma medida do
+  satélite nos outros anos (o mesmo dia do ano em que os 16 dias começam). Abaixo do normal: abaixo do menor valor
+  dos outros anos; acima: acima do maior; dentro: entre os dois. Com menos de 3 outros anos, não compara (sem dado).
+  Atenção: abaixo do normal com cultura na terra no fim da imagem. O verde nunca dá alerta sozinho: os pontos são da
+  região, escolhidos no mapa, não da lavoura.
+- **A terra coberta.** Tranquilo: com planta viva (a cultura ou o capim) pelo calendário. Atenção: sem planta viva.
+- **O aviso de sede.** A conta segue para a frente por 30 dias, sem chuva, com o tempo dos últimos 7 dias com dado (a
+  média da temperatura e da evaporação de referência); o pedido da cultura em cada dia segue o calendário e as fases.
+  O nível de sede é o dos dias de sede do motor (a água fácil de tirar acabou). Alerta: já com sede. Atenção: a sede
+  chega em até 7 dias, na conta com a chuva do satélite ou na da chuva de modelo. Tranquilo: o resto. Os 7 e os 30
+  dias são escolha desta versão, não número de fonte. Não há previsão do tempo.
+
+### Como rodar e o que ficou de fora
+- `python3 -m orbita.perguntar --lavoura-hoje --cidade rio_verde|jatai|silvania [--plantio 2026-10-20] [--rotacao
+  soja,sorgo] [--terra media] [--json]`; na API, `POST /lavoura-hoje` (o `API.md` tem o pedido e a resposta).
+- O teste é `tests/test_lavoura_hoje.py`, com o "hoje" fixo em 2026-11-15 e só com os dados guardados.
+- O verde não foi atualizado: em 2026-11-15, 08h10, o espelho (Planetary Computer) ainda só tinha a imagem de
+  16/10/2026 (a de 01/11/2026 não tinha saído). O painel diz a data da imagem.
+- Ficou de fora: a ferramenta do agente (`ferramentas.py`) e o arquivo da tela (`exportar --tudo`) ainda não levam o
+  painel; a fase vem do calendário, não de visita à lavoura; o verde é da região, não do talhão do produtor.

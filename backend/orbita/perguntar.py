@@ -13,6 +13,7 @@ As outras portas do motor, uma de cada vez (saem em JSON, ou a frase pronta sem 
     python3 -m orbita.perguntar --verde                                      (o que o satélite viu da terra)
     python3 -m orbita.perguntar --replay 2015-16                             (a safra dia a dia: os marcos)
     python3 -m orbita.perguntar --hoje                                       (como está a água hoje)
+    python3 -m orbita.perguntar --lavoura-hoje --cidade jatai --plantio 2026-10-20   (a lavoura hoje: os 6 itens)
     python3 -m orbita.perguntar --registro 2015-16                           (o registro da safra)
 Para comparar: --chuva imerg|chirps|era5|power (a fonte da chuva; o padrão é imerg, o satélite da NASA) e
 --regra rendimento|chuva (como se escolhe o pior ano; o padrão é rendimento, a pior colheita no IBGE).
@@ -41,6 +42,8 @@ def main(argv=None):
     leitor.add_argument("--verde", action="store_true", help="só o que o satélite viu da terra")
     leitor.add_argument("--replay", default=None, metavar="SAFRA", help="a safra dia a dia (2015-16)")
     leitor.add_argument("--hoje", action="store_true", help="como está a água no último dia com dado")
+    leitor.add_argument("--lavoura-hoje", action="store_true", dest="lavoura_hoje",
+                        help="a lavoura hoje: a fase, a água, o calor, o verde, a terra coberta e o aviso de sede")
     leitor.add_argument("--registro", default=None, metavar="SAFRA", help="o registro da safra (2015-16)")
     leitor.add_argument("--chuva", default=None, help="a fonte da chuva: imerg (padrão), chirps, era5 ou power")
     leitor.add_argument("--regra", default=None, help="o pior ano: rendimento (padrão, o IBGE) ou chuva")
@@ -60,6 +63,8 @@ def main(argv=None):
             outra = motor.verde_do_satelite(a.cidade)
         elif a.replay:
             outra = motor.replay_da_safra(entrada, a.replay)
+        elif a.lavoura_hoje:
+            outra = motor.lavoura_hoje(entrada)
         elif a.hoje:
             outra = motor.como_esta_hoje(entrada)
         elif a.registro:
@@ -75,6 +80,13 @@ def main(argv=None):
             return 0
         linhas = [outra["frase"]] if outra.get("frase") else []
         linhas += [f"{m['data']} · {m['frase']}" for m in outra.get("marcos", [])]
+        if outra.get("itens"):             # a lavoura hoje: a situação do topo e os seis itens, um por linha
+            linhas[0] = f"A lavoura hoje · {outra['situacao_nome']} · {outra['frase']}"
+            for item in outra["itens"]:
+                dado = item["ultimo_dado"]
+                quando = explicacao.data_br(dado["data"]) if dado["data"] else "sem data"
+                linhas.append(f"{item['titulo']} · {item['situacao_nome']} · {item['frase']} "
+                              f"(Último dado: {quando}; {dado['de']}.)")
         linhas += [f"Aviso: {aviso}" for aviso in ([outra["aviso"]] if outra.get("aviso") else outra.get("avisos", []))]
         print("\n".join(linhas))
         sobras = conferencia.conferir_texto("\n".join(linhas[:-1] if linhas else []), outra)

@@ -139,6 +139,25 @@ def _retrato(registros, data):
             "chuva_desde_1_de_setembro_mm": round(chuva, 1) + 0.0}
 
 
+def contas_de_hoje(entrada, par, chuva_recente):
+    """A conta da água até o último dia com dado, com as duas chuvas: a base do "como está hoje" e do "a lavoura hoje".
+
+    `entrada` já conferida (`motor.validar_entrada`). Devolve as séries (a guardada, a esticada com a chuva rápida do
+    satélite e a esticada com a chuva de modelo), os registros da conta com cada uma, o calendário, a rotação e a
+    regra dos anos (o ano normal e o pior ano).
+    """
+    from orbita import motor
+    guardados, _ = motor._serie(entrada)
+    temperatura = clima.ler_serie(clima.pastas_da_cidade(entrada["cidade_id"])["nasa_power"])
+    com_recente, com_modelo = esticar(guardados, temperatura, chuva_recente)
+    cal = rotacoes.calendario(par, entrada["plantio_da_soja"])
+    registros, rotacao = motor.simular_a_rotacao_de_hoje(entrada, par, com_recente, cal)
+    registros_do_modelo, _ = motor.simular_a_rotacao_de_hoje(entrada, par, com_modelo, cal)
+    _, regra = motor._regra_dos_anos(entrada, guardados)
+    return {"guardados": guardados, "com_recente": com_recente, "com_modelo": com_modelo, "cal": cal,
+            "registros": registros, "registros_do_modelo": registros_do_modelo, "rotacao": rotacao, "regra": regra}
+
+
 NA_TERRA = {"soja": "a soja", "milho": "o milho de 2ª safra", "sorgo": "o sorgo de 2ª safra",
             "braquiaria": "a braquiária", "sem_planta": "nenhuma planta viva"}
 
@@ -163,13 +182,10 @@ def como_esta_hoje(entrada, par=None, hoje=None, pasta_da_chuva_recente=None):
         return {"disponivel": False, "local": dict(cidade, id=entrada["cidade_id"]),
                 "aviso": f"A chuva recente de {cidade['nome']} não está guardada: rode data/orbita/recente/"
                          "baixar_chuva_recente.py para o ponto da cidade."}
-    guardados, _ = motor._serie(entrada)
-    temperatura = clima.ler_serie(clima.pastas_da_cidade(entrada["cidade_id"])["nasa_power"])
-    com_recente, com_modelo = esticar(guardados, temperatura, recente)
-    cal = rotacoes.calendario(par, entrada["plantio_da_soja"])
-    registros, rotacao = motor.simular_a_rotacao_de_hoje(entrada, par, com_recente, cal)
-    registros_do_modelo, _ = motor.simular_a_rotacao_de_hoje(entrada, par, com_modelo, cal)
-    _, regra = motor._regra_dos_anos(entrada, guardados)
+    contas = contas_de_hoje(entrada, par, recente)
+    guardados, com_recente, com_modelo = contas["guardados"], contas["com_recente"], contas["com_modelo"]
+    registros, registros_do_modelo = contas["registros"], contas["registros_do_modelo"]
+    rotacao, regra = contas["rotacao"], contas["regra"]
     ultimo = com_recente[-1].data
     agora = _retrato(registros, ultimo)
     pelo_modelo = _retrato(registros_do_modelo, ultimo)

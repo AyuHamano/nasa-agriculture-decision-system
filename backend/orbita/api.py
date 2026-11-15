@@ -12,6 +12,7 @@ As rotas (o `API.md` desta pasta traz um exemplo de cada uma):
     POST /mensagem       -> {"texto": o texto curto}             (o mesmo corpo)
     POST /conversa       -> {"estado": ..., "resposta": ...}     (corpo: {"estado": ..., "texto": ...})
     POST /agente         -> {"estado": ..., "resposta": ..., "comparacao": [...], ...}   (o mesmo corpo do /conversa)
+    POST /lavoura-hoje   -> a lavoura hoje, em seis itens        (corpo: cidade_id, rotacao_atual, terra, plantio_da_soja)
 
 A rota /agente é a conversa com a IA (`agente.py`; o manual é o `LEIA-ME-agente.md`). Ela precisa da chave da IA
 numa variável de ambiente (`OPENROUTER_API_KEY`); sem a chave, ou se a IA não responder, a rota devolve 503 e quem
@@ -37,12 +38,15 @@ LIMITE_DO_CORPO = 16 * 1024               # bytes: a pergunta e o estado da conv
 DESCARTE_MAXIMO = 1024 * 1024             # até quanto de um corpo recusado é lido e jogado fora antes de responder
 ESPERA = 15                               # segundos sem chegar nada: a ligação é fechada
 PRAZO_DO_CORPO = 10                       # segundos para o corpo inteiro chegar (mandar aos poucos não adianta)
-ROTAS = {"/saude": "GET", "/recomendacao": "POST", "/mensagem": "POST", "/conversa": "POST", "/agente": "POST"}
+ROTAS = {"/saude": "GET", "/recomendacao": "POST", "/mensagem": "POST", "/conversa": "POST", "/agente": "POST",
+         "/lavoura-hoje": "POST"}
+CAMPOS_DA_LAVOURA = ("cidade_id", "rotacao_atual", "terra", "plantio_da_soja")      # os campos da /lavoura-hoje
 CAMPOS_DA_PERGUNTA = ("cidade_id", "rotacao_atual", "prioridades", "terra", "plantio_da_soja", "preocupacao")
 TEXTOS_DA_PERGUNTA = {"cidade_id": "rio_verde", "terra": "media", "plantio_da_soja": "2026-11-05",
                       "preocupacao": "agua"}                     # os campos que são texto, com um exemplo de cada
 CAMPOS_DA_CONVERSA = ("estado", "texto")
-TODAS_AS_ROTAS = "GET /saude, POST /recomendacao, POST /mensagem, POST /conversa e POST /agente"
+TODAS_AS_ROTAS = ("GET /saude, POST /recomendacao, POST /mensagem, POST /conversa, POST /agente e "
+                  "POST /lavoura-hoje")
 EXEMPLO_DA_CONVERSA = '{"estado": null, "texto": "oi"}'
 EXEMPLO = ('{"cidade_id": "rio_verde", "rotacao_atual": ["soja", "milho", "pousio"], "prioridades": {"agua": 5, '
            '"solo": 4, "renda": 2, "erosao": 3}, "terra": "media"}')
@@ -51,7 +55,8 @@ ERROS_DO_SERVIDOR = {
     408: "O pedido demorou demais para chegar.",
     414: "O endereço do pedido é grande demais.",
     431: "Os cabeçalhos do pedido são grandes demais.",
-    501: "Método não aceito. Use GET em /saude e POST em /recomendacao, /mensagem, /conversa e /agente.",
+    501: "Método não aceito. Use GET em /saude e POST em /recomendacao, /mensagem, /conversa, /agente e "
+         "/lavoura-hoje.",
     505: "Versão do HTTP não aceita.",
 }
 
@@ -177,8 +182,23 @@ def rota_agente(corpo, modelo=None):
     return agente.resposta_da_rota(estado, saida)
 
 
+def rota_lavoura_hoje(corpo):
+    """A lavoura hoje (`motor.lavoura_hoje`): a fase, a água, o calor, o verde, a terra coberta e o aviso de sede."""
+    _so_estes_campos(corpo, CAMPOS_DA_LAVOURA)
+    for campo in CAMPOS_DA_LAVOURA:
+        if campo in TEXTOS_DA_PERGUNTA and corpo.get(campo) is not None and not isinstance(corpo[campo], str):
+            raise ErroDaApi(400, f'Entrada fora do formato: {campo} tem de ser um texto entre aspas, como '
+                                 f'"{TEXTOS_DA_PERGUNTA[campo]}".')
+    try:
+        return motor.lavoura_hoje({campo: corpo[campo] for campo in CAMPOS_DA_LAVOURA if campo in corpo})
+    except ValueError as erro:
+        if str(erro).startswith("Entrada fora do formato"):       # o erro de entrada do motor, já em português
+            raise ErroDaApi(400, str(erro)) from None
+        raise
+
+
 ACOES = {"/recomendacao": rota_recomendacao, "/mensagem": rota_mensagem, "/conversa": rota_conversa,
-         "/agente": rota_agente}
+         "/agente": rota_agente, "/lavoura-hoje": rota_lavoura_hoje}
 
 
 class Porta(BaseHTTPRequestHandler):
@@ -358,8 +378,8 @@ def main(argv=None):
         return 1
     endereco, porta = servidor.server_address[:2]
     print(f"Órbita Rural · a API está ligada em http://{endereco}:{porta} (Ctrl+C desliga).", flush=True)
-    print("Rotas: GET /saude · POST /recomendacao · POST /mensagem · POST /conversa · POST /agente. Nenhum WhatsApp "
-          "está ligado.", flush=True)
+    print("Rotas: GET /saude · POST /recomendacao · POST /mensagem · POST /conversa · POST /agente · "
+          "POST /lavoura-hoje. Nenhum WhatsApp está ligado.", flush=True)
     ia = _ia_do_agente()
     print(f"A IA do agente: ligada (modelo {ia['modelo']})." if ia["ligada"] else
           "A IA do agente: sem chave no ambiente (OPENROUTER_API_KEY); a rota /agente responde 503.", flush=True)
