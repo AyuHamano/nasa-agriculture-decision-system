@@ -22,6 +22,8 @@ ferramenta consultar e escreve a explicação. O resto é garantido pelo program
 | Número inventado pela IA não chega à tela | o texto é conferido por `conferencia.conferir_texto` contra a ficha, a comparação e o que as ferramentas devolveram nesta fala; sem consulta nenhuma, o texto não pode ter número; o que a IA manda como argumento a uma ferramenta não conta como conta; sobrou número, a IA tenta de novo uma vez; sobrou outra vez, saem as frases prontas do motor | `tests/test_agente.py` |
 | Uma troca de sentido conhecida também não passa | "a terra fica coberta 30 dias", quando 30 é o número de dias **sem** planta viva, é barrada como um número de fora (vista no uso de verdade, em 2026-11-15) | `tests/test_agente.py` |
 | "A água acabou" só no dia em que a conta diz | no replay de uma safra, o marco `agua_acabou` é o dia em que a sede começa (acabou só a água fácil de tirar) e o marco `agua_no_fundo` é o dia em que a água acabou; "a água acabou em 04/04/2016", dito do dia em que a sede começou, é barrado do mesmo jeito (visto nas conversas gravadas, em 2026-11-15) | `tests/test_agente.py` |
+| Letra de outro alfabeto não chega à tela | texto da IA com letra que não é do português ("fazer 监测 de campo", visto na gravação de 2026-11-15) é barrado como um número de fora: a IA tenta de novo e, se repetir, saem as frases prontas | `tests/test_fala_simples.py` |
+| A fala simples | o pedido à IA manda trocar as palavras da conta ("mediana" vira "o valor do meio"; "zona das raízes", "a camada de terra onde ficam as raízes"; "chuva de modelo", "a chuva estimada por modelo de computador"), escrever cada número como a conta escreve (252,0 mm, não 252 mm) e a data como 11/11/2026; as frases prontas do motor já saem assim. Isto é pedido, não trava: quem confere é a leitura das conversas gravadas | `tests/test_fala_simples.py` |
 | O aviso do agrônomo | todo passo sai com `aviso: "Converse com o agrônomo antes de decidir."` | `tests/test_agente.py` |
 | A marca do apoio | `apoio` sai das ferramentas que a IA consultou de fato: `conta`, `dados_do_lugar` ou `conhecimento_geral` (aí o programa põe o aviso na frente do texto) | `tests/test_agente.py` |
 | A chave da IA não vaza | ela só existe na variável de ambiente; não entra em arquivo, erro, registro nem conversa guardada | `tests/test_modelo.py`, `tests/test_exportar_conversas.py` |
@@ -125,17 +127,28 @@ devolve um aviso no lugar, e a IA diz que isso é o próximo passo.
     python3 -m orbita.exportar_conversas <pasta> --sem-ia   # sem chave: as frases prontas
 
 Grava `conversas.js` (`window.ORBITA_CONVERSAS = {...};`, o que a tela lê) e `conversas.json` (o mesmo objeto). São 4
-conversas: `antes-plantei-tarde` (plantei a soja tarde: milho ou sorgo?), `replay-2015-16` (a pior safra, dia a dia,
-com os dias e os marcos em `replay`), `depois-o-que-a-terra-mostrou` e `sem-conta-pragas-e-adubo` (sai com o aviso de
-conhecimento geral). Cada conversa diz em `texto_de` se o texto é da IA ou de frases prontas. Cada texto é conferido
-de novo contra a conta ao gravar; se sobrar número, nada é gravado. Com a IA, cada conversa é tentada até 3 vezes e
-fica a melhor (sem fala barrada e sem replay que o produtor não pediu). Rodar de novo sempre que o motor mudar.
+conversas, todas de Rio Verde (o caso provado: a safra 2015-16 é a pior colheita do IBGE e, na conta, tem mais falta
+de água que o ano normal; em Jataí o "pior ano" tem menos falta que o normal): `antes-plantei-tarde` (plantei a soja
+em 10 de novembro: milho ou sorgo? e a braquiária?), `replay-2015-16` (o momento "durante": primeiro o "como está
+hoje", logo depois da ficha, e depois a pior safra, dia a dia, com os dias e os marcos em `replay`),
+`depois-o-que-a-terra-mostrou` (o que o satélite viu e o registro da safra 2015-16) e `sem-conta-pragas-e-adubo` (sai
+com o aviso de conhecimento geral). Cada conversa diz em `texto_de` se o texto é da IA ou de frases prontas. Cada
+texto é conferido de novo contra a conta ao gravar; se sobrar número, nada é gravado. Com a IA, cada conversa é
+tentada até 3 vezes e fica a melhor: sem fala barrada, sem replay que o produtor não pediu, sem duas respostas com o
+mesmo começo, sem "antes de hoje" sem a data ao lado, sem "hoje é tal dia" fora da pergunta do "como está hoje" e sem
+palavra da conta sem explicação. Rodar de novo sempre que o motor mudar.
 
-**As que estão guardadas** (`conversas-guardadas/`): gravadas de novo em 2026-11-15, 02h46, depois dos acertos do
-motor (a frase do pior ano, o registro e o marco da água no fundo), com o Claude Haiku 5.5 e o motor
-completo (as 3 cidades, as 3 rotações, o replay, o "como está hoje" e o registro). São 13 falas do agente: 9 com o
-texto da IA e 4 com frases prontas (a ficha para conferir); nenhuma barrada pela conferência. Cada resposta foi lida
-uma a uma contra a conta antes de guardar, e o teste `AsConversasQueEstaoNoRepositorio` confere de novo a cada rodada.
+**As que estão guardadas** (`conversas-guardadas/`): gravadas de novo em 2026-11-15, 03h18, depois da fala simples e
+do marco da água no fundo dizendo o que aconteceu, com o Claude Haiku 5.5 e o motor completo. São 12 falas do agente:
+8 com o texto da IA e 4 com frases prontas (a ficha para conferir); nenhuma barrada pela conferência. Foram 3
+gravações seguidas, lidas uma a uma contra a conta: a primeira trouxe letras de outro alfabeto numa resposta (virou
+trava), a segunda dizia "hoje é 15/11/2026" em respostas que não eram a do "como está hoje" (virou regra), e a
+terceira dizia que a rotação de hoje é "a que mais sofre com a falta de água", o que a conta não diz (a rotação com
+capim vai de 229,8 a 241,2 mm, contra 225,9 mm; virou regra). O que ficou guardado: as conversas `antes-plantei-tarde`,
+`replay-2015-16` e `depois-o-que-a-terra-mostrou` da terceira gravação e a `sem-conta-pragas-e-adubo` da segunda (a
+resposta certa; nela ficou a frase "Hoje é 15/11/2026."). O teste `AsConversasQueEstaoNoRepositorio` confere tudo de
+novo a cada rodada. O que a leitura achou e não é erro de número: no "como está hoje", a IA escreveu que "o valor
+real deve estar entre esses dois" (a conta só dá os dois valores, um com cada chuva).
 
 ## O uso de verdade (2026-11-15)
 
@@ -152,6 +165,7 @@ uma a uma contra a conta antes de guardar, e o teste `AsConversasQueEstaoNoRepos
   escreveu "coberta só 30 dias" (agora barrado); a resposta pronta saía longa demais (agora é curta).
 - **O gasto:** 0,27 dólar da chave do hackathon, somando todos os ensaios e as gravações (o teto era 5). Uma conversa de 4 falas
   custa perto de meio centavo de dólar.
+  As 3 gravações de 2026-11-15, 03h14 a 03h18, custaram mais 0,05 dólar (61 pedidos).
 
 ## O uso de IA, declarado
 

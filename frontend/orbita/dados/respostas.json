@@ -1,5 +1,5 @@
 {
- "gerado_em": "2026-11-15T02:46:57-03:00",
+ "gerado_em": "2026-11-15T03:20:00-03:00",
  "gerado_por": "python3 -m orbita.exportar <pasta> (Gerado com IA (Claude))",
  "parametros_usados": {
   "cidade_id": "rio_verde",
@@ -66,8 +66,8 @@
     "primeiro_dia": "2014-07-01",
     "ultimo_dia": "2026-09-14",
     "avisos": [
-     "A chuva desta fonte vai até 2026-09-14: os 58 dias seguintes da série, sem dado de chuva, ficaram fora da conta (dia sem dado nunca vira zero).",
-     "O dia do IMERG é o UTC (começa 3 horas antes do dia de Rio Verde); a temperatura é do dia local. A chuva de um fim de tarde pode cair no dia seguinte da conta."
+     "A chuva desta fonte vai até 14/09/2026: os 58 dias seguintes da série, sem dado de chuva, ficaram fora da conta (dia sem dado nunca vira zero).",
+     "O dia do IMERG (a chuva medida por satélite da NASA) é o UTC (começa 3 horas antes do dia de Rio Verde); a temperatura é do dia local. A chuva de um fim de tarde pode cair no dia seguinte da conta."
     ],
     "conta": "FAO-56: ETo de Hargreaves (eq. 52), Kc por fase, balanço diário da água (cap. 8)"
    },
@@ -2837,7 +2837,7 @@
      "leitura": "dentro_da_faixa",
      "aviso": "\"Sem planta verde\" não é \"terra descoberta\": o satélite mede o verde das folhas e não vê a palha. Um ponto sem planta verde pode estar coberto de palha.",
      "nota": "O satélite mede o verde; o calendário, a planta no chão. Milho já seco antes da colheita e soja recém-nascida aparecem como 'sem planta verde': o satélite pode contar mais dias.",
-     "frase": "Pelo calendário, a terra fica 122 dias sem planta. O satélite viu 96 dias seguidos sem planta verde (a mediana de 36 medidas, que vão de 16 a 160 dias): a diferença é de 26 dias a mais no calendário. O número do calendário é diferente da mediana, mas cabe na faixa que o satélite viu."
+     "frase": "Pelo calendário, a terra fica 122 dias sem planta. O satélite viu 96 dias seguidos sem planta verde (o valor do meio de 36 medidas, que vão de 16 a 160 dias): a diferença é de 26 dias a mais no calendário. O número do calendário é diferente do valor do meio, mas cabe entre o menor e o maior que o satélite viu."
     },
     "limites_por_ponto": {
      "leste": 0.3271,
@@ -2942,7 +2942,7 @@
      "aviso": "Conta parcial, fora da mediana. Onde a última medida ainda está sem planta verde, o número é 'pelo menos': a sequência não fechou."
     },
     "frases": [
-     "Pelo calendário, a terra fica 122 dias sem planta. O satélite viu 96 dias seguidos sem planta verde (a mediana de 36 medidas, que vão de 16 a 160 dias): a diferença é de 26 dias a mais no calendário. O número do calendário é diferente da mediana, mas cabe na faixa que o satélite viu.",
+     "Pelo calendário, a terra fica 122 dias sem planta. O satélite viu 96 dias seguidos sem planta verde (o valor do meio de 36 medidas, que vão de 16 a 160 dias): a diferença é de 26 dias a mais no calendário. O número do calendário é diferente do valor do meio, mas cabe entre o menor e o maior que o satélite viu.",
      "O satélite mede o verde; o calendário, a planta no chão. Milho já seco antes da colheita e soja recém-nascida aparecem como 'sem planta verde': o satélite pode contar mais dias.",
      "\"Sem planta verde\" não é \"terra descoberta\": o satélite mede o verde das folhas e não vê a palha. Um ponto sem planta verde pode estar coberto de palha.",
      "Os pontos foram escolhidos no mapa, perto de Rio Verde (GO): não se sabe de quem são nem o que foi plantado em cada um. É prova só da rotação de hoje."
@@ -3871,7 +3871,7 @@
      "Hipótese desta versão: 'dia de calor forte' = dia da fase crítica com a temperatura máxima (T2M_MAX, da NASA POWER) acima do limite. As fontes dizem 'temperaturas acima de' e não dizem se é a máxima ou a média do dia; a máxima da NASA POWER é a de um quadrado de uns 50 km, não a da lavoura.",
      "Hipótese desta versão: na conta, a fase crítica é a fase do meio do FAO-56 (Tabela 11, 'Mid'), que vai da cobertura cheia ao começo da maturação e por isso pega a floração e a maior parte do enchimento dos grãos. A fonte diz qual é a fase crítica, não em que dias do calendário ela cai."
     ],
-    "aviso": "A temperatura é a da NASA POWER (um quadrado de uns 50 km), não a da lavoura. As fontes dos limites dizem 'temperaturas acima de' e não dizem se é a máxima ou a média do dia; e a fase crítica, na conta, é a fase do meio do FAO-56. Dia de calor forte não é perda de safra: é sinal para olhar com o agrônomo."
+    "aviso": "A temperatura é a da NASA POWER (um quadrado de uns 50 km), não a da lavoura. As fontes dos limites dizem 'temperaturas acima de' e não dizem se é a máxima ou a média do dia; e a fase crítica, na conta, é a fase do meio da tabela da FAO (o órgão da ONU para a agricultura). Dia de calor forte não é perda de safra: é sinal para olhar com o agrônomo."
    },
    "terra_coberta": {
     "o_que_e": "dias_sem_planta_viva: os dias seguidos sem planta viva antes do plantio da soja, pelo calendário de cada rotação (o número de sempre, o que se compara com o satélite); dias_sem_planta_viva_no_ano: o ano inteiro, contando também o intervalo entre a soja e a 2ª safra; e, onde há medida, os dias seguidos sem planta verde vistos pelo satélite",
@@ -3913,7 +3913,7 @@
      "quantos": 36,
      "prova_de": "só da rotação de hoje da região (soja, milho e pousio)",
      "diferenca": 26,
-     "frase": "Pelo calendário, a terra fica 122 dias sem planta. O satélite viu 96 dias seguidos sem planta verde (a mediana de 36 medidas, que vão de 16 a 160 dias): a diferença é de 26 dias a mais no calendário. O número do calendário é diferente da mediana, mas cabe na faixa que o satélite viu.",
+     "frase": "Pelo calendário, a terra fica 122 dias sem planta. O satélite viu 96 dias seguidos sem planta verde (o valor do meio de 36 medidas, que vão de 16 a 160 dias): a diferença é de 26 dias a mais no calendário. O número do calendário é diferente do valor do meio, mas cabe entre o menor e o maior que o satélite viu.",
      "aviso": "\"Sem planta verde\" não é \"terra descoberta\": o satélite mede o verde das folhas e não vê a palha. Um ponto sem planta verde pode estar coberto de palha. Os pontos foram escolhidos no mapa, perto de Rio Verde (GO): não se sabe de quem são nem o que foi plantado em cada um. É prova só da rotação de hoje.",
      "fonte": {
       "produto": "MOD13Q1 v061 (MODIS/Terra, índice de vegetação NDVI, uma medida a cada 16 dias, pixel de 250 m)",
@@ -3978,10 +3978,10 @@
        "terra_coberta": "empate"
       }
      },
-     "evidencia": "Em Rio Verde (GO), no pior ano (safra 2015-16) faltaram 258,4 mm de água para as culturas, com 78 dias de sede; no ano normal (safra 2019-20), 174,9 mm. Na fase crítica das culturas, 19 dias de calor forte no pior ano (soja, 0 dias acima de 40 °C; milho, 19 dias acima de 33 °C). Pelo calendário, a terra fica 122 dias seguidos sem planta viva antes do plantio da soja (125 dias no ano, contando o intervalo entre a soja e a 2ª safra). O satélite viu 96 dias seguidos sem planta verde (a mediana dos pontos medidos).",
+     "evidencia": "Em Rio Verde (GO), no pior ano (safra 2015-16) faltaram 258,4 mm de água para as culturas, com 78 dias de sede; no ano normal (safra 2019-20), 174,9 mm. Na fase crítica das culturas, 19 dias de calor forte no pior ano (soja, 0 dias acima de 40 °C; milho, 19 dias acima de 33 °C). Pelo calendário, a terra fica 122 dias seguidos sem planta viva antes do plantio da soja (125 dias no ano, contando o intervalo entre a soja e a 2ª safra). O satélite viu 96 dias seguidos sem planta verde (o valor do meio entre os pontos medidos).",
      "beneficio": "Na conta, esta rotação não ficou na frente das outras em água, calor nem terra coberta.",
      "risco": "Na água do pior ano, ficou atrás de soja, sorgo e pousio (221,6 mm): 258,4 mm de falta. No calor do pior ano, ficou atrás de soja, sorgo e pousio (0 dias): 19 dias de calor forte. Na terra coberta, ficou atrás de soja, milho e braquiária (30 dias): 122 dias seguidos sem planta viva.",
-     "falta_saber": "Na água do pior ano, a comparação com soja, milho e braquiária muda dentro da faixa da hipótese. A conta não mede renda, preço, custo nem produtividade, e a palha entra só pelo lado da evaporação. O quanto de terra a palha do milho cobre é hipótese."
+     "falta_saber": "Na água do pior ano, a comparação com soja, milho e braquiária depende de quanto o capim disputa água com o milho: isso não foi medido, e por isso a conta dá o menor e o maior valor. A conta não mede renda, preço, custo nem produtividade, e a palha entra só pelo lado da evaporação. O quanto de terra a palha do milho cobre é hipótese."
     },
     {
      "id": "soja_milho_braquiaria",
@@ -4045,7 +4045,7 @@
      "evidencia": "Em Rio Verde (GO), no pior ano (safra 2015-16) faltaram de 257,5 a 267,1 mm de água para as culturas, com 78 a 81 dias de sede; no ano normal (safra 2019-20), de 172,5 a 186,1 mm. Na fase crítica das culturas, 19 dias de calor forte no pior ano (soja, 0 dias acima de 40 °C; milho, 19 dias acima de 33 °C). Pelo calendário, a terra fica 30 dias seguidos sem planta viva antes do plantio da soja (33 dias no ano, contando o intervalo entre a soja e a 2ª safra).",
      "beneficio": "Na terra coberta, ficou na frente de soja, milho e pousio (122 dias) e soja, sorgo e pousio (122 dias): 30 dias seguidos sem planta viva.",
      "risco": "Na água do pior ano, ficou atrás de soja, sorgo e pousio (221,6 mm): de 257,5 a 267,1 mm de falta. No calor do pior ano, ficou atrás de soja, sorgo e pousio (0 dias): 19 dias de calor forte. A braquiária bebe água junto com o milho e depois dele: a terra pode chegar mais seca ao plantio da soja.",
-     "falta_saber": "Na água do pior ano, a comparação com soja, milho e pousio muda dentro da faixa da hipótese. Quanto o capim disputa água com o milho não foi medido: por isso os números desta rotação saem em faixa. O satélite não prova esta rotação, e a conta não mede renda nem o custo da semente do capim."
+     "falta_saber": "Na água do pior ano, a comparação com soja, milho e pousio depende de quanto o capim disputa água com o milho: isso não foi medido, e por isso a conta dá o menor e o maior valor. Quanto o capim disputa água com o milho não foi medido: por isso os números desta rotação saem em faixa. O satélite não prova esta rotação, e a conta não mede renda nem o custo da semente do capim."
     },
     {
      "id": "soja_sorgo_pousio",
@@ -4100,7 +4100,7 @@
      "evidencia": "Em Rio Verde (GO), no pior ano (safra 2015-16) faltaram 221,6 mm de água para as culturas, com 76 dias de sede; no ano normal (safra 2019-20), 148,1 mm. Na fase crítica das culturas, 0 dias de calor forte no pior ano (soja, 0 dias acima de 40 °C; sorgo, 0 dias acima de 35 °C). Pelo calendário, a terra fica 122 dias seguidos sem planta viva antes do plantio da soja (125 dias no ano, contando o intervalo entre a soja e a 2ª safra).",
      "beneficio": "Na água do pior ano, ficou na frente de soja, milho e pousio (258,4 mm) e soja, milho e braquiária (de 257,5 a 267,1 mm): 221,6 mm de falta. No calor do pior ano, ficou na frente de soja, milho e pousio (19 dias) e soja, milho e braquiária (19 dias): 0 dias de calor forte.",
      "risco": "Na terra coberta, ficou atrás de soja, milho e braquiária (30 dias): 122 dias seguidos sem planta viva.",
-     "falta_saber": "As fases e o ciclo do sorgo vêm da tabela geral da FAO, que não tem linha de 2ª safra em Goiás, e a raiz do sorgo vale igual à do milho. A conta não mede renda nem o preço do sorgo contra o do milho, e o satélite não prova esta rotação."
+     "falta_saber": "As fases e o ciclo do sorgo vêm da tabela geral da FAO (o órgão da ONU para a agricultura), que não tem linha de 2ª safra em Goiás, e a raiz do sorgo vale igual à do milho. A conta não mede renda nem o preço do sorgo contra o do milho, e o satélite não prova esta rotação."
     }
    ]
   },
@@ -4147,8 +4147,8 @@
     "primeiro_dia": "2014-07-01",
     "ultimo_dia": "2026-09-14",
     "avisos": [
-     "A chuva desta fonte vai até 2026-09-14: os 58 dias seguintes da série, sem dado de chuva, ficaram fora da conta (dia sem dado nunca vira zero).",
-     "O dia do IMERG é o UTC (começa 3 horas antes do dia de Rio Verde); a temperatura é do dia local. A chuva de um fim de tarde pode cair no dia seguinte da conta."
+     "A chuva desta fonte vai até 14/09/2026: os 58 dias seguintes da série, sem dado de chuva, ficaram fora da conta (dia sem dado nunca vira zero).",
+     "O dia do IMERG (a chuva medida por satélite da NASA) é o UTC (começa 3 horas antes do dia de Rio Verde); a temperatura é do dia local. A chuva de um fim de tarde pode cair no dia seguinte da conta."
     ],
     "conta": "FAO-56: ETo de Hargreaves (eq. 52), Kc por fase, balanço diário da água (cap. 8)"
    },
@@ -6901,7 +6901,7 @@
      "leitura": "dentro_da_faixa",
      "aviso": "\"Sem planta verde\" não é \"terra descoberta\": o satélite mede o verde das folhas e não vê a palha. Um ponto sem planta verde pode estar coberto de palha.",
      "nota": "O satélite mede o verde; o calendário, a planta no chão. Milho já seco antes da colheita e soja recém-nascida aparecem como 'sem planta verde': o satélite pode contar mais dias.",
-     "frase": "Pelo calendário, a terra fica 122 dias sem planta. O satélite viu 96 dias seguidos sem planta verde (a mediana de 36 medidas, que vão de 16 a 160 dias): a diferença é de 26 dias a mais no calendário. O número do calendário é diferente da mediana, mas cabe na faixa que o satélite viu."
+     "frase": "Pelo calendário, a terra fica 122 dias sem planta. O satélite viu 96 dias seguidos sem planta verde (o valor do meio de 36 medidas, que vão de 16 a 160 dias): a diferença é de 26 dias a mais no calendário. O número do calendário é diferente do valor do meio, mas cabe entre o menor e o maior que o satélite viu."
     },
     "limites_por_ponto": {
      "leste": 0.3271,
@@ -7006,7 +7006,7 @@
      "aviso": "Conta parcial, fora da mediana. Onde a última medida ainda está sem planta verde, o número é 'pelo menos': a sequência não fechou."
     },
     "frases": [
-     "Pelo calendário, a terra fica 122 dias sem planta. O satélite viu 96 dias seguidos sem planta verde (a mediana de 36 medidas, que vão de 16 a 160 dias): a diferença é de 26 dias a mais no calendário. O número do calendário é diferente da mediana, mas cabe na faixa que o satélite viu.",
+     "Pelo calendário, a terra fica 122 dias sem planta. O satélite viu 96 dias seguidos sem planta verde (o valor do meio de 36 medidas, que vão de 16 a 160 dias): a diferença é de 26 dias a mais no calendário. O número do calendário é diferente do valor do meio, mas cabe entre o menor e o maior que o satélite viu.",
      "O satélite mede o verde; o calendário, a planta no chão. Milho já seco antes da colheita e soja recém-nascida aparecem como 'sem planta verde': o satélite pode contar mais dias.",
      "\"Sem planta verde\" não é \"terra descoberta\": o satélite mede o verde das folhas e não vê a palha. Um ponto sem planta verde pode estar coberto de palha.",
      "Os pontos foram escolhidos no mapa, perto de Rio Verde (GO): não se sabe de quem são nem o que foi plantado em cada um. É prova só da rotação de hoje."
@@ -7935,7 +7935,7 @@
      "Hipótese desta versão: 'dia de calor forte' = dia da fase crítica com a temperatura máxima (T2M_MAX, da NASA POWER) acima do limite. As fontes dizem 'temperaturas acima de' e não dizem se é a máxima ou a média do dia; a máxima da NASA POWER é a de um quadrado de uns 50 km, não a da lavoura.",
      "Hipótese desta versão: na conta, a fase crítica é a fase do meio do FAO-56 (Tabela 11, 'Mid'), que vai da cobertura cheia ao começo da maturação e por isso pega a floração e a maior parte do enchimento dos grãos. A fonte diz qual é a fase crítica, não em que dias do calendário ela cai."
     ],
-    "aviso": "A temperatura é a da NASA POWER (um quadrado de uns 50 km), não a da lavoura. As fontes dos limites dizem 'temperaturas acima de' e não dizem se é a máxima ou a média do dia; e a fase crítica, na conta, é a fase do meio do FAO-56. Dia de calor forte não é perda de safra: é sinal para olhar com o agrônomo."
+    "aviso": "A temperatura é a da NASA POWER (um quadrado de uns 50 km), não a da lavoura. As fontes dos limites dizem 'temperaturas acima de' e não dizem se é a máxima ou a média do dia; e a fase crítica, na conta, é a fase do meio da tabela da FAO (o órgão da ONU para a agricultura). Dia de calor forte não é perda de safra: é sinal para olhar com o agrônomo."
    },
    "terra_coberta": {
     "o_que_e": "dias_sem_planta_viva: os dias seguidos sem planta viva antes do plantio da soja, pelo calendário de cada rotação (o número de sempre, o que se compara com o satélite); dias_sem_planta_viva_no_ano: o ano inteiro, contando também o intervalo entre a soja e a 2ª safra; e, onde há medida, os dias seguidos sem planta verde vistos pelo satélite",
@@ -7977,7 +7977,7 @@
      "quantos": 36,
      "prova_de": "só da rotação de hoje da região (soja, milho e pousio)",
      "diferenca": 26,
-     "frase": "Pelo calendário, a terra fica 122 dias sem planta. O satélite viu 96 dias seguidos sem planta verde (a mediana de 36 medidas, que vão de 16 a 160 dias): a diferença é de 26 dias a mais no calendário. O número do calendário é diferente da mediana, mas cabe na faixa que o satélite viu.",
+     "frase": "Pelo calendário, a terra fica 122 dias sem planta. O satélite viu 96 dias seguidos sem planta verde (o valor do meio de 36 medidas, que vão de 16 a 160 dias): a diferença é de 26 dias a mais no calendário. O número do calendário é diferente do valor do meio, mas cabe entre o menor e o maior que o satélite viu.",
      "aviso": "\"Sem planta verde\" não é \"terra descoberta\": o satélite mede o verde das folhas e não vê a palha. Um ponto sem planta verde pode estar coberto de palha. Os pontos foram escolhidos no mapa, perto de Rio Verde (GO): não se sabe de quem são nem o que foi plantado em cada um. É prova só da rotação de hoje.",
      "fonte": {
       "produto": "MOD13Q1 v061 (MODIS/Terra, índice de vegetação NDVI, uma medida a cada 16 dias, pixel de 250 m)",
@@ -8042,10 +8042,10 @@
        "terra_coberta": "empate"
       }
      },
-     "evidencia": "Em Rio Verde (GO), no pior ano (safra 2015-16) faltaram 225,9 mm de água para as culturas, com 73 dias de sede; no ano normal (safra 2019-20), 152,8 mm. Na fase crítica das culturas, 19 dias de calor forte no pior ano (soja, 0 dias acima de 40 °C; milho, 19 dias acima de 33 °C). Pelo calendário, a terra fica 122 dias seguidos sem planta viva antes do plantio da soja (125 dias no ano, contando o intervalo entre a soja e a 2ª safra). O satélite viu 96 dias seguidos sem planta verde (a mediana dos pontos medidos).",
+     "evidencia": "Em Rio Verde (GO), no pior ano (safra 2015-16) faltaram 225,9 mm de água para as culturas, com 73 dias de sede; no ano normal (safra 2019-20), 152,8 mm. Na fase crítica das culturas, 19 dias de calor forte no pior ano (soja, 0 dias acima de 40 °C; milho, 19 dias acima de 33 °C). Pelo calendário, a terra fica 122 dias seguidos sem planta viva antes do plantio da soja (125 dias no ano, contando o intervalo entre a soja e a 2ª safra). O satélite viu 96 dias seguidos sem planta verde (o valor do meio entre os pontos medidos).",
      "beneficio": "Na conta, esta rotação não ficou na frente das outras em água, calor nem terra coberta.",
      "risco": "Na água do pior ano, ficou atrás de soja, sorgo e pousio (191,3 mm): 225,9 mm de falta. No calor do pior ano, ficou atrás de soja, sorgo e pousio (0 dias): 19 dias de calor forte. Na terra coberta, ficou atrás de soja, milho e braquiária (30 dias): 122 dias seguidos sem planta viva.",
-     "falta_saber": "Na água do pior ano, a comparação com soja, milho e braquiária muda dentro da faixa da hipótese. A conta não mede renda, preço, custo nem produtividade, e a palha entra só pelo lado da evaporação. O quanto de terra a palha do milho cobre é hipótese."
+     "falta_saber": "Na água do pior ano, a comparação com soja, milho e braquiária depende de quanto o capim disputa água com o milho: isso não foi medido, e por isso a conta dá o menor e o maior valor. A conta não mede renda, preço, custo nem produtividade, e a palha entra só pelo lado da evaporação. O quanto de terra a palha do milho cobre é hipótese."
     },
     {
      "id": "soja_milho_braquiaria",
@@ -8109,7 +8109,7 @@
      "evidencia": "Em Rio Verde (GO), no pior ano (safra 2015-16) faltaram de 229,8 a 241,2 mm de água para as culturas, com 76 a 77 dias de sede; no ano normal (safra 2019-20), de 149,9 a 163,2 mm. Na fase crítica das culturas, 19 dias de calor forte no pior ano (soja, 0 dias acima de 40 °C; milho, 19 dias acima de 33 °C). Pelo calendário, a terra fica 30 dias seguidos sem planta viva antes do plantio da soja (33 dias no ano, contando o intervalo entre a soja e a 2ª safra).",
      "beneficio": "Na terra coberta, ficou na frente de soja, milho e pousio (122 dias) e soja, sorgo e pousio (122 dias): 30 dias seguidos sem planta viva.",
      "risco": "Na água do pior ano, ficou atrás de soja, sorgo e pousio (191,3 mm): de 229,8 a 241,2 mm de falta. No calor do pior ano, ficou atrás de soja, sorgo e pousio (0 dias): 19 dias de calor forte. A braquiária bebe água junto com o milho e depois dele: a terra pode chegar mais seca ao plantio da soja.",
-     "falta_saber": "Na água do pior ano, a comparação com soja, milho e pousio muda dentro da faixa da hipótese. Quanto o capim disputa água com o milho não foi medido: por isso os números desta rotação saem em faixa. O satélite não prova esta rotação, e a conta não mede renda nem o custo da semente do capim."
+     "falta_saber": "Na água do pior ano, a comparação com soja, milho e pousio depende de quanto o capim disputa água com o milho: isso não foi medido, e por isso a conta dá o menor e o maior valor. Quanto o capim disputa água com o milho não foi medido: por isso os números desta rotação saem em faixa. O satélite não prova esta rotação, e a conta não mede renda nem o custo da semente do capim."
     },
     {
      "id": "soja_sorgo_pousio",
@@ -8164,7 +8164,7 @@
      "evidencia": "Em Rio Verde (GO), no pior ano (safra 2015-16) faltaram 191,3 mm de água para as culturas, com 75 dias de sede; no ano normal (safra 2019-20), 126,5 mm. Na fase crítica das culturas, 0 dias de calor forte no pior ano (soja, 0 dias acima de 40 °C; sorgo, 0 dias acima de 35 °C). Pelo calendário, a terra fica 122 dias seguidos sem planta viva antes do plantio da soja (125 dias no ano, contando o intervalo entre a soja e a 2ª safra).",
      "beneficio": "Na água do pior ano, ficou na frente de soja, milho e pousio (225,9 mm) e soja, milho e braquiária (de 229,8 a 241,2 mm): 191,3 mm de falta. No calor do pior ano, ficou na frente de soja, milho e pousio (19 dias) e soja, milho e braquiária (19 dias): 0 dias de calor forte.",
      "risco": "Na terra coberta, ficou atrás de soja, milho e braquiária (30 dias): 122 dias seguidos sem planta viva.",
-     "falta_saber": "As fases e o ciclo do sorgo vêm da tabela geral da FAO, que não tem linha de 2ª safra em Goiás, e a raiz do sorgo vale igual à do milho. A conta não mede renda nem o preço do sorgo contra o do milho, e o satélite não prova esta rotação."
+     "falta_saber": "As fases e o ciclo do sorgo vêm da tabela geral da FAO (o órgão da ONU para a agricultura), que não tem linha de 2ª safra em Goiás, e a raiz do sorgo vale igual à do milho. A conta não mede renda nem o preço do sorgo contra o do milho, e o satélite não prova esta rotação."
     }
    ]
   },
@@ -8211,8 +8211,8 @@
     "primeiro_dia": "2014-07-01",
     "ultimo_dia": "2026-09-14",
     "avisos": [
-     "A chuva desta fonte vai até 2026-09-14: os 58 dias seguintes da série, sem dado de chuva, ficaram fora da conta (dia sem dado nunca vira zero).",
-     "O dia do IMERG é o UTC (começa 3 horas antes do dia de Rio Verde); a temperatura é do dia local. A chuva de um fim de tarde pode cair no dia seguinte da conta."
+     "A chuva desta fonte vai até 14/09/2026: os 58 dias seguintes da série, sem dado de chuva, ficaram fora da conta (dia sem dado nunca vira zero).",
+     "O dia do IMERG (a chuva medida por satélite da NASA) é o UTC (começa 3 horas antes do dia de Rio Verde); a temperatura é do dia local. A chuva de um fim de tarde pode cair no dia seguinte da conta."
     ],
     "conta": "FAO-56: ETo de Hargreaves (eq. 52), Kc por fase, balanço diário da água (cap. 8)"
    },
@@ -10971,7 +10971,7 @@
      "leitura": "dentro_da_faixa",
      "aviso": "\"Sem planta verde\" não é \"terra descoberta\": o satélite mede o verde das folhas e não vê a palha. Um ponto sem planta verde pode estar coberto de palha.",
      "nota": "O satélite mede o verde; o calendário, a planta no chão. Milho já seco antes da colheita e soja recém-nascida aparecem como 'sem planta verde': o satélite pode contar mais dias.",
-     "frase": "Pelo calendário, a terra fica 122 dias sem planta. O satélite viu 96 dias seguidos sem planta verde (a mediana de 36 medidas, que vão de 16 a 160 dias): a diferença é de 26 dias a mais no calendário. O número do calendário é diferente da mediana, mas cabe na faixa que o satélite viu."
+     "frase": "Pelo calendário, a terra fica 122 dias sem planta. O satélite viu 96 dias seguidos sem planta verde (o valor do meio de 36 medidas, que vão de 16 a 160 dias): a diferença é de 26 dias a mais no calendário. O número do calendário é diferente do valor do meio, mas cabe entre o menor e o maior que o satélite viu."
     },
     "limites_por_ponto": {
      "leste": 0.3271,
@@ -11076,7 +11076,7 @@
      "aviso": "Conta parcial, fora da mediana. Onde a última medida ainda está sem planta verde, o número é 'pelo menos': a sequência não fechou."
     },
     "frases": [
-     "Pelo calendário, a terra fica 122 dias sem planta. O satélite viu 96 dias seguidos sem planta verde (a mediana de 36 medidas, que vão de 16 a 160 dias): a diferença é de 26 dias a mais no calendário. O número do calendário é diferente da mediana, mas cabe na faixa que o satélite viu.",
+     "Pelo calendário, a terra fica 122 dias sem planta. O satélite viu 96 dias seguidos sem planta verde (o valor do meio de 36 medidas, que vão de 16 a 160 dias): a diferença é de 26 dias a mais no calendário. O número do calendário é diferente do valor do meio, mas cabe entre o menor e o maior que o satélite viu.",
      "O satélite mede o verde; o calendário, a planta no chão. Milho já seco antes da colheita e soja recém-nascida aparecem como 'sem planta verde': o satélite pode contar mais dias.",
      "\"Sem planta verde\" não é \"terra descoberta\": o satélite mede o verde das folhas e não vê a palha. Um ponto sem planta verde pode estar coberto de palha.",
      "Os pontos foram escolhidos no mapa, perto de Rio Verde (GO): não se sabe de quem são nem o que foi plantado em cada um. É prova só da rotação de hoje."
@@ -12005,7 +12005,7 @@
      "Hipótese desta versão: 'dia de calor forte' = dia da fase crítica com a temperatura máxima (T2M_MAX, da NASA POWER) acima do limite. As fontes dizem 'temperaturas acima de' e não dizem se é a máxima ou a média do dia; a máxima da NASA POWER é a de um quadrado de uns 50 km, não a da lavoura.",
      "Hipótese desta versão: na conta, a fase crítica é a fase do meio do FAO-56 (Tabela 11, 'Mid'), que vai da cobertura cheia ao começo da maturação e por isso pega a floração e a maior parte do enchimento dos grãos. A fonte diz qual é a fase crítica, não em que dias do calendário ela cai."
     ],
-    "aviso": "A temperatura é a da NASA POWER (um quadrado de uns 50 km), não a da lavoura. As fontes dos limites dizem 'temperaturas acima de' e não dizem se é a máxima ou a média do dia; e a fase crítica, na conta, é a fase do meio do FAO-56. Dia de calor forte não é perda de safra: é sinal para olhar com o agrônomo."
+    "aviso": "A temperatura é a da NASA POWER (um quadrado de uns 50 km), não a da lavoura. As fontes dos limites dizem 'temperaturas acima de' e não dizem se é a máxima ou a média do dia; e a fase crítica, na conta, é a fase do meio da tabela da FAO (o órgão da ONU para a agricultura). Dia de calor forte não é perda de safra: é sinal para olhar com o agrônomo."
    },
    "terra_coberta": {
     "o_que_e": "dias_sem_planta_viva: os dias seguidos sem planta viva antes do plantio da soja, pelo calendário de cada rotação (o número de sempre, o que se compara com o satélite); dias_sem_planta_viva_no_ano: o ano inteiro, contando também o intervalo entre a soja e a 2ª safra; e, onde há medida, os dias seguidos sem planta verde vistos pelo satélite",
@@ -12047,7 +12047,7 @@
      "quantos": 36,
      "prova_de": "só da rotação de hoje da região (soja, milho e pousio)",
      "diferenca": 26,
-     "frase": "Pelo calendário, a terra fica 122 dias sem planta. O satélite viu 96 dias seguidos sem planta verde (a mediana de 36 medidas, que vão de 16 a 160 dias): a diferença é de 26 dias a mais no calendário. O número do calendário é diferente da mediana, mas cabe na faixa que o satélite viu.",
+     "frase": "Pelo calendário, a terra fica 122 dias sem planta. O satélite viu 96 dias seguidos sem planta verde (o valor do meio de 36 medidas, que vão de 16 a 160 dias): a diferença é de 26 dias a mais no calendário. O número do calendário é diferente do valor do meio, mas cabe entre o menor e o maior que o satélite viu.",
      "aviso": "\"Sem planta verde\" não é \"terra descoberta\": o satélite mede o verde das folhas e não vê a palha. Um ponto sem planta verde pode estar coberto de palha. Os pontos foram escolhidos no mapa, perto de Rio Verde (GO): não se sabe de quem são nem o que foi plantado em cada um. É prova só da rotação de hoje.",
      "fonte": {
       "produto": "MOD13Q1 v061 (MODIS/Terra, índice de vegetação NDVI, uma medida a cada 16 dias, pixel de 250 m)",
@@ -12112,7 +12112,7 @@
        "terra_coberta": "empate"
       }
      },
-     "evidencia": "Em Rio Verde (GO), no pior ano (safra 2015-16) faltaram 203,0 mm de água para as culturas, com 62 dias de sede; no ano normal (safra 2019-20), 135,1 mm. Na fase crítica das culturas, 19 dias de calor forte no pior ano (soja, 0 dias acima de 40 °C; milho, 19 dias acima de 33 °C). Pelo calendário, a terra fica 122 dias seguidos sem planta viva antes do plantio da soja (125 dias no ano, contando o intervalo entre a soja e a 2ª safra). O satélite viu 96 dias seguidos sem planta verde (a mediana dos pontos medidos).",
+     "evidencia": "Em Rio Verde (GO), no pior ano (safra 2015-16) faltaram 203,0 mm de água para as culturas, com 62 dias de sede; no ano normal (safra 2019-20), 135,1 mm. Na fase crítica das culturas, 19 dias de calor forte no pior ano (soja, 0 dias acima de 40 °C; milho, 19 dias acima de 33 °C). Pelo calendário, a terra fica 122 dias seguidos sem planta viva antes do plantio da soja (125 dias no ano, contando o intervalo entre a soja e a 2ª safra). O satélite viu 96 dias seguidos sem planta verde (o valor do meio entre os pontos medidos).",
      "beneficio": "Na água do pior ano, ficou na frente de soja, milho e braquiária (de 211,8 a 224,4 mm): 203,0 mm de falta.",
      "risco": "Na água do pior ano, ficou atrás de soja, sorgo e pousio (168,5 mm): 203,0 mm de falta. No calor do pior ano, ficou atrás de soja, sorgo e pousio (0 dias): 19 dias de calor forte. Na terra coberta, ficou atrás de soja, milho e braquiária (30 dias): 122 dias seguidos sem planta viva.",
      "falta_saber": "A conta não mede renda, preço, custo nem produtividade, e a palha entra só pelo lado da evaporação. O quanto de terra a palha do milho cobre é hipótese."
@@ -12234,7 +12234,7 @@
      "evidencia": "Em Rio Verde (GO), no pior ano (safra 2015-16) faltaram 168,5 mm de água para as culturas, com 67 dias de sede; no ano normal (safra 2019-20), 108,7 mm. Na fase crítica das culturas, 0 dias de calor forte no pior ano (soja, 0 dias acima de 40 °C; sorgo, 0 dias acima de 35 °C). Pelo calendário, a terra fica 122 dias seguidos sem planta viva antes do plantio da soja (125 dias no ano, contando o intervalo entre a soja e a 2ª safra).",
      "beneficio": "Na água do pior ano, ficou na frente de soja, milho e pousio (203,0 mm) e soja, milho e braquiária (de 211,8 a 224,4 mm): 168,5 mm de falta. No calor do pior ano, ficou na frente de soja, milho e pousio (19 dias) e soja, milho e braquiária (19 dias): 0 dias de calor forte.",
      "risco": "Na terra coberta, ficou atrás de soja, milho e braquiária (30 dias): 122 dias seguidos sem planta viva.",
-     "falta_saber": "As fases e o ciclo do sorgo vêm da tabela geral da FAO, que não tem linha de 2ª safra em Goiás, e a raiz do sorgo vale igual à do milho. A conta não mede renda nem o preço do sorgo contra o do milho, e o satélite não prova esta rotação."
+     "falta_saber": "As fases e o ciclo do sorgo vêm da tabela geral da FAO (o órgão da ONU para a agricultura), que não tem linha de 2ª safra em Goiás, e a raiz do sorgo vale igual à do milho. A conta não mede renda nem o preço do sorgo contra o do milho, e o satélite não prova esta rotação."
     }
    ]
   }
