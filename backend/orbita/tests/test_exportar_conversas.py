@@ -13,6 +13,11 @@ from orbita import agente, exportar_conversas, ferramentas
 from orbita.modelo import ErroDoModelo, fala
 from orbita.tests.duble_do_motor import Duble
 
+
+def _sem_o_selo(texto):
+    """O texto sem os selos da confirmação: o selo é um sorteio de letras e algarismos e pode ter "999" por acaso."""
+    return re.sub(r'"selo": "[0-9a-f]+"', '"selo": null', texto)
+
 HOJE = datetime.date(2026, 11, 15)
 CHAVE = "sk-or-chave-de-mentira-0123456789"
 
@@ -123,7 +128,7 @@ class AsConversasGuardadas(unittest.TestCase):
         saidas = [p["saida"] for c in conversas for p in c["passos"] if p["de"] == "agente"]
         for saida in saidas:                                     # o número não sai no texto nem volta no estado;
             self.assertNotIn("999", saida["resposta"])           # fica só em `sobras`, que diz o que foi barrado
-            self.assertNotIn("999", json.dumps(saida["estado"], ensure_ascii=False))
+            self.assertNotIn("999", _sem_o_selo(json.dumps(saida["estado"], ensure_ascii=False)))
         self.assertIn(["999"], [s["conferencia"]["sobras"] for s in saidas])
         self.assertGreater(resumo["barrados_pela_conferencia"], 0)
         self.assertIn("barradas pela conferência em todas as tentativas", " ".join(resumo["avisos"]))
@@ -161,7 +166,7 @@ class AsConversasGuardadas(unittest.TestCase):
         conversas = self.conferir_o_formato(objeto)
         self.assertEqual((resumo["barrados_pela_conferencia"], resumo["avisos"]), (0, []))
         self.assertEqual([bool(c["replay"]) for c in conversas], [False, True, False, False])
-        self.assertNotIn("999", json.dumps(objeto, ensure_ascii=False))
+        self.assertNotIn("999", _sem_o_selo(json.dumps(objeto, ensure_ascii=False)))
 
     def test_a_chave_nao_entra_em_arquivo_nenhum(self):
         os.environ["OPENROUTER_API_KEY"] = CHAVE

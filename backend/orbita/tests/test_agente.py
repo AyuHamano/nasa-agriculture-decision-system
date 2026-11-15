@@ -235,7 +235,8 @@ class AResposta(ComODuble):
         aviso = modelo.pedidos[2][0][-1]                                 # a segunda tentativa leva o aviso do programa
         self.assertEqual(aviso["de"], "programa")
         self.assertIn("999, 12%", aviso["texto"])
-        self.assertNotIn("999", json.dumps(estado, ensure_ascii=False))  # nem no estado o número inventado fica
+        # nem no estado o número inventado fica (o selo é um sorteio de letras e algarismos: pode ter "999" por acaso)
+        self.assertNotIn("999", json.dumps(dict(estado, selo=None), ensure_ascii=False))
 
     def test_a_segunda_tentativa_certa_vale_e_fica_registrada(self):
         estado, saida, _ = self.passo(self.confirmada(), "vale o sorgo?", fala("", ENSAIO), fala(INVENTADA), fala(BOA))
