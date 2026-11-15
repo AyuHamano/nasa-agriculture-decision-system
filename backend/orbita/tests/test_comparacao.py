@@ -34,7 +34,10 @@ class Comparacao(unittest.TestCase):
             for chave in ("dias_de_calor_forte_no_pior_ano", "limite_c", "etiqueta"):
                 self.assertIn(chave, item["calor"])
             self.assertIn(item["calor"]["etiqueta"], ("publicado", "hipótese"))
-            self.assertEqual(set(item["terra_coberta"]), {"dias_sem_planta_viva", "pelo_satelite"})
+            # Ganhou um campo em 2026-11-15, pela revisão: os dias do ano inteiro, contando o intervalo entre a soja e
+            # a 2ª safra (o campo de sempre conta só os dias seguidos antes do plantio da soja).
+            self.assertEqual(set(item["terra_coberta"]),
+                             {"dias_sem_planta_viva", "dias_sem_planta_viva_no_ano", "pelo_satelite"})
             for frase in FRASES:
                 self.assertIsInstance(item[frase], str)
                 self.assertGreater(len(item[frase]), 20)

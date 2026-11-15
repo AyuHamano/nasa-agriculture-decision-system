@@ -14,6 +14,7 @@ ou "depende da hipótese"); e a "sede forte" usa o nível tirado das safras de q
 escrita aqui: tudo sai dos números.
 """
 import csv
+import datetime
 import json
 import statistics
 
@@ -489,12 +490,16 @@ def quem_ganha(a, b, margem):
     return "empate" if (a1 == a2 and b1 == b2) else "depende"
 
 
-def _comparacao_das_rotacoes(entrada, rot, calendario, bloco_do_calor, verde, pior, normal, empate_mm, r_parcial):
+def _comparacao_das_rotacoes(entrada, rot, calendario, bloco_do_calor, verde, pior, normal, empate_mm, r_parcial,
+                             faltas_exatas=None, no_ano=None):
     """A lista `comparacao_das_rotacoes`: cada rotação do cardápio com a água, o calor, a terra coberta e as frases.
 
     A rotação de hoje do produtor vem primeiro, marcada com `de_hoje`. Na rotação com capim, os números da água
     saem em faixa ({"de", "ate"}), pela hipótese da disputa do capim com o milho.
+    `faltas_exatas`: id -> a falta do pior ano sem arredondar (número ou faixa): é sobre ela que vale a margem do
+    empate (4,99 mm não é 5). `no_ano`: id -> os dias sem planta viva no ano inteiro, contados dia a dia.
     """
+    faltas_exatas, no_ano = faltas_exatas or {}, no_ano or {}
     itens = []
     for chave, rotacao in rotacoes.ROTACOES.items():
         if chave not in rot:
@@ -531,13 +536,14 @@ def _comparacao_das_rotacoes(entrada, rot, calendario, bloco_do_calor, verde, pi
         itens.append({"id": rotacao["id"], "nome": rotacao["nome"], "apelido": rotacao["apelido"],
                       "de_hoje": rotacao["id"] == entrada["rotacao_id"], "agua": agua, "calor": do_calor,
                       "terra_coberta": {"dias_sem_planta_viva": calendario[chave]["dias_sem_planta_viva"],
+                                        "dias_sem_planta_viva_no_ano": no_ano.get(rotacao["id"]),
                                         "pelo_satelite": pelo_satelite}})
     itens.sort(key=lambda item: not item["de_hoje"])        # a de hoje primeiro; as outras, na ordem do cardápio
     for item in itens:
         item["contra_as_outras"] = {
             outro["id"]: {
-                "agua": quem_ganha(item["agua"]["falta_no_pior_ano_mm"], outro["agua"]["falta_no_pior_ano_mm"],
-                                   empate_mm),
+                "agua": quem_ganha(faltas_exatas.get(item["id"], item["agua"]["falta_no_pior_ano_mm"]),
+                                   faltas_exatas.get(outro["id"], outro["agua"]["falta_no_pior_ano_mm"]), empate_mm),
                 "calor": quem_ganha(item["calor"]["dias_de_calor_forte_no_pior_ano"],
                                     outro["calor"]["dias_de_calor_forte_no_pior_ano"], 1),
                 "terra_coberta": quem_ganha(item["terra_coberta"]["dias_sem_planta_viva"],
@@ -565,8 +571,8 @@ def verde_do_satelite(cidade_id, dias_pelo_calendario=None, par=None):
              "dias_pelo_satelite": None, "leitura": "sem_medida", "menor": None, "maior": None, "quantos": 0,
              "prova_de": "só da rotação de hoje da região (soja, milho e pousio)"}
     if not bruto["disponivel"]:
-        return dict(saida, frase=f"Pelo calendário, a terra fica {dias_pelo_calendario} dias por ano sem planta "
-                                 f"viva. {bruto['aviso']}", aviso=bruto["aviso"])
+        return dict(saida, frase=f"Pelo calendário, a terra fica {dias_pelo_calendario} dias seguidos sem planta "
+                                 f"viva antes do plantio da soja. {bruto['aviso']}", aviso=bruto["aviso"])
     comparacao = bruto["comparacao"]
     return dict(saida, dias_pelo_satelite=comparacao["dias_pelo_satelite"], leitura=comparacao["leitura"],
                 menor=comparacao["menor"], maior=comparacao["maior"], quantos=comparacao["quantos"],
@@ -661,6 +667,13 @@ def _maior_sequencia(marcas):
 NOMES_NO_REPLAY = {"soja": "a soja", "milho": "o milho de 2ª safra", "sorgo": "o sorgo de 2ª safra"}
 
 
+def _safra_completa(linhas, safra):
+    """Se os dias vão, sem buraco, de 1 de setembro a 31 de agosto da safra (366 dias quando há 29 de fevereiro)."""
+    inicio, fim = datetime.date(int(safra[:4]), 9, 1), datetime.date(int(safra[:4]) + 1, 8, 31)
+    return bool(linhas) and (linhas[0]["data"], linhas[-1]["data"]) == (inicio.isoformat(), fim.isoformat()) \
+        and len(linhas) == (fim - inicio).days + 1
+
+
 def conferir_safra(safra):
     """Confere o nome da safra ("2015-16"): tem de ser uma das guardadas. Fora disso, erro em português."""
     safras = balanco.SAFRAS_DO_ESTUDO + (SAFRA_A_PARTE,)
@@ -698,7 +711,9 @@ def replay_da_safra(entrada, safra="2015-16", par=None):
     maximas = {dia.data: dia.tmax for dia in dias}
     limites = calor.limites(par)
     da_safra = [r for r in registros if balanco.nome_da_safra(r.data) == safra]
-    linhas, marcos = [], []
+    if not da_safra:
+        raise ValueError(f'Entrada fora do formato: a safra "{safra}" ainda não tem nenhum dia com dado guardado.')
+    linhas, marcos, incompletas = [], [], []
     for r in da_safra:
         cultura = r.tipo in rotacoes.CULTURAS
         quente = bool(cultura and r.tipo in limites and calor.na_fase_critica(cal, r.tipo, r.data)
@@ -718,9 +733,11 @@ def replay_da_safra(entrada, safra="2015-16", par=None):
         pedido = sum(da_safra[i].pedido for i in indices)
         sede = [da_safra[i].ks < 1.0 for i in indices]
         quentes = [i for i in indices if linhas[i]["calor_forte"]]
+        ciclo = cal.soja_ciclo if tipo == "soja" else cal.segundas[tipo]["ciclo"]
         resumo[tipo] = {"falta_mm": r1(falta), "pedido_mm": r1(pedido),
                         "falta_relativa_pct": r1(100.0 * falta / pedido) if pedido > 0 else 0.0,
-                        "dias": len(indices), "dias_de_sede": sum(sede), "dias_de_calor_forte": len(quentes)}
+                        "dias": len(indices), "dias_de_sede": sum(sede), "dias_de_calor_forte": len(quentes),
+                        "ciclo_completo": len(indices) == ciclo}
         marcos.append({"data": linhas[primeiro]["data"], "tipo": "plantio", "cultura": tipo,
                        "frase": f"Plantio: entra {nome}."})
         comeco, tamanho = _maior_sequencia(sede)
@@ -739,6 +756,10 @@ def replay_da_safra(entrada, safra="2015-16", par=None):
                                     f"{_n(dia['tmax_c'])} °C, acima do limite de "
                                     f"{explicacao._grau(limites[tipo]['limite_c'])} °C. Foram {len(quentes)} dias de "
                                     "calor forte nesta safra."})
+        if not resumo[tipo]["ciclo_completo"]:      # os dados acabam com a cultura ainda na terra: sem colheita
+            incompletas.append(f"Os dados guardados acabam em {linhas[-1]['data']}, antes do fim do ciclo d{nome}: "
+                               "os números desta cultura são só até esse dia, e não há marco de colheita.")
+            continue
         marcos.append({"data": linhas[ultimo]["data"], "tipo": "colheita", "cultura": tipo,
                        "falta_mm": resumo[tipo]["falta_mm"], "dias_de_sede": resumo[tipo]["dias_de_sede"],
                        "frase": f"Fim do ciclo: sai {nome}. Nesta safra faltaram {_n(falta)} mm de água para a "
@@ -758,9 +779,9 @@ def replay_da_safra(entrada, safra="2015-16", par=None):
             "rotacao": {"id": rotacao["id"], "nome": rotacao["nome"], "segunda": rotacao["segunda"]},
             "terra": entrada["terra"], "plantio_da_soja_informado": entrada["plantio_da_soja"],
             "primeiro_dia": linhas[0]["data"] if linhas else None, "ultimo_dia": linhas[-1]["data"] if linhas else None,
-            "completa": len(linhas) >= 365, "dias": linhas, "marcos": marcos, "resumo": resumo,
+            "completa": _safra_completa(linhas, safra), "dias": linhas, "marcos": marcos, "resumo": resumo,
             "limites_de_calor_c": {c: limites[c]["limite_c"] for c in ("soja", rotacao["segunda"]) if c in limites},
-            "avisos": list(avisos) + ([nota] if nota else []) + [
+            "avisos": list(avisos) + ([nota] if nota else []) + incompletas + [
                 "A água fácil de tirar acabar não é a terra secar de todo: é o ponto em que a planta começa a passar "
                 "sede (o freio da sede do FAO-56).", calor.AVISO]}
 
@@ -927,9 +948,13 @@ def responder(entrada, par=None, dias=None, rendimentos=None):
                            "melhor": {"melhor": "alternativa", "pior": "atual"}.get(compara, "empate")}
     verde = verde_do_satelite(entrada["cidade_id"], dias_hoje, par)
     terra_coberta = {
-        "o_que_e": "os dias do ano sem planta viva na terra, pelo calendário de cada rotação; e, onde há medida, os "
-                   "dias sem planta verde vistos pelo satélite",
-        "por_rotacao": {rotacoes.ROTACOES[chave]["id"]: calendario[chave] for chave in rot},
+        "o_que_e": "dias_sem_planta_viva: os dias seguidos sem planta viva antes do plantio da soja, pelo calendário de "
+                   "cada rotação (o número de sempre, o que se compara com o satélite); dias_sem_planta_viva_no_ano: "
+                   "o ano inteiro, contando também o intervalo entre a soja e a 2ª safra; e, onde há medida, os dias "
+                   "seguidos sem planta verde vistos pelo satélite",
+        "por_rotacao": {rotacoes.ROTACOES[chave]["id"]: dict(calendario[chave], dias_sem_planta_viva_no_ano=(
+            rotacoes.dias_sem_planta_no_ano(cal, rotacoes.ROTACOES[chave]["com_braquiaria"],
+                                            rotacoes.ROTACOES[chave]["segunda"]))) for chave in rot},
         "pelo_satelite": verde,
         "aviso": "O satélite prova só a rotação de hoje da região (soja, milho e pousio): é o que está no chão nos "
                  "pontos medidos. Nas outras rotações, os dias sem planta viva vêm só do calendário."}
@@ -984,7 +1009,13 @@ def responder(entrada, par=None, dias=None, rendimentos=None):
         "calor": bloco_do_calor,
         "terra_coberta": terra_coberta,
     }
+    da_alternativa = [falta_por_cenario[c]["total_mm"][pior] for c in CENARIOS]
+    faltas_exatas = {"soja_milho_pousio": falta_de_hoje["total_mm"][pior],
+                     "soja_milho_braquiaria": {"de": min(da_alternativa), "ate": max(da_alternativa)}}
+    if "com_sorgo" in rot:
+        faltas_exatas["soja_sorgo_pousio"] = falta_com_sorgo["total_mm"][pior]
     resposta["comparacao_das_rotacoes"] = _comparacao_das_rotacoes(
         entrada, rot, calendario, bloco_do_calor, verde, pior, normal, parametros.valor(par, "regras", "empate_mm"),
-        resposta)
+        resposta, faltas_exatas,
+        {ident: bloco["dias_sem_planta_viva_no_ano"] for ident, bloco in terra_coberta["por_rotacao"].items()})
     return resposta

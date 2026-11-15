@@ -7,7 +7,7 @@ da terra naquele ano, onde há medida. O registro de uma safra ao lado do de out
 import datetime
 import statistics
 
-from orbita import balanco, clima, parametros
+from orbita import balanco, clima, parametros, rotacoes
 
 NOMES = {"soja": "soja", "milho": "milho de 2ª safra", "sorgo": "sorgo de 2ª safra"}
 AVISO = ("É o registro da conta com o clima guardado da NASA para o ponto da cidade, na rotação informada: não é a "
@@ -60,22 +60,35 @@ def registro_da_safra(entrada, safra, par=None):
     limites = replay["limites_de_calor_c"]
     # A posição entre as safras guardadas, pela medida que a conta usa para a sede: a falta de água da cultura da 2ª
     # safra, em % do que ela pediu (1 = a de maior falta). A mesma conta roda em todas as safras.
+    # Entram só as safras em que a 2ª safra fechou o ciclo nos dados guardados, e a ordem sai dos números sem
+    # arredondar (14,6445% é mais falta que 14,6006%, embora os dois apareçam como 14,6).
     segunda = replay["rotacao"]["segunda"]
-    faltas = {}
+    cal = rotacoes.calendario(par, entrada["plantio_da_soja"])
+    registros, _ = motor.simular_a_rotacao_de_hoje(entrada, par, motor._serie(entrada)[0], cal)
+    numeros = balanco.numeros_por_safra(registros)
+    exatas = {}
     for outra in balanco.SAFRAS_DO_ESTUDO + (motor.SAFRA_A_PARTE,):
-        faltas[outra] = (resumo if outra == safra else motor.replay_da_safra(entrada, outra, par)["resumo"])[segunda][
-            "falta_relativa_pct"]
-    ordem = sorted(faltas, key=lambda s: -faltas[s])
+        da_segunda = numeros.get(outra, {}).get(segunda)
+        if da_segunda and da_segunda["dias"] == cal.segundas[segunda]["ciclo"]:
+            exatas[outra] = da_segunda["falta_relativa_pct"]
+    faltas = {s: motor.r1(v) for s, v in exatas.items()}
+    posicao = 1 + sum(1 for v in exatas.values() if v > exatas[safra]) if safra in exatas else None
+    empatadas = sorted(s for s, v in exatas.items() if s != safra and safra in exatas and v == exatas[safra])
     ano_da_seca = int(safra[:4]) + 1
     verde = _verde_do_ano(entrada["cidade_id"], ano_da_seca, par)
-    mediana = round(statistics.median(faltas.values()), 1) + 0.0
+    mediana = motor.r1(statistics.median(exatas.values())) if exatas else None
     nomes = " e ".join(NOMES[c] for c in culturas)
     frase = (f"Safra {safra} em {replay['local']['nome']}, com {nomes}: faltaram {_n(resumo['total']['falta_mm'])} mm "
              f"de água para as culturas, com {resumo['total']['dias_de_sede']} dias de sede e "
              f"{resumo['total']['dias_de_calor_forte']} dias de calor forte na fase crítica. A terra ficou "
-             f"{sem_planta} dias sem planta viva. A falta de água do {NOMES[segunda]} foi de "
-             f"{_n(resumo[segunda]['falta_relativa_pct'])}% do que ele pediu: entre as {len(faltas)} safras "
-             f"guardadas, a {ordem.index(safra) + 1}ª maior (a mediana é {_n(mediana)}%).")
+             f"{sem_planta} dias sem planta viva.")
+    if posicao is not None:
+        frase += (f" A falta de água do {NOMES[segunda]} foi de {_n(faltas[safra])}% do que ele pediu: entre as "
+                  f"{len(faltas)} safras guardadas com a 2ª safra completa, a {posicao}ª maior (a mediana é "
+                  f"{_n(mediana)}%).")
+    else:
+        frase += (f" O {NOMES[segunda]} ainda não fechou o ciclo nos dados guardados desta safra: ela fica fora da "
+                  "comparação com as outras.")
     if verde is not None:
         frase += (f" Em {verde['ano']}, o satélite viu {verde['dias_sem_planta_verde']} dias seguidos sem planta "
                   "verde na região (a mediana dos pontos medidos).")
@@ -99,8 +112,10 @@ def registro_da_safra(entrada, safra, par=None):
                                   "satélite prova só a rotação de hoje da região (soja, milho e pousio)."},
         "entre_as_safras_guardadas": {
             "medida": f"a falta de água do {NOMES[segunda]}, em % do que ele pediu",
-            "posicao": ordem.index(safra) + 1, "de": len(faltas), "mediana_pct": mediana,
-            "falta_da_2a_safra_pct": faltas[safra], "por_safra_pct": faltas},
+            "posicao": posicao, "de": len(faltas), "mediana_pct": mediana,
+            "falta_da_2a_safra_pct": faltas.get(safra), "por_safra_pct": faltas, "empatadas": empatadas,
+            "nota": "Entram só as safras em que a 2ª safra fechou o ciclo nos dados guardados; a ordem sai dos "
+                    "números sem arredondar."},
         "marcos": replay["marcos"],
         "registrado_em": datetime.datetime.now().astimezone().isoformat(timespec="seconds"),
         "frase": frase, "aviso": AVISO}

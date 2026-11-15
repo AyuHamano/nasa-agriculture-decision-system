@@ -21,7 +21,7 @@ resposta de antes continua lendo igual.
 | A terceira rotação, com sorgo | `rotacoes.com_sorgo` | soja e depois sorgo de 2ª safra, no lugar do milho |
 | A comparação das três | `comparacao_das_rotacoes` | uma lista; a rotação de hoje vem primeiro, marcada com `de_hoje` |
 | O calor | `calor` | os dias de calor forte na fase crítica de cada cultura |
-| A terra coberta | `terra_coberta` | os dias sem planta viva pelo calendário e, onde há medida, pelo satélite |
+| A terra coberta | `terra_coberta` | os dias seguidos sem planta viva pelo calendário (e o total do ano) e, onde há medida, pelo satélite |
 | As portas para o agente | `motor.clima_do_lugar`, `motor.verde_do_satelite`, `motor.replay_da_safra` | o clima do lugar, o que o satélite viu, a safra dia a dia |
 | O "durante" | `motor.como_esta_hoje` | como está a água da lavoura no último dia com dado |
 | O "depois" | `motor.registro_da_safra` | o registro de uma safra, depois da colheita |
@@ -52,13 +52,17 @@ rotação que o produtor faz hoje (qualquer uma do cardápio) aparece em `rotaca
 {"id": "soja_sorgo_pousio", "nome": "soja → sorgo safrinha → pousio (terra parada)", "de_hoje": true,
  "agua": {"falta_no_ano_normal_mm": 0, "falta_no_pior_ano_mm": 0, "dias_de_sede_no_pior_ano": 0, "em_faixa": false},
  "calor": {"dias_de_calor_forte_no_pior_ano": 0, "limite_c": 35.0, "etiqueta": "publicado", "por_cultura": {}},
- "terra_coberta": {"dias_sem_planta_viva": 122, "pelo_satelite": null},
+ "terra_coberta": {"dias_sem_planta_viva": 122, "dias_sem_planta_viva_no_ano": 125, "pelo_satelite": null},
  "contra_as_outras": {"soja_milho_pousio": {"agua": "melhor", "calor": "empate", "terra_coberta": "empate"}},
  "evidencia": "...", "beneficio": "...", "risco": "...", "falta_saber": "..."}
 ```
 - Na rotação com capim, os números da água saem em faixa (`{"de": ..., "ate": ...}`), porque não se sabe quanto o capim
   disputa água com o milho. `em_faixa` diz qual é o caso.
 - `calor.limite_c` é o limite da cultura da 2ª safra (a que muda entre as rotações); o detalhe está em `por_cultura`.
+- `terra_coberta.dias_sem_planta_viva` é o número de sempre: os dias seguidos sem planta viva antes do plantio da soja
+  (122 com pousio, 30 com capim), o que se compara com o satélite. `dias_sem_planta_viva_no_ano` é o ano inteiro,
+  contado dia a dia: soma os 3 dias entre a soja e a 2ª safra (125 e 33).
+- `contra_as_outras` compara os números sem arredondar: uma diferença de 4,99 mm não vira 5.
 - As quatro frases são prontas e só têm números da conta: cada uma passa pelo `conferencia.conferir_texto`. O
   benefício e o risco saem da posição da rotação contra as outras (`contra_as_outras`), não de opinião.
 
@@ -72,7 +76,7 @@ rotação que o produtor faz hoje (qualquer uma do cardápio) aparece em `rotaca
 ## 2. Como rodar
 De dentro de `backend/`:
 ```bash
-python3 -m unittest                                   # 306 testes (os 227 de antes e os novos)
+python3 -m unittest                                   # 314 testes (os 227 de antes e os novos)
 python3 -m orbita.perguntar --cidade jatai --rotacao soja,sorgo --plantio 2026-11-20   # 3 rotações comparadas
 python3 -m orbita.perguntar --cidade jatai --rotacao soja,sorgo --plantio 20/11        # entrada errada: a frase, saída 2
 python3 -m orbita.perguntar --cidade silvania --lugar          # os fatos do clima do lugar
@@ -158,10 +162,26 @@ Deu certo com ressalvas, que estão em `data/orbita/recente/LEIA-ME.md` (o que f
 - Levar a rotação de hoje do produtor também para as chaves de sempre (hoje elas comparam sempre as duas de antes).
 - O `api.py` (a porta de internet) não foi tocado aqui: ligar os campos novos é da parte do agente.
 
-## 6. Os arquivos desta parte
+## 6. A revisão da outra IA (uma volta, 2026-11-15, 01h25)
+O GPT revisou o código novo e apontou 7 defeitos; os 7 foram consertados, cada um com o teste que falhava antes
+(`tests/test_revisao_do_motor.py`):
+1. o registro quebrava se a safra mais recente ainda não tivesse chegado à 2ª safra: agora só entram na comparação as
+   safras em que a 2ª safra fechou o ciclo, e a safra parcial sai com `posicao: null`;
+2. o replay anunciava "colheita" no último dia com dado, com a cultura ainda crescendo: agora só há marco de colheita
+   com o ciclo completo (`resumo.<cultura>.ciclo_completo`), e um aviso diz até onde vão os dados;
+3. com o servidor ligado, o clima baixado de novo não era lido: a hora da última mudança do arquivo entra na chave do
+   que fica na memória (`clima.marca_dos_arquivos`);
+4. o número da terra coberta era chamado de "dias por ano", mas não contava os 3 dias entre a soja e a 2ª safra: as
+   frases passaram a dizer "dias seguidos", e entrou `dias_sem_planta_viva_no_ano`;
+5. a posição da safra no registro saía de números arredondados: agora sai dos números sem arredondar;
+6. a margem do empate na comparação das rotações valia sobre números arredondados: agora vale sobre os exatos;
+7. uma safra de 365 dias num ano de 366 saía como completa: agora confere de 1 de setembro a 31 de agosto, sem buraco.
+Não houve segunda volta (a coordenação pediu uma só).
+
+## 7. Os arquivos desta parte
 - Novos: `calor.py`, `hoje.py`, `registro.py`, este `LEIA-ME-motor.md`, e os testes `test_plantio.py`,
   `test_preocupacao.py`, `test_cidades.py`, `test_sorgo.py`, `test_comparacao.py`, `test_replay.py`, `test_hoje.py`,
-  `test_registro.py`, `test_perguntar.py`.
+  `test_registro.py`, `test_perguntar.py`, `test_revisao_do_motor.py`.
 - Mudados: `motor.py`, `rotacoes.py`, `balanco.py`, `clima.py`, `parametros.py`, `explicacao.py`, `mensagem.py`,
   `perguntar.py`, `exportar.py`, `tests/test_motor.py` (um teste mudou de sentido, com o motivo escrito nele) e
   `tests/test_exportar.py`.

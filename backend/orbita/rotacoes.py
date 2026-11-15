@@ -238,6 +238,16 @@ def cobertura_do_dia(data, com_braquiaria, cal, disputa=0.0, segunda="milho"):
     return (SEM_PLANTA, cal.solo_nu_kc * palha, None)
 
 
+def dias_sem_planta_no_ano(cal, com_braquiaria, segunda="milho"):
+    """Os dias sem planta viva num ano comum (365 dias), contados dia a dia: a janela antes da soja e o intervalo
+    entre a soja e a 2ª safra."""
+    dia, fim, total = datetime.date(2021, 9, 1), datetime.date(2022, 9, 1), 0
+    while dia < fim:
+        total += cobertura_do_dia(dia, com_braquiaria, cal, segunda=segunda)[0] == SEM_PLANTA
+        dia += datetime.timedelta(days=1)
+    return total
+
+
 def resumo_do_calendario(par, plantio_da_soja=None):
     """As datas do calendário e os dias sem planta viva de cada rotação (num ano comum, de 365 dias)."""
     cal = Calendario(par, plantio_da_soja)

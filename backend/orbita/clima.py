@@ -129,15 +129,32 @@ def serie_do_json(bruto, inicio=INICIO_DA_SIMULACAO):
     return dias
 
 
-@functools.lru_cache(maxsize=4)
-def _ler(caminho, inicio):
+def marca_dos_arquivos(*caminhos):
+    """A hora da última mudança de cada arquivo (em nanossegundos; None se não existe).
+
+    Entra na chave do que fica guardado na memória: arquivo baixado de novo é lido de novo, mesmo com o servidor
+    ligado (sem isso, o "como está hoje" ficava preso ao último dia lido antes).
+    """
+    import os
+    marcas = []
+    for caminho in caminhos:
+        try:
+            marcas.append(os.stat(caminho).st_mtime_ns)
+        except OSError:
+            marcas.append(None)
+    return tuple(marcas)
+
+
+@functools.lru_cache(maxsize=8)
+def _ler(caminho, inicio, marca=None):
     with open(caminho, encoding="utf-8") as arquivo:
         return tuple(serie_do_json(json.load(arquivo), inicio))
 
 
 def ler_serie(pasta=PASTA_NASA_POWER, inicio=INICIO_DA_SIMULACAO):
     """A série guardada em data/orbita/nasa-power/, já com a ETo de cada dia."""
-    return list(_ler(str(Path(pasta) / "resposta.json"), inicio))
+    caminho = str(Path(pasta) / "resposta.json")
+    return list(_ler(caminho, inicio, marca_dos_arquivos(caminho)))
 
 
 def ler_chuva_csv(caminho):
@@ -152,7 +169,7 @@ def ler_chuva_csv(caminho):
 
 
 @functools.lru_cache(maxsize=16)
-def _serie_com_aviso(chuva, pasta_da_chuva, pasta_power=None, lugar=None):
+def _serie_com_aviso(chuva, pasta_da_chuva, pasta_power=None, lugar=None, marca=None):
     dias = ler_serie() if pasta_power is None else ler_serie(pasta_power)
     if chuva == "power":
         return tuple(dias), ("A chuva de modelo da NASA POWER (PRECTOTCORR) fica só como comparação: em Rio Verde "
@@ -191,13 +208,16 @@ def ler_serie_com_aviso(chuva="power", pasta_da_chuva=PASTA_DA_CHUVA, cidade_id=
     `cidade_id`: a cidade (sem ela, Rio Verde, nas pastas de sempre); `lugar`: o nome dela, para os avisos.
     """
     if cidade_id in (None, CIDADE_DE_REFERENCIA):
-        dias, avisos = _serie_com_aviso(chuva, str(pasta_da_chuva))
+        marca = marca_dos_arquivos(PASTA_NASA_POWER / "resposta.json", Path(pasta_da_chuva) / f"{chuva}.csv")
+        dias, avisos = _serie_com_aviso(chuva, str(pasta_da_chuva), None, None, marca)
     else:
         pastas = pastas_da_cidade(cidade_id)
         if not (pastas["nasa_power"] / "resposta.json").exists():
             raise ValueError(f"O clima de '{cidade_id}' não está guardado: falta baixar (data/orbita/cidades/"
                              "baixar_cidade.py).")
-        dias, avisos = _serie_com_aviso(chuva, str(pastas["chuva"]), str(pastas["nasa_power"]), lugar or cidade_id)
+        marca = marca_dos_arquivos(pastas["nasa_power"] / "resposta.json", pastas["chuva"] / f"{chuva}.csv")
+        dias, avisos = _serie_com_aviso(chuva, str(pastas["chuva"]), str(pastas["nasa_power"]), lugar or cidade_id,
+                                        marca)
     return list(dias), list(avisos)
 
 

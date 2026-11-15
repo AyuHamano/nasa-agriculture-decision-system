@@ -182,7 +182,7 @@ FALTA_SABER = {
 }
 PERNAS = (("agua", "Na água do pior ano", "mm de falta", "mm"),
           ("calor", "No calor do pior ano", "dias de calor forte", "dias"),
-          ("terra_coberta", "Na terra coberta", "dias por ano sem planta viva", "dias"))
+          ("terra_coberta", "Na terra coberta", "dias seguidos sem planta viva", "dias"))
 
 
 def _valor_da_perna(item, perna):
@@ -211,7 +211,9 @@ def frases_da_rotacao(item, itens, r):
     evidencia = (f"Em {r['local']['nome']}, no pior ano (safra {pior}) faltaram {_mm(agua['falta_no_pior_ano_mm'])} "
                  f"mm de água para as culturas, com {_dias(agua['dias_de_sede_no_pior_ano'])} dias de sede; no ano "
                  f"normal (safra {normal}), {_mm(agua['falta_no_ano_normal_mm'])} mm. {_frase_do_calor(item)} Pelo "
-                 f"calendário, a terra fica {terra['dias_sem_planta_viva']} dias por ano sem planta viva.")
+                 f"calendário, a terra fica {terra['dias_sem_planta_viva']} dias seguidos sem planta viva antes do "
+                 f"plantio da soja ({terra['dias_sem_planta_viva_no_ano']} dias no ano, contando o intervalo entre "
+                 "a soja e a 2ª safra).")
     if terra["pelo_satelite"] is not None:
         evidencia += (f" O satélite viu {n(terra['pelo_satelite'])} dias seguidos sem planta verde (a mediana dos "
                       "pontos medidos).")
