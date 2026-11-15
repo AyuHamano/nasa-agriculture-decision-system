@@ -49,7 +49,7 @@ class Perguntar(unittest.TestCase):
             self.assertNotIn("--agua 5", erros.split("Exemplo:")[-1])      # o exemplo do erro já não traz as notas
         codigo, saida, erros = rodar(["--terra", "media", "--json"])
         self.assertEqual(codigo, 0, erros)
-        self.assertIsNone(json.loads(saida)["entrada"].get("prioridades"))
+        self.assertNotIn("prioridades", json.loads(saida)["entrada"])
 
     def test_entrada_errada_devolve_a_frase_em_portugues_sem_erro_cru(self):
         for argumentos in (["--cidade", "sorriso"], ["--rotacao", "soja,algodao"], ["--plantio", "20/11/2026"],

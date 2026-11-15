@@ -78,5 +78,23 @@ class Registro(unittest.TestCase):
             self.assertTrue(str(erro.exception).startswith("Entrada fora do formato:"))
 
 
+class ASafraQueAindaNaoFechou(unittest.TestCase):
+    def test_a_frase_diz_a_data_do_ultimo_dia_e_nao_fala_de_dado_nem_de_atraso(self):
+        inteiro = motor.replay_da_safra(ENTRADA, "2015-16")
+        cortado = dict(inteiro, dias=inteiro["dias"][:300], completa=False)        # a safra só até 26/06/2016
+        self.assertEqual(cortado["dias"][-1]["data"], "2016-06-26")
+        with mock.patch.object(motor, "replay_da_safra", return_value=cortado):
+            do_meio = registro.registro_da_safra(ENTRADA, "2015-16")
+        sem_planta = do_meio["terra_coberta"]["dias_sem_planta_viva"]
+        self.assertIn(f" Até 26/06/2016, a terra ficou {sem_planta} dias sem planta viva (a safra ainda não fechou;",
+                      do_meio["frase"])
+        self.assertIn("de 1 de setembro a 26/06/2016, na safra que ainda não fechou", do_meio["terra_coberta"]["nota"])
+        self.assertIn("(de 1 de setembro a 31 de agosto)", REGISTRO["terra_coberta"]["nota"])
+        for registro_ in (do_meio, REGISTRO):
+            for texto in (registro_["frase"], registro_["terra_coberta"]["nota"], registro_["aviso"]):
+                for proibido in ("último dia com dado", "atras", "aproximad"):
+                    self.assertNotIn(proibido, texto.lower())
+
+
 if __name__ == "__main__":
     unittest.main()

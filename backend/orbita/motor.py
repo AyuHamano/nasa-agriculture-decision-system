@@ -102,7 +102,8 @@ def validar_entrada(entrada):
         if do_cardapio is None:
             problemas.append(f"rotacao_atual {rotacao!r} ainda não existe: o motor conhece {cardapio}")
     # As notas de 1 a 5 saíram do motor (decisão do dono, 2026-11-15: "tira isso"). A entrada que ainda traz
-    # `prioridades` é aceita, para as rotas antigas não quebrarem, mas o campo é ignorado: não se confere nem se usa.
+    # `prioridades` é aceita, para as rotas antigas não quebrarem, mas o campo é ignorado: não se confere, não se usa
+    # e não volta na resposta (nem `entrada.prioridades`, nem `nota` na lista `prioridades` e no `destaque`).
     terra = entrada.get("terra") or "media"
     if terra not in TERRAS:
         problemas.append(f'terra "{terra}" não existe: use pouca, media ou muita (quanta água a terra segura)')
@@ -134,7 +135,6 @@ def validar_entrada(entrada):
     if problemas:
         raise ValueError("Entrada fora do formato: " + "; ".join(problemas) + ".")
     return {"cidade_id": cidade, "rotacao_atual": list(do_cardapio["culturas"]), "rotacao_id": do_cardapio["id"],
-            "prioridades": None,     # o campo de antes fica, sempre vazio: as notas saíram (2026-11-15)
             "terra": terra, "chuva": chuva, "regra": regra, "plantio_da_soja": plantio, "preocupacao": preocupacao}
 
 
@@ -964,8 +964,7 @@ def responder(entrada, par=None, dias=None, rendimentos=None):
                "solo": "os dias do ano sem planta viva na terra (o mesmo número da erosão)",
                "erosao": "os dias do ano sem planta viva na terra (o mesmo número do solo)",
                "renda": "não medido: o motor não tem preço, custo nem produtividade"}
-    prioridades = [{"id": p, "nome": NOMES[p], "nota": None, "melhor": melhores[p],
-                    "medida": medidas[p]} for p in ordem]
+    prioridades = [{"id": p, "nome": NOMES[p], "melhor": melhores[p], "medida": medidas[p]} for p in ordem]
     for p in prioridades:
         if p["id"] == "agua":
             p["veredito_pela_faixa"] = agua_pela_faixa["codigo"]
@@ -977,7 +976,7 @@ def responder(entrada, par=None, dias=None, rendimentos=None):
         por_rotacao = bloco_do_calor["por_rotacao"]
         compara = quem_ganha(por_rotacao["soja_milho_braquiaria"]["dias_no_pior_ano"],
                              por_rotacao["soja_milho_pousio"]["dias_no_pior_ano"], 1)
-        primeira_medida = {"id": "calor", "nome": NOMES["calor"], "nota": None,
+        primeira_medida = {"id": "calor", "nome": NOMES["calor"],
                            "melhor": {"melhor": "alternativa", "pior": "atual"}.get(compara, "empate")}
     verde = verde_do_satelite(entrada["cidade_id"], dias_hoje, par)
     terra_coberta = {
@@ -1028,7 +1027,7 @@ def responder(entrada, par=None, dias=None, rendimentos=None):
             p for p in PERNAS if p != entrada["preocupacao"]],
         "sede_forte": sede_forte,
         "destaque": dict({"prioridade": primeira_medida["id"], "nome": primeira_medida["nome"],
-                          "nota": primeira_medida["nota"], "melhor": primeira_medida["melhor"]},
+                          "melhor": primeira_medida["melhor"]},
                          **({"veredito_pela_faixa": agua_pela_faixa["codigo"]} if primeira_medida["id"] == "agua"
                             else {})),
         "veredito": veredito(melhores, agua_pela_faixa["codigo"]),

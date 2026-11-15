@@ -171,11 +171,15 @@ class Faixa(unittest.TestCase):
                 agora.add(".".join(caminho))
 
         anda(RESPOSTA, [])
-        # As 4 notas de entrada.prioridades saíram do motor (decisão do dono, 2026-11-15: "tira isso"): o campo
-        # entrada.prioridades continua na resposta, sempre vazio. Nenhum outro campo de antes saiu.
-        self.assertIsNone(RESPOSTA["entrada"]["prioridades"])
-        self.assertEqual([campo for campo in antigos["campos"]
-                          if campo not in agora and not campo.startswith("entrada.prioridades.")], [])
+        # As notas de 1 a 5 saíram do motor (decisão do dono, 2026-11-15: "tira isso"), e com elas as chaves que
+        # as guardavam: entrada.prioridades (com as 4 notas), prioridades[].nota e destaque.nota. Nenhum outro
+        # campo de antes saiu.
+        das_notas = ("prioridades.[].nota", "destaque.nota")
+        self.assertNotIn("prioridades", RESPOSTA["entrada"])
+        for campo in das_notas:
+            self.assertNotIn(campo, agora)
+        self.assertEqual([campo for campo in antigos["campos"] if campo not in agora and campo not in das_notas
+                          and not campo.startswith("entrada.prioridades.")], [])
         for p in RESPOSTA["prioridades"]:   # o vocabulário antigo do campo "melhor" continua o mesmo
             self.assertIn(p["melhor"], ("atual", "alternativa", "empate", "não medido"))
 

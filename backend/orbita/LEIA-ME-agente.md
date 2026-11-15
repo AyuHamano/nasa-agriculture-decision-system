@@ -131,8 +131,10 @@ campos livres e opcionais, `lugar_dito` e `rotacao_dita`: o texto curto do que o
 ("Cristalina", "sorgo e milho"; só letra, espaço, vírgula e hífen, até 60 letras, sem algarismo). Junto com eles vão
 `cidade_id` = o lugar guardado mais próximo (a IA escolhe pela latitude e longitude que a ferramenta mostra; se ela
 não mandar, o programa pergunta "Qual destes fica mais perto da sua lavoura?") e `rotacao_atual` = a rotação guardada
-mais parecida (se a IA não mandar, o programa escolhe a que tem mais culturas em comum; no empate, a primeira do
-cardápio). O resumo da ficha mostra os dois ("Cristalina (uso o clima de Silvânia (GO), o lugar guardado mais
+mais parecida, que é escolha do programa, sempre, por regra fixa (`ficha.rotacao_parecida`; a IA só anota o
+`rotacao_dita`, e a `rotacao_atual` que ela mandar junto é trocada): **tem sorgo no que foi dito: soja → sorgo →
+pousio; senão, tem capim ou braquiária: soja → milho → braquiária; senão: soja → milho → pousio** (sem maiúscula nem
+acento). O resumo da ficha mostra os dois ("Cristalina (uso o clima de Silvânia (GO), o lugar guardado mais
 próximo)"), os dois entram no selo, e mudar um deles pede o "sim" de novo. A conta do motor não é estendida para a
 sequência nova: os números são os da rotação guardada, e a resposta diz qual é.
 

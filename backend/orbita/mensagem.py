@@ -8,7 +8,7 @@ Uso:
 O texto traz, nesta ordem: a pergunta, a resposta, o resultado no que mais preocupa (ou no que foi medido), um número
 de prova de cada medida mostrada (com a fonte dita em palavras), o risco em uma linha e "Converse com o agrônomo antes
 de decidir." no fim. Não tem tabela nem markdown e cabe em uns 900 caracteres. As notas de 1 a 5 saíram (decisão do
-dono, 2026-11-15): o texto não mostra nota nem ordena por nota, mesmo que a resposta ainda traga uma.
+dono, 2026-11-15): o texto não mostra nota nem ordena por nota (a resposta do motor já não traz a chave `nota`).
 
 Não há IA aqui: são frases prontas, preenchidas só com o que está na resposta do motor. Todo número do texto está na
 resposta (o teste confere com `orbita.conferencia.conferir_texto`).

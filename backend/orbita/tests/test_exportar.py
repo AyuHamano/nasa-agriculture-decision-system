@@ -106,7 +106,7 @@ class ExportarComOpcoes(unittest.TestCase):
             self.assertEqual(resposta["rotacao_de_hoje"]["id"], "soja_sorgo_pousio")
             self.assertEqual(resposta["calendario"]["plantio_da_soja_informado"], "2026-11-20")
             self.assertEqual(resposta["entrada"]["terra"], terra)
-            self.assertIsNone(resposta["entrada"].get("prioridades"))
+            self.assertNotIn("prioridades", resposta["entrada"])
             self.assertEqual(len(resposta["comparacao_das_rotacoes"]), 3)
         self.assertNotIn("prioridades", dados["parametros_usados"])
         self.assertEqual(dados["parametros_usados"]["cidade_id"], "jatai")

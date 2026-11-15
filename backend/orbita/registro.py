@@ -8,6 +8,7 @@ import datetime
 import statistics
 
 from orbita import balanco, clima, parametros, rotacoes
+from orbita.explicacao import data_br
 
 NOMES = {"soja": "soja", "milho": "milho de 2ª safra", "sorgo": "sorgo de 2ª safra"}
 AVISO = ("É o registro da conta com o clima guardado da NASA para o ponto da cidade, na rotação informada: não é a "
@@ -94,8 +95,8 @@ def registro_da_safra(entrada, safra, par=None):
              f"de água para as culturas, com {resumo['total']['dias_de_sede']} dias de sede e "
              f"{resumo['total']['dias_de_calor_forte']} dias de calor forte na fase crítica.")
     if not replay["completa"]:
-        frase += (f" Até o último dia com dado, a terra ficou {sem_planta} dias sem planta viva (a safra ainda não "
-                  f"fechou; no ano inteiro, pelo calendário, são {no_ano}).")
+        frase += (f" Até {data_br(dias[-1]['data'])}, a terra ficou {sem_planta} dias sem planta viva (a safra ainda "
+                  f"não fechou; no ano inteiro, pelo calendário, são {no_ano}).")
     elif sem_planta != no_ano:      # a diferença é legítima: a frase diz por quê
         frase += (f" A terra ficou {sem_planta} dias sem planta viva: na comparação das rotações são {no_ano}, "
                   "contados num ano comum" + (", e esta safra tem o dia a mais do ano bissexto." if len(dias) > 365
@@ -134,7 +135,8 @@ def registro_da_safra(entrada, safra, par=None):
         "terra_coberta": {"dias_sem_planta_viva": sem_planta, "dias_da_safra": len(dias),
                           "dias_sem_planta_viva_no_ano": no_ano, "pelo_satelite": verde,
                           "nota": "Os dias sem planta viva são os da conta, nos dias desta safra (de 1 de setembro a "
-                                  "31 de agosto, ou até o último dia com dado). dias_sem_planta_viva_no_ano é o "
+                                  + ("31 de agosto" if replay["completa"] else data_br(dias[-1]["data"]) + ", na "
+                                     "safra que ainda não fechou") + "). dias_sem_planta_viva_no_ano é o "
                                   "número da comparação das rotações, contado pelo calendário num ano comum: em "
                                   "safra de ano bissexto, a conta da safra dá um dia a mais. O satélite prova só a "
                                   "rotação de hoje da região (soja, milho e pousio)."},

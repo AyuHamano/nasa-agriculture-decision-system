@@ -161,5 +161,44 @@ class ComOMotorDeVerdade(unittest.TestCase):
         self.assertTrue(replay["dias"] and replay["marcos"])
 
 
+class OPainelQueVaiAIa(unittest.TestCase):
+    """O painel da lavoura hoje, como a IA o lê: sem a leitura do agrônomo (o atraso do dado, o que não chegou)."""
+    PROIBIDO = ("atras", "último dia com dado", "aproximad", "ainda não chegou")
+
+    def frases(self, coisa):
+        if isinstance(coisa, dict):
+            for chave, valor in coisa.items():
+                yield str(chave)
+                yield from self.frases(valor)
+        elif isinstance(coisa, list):
+            for item in coisa:
+                yield from self.frases(item)
+        elif isinstance(coisa, str):
+            yield coisa
+
+    @unittest.skipUnless(hasattr(motor, "lavoura_hoje"), "o motor ainda não tem o painel da lavoura hoje")
+    def test_nenhuma_frase_do_painel_que_vai_a_ia_fala_de_atraso_nas_3_cidades(self):
+        cidades, cardapio = ferramentas.listas()["cidades"], ferramentas.listas()["rotacoes"]
+        self.assertEqual(len(cidades), 3)
+        for cidade in cidades:
+            for rotacao in cardapio.values():
+                ficha_da_cidade = dict(FICHA, cidade_id=cidade, rotacao_atual=rotacao["culturas"], plantio_da_soja=None)
+                painel = ferramentas.para_a_ia(ferramentas.chamar("lavoura_hoje", ficha_da_cidade, {}))
+                self.assertTrue(painel["disponivel"] and len(painel["itens"]) == 6, cidade)
+                for frase in self.frases(painel):
+                    for proibido in self.PROIBIDO:
+                        self.assertNotIn(proibido, frase.lower(), (cidade, rotacao["culturas"]))
+                for item in painel["itens"]:                     # nenhum campo técnico chega, nem curto
+                    self.assertEqual([c for c in item if c in ferramentas.FORA_DO_PAINEL and c != "situacao"], [])
+                self.assertEqual([c for c in painel if c in ferramentas.FORA_DO_PAINEL and c != "situacao"], [])
+
+    def test_o_campo_tecnico_curto_de_um_item_nao_passa(self):
+        item = {"id": "fase", "situacao_nome": "tranquilo", "frase": "Na terra está a soja.", "dias": 12,
+                "detalhe_tecnico": "14/11/2026 é o último dia com dado.", "regra_da_situacao": "curta",
+                "ultimo_dado": {"data": "2026-11-14", "de": "da chuva"}, "ultimo_dia_com_dado_de": "da conta"}
+        self.assertEqual(ferramentas._item_do_painel(item),
+                         {"id": "fase", "situacao": "tranquilo", "frase": "Na terra está a soja.", "dias": 12})
+
+
 if __name__ == "__main__":
     unittest.main()

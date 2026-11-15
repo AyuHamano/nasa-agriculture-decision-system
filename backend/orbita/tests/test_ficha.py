@@ -120,5 +120,37 @@ class AFicha(unittest.TestCase):
         self.assertEqual(publica["falta"], ["rotacao_atual", "terra", "preocupacao"])
 
 
+    def test_a_rotacao_dita_ganha_a_rotacao_da_conta_pela_regra_fixa(self):
+        # A regra (2026-11-15), na ordem: tem sorgo, soja → sorgo → pousio; senão, tem capim ou braquiária, soja →
+        # milho → braquiária; senão, soja → milho → pousio. Sem maiúscula nem acento. Quem escolhe é o programa.
+        sorgo, capim, sempre = ["soja", "sorgo", "pousio"], ["soja", "milho", "braquiaria"], ["soja", "milho", "pousio"]
+        for dito, esperada in (("sorgo e milho", sorgo), ("milho com capim e feijão", capim),
+                               ("braquiária e girassol", capim), ("feijão e girassol", sempre),
+                               ("sorgo com capim", sorgo),             # o sorgo vem primeiro na regra
+                               ("SORGO", sorgo), ("Braquiaria", capim), ("CAPIM", capim)):
+            self.assertEqual(ficha.rotacao_parecida(dito, self.listas), esperada, dito)
+            f, aceitos, recusados = self.anotar({"rotacao_dita": dito})
+            self.assertEqual((f["rotacao_atual"], recusados), (esperada, {}), dito)
+
+    def test_a_rotacao_que_a_ia_mandar_junto_com_a_dita_e_trocada_pela_da_regra(self):
+        for da_ia in ("soja_milho_pousio", "soja_milho_braquiaria", ["soja", "milho", "pousio"], "trigo"):
+            f, aceitos, recusados = self.anotar({"rotacao_dita": "sorgo e milho", "rotacao_atual": da_ia})
+            self.assertEqual((f["rotacao_dita"], f["rotacao_atual"]), ("sorgo e milho", ["soja", "sorgo", "pousio"]))
+            self.assertEqual(aceitos["rotacao_atual"], ["soja", "sorgo", "pousio"])
+            self.assertNotIn("rotacao_atual", recusados)
+        # a ficha que vem de fora (o estado que a tela devolve) passa pela mesma regra
+        de_fora = dict(ficha.nova(), rotacao_dita="sorgo e milho", rotacao_atual=["soja", "milho", "pousio"])
+        self.assertEqual(ficha.conferir(de_fora, self.listas, HOJE)["rotacao_atual"], ["soja", "sorgo", "pousio"])
+        # e a rotação da lista, dita depois, apaga o "dito" de antes
+        f = self.anotar({"rotacao_atual": "soja_milho_braquiaria"}, de=f)[0]
+        self.assertEqual((f["rotacao_dita"], f["rotacao_atual"]), (None, ["soja", "milho", "braquiaria"]))
+
+    def test_o_pedido_a_ia_diz_que_quem_escolhe_a_rotacao_da_conta_e_o_programa(self):
+        definicao = ficha.definicao(self.listas)
+        for texto in (definicao["descricao"], definicao["parametros"]["properties"]["rotacao_dita"]["description"]):
+            self.assertIn("quem escolhe a rotação da conta é o programa", texto)
+            self.assertNotIn("mais culturas em comum", texto)
+
+
 if __name__ == "__main__":
     unittest.main()

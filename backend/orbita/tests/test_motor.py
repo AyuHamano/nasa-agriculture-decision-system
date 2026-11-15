@@ -28,14 +28,14 @@ class Entrada(unittest.TestCase):
     def test_erros_em_portugues_dizendo_o_que_falta(self):
         # Mudou de novo em 2026-11-15 (decisão do dono: as notas de 1 a 5 saem, "tira isso"): o motor ainda aceita a
         # entrada que traz `prioridades`, para as rotas antigas não quebrarem, mas IGNORA o campo: não confere as
-        # notas (pela metade, fora de 1 a 5 ou fora do formato já não são erro) e devolve sempre None.
-        self.assertIsNone(motor.validar_entrada({k: v for k, v in ENTRADA.items() if k != "prioridades"})["prioridades"])
+        # notas (pela metade, fora de 1 a 5 ou fora do formato já não são erro) e não devolve a chave `prioridades`.
+        self.assertNotIn("prioridades", motor.validar_entrada({k: v for k, v in ENTRADA.items() if k != "prioridades"}))
         sem_agua = copy.deepcopy(ENTRADA)
         del sem_agua["prioridades"]["agua"]
         nota_6 = copy.deepcopy(ENTRADA)
         nota_6["prioridades"]["solo"] = 6
         for entrada in (ENTRADA, sem_agua, nota_6, dict(ENTRADA, prioridades="alta")):
-            self.assertIsNone(motor.validar_entrada(entrada)["prioridades"])
+            self.assertNotIn("prioridades", motor.validar_entrada(entrada))
         self.assertIn("terra", erro_de(dict(ENTRADA, terra="barro")))
         self.assertIn("cidade_id", erro_de(dict(ENTRADA, cidade_id="sorriso")))
         self.assertIn("rotacao_atual", erro_de(dict(ENTRADA, rotacao_atual=["soja", "algodao"])))
@@ -162,14 +162,17 @@ class Numeros(unittest.TestCase):
 class Prioridades(unittest.TestCase):
     def test_as_notas_que_vierem_sao_ignoradas_nada_muda(self):
         # Mudou em 2026-11-15 (decisão do dono: as notas de 1 a 5 saem): antes as notas mudavam a ordem; agora a
-        # resposta com notas é a mesma da resposta sem notas (a ordem de costume, e `nota` vazio).
+        # resposta com notas é a mesma da resposta sem notas (a ordem de costume). As chaves que ficavam vazias
+        # saíram da resposta: `entrada.prioridades`, `prioridades[].nota` e `destaque.nota`.
         outra = motor.responder(dict(ENTRADA, prioridades={"agua": 1, "solo": 2, "renda": 5, "erosao": 4}))
         sem = motor.responder({k: v for k, v in ENTRADA.items() if k != "prioridades"})
         self.assertEqual(outra, sem)
         self.assertEqual(RESPOSTA, sem)
-        self.assertIsNone(RESPOSTA["entrada"]["prioridades"])
-        self.assertEqual([p["nota"] for p in RESPOSTA["prioridades"]], [None] * 4)
-        self.assertIsNone(RESPOSTA["destaque"]["nota"])
+        self.assertNotIn("prioridades", RESPOSTA["entrada"])
+        self.assertEqual([sorted(p) for p in RESPOSTA["prioridades"]],          # a da água leva também o veredito
+                         [["id", "medida", "melhor", "nome", "veredito_pela_faixa"]]
+                         + [["id", "medida", "melhor", "nome"]] * 3)
+        self.assertNotIn("nota", RESPOSTA["destaque"])
         for palavra in ("(nota", "MAIOR NOTA"):
             self.assertNotIn(palavra, explicacao.texto(RESPOSTA))
         self.assertEqual([p["id"] for p in RESPOSTA["prioridades"]], ["agua", "solo", "erosao", "renda"])

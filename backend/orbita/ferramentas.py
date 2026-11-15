@@ -43,7 +43,10 @@ TEXTO_CURTO = 40                                    # texto maior que isto, fora
 FORA_DO_PAINEL = ("hoje", "atraso_dias", "dia_da_consulta", "dias_ja_passados_ate_a_consulta", "sem_chuva_a_partir_de",
                   "janela_dias", "horizonte_dias", "janela_do_consumo_dias", "dias_do_consumo", "dias_por_imagem",
                   "ultimo_dia_com_temperatura", "dias_com_o_consumo_estimado", "consumo_estimado_desde",
-                  "situacao", "titulo")
+                  "situacao", "titulo",
+                  # a leitura do agrônomo (fica na resposta da rota): fala do último dia com dado e do que não chegou
+                  "detalhe_tecnico", "aviso_tecnico", "regra_da_situacao", "regras", "ultimo_dado",
+                  "ultimo_dia_com_dado_de")
 
 
 class ContaIndisponivel(Exception):

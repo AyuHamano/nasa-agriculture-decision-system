@@ -31,7 +31,8 @@ escreve a explicação. O que o PROGRAMA garante, sem depender do pedido à IA:
 
 - A indicação: com a ficha confirmada, a resposta nunca termina em recusa. O que o produtor disse fora das listas
   fica nos campos "ditos" da ficha (`lugar_dito`, `rotacao_dita`); a conta roda com o lugar guardado mais próximo
-  e a rotação guardada mais parecida, e o programa garante que a resposta diz "conhecimento geral" para a parte de
+  e a rotação guardada mais parecida (escolhida pelo programa, pela regra fixa de `ficha.rotacao_parecida`, nunca
+  pela IA), e o programa garante que a resposta diz "conhecimento geral" para a parte de
   fora (acrescenta a frase, se a IA não disse). As frases prontas também terminam numa indicação.
 
 O estado é pequeno e vira JSON: a ficha, o selo da confirmação, a pergunta que o produtor fez antes de fechar a
@@ -132,8 +133,8 @@ Como a conversa anda:
 disser, o dia do plantio da soja. Tudo o que ele disser sobre isso você anota com a ferramenta anotar_na_ficha. Só \
 existem os valores das listas da ferramenta. Se ele disser um lugar ou uma rotação que não está nas listas, não \
 recuse nem liste as opções: anote lugar_dito (o lugar que ele disse) junto com cidade_id (o lugar guardado mais \
-próximo, pela latitude e longitude) e rotacao_dita (o que ele disse que planta) junto com rotacao_atual (a rotação \
-guardada mais parecida). Não anote o que ele não disse.
+próximo, pela latitude e longitude) e, para a rotação, só rotacao_dita (o que ele disse que planta): quem escolhe \
+a rotação da conta é o programa, por regra fixa, não você. Não anote o que ele não disse.
 2. O programa mostra a ficha e o produtor confirma. Quem lê o "sim" é o programa, não você.
 3. Com a ficha confirmada, você responde às perguntas dele consultando as ferramentas da conta: lavoura_hoje, \
 ensaio_da_rotacao, clima_do_lugar e verde_do_satelite.

@@ -18,9 +18,11 @@ ser confirmada de novo. Nenhum dado pessoal é pedido (nome, telefone, CPF, ende
 
 Os dois campos "ditos" (`DITOS`, opcionais, texto curto): `lugar_dito` e `rotacao_dita`. Guardam o que o produtor
 disse FORA das listas ("Cristalina", "sorgo e milho"). A conta continua fechada: `cidade_id` fica com o lugar
-guardado mais próximo e `rotacao_atual` com a rotação guardada mais parecida (se a IA não escolher, o programa
-escolhe a que tem mais culturas em comum com o que foi dito; no empate, a primeira do cardápio). O resumo da ficha
-mostra os dois, e a resposta diz que a parte de fora da conta é conhecimento geral.
+guardado mais próximo e `rotacao_atual` com a rotação guardada mais parecida. Quem escolhe essa rotação é o
+programa, sempre, por uma regra fixa (`rotacao_parecida`): tem sorgo no que foi dito, soja → sorgo → pousio; senão,
+tem capim ou braquiária, soja → milho → braquiária; senão, soja → milho → pousio. A IA só anota o que o produtor
+disse; a `rotacao_atual` que ela mandar junto é trocada pela da regra. O resumo da ficha mostra os dois, e a
+resposta diz que a parte de fora da conta é conhecimento geral.
 """
 import datetime
 import re
@@ -41,6 +43,11 @@ TERRAS_NA_PERGUNTA = {"pouca": "pouca (terra mais arenosa)", "media": "média (t
                       "muita": "muita (terra mais argilosa)"}
 PREOCUPACOES_EM_PALAVRAS = {"agua": "a falta de água", "calor": "o calor forte",
                             "terra": "a terra descoberta (sem planta viva)"}
+# A regra fixa da rotação da conta quando o produtor diz uma que a conta não tem (`rotacao_dita`), na ordem: a
+# primeira linha que tem uma das palavras no que foi dito vale; nenhuma, vale a de sempre. Sem maiúscula nem acento.
+REGRA_DA_ROTACAO_DITA = ((("sorgo",), ("soja", "sorgo", "pousio")),
+                         (("capim", "braquiaria"), ("soja", "milho", "braquiaria")))
+ROTACAO_DE_SEMPRE = ("soja", "milho", "pousio")
 CONFIRMAR = 'Está certo? Responda "sim" para eu fazer a conta, ou diga o que corrigir.'
 
 
@@ -63,15 +70,19 @@ def ler_dito(valor):
 
 
 def rotacao_parecida(dito, listas):
-    """As culturas da rotação guardada mais parecida com o que foi dito: a que tem mais culturas em comum; no
-    empate, a primeira do cardápio."""
-    palavras = set(re.findall(r"[a-z]+", _sem_acento(dito)))
-    melhor, pontos = None, -1
-    for item in listas["rotacoes"].values():
-        comuns = sum(1 for cultura in item["culturas"] if _sem_acento(cultura) in palavras)
-        if comuns > pontos:
-            melhor, pontos = item, comuns
-    return list(melhor["culturas"]) if melhor else None
+    """As culturas da rotação da conta para o que o produtor disse, pela regra fixa (`REGRA_DA_ROTACAO_DITA`):
+    tem sorgo, soja → sorgo → pousio; senão, tem capim ou braquiária, soja → milho → braquiária; senão, soja →
+    milho → pousio. A comparação ignora maiúsculas e acentos. É o programa que escolhe, sempre; a IA não.
+
+    Se o cardápio do motor não tiver a rotação da regra, vale a primeira do cardápio.
+    """
+    texto = _sem_acento(dito)
+    escolhida = next((list(culturas) for palavras, culturas in REGRA_DA_ROTACAO_DITA
+                      if any(palavra in texto for palavra in palavras)), list(ROTACAO_DE_SEMPRE))
+    guardadas = [list(item["culturas"]) for item in listas["rotacoes"].values()]
+    if escolhida in guardadas:
+        return escolhida
+    return guardadas[0] if guardadas else None
 
 
 def _opcoes(nomes):
@@ -142,7 +153,8 @@ def anotar(ficha, campos, listas, hoje=None):
             else:
                 aceitos[campo] = certo
     # O "dito" e o campo fechado andam juntos: o lugar e a rotação da lista apagam o "dito" de antes; a rotação dita
-    # sem a parecida ganha a parecida por regra; o lugar dito sem o mais próximo deixa a cidade por perguntar.
+    # ganha sempre a rotação da regra fixa (a `rotacao_atual` que a IA mandou junto é trocada); o lugar dito sem o
+    # mais próximo deixa a cidade por perguntar.
     if aceitos.get("lugar_dito") and _sem_acento(aceitos["lugar_dito"]) in {
             _sem_acento(nome).split(" (")[0] for nome in listas["cidades"].values()} | set(listas["cidades"]):
         del aceitos["lugar_dito"]                    # disse um lugar que está guardado: não é "dito"
@@ -152,11 +164,11 @@ def anotar(ficha, campos, listas, hoje=None):
             junto["lugar_dito"] = None
     elif "lugar_dito" in aceitos and "cidade_id" not in aceitos and aceitos["lugar_dito"] != ficha.get("lugar_dito"):
         junto["cidade_id"] = None
-    if "rotacao_atual" in aceitos and "rotacao_dita" not in aceitos:
-        junto["rotacao_dita"] = None
-    elif "rotacao_dita" in aceitos and "rotacao_atual" not in aceitos:
+    if "rotacao_dita" in aceitos:                    # quem escolhe a rotação da conta é o programa, não a IA
         aceitos["rotacao_atual"] = rotacao_parecida(aceitos["rotacao_dita"], listas)
         recusados.pop("rotacao_atual", None)
+    elif "rotacao_atual" in aceitos:
+        junto["rotacao_dita"] = None
     nova_ficha = dict(ficha)
     if any(ficha.get(campo) != valor for campo, valor in dict(junto, **aceitos).items()):
         nova_ficha.update(junto)
@@ -176,6 +188,8 @@ def conferir(ficha, listas, hoje=None):
             limpa[campo] = _ler(campo, valor, listas, hoje)[0]
     for campo in DITOS:
         limpa[campo] = ler_dito(ficha.get(campo))
+    if limpa["rotacao_dita"]:                        # a ficha de fora também passa pela regra fixa da rotação dita
+        limpa["rotacao_atual"] = rotacao_parecida(limpa["rotacao_dita"], listas)
     limpa["confirmada"] = ficha.get("confirmada") is True and completa(limpa)
     return limpa
 
@@ -278,7 +292,8 @@ def definicao(listas):
                      "não invente nem complete por conta. O programa confere cada valor contra a lista e devolve "
                      "o que entrou, o que foi recusado e o que ainda falta. Se ele disser um lugar ou uma rotação "
                      "que não está nas listas, não recuse: mande lugar_dito com cidade_id (o lugar guardado mais "
-                     "próximo) e rotacao_dita com rotacao_atual (a rotação guardada mais parecida).",
+                     "próximo) e, para a rotação, só rotacao_dita (o que ele disse): quem escolhe a rotação da "
+                     "conta é o programa, por regra fixa, não você.",
         "parametros": {"type": "object", "additionalProperties": False, "properties": {
             "cidade_id": {"type": "string", "enum": list(listas["cidades"]),
                           "description": "Onde fica a lavoura. Se o lugar dele não está na lista, escolha o mais "
@@ -290,10 +305,11 @@ def definicao(listas):
             "rotacao_dita": {"type": "string",
                              "description": "Só quando o que ele planta NÃO está na lista: as culturas, como ele "
                                             "disse, sem número (por exemplo, sorgo e milho; feijão depois da soja). "
-                                            "Mande junto rotacao_atual com a rotação da lista mais parecida (a que "
-                                            "tem mais culturas em comum com a dele)."},
+                                            "Não mande rotacao_atual junto: quem escolhe a rotação da conta é o "
+                                            "programa, por regra fixa, e o que você mandar é trocado."},
             "rotacao_atual": {"type": "string", "enum": list(listas["rotacoes"]),
-                              "description": "O que ele planta hoje, no ano inteiro. " + cardapio},
+                              "description": "O que ele planta hoje, no ano inteiro, só quando é uma das rotações "
+                                             "da lista. " + cardapio},
             "terra": {"type": "string", "enum": list(listas["terras"]),
                       "description": "Quanta água a terra segura. " + terras},
             "plantio_da_soja": {"type": "string",

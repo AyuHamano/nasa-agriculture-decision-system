@@ -74,8 +74,9 @@ class AsFuncoes(unittest.TestCase):
             self.assertEqual(api.rota_recomendacao(dict(ENTRADA, prioridades=notas)), motor.responder(ENTRADA))
             self.assertEqual(api.rota_mensagem(dict(ENTRADA, prioridades=notas)), api.rota_mensagem(dict(ENTRADA)))
         resposta = api.rota_recomendacao(dict(COM_NOTAS))
-        self.assertIsNone(resposta["entrada"].get("prioridades"))
-        self.assertEqual([p.get("nota") for p in resposta["prioridades"]], [None] * len(resposta["prioridades"]))
+        self.assertNotIn("prioridades", resposta["entrada"])
+        self.assertEqual([p for p in resposta["prioridades"] if "nota" in p], [])
+        self.assertNotIn("nota", resposta["destaque"])
         self.assertNotIn("nota", api.rota_mensagem(dict(COM_NOTAS))["texto"].lower())
         self.assertNotIn("prioridades", api.EXEMPLO)
 

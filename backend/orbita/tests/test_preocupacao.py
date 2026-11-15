@@ -22,9 +22,10 @@ def erro_de(entrada):
 class SemAsNotas(unittest.TestCase):
     def test_a_entrada_sem_notas_vale_e_sai_na_ordem_de_costume(self):
         self.assertEqual([p["id"] for p in RESPOSTA["prioridades"]], ["agua", "solo", "erosao", "renda"])
-        self.assertEqual([p["nota"] for p in RESPOSTA["prioridades"]], [None] * 4)
+        self.assertEqual([p for p in RESPOSTA["prioridades"] if "nota" in p], [])     # a chave `nota` saiu
         self.assertEqual(RESPOSTA["destaque"]["prioridade"], "agua")
-        self.assertIsNone(RESPOSTA["destaque"]["nota"])
+        self.assertNotIn("nota", RESPOSTA["destaque"])
+        self.assertNotIn("prioridades", RESPOSTA["entrada"])
         self.assertIsNone(RESPOSTA["preocupacao"])
         self.assertEqual(RESPOSTA["ordem_das_pernas"], ["agua", "calor", "terra"])
 
@@ -37,7 +38,7 @@ class SemAsNotas(unittest.TestCase):
     def test_notas_pela_metade_ou_fora_do_formato_sao_ignoradas(self):
         # Mudou em 2026-11-15 (decisão do dono: as notas de 1 a 5 saem): o motor não confere mais o campo.
         for notas in ({"agua": 5, "solo": 4, "renda": 2}, {"agua": 9, "solo": 4, "renda": 2, "erosao": 1}, [5, 4, 2, 3]):
-            self.assertIsNone(motor.validar_entrada(dict(SEM_NOTAS, prioridades=notas))["prioridades"])
+            self.assertNotIn("prioridades", motor.validar_entrada(dict(SEM_NOTAS, prioridades=notas)))
         self.assertEqual(ANTIGA, RESPOSTA)      # a resposta com notas é a mesma da resposta sem notas
 
     def test_os_textos_nao_falam_de_nota_e_todo_numero_esta_na_conta(self):

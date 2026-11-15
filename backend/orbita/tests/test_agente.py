@@ -677,8 +677,17 @@ class OQueOProdutorDisseForaDasListas(ComODuble):
     def test_sem_a_rotacao_parecida_o_programa_escolhe_e_o_dito_nao_leva_algarismo(self):
         estado, saida, _ = self.passo(None, "planto sorgo e milho em Jataí", fala("", SO_O_DITO))
         self.assertEqual((saida["ficha"]["rotacao_dita"], saida["ficha"]["rotacao_atual"]),
-                         ("sorgo e milho", ["soja", "milho", "pousio"]))      # empate: a primeira do cardápio
+                         ("sorgo e milho", ["soja", "sorgo", "pousio"]))      # a regra fixa: tem sorgo no que foi dito
         self.assertFalse(saida["ficha"]["falta"])
+
+    def test_a_rotacao_que_a_ia_escolher_para_a_dita_e_trocada_pela_da_regra_fixa(self):
+        da_ia = chamada("anotar_na_ficha", cidade_id="jatai", rotacao_dita="sorgo e milho",
+                        rotacao_atual="soja_milho_braquiaria", terra="media", preocupacao="agua")
+        estado, saida, modelo = self.passo(None, "planto sorgo e milho em Jataí", fala("", da_ia))
+        self.assertEqual((saida["ficha"]["rotacao_dita"], saida["ficha"]["rotacao_atual"]),
+                         ("sorgo e milho", ["soja", "sorgo", "pousio"]))
+        self.assertIn("soja → sorgo safrinha → pousio", saida["resposta"])
+        self.assertIn("quem escolhe a rotação da conta é o programa", modelo.pedidos[0][0][0]["texto"])
 
     def test_lugar_dito_sem_o_mais_proximo_vira_a_pergunta_de_qual_fica_mais_perto(self):
         estado, saida, _ = self.passo(None, "sou de Cristalina", fala("", chamada("anotar_na_ficha",

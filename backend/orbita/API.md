@@ -71,7 +71,7 @@ chegam pela rota `/agente` (a IA consulta e a resposta traz em `consultas` e em 
 | `terra` | quanta água a terra segura | `pouca`, `media` ou `muita`; sem ela, vale `media`. Arenosa é `pouca`, textura média é `media`, argilosa é `muita` |
 | `plantio_da_soja` | a data do plantio da soja (opcional) | ano-mês-dia, de 1 de setembro a 31 de dezembro (`"2026-11-20"`). O calendário inteiro anda junto com essa data |
 | `preocupacao` | o que mais preocupa (opcional) | `agua`, `calor` ou `terra`. Só muda a ordem e o destaque; nenhum número muda |
-| `prioridades` | as notas de 1 a 5: **saíram** (2026-11-15) | o campo ainda é aceito, venha o que vier nele, mas a API não o repassa ao motor; a resposta sai com `entrada.prioridades: null` e sem nota. Não mande |
+| `prioridades` | as notas de 1 a 5: **saíram** (2026-11-15) | o campo ainda é aceito, venha o que vier nele, mas a API não o repassa ao motor; a resposta sai sem a chave `entrada.prioridades` e sem a chave `nota` (na lista `prioridades` e no `destaque`). Não mande |
 
 A API aceita só esses 6 campos. A fonte da chuva e a regra dos anos, que o comando `perguntar` deixa trocar, não
 entram por aqui (vale o padrão do motor). O pedido de antes, com as notas, continua respondendo: as notas só não contam mais.
@@ -113,19 +113,19 @@ Sem a chave no ambiente, `ia_do_agente` sai `{"ligada": false, "modelo": null}`.
     curl -s -X POST http://127.0.0.1:8000/recomendacao -H 'Content-Type: application/json' \
       -d '{"cidade_id": "jatai", "rotacao_atual": ["soja", "sorgo"], "terra": "media", "plantio_da_soja": "2026-11-20", "preocupacao": "agua"}'
 
-A resposta é a mesma do `python3 -m orbita.perguntar ... --json` (103.261 bytes neste pedido). As chaves de cima e
+A resposta é a mesma do `python3 -m orbita.perguntar ... --json` (104.596 bytes neste pedido). As chaves de cima e
 alguns pedaços:
 
     {"aviso": "...", "pergunta": "...",
      "entrada": {"cidade_id": "jatai", "rotacao_atual": ["soja", "sorgo", "pousio"], "rotacao_id": "soja_sorgo_pousio",
-                 "prioridades": null, "terra": "media", "chuva": "imerg", "regra": "rendimento",
+                 "terra": "media", "chuva": "imerg", "regra": "rendimento",
                  "plantio_da_soja": "2026-11-20", "preocupacao": "agua"},
      "local": {...}, "clima": {...}, "terra": {...}, "calendario": {...},
      "rotacao_de_hoje": {"id": "soja_sorgo_pousio", "nome": "soja → sorgo safrinha → pousio (terra parada)",
                          "chave": "com_sorgo", "nota": "..."},
      "regra_dos_anos": {...}, "rotacoes": {"atual": {...}, "alternativa": {...}, "com_sorgo": {...}},
      "comparacao": {...}, "prioridades": [...], "preocupacao": ..., "ordem_das_pernas": ..., "sede_forte": {...},
-     "destaque": {"prioridade": "agua", "nome": "Água", "nota": null, "melhor": "atual",
+     "destaque": {"prioridade": "agua", "nome": "Água", "melhor": "atual",
                   "veredito_pela_faixa": "depende_da_hipotese"},
      "veredito": {"codigo": "depende", "frase": "...", "a_favor_da_troca": ["solo", "erosao"], "contra_a_troca": []},
      "safra_2025_26": {...}, "ndvi": {...}, "parametros": [...], "hipoteses": 30, "limites": [...],

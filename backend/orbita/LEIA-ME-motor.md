@@ -14,7 +14,7 @@ resposta de antes continua lendo igual.
 | o que | onde aparece | em uma linha |
 |---|---|---|
 | A data do plantio da soja | entrada `plantio_da_soja` ("2026-11-20") | opcional; o calendário inteiro anda junto com a data do produtor |
-| As notas de 1 a 5 saíram | entrada `prioridades` | o campo é aceito e ignorado (seção 13); a lista sai sempre com `nota: null` |
+| As notas de 1 a 5 saíram | entrada `prioridades` | o campo é aceito e ignorado (seção 13); a resposta sai sem `entrada.prioridades` e sem a chave `nota` |
 | O que mais preocupa | entrada `preocupacao` (`agua`, `calor` ou `terra`) | só muda a ordem e o destaque; nenhum número muda |
 | Mais duas cidades | entrada `cidade_id`: `rio_verde`, `jatai`, `silvania` | cada uma com o clima, a chuva e a colheita do IBGE do seu ponto |
 | O cardápio das rotações | entrada `rotacao_atual` | `["soja","milho","pousio"]`, `["soja","milho","braquiaria"]` ou `["soja","sorgo"]` |
@@ -411,9 +411,11 @@ outras em água, calor nem terra coberta."
 
 **As notas de 1 a 5 saíram do motor.** `motor.responder` ainda aceita a entrada que traz `prioridades` (as rotas
 antigas não quebram), mas ignora o campo: não confere as notas e não ordena por elas. A resposta é sempre a de sem
-notas: `entrada.prioridades` vazio, `prioridades[*].nota` vazio e a ordem de costume, com a preocupação na frente.
-Do texto (`explicacao.py`) saíram "(nota N)" e "DA MAIOR NOTA PARA A MENOR". Os 4 campos `entrada.prioridades.*`
-de `tests/campos_de_antes.json` são os únicos de antes que já não aparecem (o teste diz por quê).
+notas, na ordem de costume, com a preocupação na frente; e as chaves que ficavam vazias saíram da resposta:
+`entrada.prioridades`, `prioridades[*].nota` e `destaque.nota` (a lista `prioridades` continua, com `id`, `nome`,
+`melhor` e `medida`). Do texto (`explicacao.py`) saíram "(nota N)" e "DA MAIOR NOTA PARA A MENOR". Os 4 campos
+`entrada.prioridades.*`, o `prioridades.[].nota` e o `destaque.nota` de `tests/campos_de_antes.json` são os únicos
+de antes que já não aparecem (o teste diz por quê).
 
 Ficou na frase do aviso de sede "Não é previsão do tempo: a chuva que cair muda a conta.": é o sentido do "se não
 chover", não um limite do dado. Os testes novos: a classe `ALeituraDoProdutor` em `tests/test_comparacao.py`,
