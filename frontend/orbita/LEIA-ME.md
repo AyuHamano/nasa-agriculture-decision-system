@@ -30,6 +30,9 @@ pasta, e os dados estão em `dados/`.
   longa. O dia em que a sede começa (o marco `agua_acabou`; 04/04/2016) vem antes, como o aviso: etiqueta clara, frase
   menor e parada curta. No dia 24 a tela lembra quantos dias antes o aviso veio (a distância entre os dois marcos). Os
   dois dias saem da conta do motor; numa safra em que a água não acaba, o começo da sede segue como o marco forte.
+  A frase "Neste dia a água acabou." só aparece quando o marco `agua_no_fundo` vem com `situacao: "acabou"` (sobrou
+  até 0,1 mm). Com `perto_do_fundo` (a água ficou perto do fundo, sem acabar) ou `seca_no_plantio` (a terra já chegou
+  seca ao plantio), o marco leva o nome da situação e a frase que o motor escreveu, sem as três frases grandes.
 - **A leitura do agrônomo** (a aba "Agrônomo"): como a conta foi feita, com que valores, de onde eles vêm, as
   hipóteses e os limites. Dá para baixar a resposta completa do motor (o arquivo sai sem as antigas notas de
   prioridade, que não existem mais no produto).
@@ -37,7 +40,10 @@ pasta, e os dados estão em `dados/`.
 ## Os dois modos
 
 1. **Conversas guardadas** (o padrão): a tela lê `dados/conversas.js` e toca as conversas gravadas pelo agente. A
-   próxima fala do produtor aparece como um botão. Serve para a demonstração sem servidor.
+   próxima fala do produtor aparece como um botão. Serve para a demonstração sem servidor. São 4 conversas, todas de
+   Rio Verde (GO), o caso provado: uma do momento "antes", uma do "durante" (ela começa pelo "como está hoje", logo
+   depois da ficha, e só depois passa a pior safra dia a dia), uma do "depois" e uma de pragas e adubo, que sai com o
+   aviso de conhecimento geral.
 2. **Agente ao vivo:** abra a tela com o endereço da API no fim, por exemplo
    `index.html?api=http://127.0.0.1:8000`. O produtor escreve o que quiser, e a tela chama `POST /agente`, guarda o
    `estado` que volta e devolve na fala seguinte. Para ligar a API, de dentro de `backend/`:
@@ -50,24 +56,38 @@ guardadas. Pedido recusado pelo agente (a frase vem em `{"erro": ...}`) aparece 
 
 | arquivo | quem grava | o que traz |
 |---|---|---|
-| `dados/conversas.js` | o agente: `python3 -m orbita.exportar_conversas <esta pasta>/dados` (de dentro de `backend/`) | as conversas guardadas e o replay da safra (os dias e os marcos) |
+| `dados/conversas.js` | o agente. É a cópia, byte a byte, do `backend/orbita/conversas-guardadas/conversas.js` (o que o agente gravou com a IA de verdade e foi lido fala a fala) | as 4 conversas guardadas de Rio Verde e o replay da safra (os dias e os marcos) |
 | `dados/respostas.js` e `respostas.json` | o motor: `python3 -m orbita.exportar <esta pasta>/dados` (de dentro de `backend/`), como diz o cabeçalho do arquivo. O `gerar-dados.py` chama esse mesmo motor antes de gravar os outros dois | a resposta inteira do motor para os três tipos de solo (a leitura do agrônomo) |
 | `dados/complementos.js` e `validacao.js` | `python3 -B frontend/orbita/dados/gerar-dados.py` (da raiz do repositório) | o calendário do ano e a validação cruzada (o satélite contra a estação em terra e a colheita do IBGE) |
 
 Sem o `dados/conversas.js`, a tela abre, avisa que as conversas ainda não foram gravadas e mostra só a leitura do
-agrônomo. Nenhum número é escrito à mão nesta pasta. Depois de mudar o motor ou o agente, grave os dois de novo (os
-dois comandos da tabela), para a tela mostrar a conta de agora.
+agrônomo. Nenhum número é escrito à mão nesta pasta.
 
-As fontes dos dados: a chuva é do satélite GPM IMERG, da NASA; a temperatura, da NASA POWER; o verde da lavoura, do
+**Como gerar tudo de novo** (depois de mudar o motor ou o agente), da raiz do repositório:
+
+    python3 -B frontend/orbita/dados/gerar-dados.py        # respostas.js, respostas.json, complementos.js e validacao.js
+    cp backend/orbita/conversas-guardadas/conversas.js frontend/orbita/dados/conversas.js      # as conversas já gravadas
+
+Para gravar as conversas de novo (antes de copiar), de dentro de `backend/`:
+
+    python3 -m orbita.exportar_conversas orbita/conversas-guardadas            # com OPENROUTER_API_KEY no ambiente: a IA escreve
+    python3 -m orbita.exportar_conversas orbita/conversas-guardadas --sem-ia   # sem chave: as frases prontas do motor
+
+Conversa gravada com a IA precisa ser lida de novo, fala a fala, antes de ir à tela (o `LEIA-ME-agente.md` conta como).
+
+As fontes dos dados: a chuva é do GPM IMERG (a chuva medida por satélite da NASA); a temperatura, do NASA POWER (os
+dados de clima da NASA); o verde da lavoura, do
 satélite MODIS, da NASA; a conta da água segue o manual FAO-56; a colheita é do IBGE e a chuva medida em terra é da
 estação do INMET. O caminho de cada dado está em `data/orbita/`.
 
 ## Como a tela escreve números, datas e palavras
 
-- **Números:** o que a tela formata sai de um jeito só, nas duas leituras: casa decimal só quando o valor tem ("252 mm",
-  "168,1 mm"). As frases que vêm prontas dos dados aparecem como vêm.
+- **Números:** os milímetros saem sempre com uma casa decimal, do mesmo jeito que o motor escreve nas frases
+  ("252,0 mm", "168,1 mm"), nas duas leituras e no replay (onde a temperatura do dia também sai com uma casa). Dias
+  são números inteiros. A única exceção é o total da estação do INMET na validação, que o motor já entrega
+  arredondado em milímetros inteiros. As frases que vêm prontas dos dados aparecem como vêm.
 - **Datas:** no formato do Brasil (11/11/2026); na ficha, por extenso.
-- **Palavras:** os textos fixos explicam a palavra técnica na primeira vez (rotação, mm, IA) ou usam a palavra simples
+- **Palavras:** os textos fixos explicam a palavra técnica na primeira vez (rotação, mm, IA, GPM IMERG, NASA POWER) ou usam a palavra simples
   ("assistente" em vez de "agente", "a safra dia a dia" em vez de "replay").
 - **Letras e dedos:** nenhuma letra abaixo de 13 px; botões e a barra do dia da safra com 44 px ou mais de altura.
 

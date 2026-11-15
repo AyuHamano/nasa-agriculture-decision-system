@@ -140,6 +140,7 @@ var TEXTOS = {
       comSede: "Lavoura com sede", calorForte: "Calor forte",
       legenda: { chuva: "Chuva de cada dia", agua: "Água guardada na terra", sede: "Dias de sede", calor: "Dias de calor forte" },
       marcos: { plantio: "Plantio", agua_acabou: "Começa a sede", agua_no_fundo: "A água acabou", calor_forte: "Calor forte", colheita: "Colheita" },
+      fundo: { perto_do_fundo: "Água perto do fundo", seca_no_plantio: "Terra seca no plantio", outro: "Menor água do ciclo" },   // o marco agua_no_fundo quando a situação não é "acabou"
       comeco: "Toque para ver os dias passando.",
       sem: "A safra dia a dia aparece aqui quando a conversa guardada da safra 2015-16 for gravada."
     },
@@ -157,7 +158,7 @@ var TEXTOS = {
     },
     rodape: {
       lema: "Inteligência do espaço. Decisões para a terra.",
-      fontes: "De onde vêm os dados: a chuva é do satélite GPM IMERG, da NASA; a temperatura é da NASA POWER; o verde da lavoura é do satélite MODIS, da NASA. A conta da água segue o manual 56 da FAO, a agência da ONU para a agricultura. A colheita é do IBGE e a chuva medida em terra é da estação do INMET, o instituto de meteorologia do Brasil.",
+      fontes: "De onde vêm os dados: a chuva é do GPM IMERG (a chuva medida por satélite da NASA); a temperatura é do NASA POWER (os dados de clima da NASA); o verde da lavoura é do satélite MODIS, da NASA. A conta da água segue o manual 56 da FAO, a agência da ONU para a agricultura. A colheita é do IBGE e a chuva medida em terra é da estação do INMET, o instituto de meteorologia do Brasil.",
       ia: "Uso de inteligência artificial (IA): esta tela foi programada com apoio de IA (Claude). Na conversa, o texto do Órbita Rural é escrito por IA ou montado com frases prontas, e todo número é conferido com a conta antes de aparecer.",
       time: "Feito pela Equipe Agronautas no NASA Space Apps Challenge 2026. Ferramenta de apoio: converse com o agrônomo antes de decidir."
     }

@@ -8,16 +8,19 @@
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function ic(nome) { return window.ORBITA_ICONE ? window.ORBITA_ICONE(nome) : ""; }
   function fmt(x) { return typeof x !== "number" || !isFinite(x) ? "" : x.toLocaleString("pt-BR", { maximumFractionDigits: 1 }); }
+  // Os milímetros (e a temperatura do dia) saem sempre com uma casa, como o motor escreve nas frases: "252,0 mm".
+  function mm(x) { return typeof x !== "number" || !isFinite(x) ? "" : x.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 }); }
   function obj(x) { return x && typeof x === "object" && !Array.isArray(x) ? x : {}; }
   function lista(x) { return Array.isArray(x) ? x : []; }
 
-  // Um valor da comparação: número, faixa {de, ate} ou nada.
-  function valor(x) {
-    if (typeof x === "number" && isFinite(x)) return { tem: true, de: x, ate: x, faixa: false, texto: fmt(x) };
+  // Um valor da comparação: número, faixa {de, ate} ou nada. Com a unidade "mm", sai com uma casa sempre.
+  function valor(x, un) {
+    var f = un === "mm" ? mm : fmt;
+    if (typeof x === "number" && isFinite(x)) return { tem: true, de: x, ate: x, faixa: false, texto: f(x) };
     var o = obj(x);
     if (typeof o.de === "number" && typeof o.ate === "number") {
-      if (fmt(o.de) === fmt(o.ate)) return { tem: true, de: o.de, ate: o.ate, faixa: false, texto: fmt(o.de) };
-      return { tem: true, de: Math.min(o.de, o.ate), ate: Math.max(o.de, o.ate), faixa: true, texto: t("comparacao.faixa", { de: fmt(o.de), ate: fmt(o.ate) }) };
+      if (f(o.de) === f(o.ate)) return { tem: true, de: o.de, ate: o.ate, faixa: false, texto: f(o.de) };
+      return { tem: true, de: Math.min(o.de, o.ate), ate: Math.max(o.de, o.ate), faixa: true, texto: t("comparacao.faixa", { de: f(o.de), ate: f(o.ate) }) };
     }
     return { tem: false, de: null, ate: null, faixa: false, texto: t("comparacao.semMedida") };
   }
@@ -132,7 +135,7 @@
     return '<span class="barra" aria-hidden="true"><i style="width:' + a.toFixed(1) + '%"></i>' + (v.faixa ? '<b style="left:' + a.toFixed(1) + "%;width:" + (b - a).toFixed(1) + '%"></b>' : "") + "</span>";
   }
   function medida(r, m, maior, preocupacao, primeiraDoGrupo) {
-    var grupo = obj(r[m.de]), v = valor(grupo[m.chave]), extra = "";
+    var grupo = obj(r[m.de]), v = valor(grupo[m.chave], m.un), extra = "";
     if (m.grupo === "calor" && typeof grupo.limite_c === "number") {      // o limite é o da cultura mais sensível ao calor nesta rotação
       var cultura = grupo.cultura_do_limite ? nomeDaCultura(grupo.cultura_do_limite) : "";
       var hipotese = typeof grupo.etiqueta === "string" && /^hip/i.test(grupo.etiqueta);
@@ -159,8 +162,8 @@
     var grupos = rotacoes.map(function (r) {
       return "<tbody" + (r.de_hoje ? ' class="de-hoje"' : "") + '><tr class="nome"><th colspan="' + chaves.length + '" scope="rowgroup">' + (r.de_hoje ? '<span class="etiqueta">' + esc(t("comparacao.deHoje")) + "</span>" : "") + sequencia(r.nome, "curta") + "</th></tr><tr>" +
         chaves.map(function (c) {
-          var m = MEDIDAS.filter(function (x) { return x.chave === c; })[0], v = valor(obj(r[m.de])[c]);
-          var texto = v.faixa ? t("comparacao.faixaCurta", { de: fmt(v.de), ate: fmt(v.ate) }) : v.texto;
+          var m = MEDIDAS.filter(function (x) { return x.chave === c; })[0], v = valor(obj(r[m.de])[c], m.un), f = m.un === "mm" ? mm : fmt;
+          var texto = v.faixa ? t("comparacao.faixaCurta", { de: f(v.de), ate: f(v.ate) }) : v.texto;
           return "<td" + (v.tem ? (v.faixa ? ' class="faixa"' : "") : ' class="sem"') + ">" + esc(texto) + (v.tem ? " <small>" + esc(t("comparacao.unidades." + m.un)) + "</small>" : "") + "</td>";
         }).join("") + "</tr></tbody>";
     }).join("");
@@ -185,5 +188,5 @@
       '<aside class="agronomo-aviso">' + ic("pessoa") + "<div><h3>" + esc(aviso || t("comparacao.agronomo")) + "</h3><p>" + esc(t("comparacao.agronomoTexto")) + '</p><button class="botao" data-acao="abrir-agronomo">' + esc(t("comparacao.agronomoBotao")) + "</button></div></aside></section>";
   }
 
-  window.ORBITA_COMPARACAO = { ficha: ficha, comparacao: comparacao, sequencia: sequencia, falaDaCorrecao: falaDaCorrecao, esc: esc, fmt: fmt, dataPorExtenso: dataPorExtenso, dataBR: dataBR };
+  window.ORBITA_COMPARACAO = { ficha: ficha, comparacao: comparacao, sequencia: sequencia, falaDaCorrecao: falaDaCorrecao, esc: esc, fmt: fmt, mm: mm, dataPorExtenso: dataPorExtenso, dataBR: dataBR };
 })();

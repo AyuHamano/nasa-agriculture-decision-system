@@ -5,7 +5,7 @@
 (function () {
   "use strict";
 
-  var C = window.ORBITA_COMPARACAO, esc = C.esc, fmt = C.fmt;
+  var C = window.ORBITA_COMPARACAO, esc = C.esc, mm = C.mm;
   function ic(nome) { return window.ORBITA_ICONE ? window.ORBITA_ICONE(nome) : ""; }
   var MESES = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
   var MS_POR_DIA = 55, PARADA_MS = 900, PARADA_AVISO_MS = 1800, PARADA_FORTE_MS = 3600, JANELA_DIAS = 25, JANELA_FORTE_DIAS = 45;      // um ano inteiro com os marcos cabe em uns 30 segundos
@@ -59,7 +59,7 @@
     var n = dias.length, indice = {};
     dias.forEach(function (d, i) { indice[d.data] = i; });
     var marcos = (Array.isArray(replay.marcos) ? replay.marcos : []).filter(function (m) { return m && indice[m.data] !== undefined; })
-      .map(function (m) { return { i: indice[m.data], tipo: m.tipo, frase: m.frase || "", cultura: m.cultura || "", principal: m.principal === true, fundo: false }; }).sort(function (a, b) { return a.i - b.i; });
+      .map(function (m) { return { i: indice[m.data], tipo: m.tipo, frase: m.frase || "", cultura: m.cultura || "", situacao: m.situacao || "", principal: m.principal === true, fundo: false }; }).sort(function (a, b) { return a.i - b.i; });
     // No motor, "agua_acabou" é o dia em que a sede começa (a água fácil de tirar acabou) e "agua_no_fundo" é o dia
     // em que a água acaba de fato (o menor valor do ciclo, com a planta sem beber nada). A tela diz cada um pelo nome.
     // O marco principal: o que o motor marcou; sem essa marca, o único (ou o último) começo de sede.
@@ -68,9 +68,11 @@
       if (deAgua.length) deAgua[deAgua.length - 1].principal = true;
     }
     // O marco do pulso "a água acabou": o fundo da mesma cultura do marco principal, depois dele; sem marco
-    // principal, o último fundo. Se a água não acabou na safra, o motor não manda esse marco e o pulso não aparece.
+    // principal, o último fundo. Só vale o fundo em que o motor diz situacao "acabou" (sobrou até 0,1 mm). Quando a
+    // água ficou perto do fundo sem acabar ("perto_do_fundo") ou a terra já chegou seca ao plantio ("seca_no_plantio"),
+    // o marco é um marco comum: leva o nome da situação e a frase que veio do motor, sem o pulso.
     var doPrincipal = marcos.filter(function (m) { return m.principal; })[0] || null;
-    var fundos = marcos.filter(function (m) { return m.tipo === "agua_no_fundo" && (!doPrincipal || (m.cultura === doPrincipal.cultura && m.i >= doPrincipal.i)); });
+    var fundos = marcos.filter(function (m) { return m.tipo === "agua_no_fundo" && m.situacao === "acabou" && (!doPrincipal || (m.cultura === doPrincipal.cultura && m.i >= doPrincipal.i)); });
     if (fundos.length) fundos[doPrincipal ? 0 : fundos.length - 1].fundo = true;
     // O ponto alto é o dia em que a água acaba (o fundo): é ele que leva o destaque, o pulso inteiro e a parada longa.
     // O começo da sede é o aviso que veio antes: etiqueta clara, frase menor, parada curta. Numa safra em que a água
@@ -82,6 +84,10 @@
       var pct = 100 * (m.i + 0.5) / n;
       var nome = t("replay.marcos." + m.tipo);
       if (nome === "replay.marcos." + m.tipo) nome = m.tipo;
+      if (m.tipo === "agua_no_fundo" && m.situacao !== "acabou") {      // só diz "A água acabou" quando o motor diz que acabou
+        nome = t("replay.fundo." + m.situacao);
+        if (nome === "replay.fundo." + m.situacao) nome = t("replay.fundo.outro");
+      }
       if ((m.tipo === "plantio" || m.tipo === "colheita") && m.cultura) nome += ": " + nomeDaCultura(m.cultura);
       return '<span class="rp-marco m-' + esc(m.tipo) + (m.forte ? " principal" : "") + (m.aviso ? " aviso" : "") + '" data-marco="' + k + '" style="left:' + pct.toFixed(2) + '%"><b>' + esc(nome) + "</b></span>";
     }).join("");
@@ -137,8 +143,8 @@
       pecas.dia.textContent = p.dia.length < 2 ? "0" + p.dia : p.dia; pecas.mes.textContent = p.mes;      // dois algarismos sempre: a data não dança
       pecas.cultura.textContent = !d.cultura ? "" : d.cultura === "sem_planta" || d.cultura === "sem planta" ? t("replay.semPlanta") : nomeDaCultura(d.cultura) + " " + t("replay.naTerra");
       pecas.conta.textContent = t("replay.dia", { n: i + 1, total: n });
-      pecas.agua.textContent = fmt(d.agua_na_terra_mm); pecas.chuva.textContent = fmt(d.chuva_mm); pecas.falta.textContent = fmt(d.falta_mm);
-      if (pecas.tmax) pecas.tmax.textContent = fmt(d.tmax_c);
+      pecas.agua.textContent = mm(d.agua_na_terra_mm); pecas.chuva.textContent = mm(d.chuva_mm); pecas.falta.textContent = mm(d.falta_mm);      // uma casa sempre, como o motor escreve
+      if (pecas.tmax) pecas.tmax.textContent = mm(d.tmax_c);
       pecas.nivel.style.height = Math.max(0, Math.min(100, 100 * (d.agua_na_terra_mm || 0) / maiorAgua)).toFixed(1) + "%";
       pecas.sede.classList.toggle("aceso", !!d.com_sede); pecas.calor.classList.toggle("aceso", !!d.calor_forte);
       pecas.sede.setAttribute("aria-hidden", d.com_sede ? "false" : "true"); pecas.calor.setAttribute("aria-hidden", d.calor_forte ? "false" : "true");   // sinal apagado não é lido
@@ -150,7 +156,7 @@
       marcos.forEach(function (m, k) { var passou = m.i <= i; bandeirasEl[k].classList.toggle("passou", passou); if (passou) { ultimo = m; if (m.forte || m.aviso) principal = m; } });
       // A frase de um marco fica uns dias na tela e sai (não diz "neste dia" meses depois); no último dia volta a do fim.
       // No dia em que a sede começa e no dia em que a água acaba entra o pulso da demonstração (frases sem número),
-      // com a frase da conta embaixo. "Neste dia a água acabou" só aparece no marco do fundo, que sai da conta.
+      // com a frase da conta embaixo. "Neste dia a água acabou" só aparece no marco do fundo com situacao "acabou".
       var recente = !!ultimo && (i - ultimo.i <= JANELA_DIAS || i === n - 1);
       var pulso = st.comecou && !!principal && i - principal.i <= JANELA_FORTE_DIAS;
       var texto = !st.comecou ? t("replay.comeco") : pulso ? (recente ? ultimo.frase : principal.frase) : recente ? ultimo.frase : "";

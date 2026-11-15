@@ -9,6 +9,7 @@
   function dataBR(x) { return window.ORBITA_COMPARACAO.dataBR(x); }
   function int(x) { return num(x, 0); }
   function um(x) { return num(x, 1); }
+  function mm(x) { return typeof x !== "number" ? "—" : x.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 }); }      // milímetros: uma casa sempre, como o motor escreve ("252,0 mm")
   function icone(nome) { return window.ORBITA_ICONE ? window.ORBITA_ICONE(nome) : ""; }
   function e(lista) { lista = lista.slice(); return lista.length < 2 ? lista.join("") : lista.slice(0, -1).join(", ") + " e " + lista[lista.length - 1]; }
 
@@ -51,14 +52,14 @@
     var m = TEXTOS.pt.agro.metodo, extras = [
       "", t("agro.metodo.kc", { soja: [v.valorDe("culturas.soja.kc_ini"), v.valorDe("culturas.soja.kc_meio"), v.valorDe("culturas.soja.kc_fim")].map(function (x) { return num(x, 2); }).join(" · "),
                                milho: [v.valorDe("culturas.milho_2a_safra.kc_ini"), v.valorDe("culturas.milho_2a_safra.kc_meio"), v.valorDe("culturas.milho_2a_safra.kc_fim")].map(function (x) { return num(x, 2); }).join(" · ") }),
-      t("agro.metodo.caixa", { soja: um(v.terra.soja), milho: um(v.terra.milho) }), t("agro.metodo.p", { soja: num(v.valorDe("culturas.soja.p"), 2), milho: num(v.valorDe("culturas.milho_2a_safra.p"), 2) }),
+      t("agro.metodo.caixa", { soja: mm(v.terra.soja), milho: mm(v.terra.milho) }), t("agro.metodo.p", { soja: num(v.valorDe("culturas.soja.p"), 2), milho: num(v.valorDe("culturas.milho_2a_safra.p"), 2) }),
       v.sedeForte ? t("agro.metodo.forte", { nivel: um(v.sedeForte.nivel) }) : ""];
     var passos = m.passos.map(function (p, i) {
       return '<div class="method-step"><b class="n">' + (i + 1) + "</b><h3>" + esc(p.nome) + "</h3><p>" + esc(p.texto) + "</p>" + (extras[i] ? '<span class="ref"><code>' + esc(extras[i]) + "</code></span>" : "") + '<span class="ref">' + esc(p.ref) + "</span></div>";
     }).join("");
-    var terra = '<div class="kv" style="margin-top:14px"><div><small>' + esc(t("agro.terra.classe")) + "</small><strong>" + esc(v.terra.classe) + "</strong></div><div><small>" + esc(t("agro.terra.porMetro")) + "</small><strong>" + um(v.terra.porMetro) +
-                " mm</strong></div><div><small>" + esc(t("agro.terra.raizSoja")) + "</small><strong>" + um(v.terra.soja) + " mm</strong><span>" + num(v.terra.raizSoja, 1) + " " + esc(t("agro.terra.m")) + "</span></div><div><small>" +
-                esc(t("agro.terra.raizMilho")) + "</small><strong>" + um(v.terra.milho) + " mm</strong><span>" + num(v.terra.raizMilho, 1) + " " + esc(t("agro.terra.m")) + "</span></div></div>";
+    var terra = '<div class="kv" style="margin-top:14px"><div><small>' + esc(t("agro.terra.classe")) + "</small><strong>" + esc(v.terra.classe) + "</strong></div><div><small>" + esc(t("agro.terra.porMetro")) + "</small><strong>" + mm(v.terra.porMetro) +
+                " mm</strong></div><div><small>" + esc(t("agro.terra.raizSoja")) + "</small><strong>" + mm(v.terra.soja) + " mm</strong><span>" + num(v.terra.raizSoja, 1) + " " + esc(t("agro.terra.m")) + "</span></div><div><small>" +
+                esc(t("agro.terra.raizMilho")) + "</small><strong>" + mm(v.terra.milho) + " mm</strong><span>" + num(v.terra.raizMilho, 1) + " " + esc(t("agro.terra.m")) + "</span></div></div>";
     return painel(m.titulo, t("agro.metodo.sub", { de: dataBR(v.clima.primeiroDia), ate: dataBR(v.clima.ultimoDia) }), '<div class="method">' + passos + "</div>" + terra);
   }
   function faixaEPalha(v) {
@@ -69,13 +70,13 @@
       var normal = pf.normal ? pf.normal.cenarios : [];
       var linhas = pf.cenarios.map(function (c, i) {
         var info = d ? d.cenarios.filter(function (x) { return x.id === c.id; })[0] : null, n = normal[i] || {};
-        return "<tr><td><strong>" + esc(t("agro.faixa.cenarios." + c.id)) + '</strong></td><td class="num">' + (info ? "+" + um(info.pedidoAMais) + "%" : "—") + '</td><td class="num sep">' + um(c.falta) + '</td><td class="num">' + (c.diferenca > 0 ? "+" : "") + um(c.diferenca) +
-               "</td><td>" + esc(t("agro.faixa.classes." + c.classe)) + '</td><td class="num sep">' + um(n.falta) + '</td><td class="num">' + (n.diferenca > 0 ? "+" : "") + um(n.diferenca) + "</td><td>" + esc(n.classe ? t("agro.faixa.classes." + n.classe) : "—") + "</td></tr>";
+        return "<tr><td><strong>" + esc(t("agro.faixa.cenarios." + c.id)) + '</strong></td><td class="num">' + (info ? "+" + um(info.pedidoAMais) + "%" : "—") + '</td><td class="num sep">' + mm(c.falta) + '</td><td class="num">' + (c.diferenca > 0 ? "+" : "") + mm(c.diferenca) +
+               "</td><td>" + esc(t("agro.faixa.classes." + c.classe)) + '</td><td class="num sep">' + mm(n.falta) + '</td><td class="num">' + (n.diferenca > 0 ? "+" : "") + mm(n.diferenca) + "</td><td>" + esc(n.classe ? t("agro.faixa.classes." + n.classe) : "—") + "</td></tr>";
       }).join("");
       var c = TEXTOS.pt.agro.faixa.colunas;
       corpo += tabela("<tr><th></th><th></th><th class='grp sep' colspan='3'>" + esc(t("agro.faixa.pior", { safra: pf.safra })) + "</th><th class='grp sep' colspan='3'>" + esc(t("agro.faixa.normal", { safra: pf.normal ? pf.normal.safra : "" })) +
                       "</th></tr><tr><th>" + esc(c[0]) + '</th><th class="num">' + esc(c[1]) + '</th><th class="num sep">' + esc(c[2]) + '</th><th class="num">' + esc(c[3]) + "</th><th>" + esc(c[4]) + '</th><th class="num sep">' + esc(c[2]) + '</th><th class="num">' + esc(c[3]) + "</th><th>" + esc(c[4]) + "</th></tr>", linhas) +
-               '<p class="note">' + esc(t("agro.faixa.hoje", { mm: um(pf.faltaHoje), empate: um(pf.empate) })) + " <b>" + esc(pf.frase) + "</b></p>";
+               '<p class="note">' + esc(t("agro.faixa.hoje", { mm: mm(pf.faltaHoje), empate: mm(pf.empate) })) + " <b>" + esc(pf.frase) + "</b></p>";
     }
     ["atual", "alternativa"].forEach(function (rot) {
       var p = v.palha[rot]; if (!p) return;
@@ -104,21 +105,21 @@
   }
   function safraPorSafra(v) {
     var c = TEXTOS.pt.agro.safras.colunas, forte = v.sedeForte;
-    function mmPct(x) { return um(x.falta) + " (" + um(x.faltaPct) + "%)"; }
+    function mmPct(x) { return mm(x.falta) + " (" + um(x.faltaPct) + "%)"; }
     function linha(s, classe, marca) {
       var h = s.atual, a = s.alternativa, fh = forte && forte.atual && forte.atual.quais.indexOf(s.safra) >= 0, fa = forte && forte.alternativa && forte.alternativa.quais.indexOf(s.safra) >= 0;
       var fx = a.faixa && a.faixa.milhoPct ? um(a.faixa.milhoPct.menor) + " a " + um(a.faixa.milhoPct.maior) + "%" : "—";
-      return '<tr class="' + classe + '"><td><strong>' + esc(s.safra) + "</strong>" + (marca ? " <small>" + esc(marca) + "</small>" : "") + '</td><td class="num">' + um(s.chuvaJanela) + '</td><td class="num">' + int(s.rendimento) +
-        '</td><td class="num sep">' + mmPct(h.soja) + '</td><td class="num">' + mmPct(h.milho) + (fh ? " ●" : "") + '</td><td class="num">' + int(h.total.diasDeSede) + '</td><td class="num">' + um(h.aguaNoPlantio) +
-        '</td><td class="num sep">' + mmPct(a.soja) + '</td><td class="num">' + mmPct(a.milho) + (fa ? " ●" : "") + '</td><td class="num">' + fx + '</td><td class="num">' + int(a.total.diasDeSede) + '</td><td class="num">' + um(a.aguaNoPlantio) + '</td><td class="num">' + um(a.capimBebeu) + "</td></tr>";
+      return '<tr class="' + classe + '"><td><strong>' + esc(s.safra) + "</strong>" + (marca ? " <small>" + esc(marca) + "</small>" : "") + '</td><td class="num">' + mm(s.chuvaJanela) + '</td><td class="num">' + int(s.rendimento) +
+        '</td><td class="num sep">' + mmPct(h.soja) + '</td><td class="num">' + mmPct(h.milho) + (fh ? " ●" : "") + '</td><td class="num">' + int(h.total.diasDeSede) + '</td><td class="num">' + mm(h.aguaNoPlantio) +
+        '</td><td class="num sep">' + mmPct(a.soja) + '</td><td class="num">' + mmPct(a.milho) + (fa ? " ●" : "") + '</td><td class="num">' + fx + '</td><td class="num">' + int(a.total.diasDeSede) + '</td><td class="num">' + mm(a.aguaNoPlantio) + '</td><td class="num">' + mm(a.capimBebeu) + "</td></tr>";
     }
     var linhas = v.safras.map(function (n) { var s = v.porSafra[n]; return linha(s, n === v.anos.pior ? "hl-pior" : n === v.anos.normal ? "hl-normal" : "", n === v.anos.pior ? t("agro.safras.pior") : n === v.anos.normal ? t("agro.safras.normal") : ""); }).join("");
     if (v.aParte) linhas += linha({ safra: v.aParte.safra, chuvaJanela: v.aParte.chuvaJanela, rendimento: null, atual: v.aParte.atual, alternativa: v.aParte.alternativa }, "apart", t("agro.safras.aParte"));
     var cabeca = '<tr><th colspan="3"></th><th class="grp hoje sep" colspan="4">' + esc(t("agro.safras.hoje")) + '</th><th class="grp alt sep" colspan="6">' + esc(t("agro.safras.alt")) + "</th></tr><tr><th>" + esc(c.safra) + '</th><th class="num">' + esc(c.chuva) + '</th><th class="num">' + esc(c.ibge) +
       '</th><th class="num sep">' + esc(c.soja) + '</th><th class="num">' + esc(c.milho) + '</th><th class="num">' + esc(c.sede) + '</th><th class="num">' + esc(c.plantio) + '</th><th class="num sep">' + esc(c.soja) + '</th><th class="num">' + esc(c.milho) + '</th><th class="num">' + esc(c.faixa) +
       '</th><th class="num">' + esc(c.sede) + '</th><th class="num">' + esc(c.plantio) + '</th><th class="num">' + esc(c.capim) + "</th></tr>";
-    var so = v.soma, notas = '<p class="note">' + esc(t("agro.safras.soma", { total: v.safras.length, sojaHoje: um(so.atual.soja), sojaAlt: um(so.alternativa.soja), milhoHoje: um(so.atual.milho), milhoAlt: um(so.alternativa.milho), sedeHoje: int(so.atual.diasDeSede), sedeAlt: int(so.alternativa.diasDeSede) })) +
-      (so.faixaDaAlternativa.milho ? " " + esc(t("agro.safras.somaFaixa", { a: um(so.faixaDaAlternativa.milho.menor), b: um(so.faixaDaAlternativa.milho.maior) })) : "") + "</p>";
+    var so = v.soma, notas = '<p class="note">' + esc(t("agro.safras.soma", { total: v.safras.length, sojaHoje: mm(so.atual.soja), sojaAlt: mm(so.alternativa.soja), milhoHoje: mm(so.atual.milho), milhoAlt: mm(so.alternativa.milho), sedeHoje: int(so.atual.diasDeSede), sedeAlt: int(so.alternativa.diasDeSede) })) +
+      (so.faixaDaAlternativa.milho ? " " + esc(t("agro.safras.somaFaixa", { a: mm(so.faixaDaAlternativa.milho.menor), b: mm(so.faixaDaAlternativa.milho.maior) })) : "") + "</p>";
     if (forte && forte.atual) {
       var fa2 = forte.alternativa || {};
       notas += '<p class="note"><b>● ' + esc(t("agro.safras.forteTitulo")) + ":</b> " + esc(forte.oQueE) + ". " + esc(t("agro.safras.forte", { nivel: um(forte.nivel), quebra: forte.quebra, quebras: e(forte.safrasDeQuebra), hoje: forte.atual.quantas, hojeQuais: e(forte.atual.quais) || "—",
