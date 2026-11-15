@@ -29,6 +29,7 @@ TERRAS = ("pouca", "media", "muita")
 ORDEM_DE_DESEMPATE = ("agua", "solo", "erosao", "renda")
 NOMES = {"agua": "Água", "solo": "Solo", "erosao": "Erosão", "renda": "Renda", "calor": "Calor"}
 PREOCUPACOES = ("agua", "calor", "terra")       # o que mais preocupa o produtor: só muda a ordem e o destaque
+AVISO_DO_PRODUTOR = "Converse com o agrônomo antes de decidir."     # a linha curta de todo aviso que o produtor lê
 PERNAS = ("agua", "calor", "terra")             # as três pernas do projeto, na ordem de costume
 NA_FRENTE = {"agua": ("agua",), "terra": ("solo", "erosao"), "calor": ()}   # a preocupação nas prioridades antigas
 NAO_MEDIDO = "não medido"
@@ -100,19 +101,8 @@ def validar_entrada(entrada):
         do_cardapio = rotacoes.achar_rotacao(rotacao)
         if do_cardapio is None:
             problemas.append(f"rotacao_atual {rotacao!r} ainda não existe: o motor conhece {cardapio}")
-    notas = entrada.get("prioridades")
-    if notas is None:
-        pass    # as notas de 1 a 5 saíram (decisão do dono, 2026-11-14): sem elas, vale a ordem de costume
-    elif not isinstance(notas, dict):
-        problemas.append("as prioridades, quando vêm, são as 4 notas (agua, solo, renda e erosao, cada uma de 1 a "
-                         "5); sem notas, não mande o campo")
-    else:
-        for nome in ("agua", "solo", "renda", "erosao"):
-            nota = notas.get(nome)
-            if nota is None:
-                problemas.append(f"falta a nota de {nome} em prioridades (de 1 a 5)")
-            elif isinstance(nota, bool) or not isinstance(nota, int) or not 1 <= nota <= 5:
-                problemas.append(f"a nota de {nome} tem de ser um número inteiro de 1 a 5 (veio {nota!r})")
+    # As notas de 1 a 5 saíram do motor (decisão do dono, 2026-11-15: "tira isso"). A entrada que ainda traz
+    # `prioridades` é aceita, para as rotas antigas não quebrarem, mas o campo é ignorado: não se confere nem se usa.
     terra = entrada.get("terra") or "media"
     if terra not in TERRAS:
         problemas.append(f'terra "{terra}" não existe: use pouca, media ou muita (quanta água a terra segura)')
@@ -144,7 +134,7 @@ def validar_entrada(entrada):
     if problemas:
         raise ValueError("Entrada fora do formato: " + "; ".join(problemas) + ".")
     return {"cidade_id": cidade, "rotacao_atual": list(do_cardapio["culturas"]), "rotacao_id": do_cardapio["id"],
-            "prioridades": None if notas is None else {nome: notas[nome] for nome in ("agua", "solo", "renda", "erosao")},
+            "prioridades": None,     # o campo de antes fica, sempre vazio: as notas saíram (2026-11-15)
             "terra": terra, "chuva": chuva, "regra": regra, "plantio_da_soja": plantio, "preocupacao": preocupacao}
 
 
@@ -966,18 +956,15 @@ def responder(entrada, par=None, dias=None, rendimentos=None):
     dias_alternativa = calendario["alternativa"]["dias_sem_planta_viva"]
     solo = "empate" if dias_hoje == dias_alternativa else ("alternativa" if dias_alternativa < dias_hoje else "atual")
     melhores = {"agua": comparacao_da_agua["melhor"], "solo": solo, "erosao": solo, "renda": NAO_MEDIDO}
-    notas = entrada["prioridades"]
+    # Sem notas (elas saíram em 2026-11-15): a ordem de costume, com a preocupação do produtor na frente.
     na_frente = NA_FRENTE.get(entrada["preocupacao"], ())
-    if notas is None:       # sem as notas: a ordem de costume, com a preocupação do produtor na frente
-        ordem = list(na_frente) + [p for p in ORDEM_DE_DESEMPATE if p not in na_frente]
-    else:                   # com as notas, como antes: a maior nota primeiro (a preocupação só desempata)
-        ordem = sorted(ORDEM_DE_DESEMPATE, key=lambda p: (-notas[p], p not in na_frente))
+    ordem = list(na_frente) + [p for p in ORDEM_DE_DESEMPATE if p not in na_frente]
     medidas = {"agua": "a falta de água da soja e do milho no pior ano, com a alternativa em faixa (a disputa do "
                        "capim com o milho), e as safras de sede forte",
                "solo": "os dias do ano sem planta viva na terra (o mesmo número da erosão)",
                "erosao": "os dias do ano sem planta viva na terra (o mesmo número do solo)",
                "renda": "não medido: o motor não tem preço, custo nem produtividade"}
-    prioridades = [{"id": p, "nome": NOMES[p], "nota": None if notas is None else notas[p], "melhor": melhores[p],
+    prioridades = [{"id": p, "nome": NOMES[p], "nota": None, "melhor": melhores[p],
                     "medida": medidas[p]} for p in ordem]
     for p in prioridades:
         if p["id"] == "agua":
@@ -986,7 +973,7 @@ def responder(entrada, par=None, dias=None, rendimentos=None):
     safras_do_calor = balanco.SAFRAS_DO_ESTUDO + (SAFRA_A_PARTE,)
     bloco_do_calor = calor.bloco(dias, cal, par, safras_do_calor, pior, normal, {
         rotacao["id"]: ["soja", rotacao["segunda"]] for chave, rotacao in rotacoes.ROTACOES.items() if chave in rot})
-    if notas is None and entrada["preocupacao"] == "calor":    # a preocupação é o calor: ele vira o destaque
+    if entrada["preocupacao"] == "calor":    # a preocupação é o calor: ele vira o destaque
         por_rotacao = bloco_do_calor["por_rotacao"]
         compara = quem_ganha(por_rotacao["soja_milho_braquiaria"]["dias_no_pior_ano"],
                              por_rotacao["soja_milho_pousio"]["dias_no_pior_ano"], 1)
@@ -1012,7 +999,7 @@ def responder(entrada, par=None, dias=None, rendimentos=None):
         aviso_a_parte = ("a conferir: é a safra mais recente, com o dado ainda provisório; fica fora das 10 e fora "
                          "da regra dos anos")
     resposta = {
-        "aviso": "Motor provisório, sem site. Não é recomendação agronômica: valide com o agrônomo.",
+        "aviso": AVISO_DO_PRODUTOR,
         "pergunta": "Com o clima que a NASA registrou na minha região, vale trocar a minha rotação de hoje por outra?",
         "entrada": entrada,
         "local": dict(cidade, id=entrada["cidade_id"]),

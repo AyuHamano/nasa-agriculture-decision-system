@@ -171,7 +171,11 @@ class Faixa(unittest.TestCase):
                 agora.add(".".join(caminho))
 
         anda(RESPOSTA, [])
-        self.assertEqual([campo for campo in antigos["campos"] if campo not in agora], [])
+        # As 4 notas de entrada.prioridades saíram do motor (decisão do dono, 2026-11-15: "tira isso"): o campo
+        # entrada.prioridades continua na resposta, sempre vazio. Nenhum outro campo de antes saiu.
+        self.assertIsNone(RESPOSTA["entrada"]["prioridades"])
+        self.assertEqual([campo for campo in antigos["campos"]
+                          if campo not in agora and not campo.startswith("entrada.prioridades.")], [])
         for p in RESPOSTA["prioridades"]:   # o vocabulário antigo do campo "melhor" continua o mesmo
             self.assertIn(p["melhor"], ("atual", "alternativa", "empate", "não medido"))
 
@@ -365,9 +369,10 @@ class MensagemCurta(unittest.TestCase):
 
     def test_a_mensagem_diz_o_veredito_pela_faixa_e_cabe_no_limite(self):
         from orbita import mensagem
-        palavras = {"alternativa_melhor": "Água (nota 5): a alternativa se saiu melhor.",
-                    "alternativa_pior": "Água (nota 5): a alternativa se saiu pior.", "empate": "Água (nota 5): empate.",
-                    "depende_da_hipotese": "Água (nota 5): depende da hipótese"}
+        # Sem "(nota 5)" desde 2026-11-15: as notas de 1 a 5 saíram do motor (decisão do dono).
+        palavras = {"alternativa_melhor": "Água: a alternativa se saiu melhor.",
+                    "alternativa_pior": "Água: a alternativa se saiu pior.", "empate": "Água: empate.",
+                    "depende_da_hipotese": "Água: depende da hipótese"}
         for terra in ("pouca", "media", "muita"):
             r = motor.responder(dict(ENTRADA, terra=terra))
             texto = mensagem.texto(r)

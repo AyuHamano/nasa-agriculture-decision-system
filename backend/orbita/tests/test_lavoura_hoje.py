@@ -110,8 +110,9 @@ class OPainel(unittest.TestCase):
 
     def test_o_como_esta_hoje_continua_com_os_campos_de_sempre(self):
         # Nenhum campo de antes saiu; os 4 a mais entraram quando a conta passou a seguir até o último dia de chuva.
+        # Em 2026-11-15 (a leitura do produtor) entraram mais 2: aviso_tecnico e detalhe_tecnico.
         novos = ["ultimo_dia_com_temperatura", "dias_com_o_consumo_estimado", "consumo_estimado_desde",
-                 "janela_do_consumo_dias"]
+                 "janela_do_consumo_dias", "aviso_tecnico", "detalhe_tecnico"]
         self.assertEqual(sorted(RETRATO), sorted(novos + [
             "disponivel", "local", "rotacao", "terra", "plantio_da_soja_informado", "hoje", "ultimo_dia_com_dado",
             "ultimo_dia_com_dado_de", "atraso_dias", "safra", "o_que_esta_na_terra", "agua_na_terra_mm",
@@ -221,7 +222,10 @@ class OCalor(unittest.TestCase):
         self.assertEqual(guardadas["desde_o_plantio"]["valor_do_meio"], statistics.median(na_mao))
         # O calor só conta até o último dia com temperatura medida, e diz a data dele (a conta da água vai além).
         self.assertEqual(item["ultimo_dado"]["data"], ULTIMO_COM_TEMPERATURA.isoformat())
-        self.assertIn(f"até {lavoura.data_br(ULTIMO_COM_TEMPERATURA)}, o último dia com temperatura medida", item["frase"])
+        # Desde 2026-11-15 a frase leva só a data; de qual dado ela é fica no detalhe técnico.
+        self.assertIn(f"até {lavoura.data_br(ULTIMO_COM_TEMPERATURA)}, ", item["frase"])
+        self.assertEqual(item["detalhe_tecnico"],
+                         f"{lavoura.data_br(ULTIMO_COM_TEMPERATURA)} é o último dia com temperatura medida.")
         self.assertLessEqual(item["dia_da_maxima"], ULTIMO_COM_TEMPERATURA.isoformat())
 
     def test_a_regra_da_situacao_do_calor(self):
@@ -284,7 +288,7 @@ class OVerde(unittest.TestCase):
             self.assertGreaterEqual(len(item["outros_anos"]["anos"]), 3, cidade)
             self.assertNotIn(2026, item["outros_anos"]["anos"])
             self.assertIn("16/10/2026", item["frase"])
-            self.assertIn("não é a sua lavoura", item["frase"])
+            self.assertIn("não é a sua lavoura", item["detalhe_tecnico"])    # saiu da frase em 2026-11-15
         with tempfile.TemporaryDirectory() as pasta:
             sem = lavoura.lavoura_hoje(ENTRADA, hoje=DIA_DO_TESTE, pasta_do_verde=pathlib.Path(pasta))
         item = {i["id"]: i for i in sem["itens"]}["verde"]
@@ -373,7 +377,7 @@ class OAvisoDeSede(unittest.TestCase):
                          (ULTIMO_COM_TEMPERATURA.isoformat(), 7))
         if PAINEL["dias_com_o_consumo_estimado"]:
             self.assertEqual(agua["consumo_estimado_desde"], (ULTIMO_COM_TEMPERATURA + UM_DIA).isoformat())
-            self.assertIn("o consumo da cultura é o do tempo dos 7 dias anteriores", agua["frase"])
+            self.assertIn("o consumo da cultura é o do tempo dos 7 dias anteriores", agua["detalhe_tecnico"])
             entrada = motor.validar_entrada(ENTRADA)
             contas = hoje.contas_de_hoje(entrada, PAR, hoje.ler_chuva_recente("rio_verde")[0], DIA_DO_TESTE)
             recente = hoje.ler_chuva_recente("rio_verde")[0]
@@ -438,6 +442,44 @@ class ALinhaDeComandoEARota(unittest.TestCase):
             servidor.server_close()
         self.assertEqual([i["id"] for i in corpo["itens"]], list(lavoura.ITENS))
         self.assertEqual(corpo["local"]["id"], "rio_verde")
+
+
+class ALeituraDoProdutor(unittest.TestCase):
+    """A rodada do alinhamento (decisão do dono, 2026-11-15): as frases do produtor levam só a data do dado, sem
+    tratar a data como defeito nem explicar limite; o que saiu fica em `detalhe_tecnico` e `aviso_tecnico`."""
+    PROIBIDOS = ("aproximad", "com atraso", "atraso", "ainda não entrou", "ainda não entraram", "ainda não chegou",
+                 "último dia com dado", "último dado", "dia desta consulta", "temperatura medida",
+                 "não é a sua lavoura", "com o tempo dos últimos")
+
+    def test_nenhuma_frase_do_produtor_trata_a_data_como_defeito(self):
+        for cidade in motor.CIDADES:
+            for rotacao in (["soja", "milho", "pousio"], ["soja", "milho", "braquiaria"], ["soja", "sorgo"]):
+                painel = motor.lavoura_hoje({"cidade_id": cidade, "rotacao_atual": rotacao}, hoje=DIA_DO_TESTE)
+                frases = [painel["frase"], painel["aviso"]] + [item["frase"] for item in painel["itens"]]
+                for frase in frases:
+                    for termo in self.PROIBIDOS:
+                        self.assertNotIn(termo, frase, (cidade, rotacao, termo))
+                for item in painel["itens"]:
+                    self.assertTrue(item["detalhe_tecnico"].strip(), (cidade, item["id"]))
+                    self.assertEqual(conferencia.conferir_texto(item["detalhe_tecnico"], item), [], (cidade, item["id"]))
+
+    def test_o_aviso_do_topo_e_a_linha_curta_e_o_longo_vai_ao_aviso_tecnico(self):
+        self.assertEqual(PAINEL["aviso"], "Converse com o agrônomo antes de decidir.")
+        self.assertEqual(PAINEL["aviso_tecnico"], lavoura.AVISO)
+        self.assertIn("último dia com dado", PAINEL["detalhe_tecnico"])
+        self.assertEqual(PAINEL["frase"].count(lavoura.data_br(ULTIMO)), 1)
+
+    def test_a_frase_da_agua_leva_so_a_data_e_o_resto_fica_no_detalhe(self):
+        agua = ITENS["agua"]
+        self.assertTrue(agua["frase"].startswith(f"Em {lavoura.data_br(ULTIMO)}, a conta dava "))
+        self.assertTrue(agua["frase"].endswith(" mm."))
+        self.assertIn(f"A chuva do satélite já guardada vai até {lavoura.data_br(agua['chuva_do_satelite_ate'])}.",
+                      agua["detalhe_tecnico"])
+        aviso = ITENS["aviso_de_sede"]
+        self.assertIn("A conta segue a água da terra para a frente com o tempo dos últimos 7 dias com temperatura",
+                      aviso["detalhe_tecnico"])
+        if ITENS["fase"]["no_dia_da_consulta"] and DIA_DO_TESTE != ULTIMO:
+            self.assertIn(f"No dia desta consulta ({lavoura.data_br(DIA_DO_TESTE)})", ITENS["fase"]["detalhe_tecnico"])
 
 
 if __name__ == "__main__":

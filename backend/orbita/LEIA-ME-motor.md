@@ -14,7 +14,7 @@ resposta de antes continua lendo igual.
 | o que | onde aparece | em uma linha |
 |---|---|---|
 | A data do plantio da soja | entrada `plantio_da_soja` ("2026-11-20") | opcional; o calendário inteiro anda junto com a data do produtor |
-| As notas de 1 a 5 saíram | entrada `prioridades` | virou opcional; sem ela, a lista sai com `nota: null` |
+| As notas de 1 a 5 saíram | entrada `prioridades` | o campo é aceito e ignorado (seção 13); a lista sai sempre com `nota: null` |
 | O que mais preocupa | entrada `preocupacao` (`agua`, `calor` ou `terra`) | só muda a ordem e o destaque; nenhum número muda |
 | Mais duas cidades | entrada `cidade_id`: `rio_verde`, `jatai`, `silvania` | cada uma com o clima, a chuva e a colheita do IBGE do seu ponto |
 | O cardápio das rotações | entrada `rotacao_atual` | `["soja","milho","pousio"]`, `["soja","milho","braquiaria"]` ou `["soja","sorgo"]` |
@@ -106,7 +106,7 @@ comparação das rotações, e agora cada um diz de onde vem:
 ## 2. Como rodar
 De dentro de `backend/`:
 ```bash
-python3 -m unittest                                   # 491 testes (os 227 de antes e os novos)
+python3 -m unittest                                   # 522 testes (os 227 de antes e os novos)
 python3 -m orbita.perguntar --cidade jatai --rotacao soja,sorgo --plantio 2026-11-20   # 3 rotações comparadas
 python3 -m orbita.perguntar --cidade jatai --rotacao soja,sorgo --plantio 20/11        # entrada errada: a frase, saída 2
 python3 -m orbita.perguntar --cidade silvania --lugar          # os fatos do clima do lugar
@@ -325,8 +325,8 @@ que resume e a `situacao`, que é a pior dos itens.
 - O teste é `tests/test_lavoura_hoje.py`, com o "hoje" fixo em 2026-11-15 e só com os dados guardados.
 - O verde não foi atualizado: em 2026-11-15, 08h10, o espelho (Planetary Computer) ainda só tinha a imagem de
   16/10/2026 (a de 01/11/2026 não tinha saído). O painel diz a data da imagem.
-- Ficou de fora: a ferramenta do agente (`ferramentas.py`) e o arquivo da tela (`exportar --tudo`) ainda não levam o
-  painel; a fase vem do calendário, não de visita à lavoura; o verde é da região, não do talhão do produtor.
+- Ficou de fora: o arquivo da tela (`exportar --tudo`) ainda não leva o painel (a ferramenta do agente passou a
+  levar em 2026-11-15: a `lavoura_hoje`, no `ferramentas.py`); a fase vem do calendário, não de visita à lavoura; o verde é da região, não do talhão do produtor.
 
 ## 11. A chuva do dia no lugar da chuva lida da cor, e a temperatura um dia mais perto (2026-11-15, 08h20)
 A pedido da coordenação, num commit à parte do painel:
@@ -351,8 +351,8 @@ A pedido da coordenação, num commit à parte do painel:
   emenda de 14 para 15/09/2026 ficam 3 horas sem entrar em nenhuma das duas); em Rio Verde, de 15/09 a 12/11/2026, a
   chuva nova soma 431,8 mm (a lida da cor dava 411,0 mm até 11/11).
 - **O que não acompanhou** (fora das pastas desta parte, ou sem tempo): os números gravados da tela (`motor.js`,
-  `respostas.js`) e as conversas guardadas ainda trazem a água com a chuva lida da cor e a faixa; o pedido à IA do
-  agente (`agente.py`) ainda manda dar "os dois valores da água"; os documentos de `docs/orbita/` e a seção 3 deste
+  `respostas.js`) ainda trazem a água com a chuva lida da cor e a faixa (as conversas guardadas e o pedido à IA do
+  agente foram acertados na rodada do alinhamento, em 2026-11-15: seção 13); os documentos de `docs/orbita/` e a seção 3 deste
   arquivo ainda descrevem a leitura da cor como a fonte da conta. Nenhuma rotina agendada baixa a chuva ou a
   temperatura: é rodar os dois programas à mão.
 
@@ -379,3 +379,43 @@ A temperatura da NASA POWER chega uns 3 dias depois; a chuva do satélite, no di
   (21/11/2026).
 - O limite: nos dias estimados a temperatura de verdade pode ter sido outra; quando ela chega (rodando
   `data/orbita/nasa-power/acrescentar_dias.py`), a conta desses dias é refeita com o dado medido.
+
+## 13. A rodada do alinhamento (2026-11-15, 08h54)
+
+O dono do projeto decidiu no dia: as limitações não precisam ficar explícitas para o produtor, a data do dado não é
+defeito e as notas de 1 a 5 saem. O que a conta dá não mudou: nenhum número e nenhuma situação (tranquilo, atenção,
+alerta) mudou, e nenhum campo de antes saiu. Cada resposta passa a ter duas leituras:
+
+- **A leitura do produtor** (frases curtas, só com a data do dado): `frase`, `aviso`, e, na comparação, `risco` e
+  `falta_saber`.
+- **A leitura do agrônomo** (o texto de antes, inteiro): os campos novos `risco_detalhe`, `falta_saber_detalhe`,
+  `detalhe_tecnico` e `aviso_tecnico`, mais os de sempre (`aviso` de cada item, `o_que_e`, `ultimo_dado`,
+  `regra_da_situacao`, `limites`, `hipoteses`).
+
+| onde | o que mudou | campo novo |
+|---|---|---|
+| `comparacao_das_rotacoes[*]` | `risco` e `falta_saber` saem em UMA frase só | `risco_detalhe` e `falta_saber_detalhe`: o texto de antes, igual |
+| `motor.lavoura_hoje`, o topo | a `frase` sem "(o último dia com dado)"; o `aviso` é a linha curta | `aviso_tecnico` (o aviso longo de antes) e `detalhe_tecnico` (de qual dado é a data) |
+| `motor.lavoura_hoje`, cada item | a `frase` leva só a data do dado | `detalhe_tecnico`: o que saiu da frase (até onde vai cada dado, o dia da consulta, os pontos da região) |
+| `motor.como_esta_hoje` | a `frase` leva só a data do dado; o `aviso` é a linha curta | `aviso_tecnico` e `detalhe_tecnico` |
+| `motor.responder`, o topo | o `aviso` é a linha curta (saiu "Motor provisório, sem site...") | nenhum: `limites` e `hipoteses` continuam |
+
+A linha curta é uma só, em todo lugar: "Converse com o agrônomo antes de decidir." (`motor.AVISO_DO_PRODUTOR`).
+
+**A regra de qual frase fica** (`explicacao.frase_principal`), a mesma para o `risco` e para o `falta_saber`: as
+frases continuam sendo montadas na ordem de sempre (água, calor, terra coberta e, no fim, a frase própria da
+rotação). Se o produtor disse o que mais o preocupa (`preocupacao`: agua, calor ou terra) e a rotação tem frase
+nessa perna (no risco: ela perde nessa perna para outra rotação), fica essa frase. Senão, fica a primeira da ordem
+de sempre. As duas nunca saem vazias: sem perda nenhuma, o risco é "Na conta, esta rotação não ficou atrás das
+outras em água, calor nem terra coberta."
+
+**As notas de 1 a 5 saíram do motor.** `motor.responder` ainda aceita a entrada que traz `prioridades` (as rotas
+antigas não quebram), mas ignora o campo: não confere as notas e não ordena por elas. A resposta é sempre a de sem
+notas: `entrada.prioridades` vazio, `prioridades[*].nota` vazio e a ordem de costume, com a preocupação na frente.
+Do texto (`explicacao.py`) saíram "(nota N)" e "DA MAIOR NOTA PARA A MENOR". Os 4 campos `entrada.prioridades.*`
+de `tests/campos_de_antes.json` são os únicos de antes que já não aparecem (o teste diz por quê).
+
+Ficou na frase do aviso de sede "Não é previsão do tempo: a chuva que cair muda a conta.": é o sentido do "se não
+chover", não um limite do dado. Os testes novos: a classe `ALeituraDoProdutor` em `tests/test_comparacao.py`,
+`tests/test_lavoura_hoje.py` e `tests/test_hoje.py`, e os de notas em `tests/test_motor.py` e
+`tests/test_preocupacao.py`.

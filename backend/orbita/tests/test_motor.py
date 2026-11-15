@@ -26,16 +26,16 @@ class Entrada(unittest.TestCase):
         self.assertEqual(motor.validar_entrada(entrada)["terra"], "media")
 
     def test_erros_em_portugues_dizendo_o_que_falta(self):
-        # Mudou de sentido em 2026-11-15: as notas de 1 a 5 saíram (o dono do projeto: "tira isso"), e a entrada sem
-        # prioridades passou a valer. Continua sendo erro mandar as prioridades pela metade ou fora do formato.
+        # Mudou de novo em 2026-11-15 (decisão do dono: as notas de 1 a 5 saem, "tira isso"): o motor ainda aceita a
+        # entrada que traz `prioridades`, para as rotas antigas não quebrarem, mas IGNORA o campo: não confere as
+        # notas (pela metade, fora de 1 a 5 ou fora do formato já não são erro) e devolve sempre None.
         self.assertIsNone(motor.validar_entrada({k: v for k, v in ENTRADA.items() if k != "prioridades"})["prioridades"])
-        self.assertIn("prioridades", erro_de(dict(ENTRADA, prioridades="alta")))
         sem_agua = copy.deepcopy(ENTRADA)
         del sem_agua["prioridades"]["agua"]
-        self.assertIn("agua", erro_de(sem_agua))
         nota_6 = copy.deepcopy(ENTRADA)
         nota_6["prioridades"]["solo"] = 6
-        self.assertIn("1 a 5", erro_de(nota_6))
+        for entrada in (ENTRADA, sem_agua, nota_6, dict(ENTRADA, prioridades="alta")):
+            self.assertIsNone(motor.validar_entrada(entrada)["prioridades"])
         self.assertIn("terra", erro_de(dict(ENTRADA, terra="barro")))
         self.assertIn("cidade_id", erro_de(dict(ENTRADA, cidade_id="sorriso")))
         self.assertIn("rotacao_atual", erro_de(dict(ENTRADA, rotacao_atual=["soja", "algodao"])))
@@ -160,14 +160,27 @@ class Numeros(unittest.TestCase):
 
 
 class Prioridades(unittest.TestCase):
-    def test_so_mudam_a_ordem_nenhum_numero_muda(self):
+    def test_as_notas_que_vierem_sao_ignoradas_nada_muda(self):
+        # Mudou em 2026-11-15 (decisão do dono: as notas de 1 a 5 saem): antes as notas mudavam a ordem; agora a
+        # resposta com notas é a mesma da resposta sem notas (a ordem de costume, e `nota` vazio).
         outra = motor.responder(dict(ENTRADA, prioridades={"agua": 1, "solo": 2, "renda": 5, "erosao": 4}))
-        for chave in ("rotacoes", "regra_dos_anos", "safra_2025_26", "veredito"):
-            self.assertEqual(outra[chave], RESPOSTA[chave])
+        sem = motor.responder({k: v for k, v in ENTRADA.items() if k != "prioridades"})
+        self.assertEqual(outra, sem)
+        self.assertEqual(RESPOSTA, sem)
+        self.assertIsNone(RESPOSTA["entrada"]["prioridades"])
+        self.assertEqual([p["nota"] for p in RESPOSTA["prioridades"]], [None] * 4)
+        self.assertIsNone(RESPOSTA["destaque"]["nota"])
+        for palavra in ("(nota", "MAIOR NOTA"):
+            self.assertNotIn(palavra, explicacao.texto(RESPOSTA))
         self.assertEqual([p["id"] for p in RESPOSTA["prioridades"]], ["agua", "solo", "erosao", "renda"])
-        self.assertEqual([p["id"] for p in outra["prioridades"]], ["renda", "erosao", "solo", "agua"])
+        self.assertEqual([p["id"] for p in outra["prioridades"]], ["agua", "solo", "erosao", "renda"])
         self.assertEqual({p["id"]: p["melhor"] for p in outra["prioridades"]},
                          {p["id"]: p["melhor"] for p in RESPOSTA["prioridades"]})
+
+    def test_o_aviso_do_topo_e_a_linha_curta_do_produtor(self):
+        # Mudou em 2026-11-15 (decisão do dono): saiu "Motor provisório, sem site. Não é recomendação agronômica..."
+        self.assertEqual(RESPOSTA["aviso"], "Converse com o agrônomo antes de decidir.")
+        self.assertTrue(RESPOSTA["limites"] and RESPOSTA["hipoteses"])       # a leitura do agrônomo continua
 
     def test_cada_prioridade_diz_quem_se_saiu_melhor(self):
         por_id = {p["id"]: p for p in RESPOSTA["prioridades"]}
@@ -213,7 +226,7 @@ class Explicacao(unittest.TestCase):
         self.assertIn("sem planta verde", explicacao.texto(RESPOSTA))
 
     def test_perguntar_em_texto_e_em_json(self):
-        args = ["--agua", "5", "--solo", "4", "--renda", "2", "--erosao", "3", "--terra", "media"]
+        args = ["--terra", "media"]      # as notas saíram da linha de comando com as do motor (2026-11-15)
         saida = io.StringIO()
         with contextlib.redirect_stdout(saida):
             self.assertEqual(perguntar.main(args), 0)
@@ -223,11 +236,12 @@ class Explicacao(unittest.TestCase):
             self.assertEqual(perguntar.main(args + ["--json"]), 0)
         self.assertEqual(json.loads(saida.getvalue())["veredito"], RESPOSTA["veredito"])
 
-    def test_perguntar_sem_uma_nota_diz_o_que_falta(self):
+    def test_perguntar_nao_aceita_mais_as_notas(self):
+        # Mudou em 2026-11-15 (decisão do dono: as notas saem): a linha de comando já não tem --agua, --solo...
         erro = io.StringIO()
         with contextlib.redirect_stderr(erro), contextlib.redirect_stdout(io.StringIO()):
             self.assertEqual(perguntar.main(["--agua", "5", "--solo", "4", "--renda", "2"]), 2)
-        self.assertIn("erosao", erro.getvalue())
+        self.assertIn("fora do formato", erro.getvalue())
 
 
 if __name__ == "__main__":

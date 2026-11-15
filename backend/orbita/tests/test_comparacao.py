@@ -189,5 +189,47 @@ class TerraCoberta(unittest.TestCase):
         self.assertTrue(str(erro.exception).startswith("Entrada fora do formato:"))
 
 
+class ALeituraDoProdutor(unittest.TestCase):
+    """A rodada do alinhamento (decisão do dono, 2026-11-15): o risco e o que falta saber saem em UMA frase só (a
+    da perna que preocupa o produtor, se ele disse qual e a rotação tem frase nela; senão, a primeira da ordem de
+    sempre). O texto de antes vai, inteiro, para `risco_detalhe` e `falta_saber_detalhe` (a leitura do agrônomo)."""
+    ROTULOS = {"agua": "Na água", "calor": "No calor", "terra": "Na terra coberta"}
+    PERNAS = {"agua": "agua", "calor": "calor", "terra": "terra_coberta"}
+
+    def test_uma_frase_so_e_o_texto_de_antes_no_detalhe(self):
+        for resposta in (RESPOSTA, COM_SORGO):
+            for item in resposta["comparacao_das_rotacoes"]:
+                for curto in ("risco", "falta_saber"):
+                    frase, longo = item[curto], item[curto + "_detalhe"]
+                    self.assertTrue(frase.strip() and longo.strip(), (item["id"], curto))
+                    self.assertTrue(frase.endswith("."), (item["id"], curto))
+                    self.assertNotIn(". ", frase, (item["id"], curto))          # uma frase só
+                    self.assertIn(frase, longo, (item["id"], curto))            # tirada do texto de antes
+                    self.assertEqual(conferencia.conferir_texto(longo, resposta), [], (item["id"], curto))
+        hoje = por_id(RESPOSTA)["soja_milho_pousio"]
+        for pedaco in ("Na água do pior ano, ficou atrás de", "Na terra coberta, ficou atrás de"):
+            self.assertIn(pedaco, hoje["risco_detalhe"])
+        self.assertIn("O quanto de terra a palha do milho cobre é hipótese.", hoje["falta_saber_detalhe"])
+        self.assertTrue(hoje["risco"].startswith("Na água do pior ano, ficou atrás de"))    # sem preocupação: a 1ª
+
+    def test_o_risco_e_o_da_preocupacao_quando_a_rotacao_perde_nela(self):
+        for preocupacao in ("agua", "calor", "terra"):
+            resposta = motor.responder(dict(ENTRADA, preocupacao=preocupacao))
+            for item in resposta["comparacao_das_rotacoes"]:
+                perde = any(contra[self.PERNAS[preocupacao]] == "pior" for contra in item["contra_as_outras"].values())
+                if perde:
+                    self.assertTrue(item["risco"].startswith(self.ROTULOS[preocupacao]), (preocupacao, item["id"]))
+                    self.assertIn("ficou atrás de", item["risco"])
+                else:       # não perde nela: vale a primeira frase da ordem de sempre
+                    self.assertTrue(item["risco_detalhe"].startswith(item["risco"]), (preocupacao, item["id"]))
+                self.assertEqual(item["risco_detalhe"], por_id(RESPOSTA)[item["id"]]["risco_detalhe"])
+
+    def test_a_regra_da_frase_principal(self):
+        frases = [("agua", "A."), ("terra_coberta", "B."), (None, "C.")]
+        self.assertEqual(explicacao.frase_principal(frases), "A.")
+        self.assertEqual(explicacao.frase_principal(frases, "terra"), "B.")
+        self.assertEqual(explicacao.frase_principal(frases, "calor"), "A.")
+
+
 if __name__ == "__main__":
     unittest.main()

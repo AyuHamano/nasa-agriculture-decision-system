@@ -77,6 +77,11 @@ DE_QUAL_DADO = {
     "aviso_de_sede": "a conta da água até este dia, o último com chuva do satélite; daí para a frente é a conta sem "
                      "chuva nenhuma, não é dado",
 }
+# A leitura do produtor (decisão do dono, 2026-11-15): o `aviso` do topo é a linha curta e cada `frase` leva só a
+# data do dado. O que saiu das frases fica em `detalhe_tecnico` (de cada item e do topo) e o aviso longo de antes,
+# inteiro, em `aviso_tecnico`: é a leitura do agrônomo, com `aviso`, `o_que_e`, `ultimo_dado` e `regra_da_situacao`.
+AVISO_DO_PRODUTOR = retrato_de_hoje.AVISO_DO_PRODUTOR
+PONTOS_DA_REGIAO = "O satélite olha pontos da região: não é a sua lavoura."
 O_QUE_E_O_VERDE = ("O verde do satélite é um índice de 0 a 1: perto de 1, muita planta verde; perto de 0,2, quase "
                    "nenhuma. Cada imagem junta 16 dias.")
 
@@ -159,11 +164,11 @@ def _item_da_fase(cal, rotacao, tipo, ultimo, hoje):
     if fase is None:
         proximo = proximo_plantio(cal, rotacao["segunda"], ultimo)
         estado = "com a braquiária (o capim) viva" if tipo == rotacoes.BRAQUIARIA else "sem planta viva"
-        frase = (f"Em {data_br(ultimo)}, o último dia com dado, a terra estava {estado}. Pelo calendário, "
+        frase = (f"Em {data_br(ultimo)}, a terra estava {estado}. Pelo calendário, "
                  f"{NA_TERRA[proximo['cultura']]} entra em {data_br(proximo['data'])}: faltavam "
                  f"{_dias(proximo['faltam_dias'])}.")
         return {"situacao": situacao_da_fase(False), "frase": frase, "o_que_esta_na_terra": tipo, "cultura": None,
-                "proximo_plantio": proximo}
+                "proximo_plantio": proximo, "detalhe_tecnico": f"{data_br(ultimo)} é o último dia com dado."}
     na_consulta = fase_no_dia(cal, rotacao["segunda"], hoje)
     if na_consulta is not None and na_consulta["plantio"] == fase["plantio"]:
         na_consulta = {"data": hoje.isoformat(), "dias_desde_o_plantio": na_consulta["dias_desde_o_plantio"],
@@ -172,7 +177,7 @@ def _item_da_fase(cal, rotacao, tipo, ultimo, hoje):
         na_consulta = None
     nome = NA_TERRA[fase["cultura"]]
     frase = (f"Na terra está {nome}, {PLANTADA[fase['cultura']]} em {data_br(fase['plantio'])}. Em {data_br(ultimo)}, "
-             f"o último dia com dado, fazia {_dias(fase['dias_desde_o_plantio'])} do plantio e a lavoura estava "
+             f"fazia {_dias(fase['dias_desde_o_plantio'])} do plantio e a lavoura estava "
              f"{fase['fase_nome']}, no dia {fase['dia_da_fase']} dos {fase['dias_da_fase']} dessa fase.")
     if fase["fase_critica"]:
         frase += (f" É a fase em que a falta de água e o calor mais pesam; ela vai até "
@@ -180,11 +185,12 @@ def _item_da_fase(cal, rotacao, tipo, ultimo, hoje):
     elif fase["fase"] != "final":
         frase += (f" A fase crítica (a floração e o enchimento do grão) começa em {data_br(fase['fase_critica_de'])}, "
                   f"pelo calendário.")
+    detalhe = f"{data_br(ultimo)} é o último dia com dado."
     if na_consulta is not None and hoje != ultimo:
-        frase += (f" No dia desta consulta ({data_br(hoje)}), {_dias(na_consulta['dias_desde_o_plantio'])} do "
-                  "plantio.")
+        detalhe += (f" No dia desta consulta ({data_br(hoje)}), {_dias(na_consulta['dias_desde_o_plantio'])} do "
+                    "plantio.")
     return dict(fase, situacao=situacao_da_fase(fase["fase_critica"]), frase=frase, o_que_esta_na_terra=tipo,
-                no_dia_da_consulta=na_consulta, proximo_plantio=None)
+                no_dia_da_consulta=na_consulta, proximo_plantio=None, detalhe_tecnico=detalhe)
 
 
 # ------------------------------------------------------------------------------------------------ 2. a água
@@ -224,13 +230,15 @@ def _item_da_agua(retrato, contas, ultimo):
         frase += f"{NA_TERRA[tipo]} não estava com sede."
     frase += (f" No mesmo dia do ano normal (safra {normal['safra']}) havia {_n(normal['agua_na_terra_mm'])} mm; "
               f"no do pior ano (safra {pior['safra']}), {_n(pior['agua_na_terra_mm'])} mm.")
+    detalhe = []            # o que saiu da frase do produtor em 2026-11-15: até onde vai cada dado
     if chuva_ate:
-        frase += f" A chuva do satélite já guardada vai até {data_br(chuva_ate)}."
+        detalhe.append(f"A chuva do satélite já guardada vai até {data_br(chuva_ate)}.")
     if retrato["dias_com_o_consumo_estimado"]:
-        frase += (f" De {data_br(retrato['consumo_estimado_desde'])} em diante a temperatura ainda não chegou: nesses "
-                  f"dias o consumo da cultura é o do tempo dos {JANELA_DO_CONSUMO_DIAS} dias anteriores.")
+        detalhe.append(f"De {data_br(retrato['consumo_estimado_desde'])} em diante a temperatura ainda não chegou: "
+                       f"nesses dias o consumo da cultura é o do tempo dos {JANELA_DO_CONSUMO_DIAS} dias anteriores.")
     campos = ("data", "safra", "agua_na_terra_mm", "agua_na_terra_pct", "com_sede", "diferenca_mm", "leitura")
     return {"situacao": situacao_da_agua(ha_cultura, bool(sede)), "frase": frase,
+            "detalhe_tecnico": " ".join(detalhe) or f"{data_br(ultimo)} é o último dia com dado.",
             "o_que_esta_na_terra": tipo, "agua_na_terra_mm": retrato["agua_na_terra_mm"],
             "agua_que_a_terra_segura_mm": retrato["agua_que_a_terra_segura_mm"],
             "agua_na_terra_pct": retrato["agua_na_terra_pct"], "com_sede": retrato["com_sede"],
@@ -270,6 +278,7 @@ def situacao_do_calor(na_fase_critica, desde_o_plantio, valor_do_meio):
 def _item_do_calor(par, cal, serie, fase, ultimo):
     if fase.get("cultura") is None or fase["cultura"] not in calor.limites(par):
         return {"situacao": "tranquilo", "cultura": None, "limite_c": None,
+                "detalhe_tecnico": f"{data_br(ultimo)} é o último dia com temperatura medida.",
                 "frase": f"Em {data_br(ultimo)} não havia cultura na terra: o calor é contado do plantio em diante."}
     cultura, limite = fase["cultura"], calor.limites(par)[fase["cultura"]]
     maximas = {dia.data: dia.tmax for dia in serie}
@@ -303,7 +312,7 @@ def _item_do_calor(par, cal, serie, fase, ultimo):
     meio = guardadas["desde_o_plantio"]["valor_do_meio"] if por_safra else None
     nome, grau = NA_TERRA[cultura], _grau(limite["limite_c"])
     teve = f"teve {_dias(desde)}" if desde else "não teve nenhum dia"
-    frase = (f"Do plantio até {data_br(ultimo)}, o último dia com temperatura medida, {nome} {teve} de calor forte (a máxima do dia acima de {grau} °C, "
+    frase = (f"Do plantio até {data_br(ultimo)}, {nome} {teve} de calor forte (a máxima do dia acima de {grau} °C, "
              "o limite da cultura)")
     if desde:
         frase += f", {_dias(na_fase)} na fase atual"
@@ -318,6 +327,7 @@ def _item_do_calor(par, cal, serie, fase, ultimo):
     if na_critica:
         frase += f" Dentro da fase crítica já foram {_dias(na_critica)} de calor forte."
     return {"situacao": situacao_do_calor(na_critica, desde, meio), "frase": frase, "cultura": cultura,
+            "detalhe_tecnico": f"{data_br(ultimo)} é o último dia com temperatura medida.",
             "limite_c": limite["limite_c"], "fonte_do_limite": limite["fonte"], "etiqueta_do_limite": limite["etiqueta"],
             "dias_de_calor_forte_desde_o_plantio": desde, "dias_de_calor_forte_na_fase_atual": na_fase,
             "dias_de_calor_forte_na_fase_critica": na_critica, "fase_atual": fase["fase"],
@@ -375,6 +385,7 @@ def _item_do_verde(cidade_id, nome_da_cidade, cal, rotacao, hoje, pasta=None):
         verde = None
     if verde is None:
         return {"situacao": "sem_dado", "verde": None, "imagem": None, "leitura": None, "o_que_e": O_QUE_E_O_VERDE,
+                "detalhe_tecnico": PONTOS_DA_REGIAO,
                 "frase": f"Não há imagem do satélite com medida boa guardada para {nome_da_cidade}."}
     fim = datetime.date.fromisoformat(verde["imagem_ate"])
     na_terra = rotacoes.cobertura_do_dia(fim, rotacao["com_braquiaria"], cal, segunda=rotacao["segunda"])[0]
@@ -389,8 +400,8 @@ def _item_do_verde(cidade_id, nome_da_cidade, cal, rotacao, hoje, pasta=None):
         frase += (f" Na mesma época dos outros {outros['quantos']} anos guardados, o valor do meio foi "
                   f"{_v(outros['valor_do_meio'])} (do menor, {_v(outros['menor'])}, ao maior, {_v(outros['maior'])}): "
                   f"este ano está {leitura}.")
-    frase += " O satélite olha pontos da região: não é a sua lavoura."
     return dict(verde, situacao=situacao_do_verde(verde["leitura"], na_terra in rotacoes.CULTURAS), frase=frase,
+                detalhe_tecnico=PONTOS_DA_REGIAO,
                 o_que_estava_na_terra_no_fim_da_imagem=na_terra, o_que_e=O_QUE_E_O_VERDE, fonte=ndvi.fonte(pasta),
                 aviso=ndvi.aviso_dos_pontos(nome_da_cidade) + " " + ndvi.AVISO)
 
@@ -441,6 +452,8 @@ def _item_da_terra(cal, rotacao, ultimo):
              f"{_quantos_dias(terra['na_safra']['dias_com_planta_viva'])} com planta viva e "
              f"{_quantos_dias(terra['na_safra']['dias_sem_planta_viva'])} sem.")
     return dict(terra, situacao=situacao_da_terra(terra["com_planta_viva"]), frase=frase,
+                detalhe_tecnico=f"{data_br(ultimo)} é o último dia com dado; a contagem vem do calendário da "
+                                "rotação, não de medida.",
                 aviso="É o calendário da rotação, não medida: a palha que fica na terra não entra nesta contagem.")
 
 
@@ -508,6 +521,7 @@ def _item_do_aviso(entrada, par, contas, tipo, ultimo, hoje, chuva_recente):
     if tipo not in rotacoes.CULTURAS:
         return dict(base, situacao=situacao_do_aviso(False, False, None), ja_com_sede=False,
                     dias_seguidos_de_sede=0, dias_ate_a_sede=None, data_da_sede=None,
+                    detalhe_tecnico=f"{data_br(ultimo)} é o último dia com dado.",
                     frase=f"Em {data_br(ultimo)} não havia cultura na terra: não há aviso de sede.")
 
     def lado(registros, serie):
@@ -537,16 +551,18 @@ def _item_do_aviso(entrada, par, contas, tipo, ultimo, hoje, chuva_recente):
         frase = f"Em {data_br(ultimo)}, {em_palavras(satelite)}. Sem chuva, a sede continua."
     else:
         frase = f"Se não chover nada depois de {data_br(ultimo)}, {em_palavras(satelite)}."
-    frase += (f" A conta segue a água da terra para a frente com o tempo dos últimos {JANELA_DO_CONSUMO_DIAS} dias "
-              f"com temperatura; nos últimos {JANELA_DO_CONSUMO_DIAS} dias da conta a lavoura bebeu em média {_n(consumo)} mm por dia.")
+    frase += (f" Nos últimos {JANELA_DO_CONSUMO_DIAS} dias da conta a lavoura bebeu em média {_n(consumo)} mm por "
+              "dia.")
+    detalhe = (f"A conta segue a água da terra para a frente com o tempo dos últimos {JANELA_DO_CONSUMO_DIAS} dias "
+               "com temperatura.")
     if hoje > ultimo:
-        frase += f" O dia desta consulta é {data_br(hoje)}, {_dias((hoje - ultimo).days)} depois do último dado"
-        frase += "." if depois is None else (
+        detalhe += f" O dia desta consulta é {data_br(hoje)}, {_dias((hoje - ultimo).days)} depois do último dado"
+        detalhe += "." if depois is None else (
             f"; de {data_br(depois['de'])} a {data_br(depois['ate'])} o satélite já marcou "
             f"{_n(depois['satelite_rapido_mm'])} mm de chuva, que ainda não entraram na conta.")
     frase += " Não é previsão do tempo: a chuva que cair muda a conta."
     return dict(base, situacao=situacao_do_aviso(True, satelite["ja_com_sede"], satelite["dias_ate_a_sede"]),
-                frase=frase, **satelite, consumo_medio_mm_por_dia=consumo,
+                frase=frase, detalhe_tecnico=detalhe, **satelite, consumo_medio_mm_por_dia=consumo,
                 dias_do_consumo=len(da_cultura), agua_na_terra_mm=round(contas["registros"][-1].agua_na_terra, 1) + 0.0,
                 nivel_de_sede="o dia em que a água fácil de tirar da terra acaba e a planta começa a passar sede "
                               "(a mesma regra dos dias de sede do motor)")
@@ -558,13 +574,13 @@ def _resumo(cidade, ultimo, itens):
     if fase["cultura"] is None:
         estado = ("com a braquiária (o capim) viva" if fase["o_que_esta_na_terra"] == rotacoes.BRAQUIARIA
                   else "sem planta viva")
-        frase = (f"Em {cidade}, em {data_br(ultimo)} (o último dia com dado), a terra estava {estado}, com "
+        frase = (f"Em {cidade}, em {data_br(ultimo)}, a terra estava {estado}, com "
                  f"{_n(agua['agua_na_terra_mm'])} mm de água; {NA_TERRA[fase['proximo_plantio']['cultura']]} entra em "
                  f"{data_br(fase['proximo_plantio']['data'])}.")
     else:
         sede = (f"com sede havia {_dias(agua['dias_seguidos_de_sede'])} seguidos" if agua["dias_seguidos_de_sede"]
                 else "sem sede")
-        frase = (f"Em {cidade}, em {data_br(ultimo)} (o último dia com dado), {NA_TERRA[fase['cultura']]} tinha "
+        frase = (f"Em {cidade}, em {data_br(ultimo)}, {NA_TERRA[fase['cultura']]} tinha "
                  f"{_dias(fase['dias_desde_o_plantio'])} e estava {fase['fase_nome']}, {sede}, com "
                  f"{_n(agua['agua_na_terra_mm'])} mm de água ao alcance da planta.")
     for situacao, comeco in (("alerta", "Em alerta"), ("atencao", "Pede atenção")):
@@ -626,4 +642,5 @@ def lavoura_hoje(entrada, par=None, hoje=None, pasta_da_chuva_recente=None, past
             "safra": retrato["safra"], "situacao": situacao, "situacao_nome": NOMES_DAS_SITUACOES[situacao],
             "frase": _resumo(cidade, ultimo, itens), "itens": lista, "regras": dict(REGRAS),
             "janela_do_consumo_dias": JANELA_DO_CONSUMO_DIAS, "horizonte_sem_chuva_dias": HORIZONTE_SEM_CHUVA_DIAS,
-            "aviso": AVISO}
+            "aviso": AVISO_DO_PRODUTOR, "aviso_tecnico": AVISO,
+            "detalhe_tecnico": f"{data_br(ultimo)} é o último dia com dado {retrato['ultimo_dia_com_dado_de']}"}

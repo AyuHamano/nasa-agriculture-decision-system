@@ -86,7 +86,8 @@ class Retrato(unittest.TestCase):
         self.assertEqual(faixa, {"de": RETRATO["agua_na_terra_mm"], "ate": RETRATO["agua_na_terra_mm"]})
         self.assertIn("agua_na_terra_mm", RETRATO["com_a_chuva_de_modelo"])
         self.assertNotIn("modelo", RETRATO["frase"])
-        self.assertIn(hoje.data_br(chuva["fonte"]["ultimo_dia_com_dado"]), RETRATO["frase"])
+        # Desde 2026-11-15 (a leitura do produtor) até onde vai a chuva fica no detalhe técnico, não na frase.
+        self.assertIn(f"vai até {hoje.data_br(chuva['fonte']['ultimo_dia_com_dado'])}", RETRATO["detalhe_tecnico"])
         self.assertIn("chuva-do-dia", chuva["origem"])
 
     def test_cada_ultimo_dia_com_dado_diz_de_qual_dado_e(self):
@@ -112,7 +113,7 @@ class Retrato(unittest.TestCase):
         self.assertEqual(RETRATO["com_a_chuva_de_modelo"]["data"], com_temperatura.isoformat())
         if RETRATO["dias_com_o_consumo_estimado"]:
             self.assertEqual(RETRATO["consumo_estimado_desde"], (com_temperatura + datetime.timedelta(days=1)).isoformat())
-            self.assertIn("o consumo da cultura é o dos 7 dias anteriores", RETRATO["frase"])
+            self.assertIn("o consumo da cultura é o dos 7 dias anteriores", RETRATO["detalhe_tecnico"])
 
     def test_a_conta_segue_ate_o_ultimo_dia_com_chuva_com_o_tempo_dos_7_dias_anteriores(self):
         dia = lambda n, tmax, eto: clima.Dia(D(2026, 11, 1) + datetime.timedelta(days=n), 1.0, tmax, 20.0, eto)  # noqa: E731
@@ -152,6 +153,26 @@ class Retrato(unittest.TestCase):
         with self.assertRaises(ValueError) as erro:
             motor.como_esta_hoje(dict(ENTRADA, cidade_id="sorriso"))
         self.assertTrue(str(erro.exception).startswith("Entrada fora do formato:"))
+
+
+class ALeituraDoProdutor(unittest.TestCase):
+    """A rodada do alinhamento (decisão do dono, 2026-11-15): a frase leva só a data do dado, o aviso é a linha
+    curta, e o que saiu fica em `detalhe_tecnico` e `aviso_tecnico` (a leitura do agrônomo)."""
+
+    def test_a_frase_e_o_aviso_nao_tratam_a_data_como_defeito(self):
+        self.assertEqual(RETRATO["aviso"], "Converse com o agrônomo antes de decidir.")
+        self.assertEqual(RETRATO["aviso_tecnico"], hoje.AVISO)
+        self.assertIn(f"em {hoje.data_br(RETRATO['ultimo_dia_com_dado'])}", RETRATO["frase"])
+        for termo in ("aproximad", "atraso", "ainda não entrou", "ainda não chegou", "último dia com dado",
+                      "dia desta consulta"):
+            self.assertNotIn(termo, RETRATO["frase"], termo)
+            self.assertNotIn(termo, RETRATO["aviso"], termo)
+
+    def test_o_que_saiu_da_frase_esta_no_detalhe_tecnico(self):
+        detalhe = RETRATO["detalhe_tecnico"]
+        self.assertIn(f"O último dia com dado é {hoje.data_br(RETRATO['ultimo_dia_com_dado'])}", detalhe)
+        self.assertIn(f"dia desta consulta ({hoje.data_br(DIA_DO_TESTE)})", detalhe)
+        self.assertEqual(conferencia.conferir_texto(detalhe, RETRATO), [])
 
 
 if __name__ == "__main__":

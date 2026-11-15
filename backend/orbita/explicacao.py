@@ -73,8 +73,7 @@ def _prioridade(p, r):
     if rotulo == "No pior ano" and pior_contra_normal(hoje["safras"][seco]["total"]["falta_mm"],
                                                       hoje["safras"][normal]["total"]["falta_mm"]) != "maior":
         rotulo = "No ano da pior colheita da região"    # a conta não deu nele mais falta de água que no ano normal
-    nota = "" if p.get("nota") is None else f" (nota {p['nota']})"
-    linhas = [f"{p['nome']}{nota}: {_quem(p)}."]
+    linhas = [f"{p['nome']}: {_quem(p)}."]      # as notas de 1 a 5 saíram (decisão do dono, 2026-11-15)
     if p["id"] == "agua":
         a, faixa = hoje["safras"][seco]["total"], alternativa["faixa"][seco]["falta_total_mm"]
         meio = alternativa["safras"][seco]["total"]
@@ -211,17 +210,33 @@ RISCOS_PROPRIOS = {
     "soja_milho_braquiaria": "A braquiária bebe água junto com o milho e depois dele: a terra pode chegar mais seca "
                              "ao plantio da soja.",
 }
+# O que falta saber de cada rotação, frase por frase (a primeira é a principal; juntas, dão o texto de sempre).
 FALTA_SABER = {
-    "soja_milho_pousio": "A conta não mede renda, preço, custo nem produtividade, e a palha entra só pelo lado da "
-                         "evaporação. O quanto de terra a palha do milho cobre é hipótese.",
-    "soja_milho_braquiaria": "Quanto o capim disputa água com o milho não foi medido: por isso os números desta "
-                             "rotação saem em faixa. O satélite não prova esta rotação, e a conta não mede renda "
-                             "nem o custo da semente do capim.",
-    "soja_sorgo_pousio": "As fases e o ciclo do sorgo vêm da tabela geral da FAO (o órgão da ONU para a "
-                         "agricultura), que não tem linha de 2ª safra em "
-                         "Goiás, e a raiz do sorgo vale igual à do milho. A conta não mede renda nem o preço do "
-                         "sorgo contra o do milho, e o satélite não prova esta rotação.",
+    "soja_milho_pousio": ("A conta não mede renda, preço, custo nem produtividade, e a palha entra só pelo lado da "
+                          "evaporação.", "O quanto de terra a palha do milho cobre é hipótese."),
+    "soja_milho_braquiaria": ("Quanto o capim disputa água com o milho não foi medido: por isso os números desta "
+                              "rotação saem em faixa.", "O satélite não prova esta rotação, e a conta não mede renda "
+                              "nem o custo da semente do capim."),
+    "soja_sorgo_pousio": ("As fases e o ciclo do sorgo vêm da tabela geral da FAO (o órgão da ONU para a "
+                          "agricultura), que não tem linha de 2ª safra em "
+                          "Goiás, e a raiz do sorgo vale igual à do milho.", "A conta não mede renda nem o preço do "
+                          "sorgo contra o do milho, e o satélite não prova esta rotação."),
 }
+FALTA_SABER_DE_COSTUME = ("A conta não mede renda, preço nem produtividade.",)
+SEM_RISCO_NA_CONTA = ("Na conta, esta rotação não ficou atrás das outras em água, calor nem terra coberta.",
+                      "O risco que a conta não vê (praga, preço, data de plantio) continua valendo.")
+PERNA_DA_PREOCUPACAO = {"agua": "agua", "calor": "calor", "terra": "terra_coberta"}
+
+
+def frase_principal(frases, preocupacao=None):
+    """A UMA frase que o produtor lê, tirada da lista de sempre (a regra do alinhamento, 2026-11-15).
+
+    `frases`: a lista na ordem de sempre, cada uma como (a perna dela ou None, o texto). Vale a frase da perna que
+    preocupa o produtor (água, calor ou terra), se ele disse qual e a rotação tem frase nessa perna; senão, a
+    primeira da ordem de sempre. O texto inteiro (todas as frases) continua no campo `_detalhe`.
+    """
+    perna = PERNA_DA_PREOCUPACAO.get(preocupacao)
+    return next((texto for de, texto in frases if perna and de == perna), frases[0][1])
 PERNAS = (("agua", "Na água do pior ano", "mm de falta", "mm"),
           ("calor", "No calor do pior ano", "dias de calor forte", "dias"),
           ("terra_coberta", "Na terra coberta", "dias seguidos sem planta viva", "dias"))
@@ -276,7 +291,7 @@ def frases_da_rotacao(item, itens, r):
         evidencia += (f" O satélite viu {n(terra['pelo_satelite'])} dias seguidos sem planta verde (o valor do meio "
                       "entre os pontos medidos).")
     outras = {o["id"]: o for o in itens if o["id"] != item["id"]}
-    frente, atras, depende = [], [], []
+    frente, atras, depende = [], [], []       # atras e depende guardam (a perna, a frase)
     for perna, rotulo, unidade, curta in PERNAS:
         rotulo = rotulo.replace("do pior ano", do_pior_ano)
         ganhou = [o for i, o in outras.items() if item["contra_as_outras"][i][perna] == "melhor"]
@@ -287,19 +302,25 @@ def frases_da_rotacao(item, itens, r):
             frente.append(f"{rotulo}, ficou na frente de " + _e(
                 f"{o['apelido']} ({_mm(_valor_da_perna(o, perna))} {curta})" for o in ganhou) + f": {meu} {unidade}.")
         if perdeu:
-            atras.append(f"{rotulo}, ficou atrás de " + _e(
-                f"{o['apelido']} ({_mm(_valor_da_perna(o, perna))} {curta})" for o in perdeu) + f": {meu} {unidade}.")
+            atras.append((perna, f"{rotulo}, ficou atrás de " + _e(
+                f"{o['apelido']} ({_mm(_valor_da_perna(o, perna))} {curta})" for o in perdeu) + f": {meu} {unidade}."))
         if aberto:
-            depende.append(f"{rotulo}, a comparação com " + _e(o["apelido"] for o in aberto)
-                           + " depende de quanto o capim disputa água com o milho: isso não foi medido, e "
-                             "por isso a conta dá o menor e o maior valor.")
+            depende.append((perna, f"{rotulo}, a comparação com " + _e(o["apelido"] for o in aberto)
+                            + " depende de quanto o capim disputa água com o milho: isso não foi medido, e "
+                              "por isso a conta dá o menor e o maior valor."))
     beneficio = " ".join(frente) or ("Na conta, esta rotação não ficou na frente das outras em água, calor nem "
                                      "terra coberta.")
-    risco = " ".join(atras + ([RISCOS_PROPRIOS[item["id"]]] if item["id"] in RISCOS_PROPRIOS else [])) or (
-        "Na conta, esta rotação não ficou atrás das outras em água, calor nem terra coberta. O risco que a conta "
-        "não vê (praga, preço, data de plantio) continua valendo.")
-    falta = " ".join(depende + [FALTA_SABER.get(item["id"], "A conta não mede renda, preço nem produtividade.")])
-    return {"evidencia": evidencia, "beneficio": beneficio, "risco": risco, "falta_saber": falta}
+    # A leitura do produtor (decisão do dono, 2026-11-15): o risco e o que falta saber em UMA frase só, escolhida
+    # por `frase_principal`; o texto de sempre, inteiro, vai a `risco_detalhe` e `falta_saber_detalhe` (a leitura
+    # do agrônomo).
+    riscos = atras + ([(None, RISCOS_PROPRIOS[item["id"]])] if item["id"] in RISCOS_PROPRIOS else [])
+    riscos = riscos or [(None, frase) for frase in SEM_RISCO_NA_CONTA]
+    faltas = depende + [(None, frase) for frase in FALTA_SABER.get(item["id"], FALTA_SABER_DE_COSTUME)]
+    preocupacao = r.get("preocupacao")
+    return {"evidencia": evidencia, "beneficio": beneficio,
+            "risco": frase_principal(riscos, preocupacao), "falta_saber": frase_principal(faltas, preocupacao),
+            "risco_detalhe": " ".join(texto for _, texto in riscos),
+            "falta_saber_detalhe": " ".join(texto for _, texto in faltas)}
 
 
 def texto_da_comparacao(r):
@@ -313,11 +334,8 @@ def texto_da_comparacao(r):
 
 
 def _linha_do_destaque(r):
-    """A linha do destaque: com as notas, a maior nota entre o que foi medido; sem elas, o que mais preocupa."""
+    """A linha do destaque: o que mais preocupa o produtor (as notas de 1 a 5 saíram, 2026-11-15)."""
     destaque = r["destaque"]
-    if destaque.get("nota") is not None:
-        return (f"Na sua maior nota entre o que foi medido ({destaque['nome'].lower()}, nota {destaque['nota']}): "
-                f"{_quem(destaque)}.")
     de_onde = "No que mais preocupa" if r.get("preocupacao") else "No primeiro ponto medido"
     return f"{de_onde} ({destaque['nome'].lower()}): {_quem(destaque)}."
 
@@ -339,8 +357,6 @@ def texto(r):
          r["veredito"]["frase"],
          _linha_do_destaque(r),
          "",
-         "SUAS PRIORIDADES, DA MAIOR NOTA PARA A MENOR (elas só mudam a ordem; nenhum número muda)"
-         if r["destaque"].get("nota") is not None else
          "O QUE FOI MEDIDO, COM O QUE MAIS PREOCUPA NA FRENTE (a ordem não muda nenhum número)"]
     for i, p in enumerate(r["prioridades"], start=1):
         linhas = _prioridade(p, r)

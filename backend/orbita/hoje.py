@@ -32,6 +32,11 @@ AVISO = ("A chuva dos dias recentes é a chuva medida por satélite da NASA (o G
          "uns 50 km, e chega com uns 3 dias de atraso: nos dias em que ela ainda não chegou, a conta usa a chuva "
          "do satélite e, para o consumo da cultura, o tempo médio dos 7 dias anteriores com temperatura. É um retrato para conversar com o agrônomo, não uma medida da lavoura.")
 
+# A leitura do produtor (decisão do dono, 2026-11-15): o `aviso` é esta linha curta, e a `frase` leva só a data do
+# dado, sem tratar a data como defeito. O texto de antes fica inteiro em `aviso_tecnico` (o AVISO acima) e em
+# `detalhe_tecnico` (o que saiu da frase): é a leitura do agrônomo.
+AVISO_DO_PRODUTOR = "Converse com o agrônomo antes de decidir."
+
 # As duas datas que se chamam "último dia com dado" são de dados diferentes: cada uma diz de qual, ao lado.
 DIA_DA_CONTA = ("da conta: o último dia com a chuva do satélite em mm, sem dia faltando no meio. Nos dias em que a "
                 "temperatura (a da NASA POWER) ainda não chegou, o consumo da cultura é o do tempo médio dos 7 dias "
@@ -258,6 +263,9 @@ def como_esta_hoje(entrada, par=None, hoje=None, pasta_da_chuva_recente=None):
     antes = "1 dia" if (hoje - ultimo).days == 1 else f"{(hoje - ultimo).days} dias"
     estimado = (f"; de {data_br(estimados[0])} em diante a temperatura ainda não chegou, e o consumo da cultura é o "
                 f"dos {JANELA_DO_CONSUMO_DIAS} dias anteriores" if estimados else "")
+    # O que saiu da frase do produtor em 2026-11-15 (a data do dado contra o dia da consulta e até onde vai cada dado).
+    detalhe = (f"O último dia com dado é {data_br(ultimo)}, {antes} antes do dia desta consulta ({data_br(hoje)}). "
+               f"A chuva do satélite, em mm de cada dia, vai até {data_br(fonte['ultimo_dia_com_dado'])}{estimado}.")
     normal = _retrato(registros, _mesmo_dia(ultimo, regra["ano_normal"]))
     pior = _retrato(registros, _mesmo_dia(ultimo, regra["pior_ano"]))
     primeiro_recente = guardados[-1].data + datetime.timedelta(days=1)
@@ -269,14 +277,12 @@ def como_esta_hoje(entrada, par=None, hoje=None, pasta_da_chuva_recente=None):
         return {"diferenca_mm": diferenca, "leitura": "igual" if abs(diferenca) < 0.05 else (
             "mais água na terra" if diferenca > 0 else "menos água na terra")}
 
-    na_terra = ("A terra está sem planta viva." if agora["o_que_esta_na_terra"] == "sem_planta"
-                else f"Na terra está {NA_TERRA[agora['o_que_esta_na_terra']]}.")
-    # As duas datas vão escritas: a frase continua verdadeira quando é lida depois (numa conversa guardada).
-    frase = (f"Em {cidade['nome']}, o último dia com dado é {data_br(ultimo)}, {antes} antes "
-             f"do dia desta consulta ({data_br(hoje)}). {na_terra} A conta dá "
+    na_terra = ("a terra estava sem planta viva" if agora["o_que_esta_na_terra"] == "sem_planta"
+                else f"na terra estava {NA_TERRA[agora['o_que_esta_na_terra']]}")
+    # A data do dado vai escrita: a frase continua verdadeira quando é lida depois (numa conversa guardada).
+    frase = (f"Em {cidade['nome']}, em {data_br(ultimo)}, {na_terra} e a conta dava "
              f"{_n(agora['agua_na_terra_mm'])} mm de água na camada de terra onde ficam as raízes, "
-             f"{_n(agora['agua_na_terra_pct'])}% do que a terra segura (a chuva do satélite, em mm de cada dia, "
-             f"vai até {data_br(fonte['ultimo_dia_com_dado'])}{estimado}). No mesmo dia do ano normal (safra {regra['ano_normal']}) "
+             f"{_n(agora['agua_na_terra_pct'])}% do que a terra segura. No mesmo dia do ano normal (safra {regra['ano_normal']}) "
              f"havia {_n(normal['agua_na_terra_mm'])} mm; no do pior ano (safra {regra['pior_ano']}), "
              f"{_n(pior['agua_na_terra_mm'])} mm.")
     return {
@@ -305,4 +311,4 @@ def como_esta_hoje(entrada, par=None, hoje=None, pasta_da_chuva_recente=None):
             "chuva_guardada_ate": guardados[-1].data.isoformat(),
             "conferencia_em_mm": conferencia_em_mm(entrada["cidade_id"],
                                                    ler_chuva_da_cor(entrada["cidade_id"])[0] or {})},
-        "frase": frase, "aviso": AVISO}
+        "frase": frase, "aviso": AVISO_DO_PRODUTOR, "aviso_tecnico": AVISO, "detalhe_tecnico": detalhe}
