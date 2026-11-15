@@ -10,7 +10,7 @@ var TEXTOS = {
   pt: {
     abertura: {
       titulo: "A lavoura o ano inteiro, com o que o satélite viu",
-      texto: "Conte o que você planta e onde. O Órbita Rural faz a conta com o que os satélites da NASA viram na sua região e põe a sua rotação ao lado de outras."
+      texto: "Conte o que você planta e onde. O Órbita Rural faz a conta com o que os satélites da NASA viram na sua região e põe a sua rotação (o que você planta, na ordem, ao longo do ano) ao lado de outras."
     },
     leituras: { produtor: "Produtor", agronomo: "Agrônomo", rotulo: "Quem está lendo" },
     momentos: {
@@ -24,14 +24,14 @@ var TEXTOS = {
     },
     modo: {
       guardadas: "Conversas guardadas",
-      aoVivo: "Agente ao vivo",
-      explicaGuardadas: "Você está vendo conversas guardadas: foram gravadas com o agente e os números são os da conta.",
-      explicaAoVivo: "O agente está ligado: escreva a sua pergunta.",
-      caiu: "Não consegui falar com o agente agora ({motivo}). Mostrando as conversas guardadas.",
-      semChave: "o servidor está sem a chave da IA",
+      aoVivo: "Assistente ao vivo",
+      explicaGuardadas: "Você está vendo conversas guardadas: foram gravadas com o assistente do Órbita Rural e os números são os da conta.",
+      explicaAoVivo: "O assistente está ligado: escreva a sua pergunta.",
+      caiu: "Não consegui falar com o assistente agora ({motivo}). Mostrando as conversas guardadas.",
+      semChave: "o servidor está sem a chave da inteligência artificial",
       semResposta: "ele não respondeu",
       erro: "ele respondeu com erro",
-      semConversas: "As conversas guardadas ainda não foram gravadas nesta pasta. Veja no LEIA-ME.md como gravar, ou abra a tela com o agente ligado."
+      semConversas: "As conversas guardadas ainda não foram gravadas nesta pasta. Veja no LEIA-ME.md como gravar, ou abra a tela com o assistente ligado."
     },
     conversa: {
       titulo: "A conversa",
@@ -53,7 +53,7 @@ var TEXTOS = {
       },
       conferido: "Números conferidos com a conta",
       naoConferido: "Texto trocado pelas frases da conta",
-      textoDe: { ia: "Texto escrito por IA; cada número foi conferido com a conta.", frases_prontas: "Texto de frases prontas, preenchidas com os números da conta." },
+      textoDe: { ia: "Texto escrito por inteligência artificial (IA); cada número foi conferido com a conta.", frases_prontas: "Texto de frases prontas, preenchidas com os números da conta." },
       verComparacao: "Ver a comparação",
       verFicha: "Ver a ficha",
       verReplay: "Ver a safra dia a dia",
@@ -63,12 +63,12 @@ var TEXTOS = {
       titulo: "A sua ficha",
       sub: "É com ela que a conta é feita. Confira antes.",
       vaziaTitulo: "A ficha aparece aqui",
-      vaziaTexto: "Três coisas bastam para a conta: o município, o tipo de solo e a rotação de hoje. O agente pergunta o que faltar.",
+      vaziaTexto: "Três coisas bastam para a conta: o município, o tipo de solo e a rotação de hoje. O Órbita Rural pergunta o que faltar.",
       campos: { cidade_id: "Município", terra: "Tipo de solo", rotacao_atual: "O que você planta hoje", plantio_da_soja: "Plantio da soja", preocupacao: "O que mais preocupa" },
       falta: "falta dizer",
       semData: "pelo calendário da região",
       cidades: { rio_verde: "Rio Verde (GO)", jatai: "Jataí (GO)", silvania: "Silvânia (GO)" },
-      terras: { pouca: "Arenoso (segura pouca água)", media: "Textura média", muita: "Argiloso (segura muita água)" },
+      terras: { pouca: "Arenoso (segura pouca água)", media: "Textura média (nem arenoso nem argiloso)", muita: "Argiloso (segura muita água)" },
       culturas: { soja: "soja", milho: "milho safrinha", pousio: "pousio (terra parada)", braquiaria: "braquiária (capim)", sorgo: "sorgo" },
       preocupacoes: { agua: "A água", calor: "O calor", terra: "A terra descoberta" },
       confirmar: "Está certo, pode calcular",
@@ -76,14 +76,14 @@ var TEXTOS = {
       corrigir: "Corrigir",
       confirmada: "Ficha conferida por você",
       corrigirTitulo: "O que está errado?",
-      corrigirGuardada: "Nesta demonstração a ficha é a da conversa guardada. Com o agente ligado, ele refaz a conta com a sua correção.",
+      corrigirGuardada: "Nesta demonstração a ficha é a da conversa guardada. Com o assistente ligado, ele refaz a conta com a sua correção.",
       corrigirEnviar: "Mandar a correção",
       cancelar: "Cancelar",
       correcaoFala: "Corrigindo a ficha: {itens}."
     },
     comparacao: {
       titulo: "As rotações lado a lado",
-      sub: "A sua rotação de hoje e outras opções, com a mesma conta e o mesmo clima.",
+      sub: "A sua rotação de hoje e outras opções, com a mesma conta e o mesmo clima. A água vem em milímetros (mm): 1 mm é 1 litro de água em cada metro quadrado de terra.",
       deHoje: "A sua rotação de hoje",
       outra: "Outra opção",
       preocupaLinha: "Você disse que o que mais preocupa é {o_que}: por isso vem primeiro.",
@@ -102,7 +102,7 @@ var TEXTOS = {
       semMedida: "sem medida",
       limite: "acima de {c} °C",
       limiteDaCultura: "{cultura}: acima de {c} °C na fase mais sensível",
-      limiteHipotese: "(limite por hipótese)",
+      limiteHipotese: "(limite ainda não confirmado)",
       satelite: "O satélite viu {n} dias sem planta verde",
       frases: { evidencia: "A prova", beneficio: "O que ganha", risco: "O risco", falta_saber: "O que falta saber" },
       resumo: "Resumo",
@@ -113,7 +113,7 @@ var TEXTOS = {
         ["Água que faltou", "o quanto a planta pediu e a terra não tinha para dar."],
         ["Dia de sede", "dia em que a planta já sentia a falta de água."],
         ["Calor forte", "dia mais quente do que a cultura aguenta na fase em que ela é mais sensível."],
-        ["Sem planta viva", "dia do ano em que a terra fica sem planta crescendo. O satélite confere isso pelo verde das folhas (o índice NDVI)."],
+        ["Sem planta viva", "dia do ano em que a terra fica sem planta crescendo. O satélite confere isso pelo verde das folhas (os técnicos chamam essa medida de NDVI)."],
         ["Pior ano", "a safra de pior colheita da região nos registros do IBGE. O ano normal é a safra do meio."],
         ["De ... a ...", "quando a conta depende de algo que ainda não foi medido, ela mostra a faixa em vez de um número só."]
       ],
@@ -129,6 +129,7 @@ var TEXTOS = {
       rotacao: "Na terra: {nome}.",
       pulso: ["Neste dia a água acabou.", "O produtor não sabia.", "O satélite sabia."],
       pulsoSede: ["Neste dia a sede começou."],
+      avisoAntes: "O aviso veio {n} dias antes: a sede começou em {data}.",
       culturas: { soja: "soja", milho: "milho safrinha", sorgo: "sorgo", braquiaria: "braquiária (capim)", milho_com_capim: "milho com capim", sem_planta: "sem planta" },
       semPlanta: "Terra sem planta viva",
       tocar: "Tocar", pausar: "Pausar", voltar: "Voltar ao começo", cheia: "Tela cheia", sair: "Sair da tela cheia",
@@ -140,14 +141,14 @@ var TEXTOS = {
       legenda: { chuva: "Chuva de cada dia", agua: "Água guardada na terra", sede: "Dias de sede", calor: "Dias de calor forte" },
       marcos: { plantio: "Plantio", agua_acabou: "Começa a sede", agua_no_fundo: "A água acabou", calor_forte: "Calor forte", colheita: "Colheita" },
       comeco: "Toque para ver os dias passando.",
-      sem: "O replay da safra aparece aqui quando a conversa guardada da safra 2015-16 for gravada."
+      sem: "A safra dia a dia aparece aqui quando a conversa guardada da safra 2015-16 for gravada."
     },
     agronomo: {
       titulo: "A leitura do agrônomo",
       texto: "Como a conta foi feita, com que valores e de onde eles vêm. As hipóteses e os limites da conta ficam aqui.",
       terra: "A conta para o solo",
       nota: "Esta leitura mostra a conta guardada de Rio Verde (GO), com a rotação de hoje e a rotação com capim.",
-      sem: "A resposta do motor não foi gravada nesta pasta (dados/respostas.js).",
+      sem: "A conta ainda não foi gravada nesta pasta (dados/respostas.js).",
       voltar: "Voltar para a conversa"
     },
     cooperativa: {
@@ -156,8 +157,8 @@ var TEXTOS = {
     },
     rodape: {
       lema: "Inteligência do espaço. Decisões para a terra.",
-      fontes: "De onde vêm os dados: a chuva é do satélite GPM IMERG, da NASA; a temperatura é da NASA POWER; o verde da lavoura é do satélite MODIS, da NASA. A conta da água segue o manual FAO-56. A colheita é do IBGE e a chuva medida em terra é da estação do INMET.",
-      ia: "Uso de IA: esta tela foi programada com apoio de IA (Claude). Na conversa, o texto do agente é escrito por IA ou montado com frases prontas, e todo número é conferido com a conta antes de aparecer.",
+      fontes: "De onde vêm os dados: a chuva é do satélite GPM IMERG, da NASA; a temperatura é da NASA POWER; o verde da lavoura é do satélite MODIS, da NASA. A conta da água segue o manual 56 da FAO, a agência da ONU para a agricultura. A colheita é do IBGE e a chuva medida em terra é da estação do INMET, o instituto de meteorologia do Brasil.",
+      ia: "Uso de inteligência artificial (IA): esta tela foi programada com apoio de IA (Claude). Na conversa, o texto do Órbita Rural é escrito por IA ou montado com frases prontas, e todo número é conferido com a conta antes de aparecer.",
       time: "Feito pela Equipe Agronautas no NASA Space Apps Challenge 2026. Ferramenta de apoio: converse com o agrônomo antes de decidir."
     }
   }

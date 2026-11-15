@@ -5,7 +5,8 @@
   "use strict";
 
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
-  function num(x, casas) { return typeof x !== "number" ? "—" : x.toLocaleString("pt-BR", { minimumFractionDigits: casas || 0, maximumFractionDigits: casas || 0 }); }
+  function num(x, casas) { return typeof x !== "number" ? "—" : x.toLocaleString("pt-BR", { maximumFractionDigits: casas || 0 }); }      // como na tela do produtor: casa decimal só quando o valor tem
+  function dataBR(x) { return window.ORBITA_COMPARACAO.dataBR(x); }
   function int(x) { return num(x, 0); }
   function um(x) { return num(x, 1); }
   function icone(nome) { return window.ORBITA_ICONE ? window.ORBITA_ICONE(nome) : ""; }
@@ -14,9 +15,10 @@
   /* ---------- peças de desenho ---------- */
   function faixaDoAno(trechos, classe) {
     return '<div class="year-strip ' + (classe || "") + '">' + trechos.map(function (s) {
-      var nome = t("resultado.ano.coberturas." + s.cobertura);
+      var nome = t("resultado.ano.coberturas." + s.cobertura), curto = t("resultado.ano.curtas." + s.cobertura);
+      if (curto === "resultado.ano.curtas." + s.cobertura) curto = nome;      // dentro da faixa vai o nome curto, e só onde cabe (ver ajustar); o inteiro está na legenda
       return '<i class="seg seg-' + esc(s.cobertura) + '" style="flex:' + Number(s.dias) + ' 1 0" title="' + esc(t("resultado.ano.trecho", { o_que: nome, de: s.de, ate: s.ate, dias: s.dias })) + '">' +
-             (classe ? "" : "<span>" + (s.dias >= 60 ? esc(nome) : "") + "</span>") + "</i>";
+             (classe ? "" : '<span data-nome="' + esc(curto) + '" aria-hidden="true"></span>') + "</i>";
     }).join("") + "</div>";
   }
   function meses(a, classe) {
@@ -41,7 +43,7 @@
 
   /* ---------- a leitura do agrônomo ---------- */
   function etiqueta(x) { return '<span class="tag ' + (x === "publicado" ? "pub" : "hip") + '">' + esc(x || t("agro.parametros.hipotese")) + "</span>"; }
-  function tabela(cabeca, linhas, classe) { return '<div class="table-wrap"><table class="data-table ' + (classe || "") + '"><thead>' + cabeca + "</thead><tbody>" + linhas + "</tbody></table></div>"; }
+  function tabela(cabeca, linhas, classe) { return '<p class="dica-rola" hidden>' + esc(t("agro.arraste")) + '</p><div class="table-wrap"><table class="data-table ' + (classe || "") + '"><thead>' + cabeca + "</thead><tbody>" + linhas + "</tbody></table></div>"; }
   function painel(titulo, sub, corpo, extra) {
     return '<article class="panel block"><header class="block-head"><div><h2>' + esc(titulo) + "</h2>" + (sub ? "<p>" + esc(sub) + "</p>" : "") + "</div>" + (extra || "") + "</header>" + corpo + "</article>";
   }
@@ -57,7 +59,7 @@
     var terra = '<div class="kv" style="margin-top:14px"><div><small>' + esc(t("agro.terra.classe")) + "</small><strong>" + esc(v.terra.classe) + "</strong></div><div><small>" + esc(t("agro.terra.porMetro")) + "</small><strong>" + um(v.terra.porMetro) +
                 " mm</strong></div><div><small>" + esc(t("agro.terra.raizSoja")) + "</small><strong>" + um(v.terra.soja) + " mm</strong><span>" + num(v.terra.raizSoja, 1) + " " + esc(t("agro.terra.m")) + "</span></div><div><small>" +
                 esc(t("agro.terra.raizMilho")) + "</small><strong>" + um(v.terra.milho) + " mm</strong><span>" + num(v.terra.raizMilho, 1) + " " + esc(t("agro.terra.m")) + "</span></div></div>";
-    return painel(m.titulo, t("agro.metodo.sub", { de: v.clima.primeiroDia, ate: v.clima.ultimoDia }), '<div class="method">' + passos + "</div>" + terra);
+    return painel(m.titulo, t("agro.metodo.sub", { de: dataBR(v.clima.primeiroDia), ate: dataBR(v.clima.ultimoDia) }), '<div class="method">' + passos + "</div>" + terra);
   }
   function faixaEPalha(v) {
     var pf = v.agua.pelaFaixa, d = v.disputa, corpo = "";
@@ -96,7 +98,7 @@
     var c = TEXTOS.pt.agro.calendario.colunas, k = v.calendario, h = v.semPlanta.atual, a = v.semPlanta.alternativa;
     var linhas = [["soja", k.soja], ["milho", k.milho]].map(function (x) { return "<tr><td><strong>" + esc(t("agro.calendario." + x[0])) + "</strong></td><td>" + esc(x[1].plantio) + "</td><td>" + esc(x[1].sai) + '</td><td class="num">' + int(x[1].ciclo) + "</td></tr>"; }).join("") +
       "<tr><td><strong>" + esc(t("agro.calendario.capim")) + '</strong></td><td colspan="3">' + esc(t("agro.calendario.capimTexto", { data: k.capim.secaEm, dias: int(k.capim.diasAntes) })) + "</td></tr>";
-    return painel(t("agro.calendario.titulo"), t("agro.calendario.sub"), '<div class="val-grid"><div>' + tabela("<tr>" + c.map(function (x, i) { return "<th" + (i === 3 ? ' class="num"' : "") + ">" + esc(x) + "</th>"; }).join("") + "</tr>", linhas) +
+    return painel(t("agro.calendario.titulo"), t("agro.calendario.sub"), '<div class="val-grid"><div>' + tabela("<tr>" + c.map(function (x, i) { return "<th" + (i === 3 ? ' class="num"' : "") + ">" + esc(x) + "</th>"; }).join("") + "</tr>", linhas, "cal") +
       '<p class="note">' + esc(t("agro.calendario.entre", { dias: int(k.entre) })) + " " + esc(t("agro.calendario.semPlanta", { hoje: int(h.dias), hojeDe: h.de, hojeAte: h.ate, alt: int(a.dias), altDe: a.de, altAte: a.ate })) + '</p></div><div class="mini-years">' +
       (v.anoDaTerra ? linhasDoAno(v, true) + legendaDoAno(v.anoDaTerra) : "") + "</div></div>");
   }
@@ -152,7 +154,7 @@
     if (v.aParte) itens.push(t("agro.limites.aParte", { safra: v.aParte.safra, aviso: v.aParte.aviso, hoje: um(v.aParte.atual.milho.faltaPct), alt: um(v.aParte.alternativa.milho.faltaPct) }));
     var f = v.clima, fontes = '<p class="note"><b>' + esc(t("agro.fontes.chuva")) + ":</b> " + esc(f.chuvaFonte) + ". <b>" + esc(t("agro.fontes.temperatura")) + ":</b> " + esc(f.temperaturaFonte) +
       (f.temperaturaLink ? ' (<a href="' + esc(f.temperaturaLink) + '" target="_blank" rel="noopener">' + esc(t("agro.fontes.consulta")) + "</a>)" : "") + ". <b>" + esc(t("agro.fontes.conta")) + ":</b> " + esc(f.conta) + ". <b>" + esc(t("agro.fontes.rendimento")) + ":</b> " + esc(v.regra.fonteDoRendimento) +
-      ". <b>" + esc(t("agro.fontes.periodo")) + ":</b> " + esc(t("agro.fontes.de", { de: f.primeiroDia, ate: f.ultimoDia })) + ".</p>";
+      ". <b>" + esc(t("agro.fontes.periodo")) + ":</b> " + esc(t("agro.fontes.de", { de: dataBR(f.primeiroDia), ate: dataBR(f.ultimoDia) })) + ".</p>";
     return painel(t("agro.limites.titulo"), t("agro.limites.sub"), '<ul class="plain-list">' + itens.map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ul><h3 class='sub' style='margin-top:16px'>" + esc(t("agro.fontes.titulo")) + "</h3>" + fontes);
   }
   function desenharAgronomo(v, val) {
@@ -160,5 +162,20 @@
            metodo(v) + faixaEPalha(v) + parametros(v) + calendario(v) + safraPorSafra(v) + validacao(v, val) + limites(v);
   }
 
-  window.ORBITA_RESULTADO = { agronomo: desenharAgronomo, num: num, int: int, um: um, esc: esc };
+  // Depois de desenhar, e quando a largura muda: o nome de cada trecho do ano só aparece onde cabe inteiro (nada de
+  // palavra cortada), e a tabela mais larga do que a tela ganha o aviso de arrastar e entra na ordem do teclado.
+  function ajustar(el) {
+    Array.prototype.forEach.call(el.querySelectorAll(".seg span[data-nome]"), function (s) {
+      s.textContent = s.getAttribute("data-nome");
+      if (s.offsetWidth > s.parentNode.clientWidth - 3) s.textContent = "";
+    });
+    Array.prototype.forEach.call(el.querySelectorAll(".table-wrap"), function (w) {
+      var rola = w.scrollWidth > w.clientWidth + 1, dica = w.previousElementSibling;
+      if (dica && dica.classList.contains("dica-rola")) dica.hidden = !rola;
+      if (rola) { w.tabIndex = 0; w.setAttribute("role", "region"); w.setAttribute("aria-label", t("agro.tabela")); }
+      else { w.removeAttribute("tabindex"); w.removeAttribute("role"); w.removeAttribute("aria-label"); }
+    });
+  }
+
+  window.ORBITA_RESULTADO = { ajustar: ajustar, agronomo: desenharAgronomo, num: num, int: int, um: um, esc: esc };
 })();

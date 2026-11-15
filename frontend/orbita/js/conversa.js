@@ -79,13 +79,12 @@
     // Depois de desenhar as falas E o compositor (ele muda a altura da lista): a última fala fica à vista desde o começo dela.
     function rolar() {
       var ultima = elFalas.lastElementChild;
-      if (!ultima || !st.falas.length) return;
-      if (elFalas.scrollHeight > elFalas.clientHeight + 4) {       // no computador a lista rola por dentro
-        var doAgente = ultima.classList.contains("agente") && !ultima.classList.contains("esperando");
-        elFalas.scrollTop = doAgente ? Math.min(ultima.offsetTop - 8, elFalas.scrollHeight - elFalas.clientHeight) : elFalas.scrollHeight;
-      } else if (st.falas.length > 1 && ultima.getBoundingClientRect().bottom > window.innerHeight) {
-        ultima.scrollIntoView({ block: "nearest", behavior: calmo ? "auto" : "smooth" });
-      }
+      if (!ultima || st.falas.length < 2) return;
+      // A conversa corre com a página (não há caixa que rola por dentro). Fala que já está inteira à vista fica onde está;
+      // resposta mais alta do que a tela vai com o começo no alto, para ler de cima para baixo; o resto anda só o que falta.
+      var q = ultima.getBoundingClientRect(), alto = window.innerHeight;
+      if (q.top >= 0 && q.bottom <= alto) return;
+      ultima.scrollIntoView({ block: q.height > alto - 32 ? "start" : "nearest", behavior: calmo ? "auto" : "smooth" });
     }
     function desenharCompositor() {
       var html = "";

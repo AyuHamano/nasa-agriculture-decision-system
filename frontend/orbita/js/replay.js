@@ -8,7 +8,7 @@
   var C = window.ORBITA_COMPARACAO, esc = C.esc, fmt = C.fmt;
   function ic(nome) { return window.ORBITA_ICONE ? window.ORBITA_ICONE(nome) : ""; }
   var MESES = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
-  var MS_POR_DIA = 55, PARADA_MS = 900, PARADA_FORTE_MS = 3600, JANELA_DIAS = 25, JANELA_FORTE_DIAS = 45;      // um ano inteiro com os marcos cabe em uns 30 segundos
+  var MS_POR_DIA = 55, PARADA_MS = 900, PARADA_AVISO_MS = 1800, PARADA_FORTE_MS = 3600, JANELA_DIAS = 25, JANELA_FORTE_DIAS = 45;      // um ano inteiro com os marcos cabe em uns 30 segundos
   var ativo = null;   // o replay montado agora (só um por vez)
 
   function partesDaData(iso) {
@@ -72,13 +72,18 @@
     var doPrincipal = marcos.filter(function (m) { return m.principal; })[0] || null;
     var fundos = marcos.filter(function (m) { return m.tipo === "agua_no_fundo" && (!doPrincipal || (m.cultura === doPrincipal.cultura && m.i >= doPrincipal.i)); });
     if (fundos.length) fundos[doPrincipal ? 0 : fundos.length - 1].fundo = true;
+    // O ponto alto é o dia em que a água acaba (o fundo): é ele que leva o destaque, o pulso inteiro e a parada longa.
+    // O começo da sede é o aviso que veio antes: etiqueta clara, frase menor, parada curta. Numa safra em que a água
+    // não chega a acabar, o motor não manda o fundo, e o começo da sede segue como o marco forte.
+    var temFundo = marcos.some(function (m) { return m.fundo; });
+    marcos.forEach(function (m) { m.forte = m.fundo || (m.principal && !temFundo); m.aviso = m.principal && temFundo && !m.fundo; });
     var maiorAgua = maiorDe(dias, "agua_na_terra_mm") || 1, temTmax = dias.some(function (d) { return typeof d.tmax_c === "number"; });
     var bandeiras = marcos.map(function (m, k) {
       var pct = 100 * (m.i + 0.5) / n;
       var nome = t("replay.marcos." + m.tipo);
       if (nome === "replay.marcos." + m.tipo) nome = m.tipo;
       if ((m.tipo === "plantio" || m.tipo === "colheita") && m.cultura) nome += ": " + nomeDaCultura(m.cultura);
-      return '<span class="rp-marco m-' + esc(m.tipo) + (m.principal || m.fundo ? " principal" : "") + '" data-marco="' + k + '" style="left:' + pct.toFixed(2) + '%"><b>' + esc(nome) + "</b></span>";
+      return '<span class="rp-marco m-' + esc(m.tipo) + (m.forte ? " principal" : "") + (m.aviso ? " aviso" : "") + '" data-marco="' + k + '" style="left:' + pct.toFixed(2) + '%"><b>' + esc(nome) + "</b></span>";
     }).join("");
 
     el.innerHTML = '<div class="palco-dentro"><header class="palco-topo"><h2 id="tituloDoReplay">' + esc(t("replay.titulo", { safra: replay.safra || "" })) + "</h2><p>" + esc(t(cidade ? "replay.texto" : "replay.textoSemLugar", { cidade: cidade })) + (replay.rotacao && replay.rotacao.nome ? " " + esc(t("replay.rotacao", { nome: replay.rotacao.nome })) : "") + "</p></header>" +
@@ -142,7 +147,7 @@
       pecas.linha.value = i;
       pecas.linha.setAttribute("aria-valuetext", p.dia + " de " + p.mes);
       var ultimo = null, principal = null;   // "principal" aqui: o último marco forte que já passou (a sede começou ou a água acabou)
-      marcos.forEach(function (m, k) { var passou = m.i <= i; bandeirasEl[k].classList.toggle("passou", passou); if (passou) { ultimo = m; if (m.principal || m.fundo) principal = m; } });
+      marcos.forEach(function (m, k) { var passou = m.i <= i; bandeirasEl[k].classList.toggle("passou", passou); if (passou) { ultimo = m; if (m.forte || m.aviso) principal = m; } });
       // A frase de um marco fica uns dias na tela e sai (não diz "neste dia" meses depois); no último dia volta a do fim.
       // No dia em que a sede começa e no dia em que a água acaba entra o pulso da demonstração (frases sem número),
       // com a frase da conta embaixo. "Neste dia a água acabou" só aparece no marco do fundo, que sai da conta.
@@ -152,16 +157,22 @@
       var chave = (pulso ? (principal.fundo ? "pulso-fundo|" : "pulso-sede|") : "") + texto;
       if (pecas.frase.getAttribute("data-texto") !== chave) {
         pecas.frase.setAttribute("data-texto", chave);
+        // No dia em que a água acaba, a tela lembra o aviso: quantos dias antes a sede tinha começado (a distância entre os dois marcos).
+        var antes = pulso && principal.fundo ? marcos.filter(function (m) { return m.aviso && m.i < principal.i; }).pop() : null;
         pecas.frase.innerHTML = pulso
-          ? '<strong class="rp-pulso">' + [].concat(t(principal.fundo ? "replay.pulso" : "replay.pulsoSede")).map(function (f) { return "<span>" + esc(f) + "</span>"; }).join(" ") + "</strong>" + (texto ? "<small>" + esc(texto) + "</small>" : "")
+          ? '<strong class="rp-pulso' + (principal.aviso ? " aviso" : "") + '">' + [].concat(t(principal.fundo ? "replay.pulso" : "replay.pulsoSede")).map(function (f) { return "<span>" + esc(f) + "</span>"; }).join(" ") + "</strong>" + (texto ? "<small>" + esc(texto) + "</small>" : "") +
+            (antes ? '<small class="rp-antes">' + esc(t("replay.avisoAntes", { n: principal.i - antes.i, data: C.dataBR(dias[antes.i].data) })) + "</small>" : "")
           : "<span>" + esc(texto) + "</span>";
       }
       pecas.frase.classList.toggle("forte", pulso);
+      quadro.classList.toggle("no-fundo", pulso && !!principal.fundo && i - principal.i <= JANELA_DIAS);
+      pecas.linha.style.setProperty("--p", (100 * i / Math.max(1, n - 1)).toFixed(2) + "%");
       quadro.classList.toggle("sem-agua", !!d.com_sede);
     }
     function botao() {
       pecas.tocar.innerHTML = ic(st.tocando ? "pausar" : "tocar") + "<span>" + esc(t(st.tocando ? "replay.pausar" : "replay.tocar")) + "</span>";
       pecas.tocar.setAttribute("aria-pressed", st.tocando ? "true" : "false");
+      quadro.classList.toggle("tocando", st.tocando);
     }
     function passo(agora) {
       if (!st.tocando) return;
@@ -172,7 +183,7 @@
         var cada = MS_POR_DIA / st.velocidade;
         while (st.resto >= cada && st.i < n - 1 && st.parada <= 0) {
           st.resto -= cada; st.i += 1;
-          for (var k = 0; k < marcos.length; k++) if (marcos[k].i === st.i) st.parada = Math.max(st.parada, (marcos[k].principal || marcos[k].fundo ? PARADA_FORTE_MS : PARADA_MS) / st.velocidade);
+          for (var k = 0; k < marcos.length; k++) if (marcos[k].i === st.i) st.parada = Math.max(st.parada, (marcos[k].forte ? PARADA_FORTE_MS : marcos[k].aviso ? PARADA_AVISO_MS : PARADA_MS) / st.velocidade);
         }
         mostrar(st.i);
         if (st.i >= n - 1) { parar(); return; }

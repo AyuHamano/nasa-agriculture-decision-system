@@ -36,6 +36,12 @@
     return m ? Number(m[3]) + " de " + MESES[Number(m[2]) - 1] + " de " + m[1] : "";
   }
 
+  // A data como se escreve no Brasil: "2026-11-11" vira "11/11/2026"; o que não é data nesse formato fica como veio.
+  function dataBR(iso) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso || ""));
+    return m ? m[3] + "/" + m[2] + "/" + m[1] : String(iso == null ? "" : iso);
+  }
+
   /* ---------- a ficha ---------- */
   function classeDaTerra(terra) {
     var o = obj(window.ORBITA_RESPOSTAS), r = obj(o.respostas && typeof o.respostas === "object" ? o.respostas : o)[terra];
@@ -155,7 +161,7 @@
         chaves.map(function (c) {
           var m = MEDIDAS.filter(function (x) { return x.chave === c; })[0], v = valor(obj(r[m.de])[c]);
           var texto = v.faixa ? t("comparacao.faixaCurta", { de: fmt(v.de), ate: fmt(v.ate) }) : v.texto;
-          return "<td" + (v.tem ? "" : ' class="sem"') + ">" + esc(texto) + (v.tem ? " <small>" + esc(t("comparacao.unidades." + m.un)) + "</small>" : "") + "</td>";
+          return "<td" + (v.tem ? (v.faixa ? ' class="faixa"' : "") : ' class="sem"') + ">" + esc(texto) + (v.tem ? " <small>" + esc(t("comparacao.unidades." + m.un)) + "</small>" : "") + "</td>";
         }).join("") + "</tr></tbody>";
     }).join("");
     return '<div class="resumo"><table><caption>' + esc(t("comparacao.resumo")) + "</caption><thead>" + cab + "</thead>" + grupos + "</table></div>";
@@ -179,5 +185,5 @@
       '<aside class="agronomo-aviso">' + ic("pessoa") + "<div><h3>" + esc(aviso || t("comparacao.agronomo")) + "</h3><p>" + esc(t("comparacao.agronomoTexto")) + '</p><button class="botao" data-acao="abrir-agronomo">' + esc(t("comparacao.agronomoBotao")) + "</button></div></aside></section>";
   }
 
-  window.ORBITA_COMPARACAO = { ficha: ficha, comparacao: comparacao, sequencia: sequencia, falaDaCorrecao: falaDaCorrecao, esc: esc, fmt: fmt, dataPorExtenso: dataPorExtenso };
+  window.ORBITA_COMPARACAO = { ficha: ficha, comparacao: comparacao, sequencia: sequencia, falaDaCorrecao: falaDaCorrecao, esc: esc, fmt: fmt, dataPorExtenso: dataPorExtenso, dataBR: dataBR };
 })();

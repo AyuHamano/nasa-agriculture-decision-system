@@ -122,10 +122,22 @@
     el.innerHTML = topo + '<p class="nota">' + esc(t("agronomo.nota")) + '</p><div class="agro-acoes"><div class="segmento" role="group" aria-label="' + esc(t("agronomo.terra")) + '"><span>' + esc(t("agronomo.terra")) + "</span>" +
       terras.map(function (k) { return '<button data-acao="terra-do-agronomo" data-terra="' + k + '" aria-pressed="' + (k === terra) + '">' + esc(String(t("ficha.terras." + k)).replace(/\s*\(.*\)\s*$/, "")) + "</button>"; }).join("") +
       '</div><button class="botao" data-acao="voltar-produtor">' + esc(t("agronomo.voltar")) + "</button></div></header>" + window.ORBITA_RESULTADO.agronomo(v, window.ORBITA_VALIDACAO);
+    window.ORBITA_RESULTADO.ajustar(el);
+  }
+  var relogioDoAgronomo = 0;
+  window.addEventListener("resize", function () {
+    clearTimeout(relogioDoAgronomo);
+    relogioDoAgronomo = setTimeout(function () { var el = $("leituraAgronomo"); if (el && !el.hidden && app.respostaDoAgronomo) window.ORBITA_RESULTADO.ajustar(el); }, 150);
+  });
+  // As notas de prioridade (3, 3, 3, 3) saíram do produto: o arquivo que se baixa não as leva, em nenhum nível.
+  function semPrioridades(o) {
+    if (Array.isArray(o)) return o.map(semPrioridades);
+    if (o && typeof o === "object") { var s = {}; Object.keys(o).forEach(function (k) { if (k !== "prioridades") s[k] = semPrioridades(o[k]); }); return s; }
+    return o;
   }
   function baixarResposta() {
     if (!app.respostaDoAgronomo) return;
-    var endereco = URL.createObjectURL(new Blob([JSON.stringify(app.respostaDoAgronomo, null, 2)], { type: "application/json" }));
+    var endereco = URL.createObjectURL(new Blob([JSON.stringify(semPrioridades(app.respostaDoAgronomo), null, 2)], { type: "application/json" }));
     var a = document.createElement("a"); a.href = endereco; a.download = "orbita-rural-resposta-" + app.terraDoAgronomo + ".json";
     document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(endereco); }, 1000);
   }

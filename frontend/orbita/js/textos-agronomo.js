@@ -13,6 +13,13 @@ TEXTOS.pt.resultado = {
       "capim": "Capim cobrindo a terra",
       "sem_planta": "Terra sem planta viva"
     },
+    "curtas": {
+      "soja": "Soja",
+      "milho": "Milho",
+      "milho_com_capim": "Milho com capim",
+      "capim": "Capim",
+      "sem_planta": "Sem planta"
+    },
     "trecho": "{o_que}: de {de} a {ate} ({dias} dias)"
   },
   "safras": {
@@ -21,7 +28,9 @@ TEXTOS.pt.resultado = {
 };
 TEXTOS.pt.agro = {
   "intro": "Esta leitura mostra como a conta foi feita, com que valores e de onde eles vêm, para o agrônomo conferir. Os números são os mesmos da leitura do produtor, agora em milímetros.",
-  "baixar": "Baixar a resposta completa (JSON)",
+  "baixar": "Baixar a conta completa (arquivo .json)",
+  "arraste": "Arraste a tabela para o lado para ver todas as colunas.",
+  "tabela": "Tabela larga: role para o lado",
   "baixado": "Arquivo baixado.",
   "metodo": {
     "titulo": "O método em 5 passos",
@@ -92,7 +101,7 @@ TEXTOS.pt.agro = {
   },
   "parametros": {
     "titulo": "Os parâmetros da conta",
-    "sub": "{total} valores, cada um com a fonte. {hip} ainda são hipótese: escolha do time, a conferir.",
+    "sub": "{total} valores usados na conta (os parâmetros), cada um com a fonte. {hip} ainda são hipótese: escolha do time, a conferir.",
     "todos": "Todos",
     "soHipoteses": "Só as hipóteses",
     "colunas": [
@@ -146,7 +155,7 @@ TEXTOS.pt.agro = {
     "forte": "Nível: {nivel}% de falta. Safra de quebra: {quebra}; são elas: {quebras}. Passaram do nível: {hoje} na rotação de hoje ({hojeQuais}) e {alt} na alternativa ({altQuais}).",
     "alarmes": "Alarme falso (sede forte com colheita boa): {safras}.",
     "quebrasAbaixo": "Quebra que a conta não viu: {safras}.",
-    "regra": "Como os anos foram escolhidos: {criterio}. Mediana das {total} safras: {mediana} kg/ha.",
+    "regra": "Como os anos foram escolhidos: {criterio}. Mediana (o valor do meio) das {total} safras: {mediana} kg/ha.",
     "pelaChuva": "Pela regra da chuva, o pior ano seria a safra {pior} e o normal, a {normal}."
   },
   "validacao": {
