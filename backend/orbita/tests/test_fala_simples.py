@@ -88,8 +88,22 @@ class AsRegrasDaIA(unittest.TestCase):
         for trecho in ('diga "o valor do meio"', 'diga "a camada de terra onde ficam as raízes"',
                        'diga "a chuva estimada por modelo de computador"', 'diga "a chuva medida por satélite da NASA"',
                        "com a mesma casa depois da vírgula", "a data do dia da consulta e a data do último dia com dado",
-                       "ficou perto do fundo sem acabar"):
+                       "ficou perto do fundo sem acabar",
+                       'Não diga que uma rotação é "a que mais sofre"', "Escreva só em português"):
             self.assertIn(trecho, " ".join(agente.REGRAS.split()))
+
+
+class LetraDeOutroAlfabeto(unittest.TestCase):
+    def test_o_texto_com_letra_de_outro_alfabeto_e_barrado(self):
+        # Visto na gravação de 2026-11-15: "Vale fazer 监测 de campo toda semana", numa resposta de conhecimento geral.
+        sobras = agente._sentido_trocado("Vale fazer 监测 de campo toda semana e conversar com o agrônomo.")
+        self.assertEqual(sobras, ["监测 (letra de outro alfabeto: escreva só em português)"])
+        saida = {"resposta": "Vale fazer 监测 de campo.", "ficha": {}, "comparacao": None, "consultas": []}
+        self.assertEqual(len(agente.conferir_saida(saida, DIA)), 1)
+
+    def test_o_portugues_com_acento_ordinal_grau_e_seta_passa(self):
+        texto = "soja → milho de 2ª safra: máxima de 33,2 °C; a 1º de março • não é à toa. Órbita, ação, pé, vovô."
+        self.assertEqual(agente._sentido_trocado(texto), [])
 
 
 class AsFrasesProntasDoRegistro(unittest.TestCase):
@@ -133,6 +147,12 @@ class ORoteiroDasConversas(unittest.TestCase):
         self.assertEqual(exportar_conversas.comecos_repetidos(gravada("Confira a sua ficha: a", "Confira a sua ficha: a")), 0)
         self.assertEqual(exportar_conversas.hoje_sem_data(gravada("O último dia com dado foi 4 dias antes de hoje.")), 1)
         self.assertEqual(exportar_conversas.hoje_sem_data(gravada("Até 11/11/2026, 4 dias antes de hoje (15/11/2026).")), 0)
+        solta = {"passos": [{"de": "agente", "saida": {"resposta": "Hoje é 15/11/2026. A decisão é sua.",
+                                                       "consultas": [{"resultado": {"comparacao": []}}]}}]}
+        do_hoje = {"passos": [{"de": "agente", "saida": {"resposta": "Hoje é 15/11/2026, e o último dado é de 11/11/2026.",
+                                                         "consultas": [{"resultado": {"hoje": {"disponivel": True}}}]}}]}
+        self.assertEqual(exportar_conversas.hoje_fora_de_hora(solta), 1)
+        self.assertEqual(exportar_conversas.hoje_fora_de_hora(do_hoje), 0)
         self.assertEqual(exportar_conversas.palavras_da_conta(gravada("A mediana delas é 38,0%.")), 1)
         self.assertEqual(exportar_conversas.palavras_da_conta(gravada("O valor do meio delas é 38,0%.")), 0)
 

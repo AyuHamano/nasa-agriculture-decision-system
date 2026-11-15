@@ -110,6 +110,7 @@ def _barradas(gravada):
 
 COMECO = 60                                         # as letras do começo de uma resposta que não podem se repetir
 HOJE_SOLTO = re.compile(r"\b(?:antes de hoje|dias? atrás|até hoje)\b", re.IGNORECASE)
+HOJE_E = re.compile(r"\bhoje é \d", re.IGNORECASE)
 DATA_ESCRITA = re.compile(r"\b\d{1,2}/\d{1,2}/\d{4}\b")
 PALAVRAS_DA_CONTA = ("mediana", "zona das raízes", "faixa da hipótese", "chuva de modelo", "franco-arenosa")
 
@@ -137,6 +138,13 @@ def hoje_sem_data(gravada):
     return sum(1 for frase in frases if HOJE_SOLTO.search(frase) and not DATA_ESCRITA.search(frase))
 
 
+def hoje_fora_de_hora(gravada):
+    """Quantas respostas dizem que dia é hoje ("Hoje é 15/11/2026") sem a pergunta ter sido a do "como está hoje"."""
+    saidas = [p["saida"] for p in gravada["passos"] if p["de"] == "agente"]
+    return sum(1 for s in saidas if HOJE_E.search(s["resposta"])
+               and not any(isinstance((c.get("resultado") or {}).get("hoje"), dict) for c in s.get("consultas") or ()))
+
+
 def palavras_da_conta(gravada):
     """Quantas respostas trazem uma palavra da conta que o produtor não conhece (a lista: PALAVRAS_DA_CONTA)."""
     return sum(1 for texto in _respostas(gravada) if any(palavra in texto.lower() for palavra in PALAVRAS_DA_CONTA))
@@ -145,10 +153,11 @@ def palavras_da_conta(gravada):
 def _falhas(conversa, gravada):
     """O que desabona uma conversa gravada com a IA: cada fala barrada pela conferência (ali saíram as frases
     prontas), um replay que a conversa não pediu (só a conversa do replay leva os dias de uma safra), duas respostas
-    com o mesmo começo, um "antes de hoje" sem a data ao lado e uma palavra da conta sem explicação."""
+    com o mesmo começo, um "antes de hoje" sem a data ao lado, um "hoje é tal dia" numa resposta que não é a do
+    "como está hoje" e uma palavra da conta sem explicação."""
     replay_a_mais = 0 if conversa["id"].startswith("replay-") or not gravada["replay"] else 1
     return (_barradas(gravada) + replay_a_mais + comecos_repetidos(gravada) + hoje_sem_data(gravada)
-            + palavras_da_conta(gravada))
+            + hoje_fora_de_hora(gravada) + palavras_da_conta(gravada))
 
 
 def _com_a_ia(conversa, ia, hoje):

@@ -40,6 +40,7 @@ import json
 import re
 import secrets
 import sys
+import unicodedata
 
 from orbita import conferencia, conversa, ferramentas, ficha
 
@@ -93,6 +94,8 @@ DATA_NO_TEXTO = re.compile(r"(?<![\d/])(\d{1,2})/(\d{1,2})(?:/(\d{4}))?(?![\d/])
 FIM_DE_FRASE = re.compile(r"[.!?\n•]")
 A_SEDE_COMECOU = (" (nesse dia a sede começou: acabou só a água fácil de tirar; a conta só diz que a água acabou no "
                   "marco da água no fundo, se houver)")
+
+OUTRO_ALFABETO = " (letra de outro alfabeto: escreva só em português)"
 
 OLA = ("oi", "ola", "oie", "opa", "alo", "bom dia", "boa tarde", "boa noite", "e ai", "eai", "oi tudo bem",
        "ola tudo bem", "oi bom dia", "oi boa tarde", "oi boa noite", "comecar", "inicio")
@@ -152,8 +155,10 @@ assunto, sem repetir esse aviso.
 satélite viu.
 - Ao comparar, ponha os dois números lado a lado. Não diga a diferença entre eles, nem "o dobro", nem "metade", nem \
 de qual dos dois um terceiro número está mais perto.
-- Escreva as datas no jeito brasileiro, dia/mês/ano, como 14/03/2016. Nunca escreva só "hoje" ou "tantos dias \
-antes de hoje": escreva a data do dia da consulta e a data do último dia com dado, as duas, como a ferramenta dá.
+- Escreva as datas no jeito brasileiro, dia/mês/ano, como 14/03/2016. Só fale do dia de hoje quando o \
+produtor perguntar como a lavoura está hoje. Nessa resposta, nunca escreva só "hoje" ou "tantos dias antes de \
+hoje": escreva a data do dia da consulta e a data do último dia com dado, as duas, como a ferramenta dá. Nas \
+outras respostas, não diga que dia é hoje.
 - Escreva cada número igual ao da conta, com a mesma casa depois da vírgula: se a conta diz 252,0 mm, escreva \
 252,0 mm (não 252 mm); se diz 96 dias, escreva 96 dias.
 - O produtor não conhece as palavras da conta. Não escreva "mediana": diga "o valor do meio". Não escreva "zona das \
@@ -162,6 +167,12 @@ valor, porque isso não foi medido". Não escreva "chuva de modelo": diga "a chu
 computador". Não escreva "GPM IMERG" nem "NASA GIBS" sozinhos: diga "a chuva medida por satélite da NASA". Não \
 escreva "FAO" sozinho: diga "a FAO, o órgão da ONU para a agricultura". Não escreva "franco-arenosa": diga "terra \
 de textura média".
+- A falta de água de cada rotação, na comparação, é das culturas do ano inteiro (a soja mais a segunda safra), \
+não só do milho ou do sorgo: diga "na rotação com milho faltaram", não "o milho deixou faltando". O que o satélite \
+viu da terra vale para a rotação de hoje da região, não para uma cultura.
+- Não diga que uma rotação é "a que mais sofre", "a melhor" ou "a pior" de todas: as rotações com capim saem em \
+faixa, e a ordem entre elas pode mudar. Ponha os números de cada uma lado a lado e deixe o produtor ver.
+- Escreva só em português, com as letras do português.
 - No marco da água no fundo, a frase da conta diz o que aconteceu: a água acabou, ficou perto do fundo sem acabar, \
 ou a terra já estava seca no dia do plantio. Conte como a frase conta; não diga que a água acabou nos outros dois \
 casos.
@@ -332,12 +343,25 @@ def _agua_acabou_no_dia_errado(texto, consultas):
     return achados
 
 
+def _outro_alfabeto(texto):
+    """Os trechos escritos com letra de outro alfabeto (visto na gravação de 2026-11-15: "fazer 监测 de campo")."""
+    trechos, atual = [], ""
+    for letra in texto + " ":
+        de_fora = letra.isalpha() and letra not in "ªºµ" and "LATIN" not in unicodedata.name(letra, "")
+        if de_fora:
+            atual += letra
+        elif atual:
+            trechos.append(atual + OUTRO_ALFABETO)
+            atual = ""
+    return list(dict.fromkeys(trechos))
+
+
 def _sentido_trocado(texto, consultas=()):
     """Os trechos com o sentido trocado: um número de "dias sem planta viva" dito como dias de terra coberta (o
     contrário), e "a água acabou" dito do dia em que a sede só começou (com os replays consultados nesta fala)."""
     texto = texto or ""
     return ([achado.group(0) + SENTIDO_TROCADO for achado in COBERTA_TANTOS_DIAS.finditer(texto)]
-            + _agua_acabou_no_dia_errado(texto, consultas))
+            + _agua_acabou_no_dia_errado(texto, consultas) + _outro_alfabeto(texto))
 
 
 def _conta(fch, comparacao, consultas):
