@@ -13,6 +13,8 @@ No terminal, de dentro de backend/ (precisa da chave no ambiente; ver LEIA-ME-ag
 O que a IA faz: entende a fala do produtor, propõe os valores da ficha, escolhe qual ferramenta consultar e
 escreve a explicação. O que o PROGRAMA garante, sem depender do pedido à IA:
 - A ficha é fechada: só entra valor das listas do motor (`ficha.py`), e é o programa que lê o "sim" do produtor.
+  A confirmação leva um selo (`estado["selo"]`) feito com um segredo que só existe na memória deste programa: o
+  estado volta de quem chama (o navegador), e "confirmada" escrito à mão, sem o selo certo, não vale.
 - A conta só roda com a ficha confirmada. Ferramenta da conta pedida antes disso não roda.
 - Com a ficha confirmada, toda resposta sai com a comparação de 3 rotações ou mais, contando a de hoje, cada uma
   com a evidência, o benefício, o risco e o que falta saber (`comparacao`), e com o aviso do agrônomo (`aviso`).
@@ -26,13 +28,16 @@ escreve a explicação. O que o PROGRAMA garante, sem depender do pedido à IA:
 - O `momento`: `depois` (o verde do satélite ou o registro), `durante` (o replay de uma safra ou o "como está
   hoje") ou `antes` (o resto).
 
-O estado é pequeno e vira JSON: a ficha, a pergunta que o produtor fez antes de fechar a ficha, o momento e as
-últimas falas (cortadas). Quem chama guarda e devolve na fala seguinte; cabe no limite do corpo da API.
+O estado é pequeno e vira JSON: a ficha, o selo da confirmação, a pergunta que o produtor fez antes de fechar a
+ficha, o momento e as últimas falas (cortadas numa palavra inteira e conferidas de novo). Quem chama guarda e devolve na fala seguinte; cabe no limite do corpo da API.
 A IA não escolhe a rotação pelo produtor, e nenhum dado pessoal é pedido.
 """
 import datetime
+import hashlib
+import hmac
 import json
 import re
+import secrets
 import sys
 
 from orbita import conferencia, conversa, ferramentas, ficha
@@ -48,6 +53,8 @@ MOMENTOS = ("antes", "durante", "depois")
 APOIOS = ("conta", "dados_do_lugar", "conhecimento_geral")
 QUANTOS_MARCOS = 8
 FRASE_MINIMA = 40                # um texto cortado só vale se sobrar pelo menos isto até a última frase inteira
+ARGUMENTOS = {"clima_do_lugar": ("hoje",), "ensaio_da_rotacao": ("safra",), "verde_do_satelite": ("safra",)}
+_SEGREDO = secrets.token_bytes(32)   # sorteado quando o programa liga; fica só na memória (nunca em arquivo)
 
 AVISO = "Converse com o agrônomo antes de decidir."
 AVISO_DE_CONHECIMENTO_GERAL = "Isto é conhecimento geral: não saiu da conta com os dados da NASA."
@@ -58,13 +65,15 @@ SAUDACAO = ("Olá! Aqui é o Órbita Rural. Eu ensaio a sua rotação de cultura
 NAO_ENTENDI = "Não entendi."
 PODE_PERGUNTAR = ("Pode perguntar sobre a sua rotação. Por exemplo: vale trocar o que eu planto? Como foi a pior "
                   "safra, dia a dia? Quantos dias a terra fica sem planta viva?")
-DE_NADA = "Por nada! " + PODE_PERGUNTAR + " A comparação das rotações continua aqui embaixo."
+DE_NADA = PODE_PERGUNTAR + " A comparação das rotações continua aqui embaixo."
+AGRADECEU = ("obrigad", "brigad", "valeu")
 FICHA_MUDOU = "Mudei a sua ficha, e por isso a conta espera você confirmar de novo."
 FICHA_NAO_CONFIRMADA = ("A ficha ainda não foi confirmada pelo produtor: a conta só roda depois do sim dele. Não "
                         "diga nenhum número da conta.")
 SEM_CONTA = ("Sobre isso eu não tenho conta, e por isso não dou número. O que a conta mostra da sua rotação está na "
              "comparação aqui embaixo. Para esse assunto, converse com o agrônomo.")
 SEM_NUMERO = "Fiz a conta. O resultado de cada rotação está na comparação aqui embaixo."
+FALA_LONGA = "(Resposta longa: o resultado de cada rotação está na comparação.)"
 CONTA_RECUSADA = "Não consegui fazer a conta com essa ficha. {motivo} Diga o que corrigir."
 AVISO_DA_TRAVA = ("A conferência achou números que não estão no que as ferramentas devolveram nesta fala: {sobras}. "
                   "Escreva a resposta inteira de novo sem esses números. Se o número é da conta, consulte a "
@@ -124,13 +133,49 @@ agrônomo. Não repita a tabela inteira: explique o que ela mostra para a pergun
 
 def _cortar(texto, teto):
     """O texto cortado para caber em `teto` bytes depois de virar JSON (a conta mais larga: \\uXXXX por letra
-    acentuada). Assim o estado cabe no corpo da API, escreva quem chama o JSON como escrever."""
+    acentuada). Assim o estado cabe no corpo da API, escreva quem chama o JSON como escrever.
+
+    O corte cai sempre no fim de uma palavra inteira: um número ("232,9") ou uma data nunca fica pela metade.
+    """
     texto = texto.strip()
     if len(json.dumps(texto)) <= teto:
         return texto
     while texto and len(json.dumps(texto + "…")) > teto:
-        texto = texto[:max(len(texto) * 9 // 10, len(texto) - 40)].rstrip()
-    return texto + "…"
+        texto = texto[:max(len(texto) * 9 // 10, len(texto) - 40)]
+    espaco = max(texto.rfind(" "), texto.rfind("\n"))
+    if espaco > 0:
+        texto = texto[:espaco]                           # sai a última palavra, que pode ter ficado pela metade
+    else:
+        texto = re.sub(r"[\d.,/:%+-]+$", "", texto)       # uma palavra só: sai o resto de número do fim
+    return texto.rstrip() + "…"
+
+
+def _guardar(resposta, conta, permitidos):
+    """A fala do agente como fica no estado: cortada e conferida de novo. Se o corte deixou número fora da conta
+    (uma data escrita em palavras, partida no meio), recua até o fim da frase anterior; sem frase, fica um aviso."""
+    guardada = _cortar(resposta, TAMANHO_DA_FALA)
+    while guardada != resposta and conferencia.conferir_texto(guardada, conta, permitidos):
+        corpo = guardada[:-1]
+        fim = max(corpo.rfind(ponto) for ponto in (". ", "! ", "? ", "\n"))
+        if fim < FRASE_MINIMA:
+            return FALA_LONGA
+        guardada = corpo[:fim + 1].rstrip() + "…"
+    return guardada
+
+
+def _selo(fch):
+    """O selo da ficha confirmada: a prova de que foi este programa que leu o "sim" do produtor para esta ficha.
+
+    É um HMAC-SHA256 dos 5 campos da ficha com o segredo da memória. Quem chama guarda e devolve o selo junto com o
+    estado; sem o segredo, não dá para fazer o selo de outra ficha. Se o programa reiniciar, o segredo muda e o
+    produtor confirma a ficha de novo.
+    """
+    marca = json.dumps([fch.get(campo) for campo in ficha.CAMPOS], ensure_ascii=False, separators=(",", ":"))
+    return hmac.new(_SEGREDO, marca.encode("utf-8"), hashlib.sha256).hexdigest()
+
+
+def _selo_confere(selo, fch):
+    return isinstance(selo, str) and hmac.compare_digest(selo.encode("utf-8"), _selo(fch).encode("utf-8"))
 
 
 def _sem_marcas(texto):
@@ -161,7 +206,7 @@ def _disse_sim(fala):
 
 
 def _novo():
-    return {"v": VERSAO, "ficha": ficha.nova(), "pergunta": None, "momento": "antes", "falas": []}
+    return {"v": VERSAO, "ficha": ficha.nova(), "selo": None, "pergunta": None, "momento": "antes", "falas": []}
 
 
 def _conferir_estado(estado, listas, hoje):
@@ -176,7 +221,10 @@ def _conferir_estado(estado, listas, hoje):
     while falas and falas[0]["de"] != "produtor":
         falas.pop(0)
     pergunta = estado.get("pergunta")
-    return {"v": VERSAO, "ficha": ficha.conferir(estado.get("ficha"), listas, hoje),
+    fch = ficha.conferir(estado.get("ficha"), listas, hoje)
+    if fch["confirmada"] and not _selo_confere(estado.get("selo"), fch):
+        fch = dict(fch, confirmada=False)            # "confirmada" sem o selo deste programa não vale: confirma de novo
+    return {"v": VERSAO, "ficha": fch, "selo": None,
             "pergunta": _cortar(pergunta, TAMANHO_DA_PERGUNTA) if isinstance(pergunta, str) and pergunta.strip()
             else None,
             "momento": estado.get("momento") if estado.get("momento") in MOMENTOS else "antes", "falas": falas}
@@ -206,8 +254,12 @@ def _conversa(estado, fch, hoje, fala_do_produtor):
 
 
 def _conta(fch, comparacao, consultas):
-    """A conta contra a qual o texto é conferido: a ficha, a comparação e o que a IA leu das ferramentas."""
-    return {"ficha": fch, "comparacao": comparacao, "consultas": list(consultas)}
+    """A conta contra a qual o texto é conferido: a ficha, a comparação e o que as ferramentas devolveram.
+
+    Dos `consultas` entra só o `resultado` (o que veio do motor). Os `argumentos` são o que a IA pediu: não são conta.
+    """
+    return {"ficha": fch, "comparacao": comparacao,
+            "resultados": [c.get("resultado") for c in consultas if isinstance(c, dict)]}
 
 
 def _permitidos(hoje, comparacao=None):
@@ -228,13 +280,18 @@ def conferir_saida(saida, hoje):
 def _sair(estado, texto, resposta, hoje, *, comparacao=None, apoio=None, momento=None,
           texto_de="frases_prontas", passou=True, sobras=(), tentativas=0, consultas=(), replay=None):
     """Monta o estado novo e a saída. O texto que sai, de quem for, passa pela conferência mais uma vez."""
-    conta = _conta(ficha.publica(estado["ficha"]), comparacao, consultas)
-    if conferencia.conferir_texto(resposta, conta, _permitidos(hoje, comparacao)):
+    confirmada = estado["ficha"]["confirmada"] is True
+    if confirmada and not comparacao:
+        raise RuntimeError("Erro de dentro do agente: com a ficha confirmada, toda resposta leva a comparação das "
+                           "rotações.")
+    conta, permitidos = _conta(ficha.publica(estado["ficha"]), comparacao, consultas), _permitidos(hoje, comparacao)
+    if conferencia.conferir_texto(resposta, conta, permitidos):
         resposta, texto_de, passou = (SEM_NUMERO if comparacao else NAO_ENTENDI), "frases_prontas", False
     momento = momento or estado["momento"]
     falas = estado["falas"] + [{"de": "produtor", "texto": _cortar(texto, TAMANHO_DA_FALA) or "…"},
-                               {"de": "agente", "texto": _cortar(resposta, TAMANHO_DA_FALA)}]
-    estado = dict(estado, momento=momento, falas=falas[-MAX_FALAS:])
+                               {"de": "agente", "texto": _guardar(resposta, conta, permitidos)}]
+    estado = dict(estado, momento=momento, falas=falas[-MAX_FALAS:],
+                  selo=_selo(estado["ficha"]) if confirmada else None)
     saida = {"resposta": resposta, "momento": momento, "ficha": ficha.publica(estado["ficha"]),
              "comparacao": comparacao, "apoio": apoio,
              "conferencia": {"passou": passou, "sobras": list(sobras), "tentativas": tentativas},
@@ -318,8 +375,12 @@ class _Consultas:
         return self._ensaio
 
     def chamar(self, nome, argumentos):
-        argumentos = {chave: valor for chave, valor in (argumentos if isinstance(argumentos, dict) else {}).items()
-                      if chave in ("safra", "hoje") and valor not in (None, "", False)}
+        pedido, argumentos = (argumentos if isinstance(argumentos, dict) else {}), {}
+        aceita = ARGUMENTOS.get(nome, ())             # cada ferramenta só aceita o argumento dela, e no formato dele
+        if "safra" in aceita and isinstance(pedido.get("safra"), str) and pedido["safra"].strip():
+            argumentos["safra"] = pedido["safra"].strip()[:20]
+        if "hoje" in aceita and pedido.get("hoje") is True:
+            argumentos["hoje"] = True
         if nome == "ensaio_da_rotacao" and not argumentos.get("safra"):
             resultado = self.ensaio()
         else:
@@ -412,8 +473,11 @@ def _conta_recusada(estado, texto, erro, hoje):
                  consultas=[{"ferramenta": "ensaio_da_rotacao", "argumentos": {}, "resultado": {"erro": motivo}}])
 
 
-def _responder(estado, texto, pergunta, modelo, listas, hoje):
-    """A ficha está confirmada: a IA consulta as ferramentas e explica; o programa confere e completa."""
+def _responder(estado, texto, pergunta, modelo, listas, hoje, pronto=None):
+    """A ficha está confirmada: a IA consulta as ferramentas e explica; o programa confere e completa.
+
+    Sem `pergunta` (uma cortesia, uma fala vazia), a IA não é chamada: sai o texto `pronto`, com a comparação.
+    """
     fch = estado["ficha"]
     consultas = _Consultas(fch)
     try:
@@ -426,8 +490,9 @@ def _responder(estado, texto, pergunta, modelo, listas, hoje):
     def conta():
         return _conta(ficha.publica(fch), comparacao, consultas.feitas)
 
-    if pergunta is None:                              # uma cortesia ("obrigado"): não precisa da IA
-        return _sair(estado, texto, DE_NADA, hoje, comparacao=comparacao, apoio="conta")
+    if pergunta is None:                              # uma cortesia ("obrigado", "ok"): não precisa da IA
+        comeco = "Por nada! " if any(pedaco in conversa._limpar(texto) for pedaco in AGRADECEU) else "Combinado. "
+        return _sair(estado, texto, pronto or comeco + DE_NADA, hoje, comparacao=comparacao, apoio="conta")
     definicoes = ferramentas.definicoes() + [ficha.definicao(listas)]
     mensagens = _conversa(estado, fch, hoje, pergunta)
     texto_da_ia, sobras_da_ia, pedidos, voltas, tentativas, nova_ficha = "", [], 0, 0, 0, None
@@ -484,7 +549,8 @@ def _responder(estado, texto, pergunta, modelo, listas, hoje):
         sobras_da_ia = []
     else:
         final = _frases_prontas(consultas.feitas, comparacao, lugar)
-    return _sair(dict(estado, pergunta=None), texto, final, hoje, comparacao=comparacao, apoio=apoio, momento=_momento(consultas.feitas), texto_de="ia" if texto_da_ia else "frases_prontas",
+    return _sair(dict(estado, pergunta=None), texto, final, hoje, comparacao=comparacao, apoio=apoio,
+                 momento=_momento(consultas.feitas), texto_de="ia" if texto_da_ia else "frases_prontas",
                  passou=not sobras_da_ia, sobras=sobras_da_ia, tentativas=tentativas, consultas=consultas.feitas,
                  replay=consultas.replay)
 
@@ -516,9 +582,10 @@ def passo(estado, texto, modelo, hoje=None):
     vazia = not any(fch.get(campo) for campo in ficha.CAMPOS)
     if vazia and (not fala or fala in OLA or fala in conversa.DE_NOVO):
         return _sair(estado, texto, SAUDACAO + "\n\n" + ficha.pergunta_do_que_falta(fch, listas), hoje)
+    if not fala and fch["confirmada"]:                # nem a fala vazia sai sem a comparação
+        return _responder(estado, texto, None, modelo, listas, hoje, pronto=NAO_ENTENDI + " " + PODE_PERGUNTAR)
     if not fala:
-        pronto = (PODE_PERGUNTAR if fch["confirmada"] else ficha.resumo(fch, listas) if ficha.completa(fch)
-                  else ficha.pergunta_do_que_falta(fch, listas))
+        pronto = ficha.resumo(fch, listas) if ficha.completa(fch) else ficha.pergunta_do_que_falta(fch, listas)
         return _sair(estado, texto, NAO_ENTENDI + " " + pronto, hoje)
     if ficha.completa(fch) and not fch["confirmada"] and _disse_sim(fala):
         pergunta = texto if "?" in texto else (estado["pergunta"] or PERGUNTA_PADRAO)

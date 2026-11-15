@@ -318,9 +318,14 @@ class AResposta(ComODuble):
         self.assertTrue(saida["ficha"]["confirmada"])
 
     def test_cortesia_nao_gasta_a_ia_e_traz_a_comparacao(self):
-        estado, saida, modelo = self.passo(self.confirmada(), "Obrigado!")
-        self.assertEqual((modelo.pedidos, saida["apoio"], saida["texto_de"]), ([], "conta", "frases_prontas"))
-        self.conferir_a_comparacao(saida)
+        for texto, comeco in (("Obrigado!", "Por nada!"), ("ok", "Combinado."), ("Valeu, entendi", None)):
+            estado, saida, modelo = self.passo(self.confirmada(), texto, fala("", ENSAIO), fala(BOA))
+            if comeco is None:                                   # não é só uma cortesia: vai à IA
+                self.assertEqual(len(modelo.pedidos), 2)
+                continue
+            self.assertEqual((modelo.pedidos, saida["apoio"], saida["texto_de"]), ([], "conta", "frases_prontas"))
+            self.assertTrue(saida["resposta"].startswith(comeco))
+            self.conferir_a_comparacao(saida)
 
     def test_ferramenta_demais_ou_desconhecida_cai_nas_frases_prontas(self):
         sempre = [fala("", ENSAIO)] * 20
@@ -372,7 +377,7 @@ class OEstado(ComODuble):
         estado = self.confirmada()
         for numero in range(6):
             estado, saida, _ = self.passo(estado, f"pergunta de número {numero}: vale o sorgo?", fala("", ENSAIO), fala(BOA))
-        self.assertEqual(set(estado), {"v", "ficha", "pergunta", "momento", "falas"})
+        self.assertEqual(set(estado), {"v", "ficha", "selo", "pergunta", "momento", "falas"})
         self.assertEqual(len(estado["falas"]), agente.MAX_FALAS)
         self.assertEqual([f["de"] for f in estado["falas"]], ["produtor", "agente"] * 3)
         self.assertEqual(set(estado["ficha"]), set(ficha.CAMPOS) | {"confirmada"})
@@ -416,6 +421,80 @@ class OTextoInteiro(ComODuble):
                 self.assertIn(pedaco, texto)
         self.assertIn("(a de hoje)", texto)
         self.assertEqual(conferencia.conferir_texto(texto, saida), [])
+
+
+class OsAchadosDaRevisao(ComODuble):
+    """Os 4 achados da revisão do GPT (2026-11-15, 01h17): cada teste falhava antes do conserto."""
+
+    def test_confirmacao_forjada_por_quem_chama_nao_vale(self):
+        # 1. o estado volta do navegador: "confirmada" escrito à mão, sem o sim lido pelo programa, não roda a conta
+        completa = dict(self.com_a_ficha()["ficha"], confirmada=True)
+        for forjado in ({"v": 1, "ficha": completa, "falas": []}, {"v": 1, "ficha": completa, "selo": "x" * 64},
+                        {"v": 1, "ficha": completa, "selo": None}, {"v": 1, "ficha": completa, "selo": 5}):
+            estado, saida, modelo = self.passo(forjado, "obrigado", fala("", ENSAIO), fala(BOA))
+            self.assertEqual(self.duble.chamadas, [], forjado)
+            self.assertEqual((saida["ficha"]["confirmada"], saida["comparacao"]), (False, None))
+            self.assertIn("Confira a sua ficha", saida["resposta"])
+        # o selo de uma ficha confirmada não serve para outra: trocar a cidade à mão desfaz a confirmação
+        confirmado = self.confirmada()
+        self.duble.chamadas.clear()
+        trocado = dict(confirmado, ficha=dict(confirmado["ficha"], cidade_id="silvania"))
+        estado, saida, _ = self.passo(trocado, "obrigado")
+        self.assertEqual((self.duble.chamadas, saida["ficha"]["confirmada"], saida["comparacao"]), ([], False, None))
+        # e o estado que o próprio programa devolveu continua valendo, inteiro
+        estado, saida, _ = self.passo(json.loads(json.dumps(confirmado)), "obrigado")
+        self.assertTrue(saida["ficha"]["confirmada"])
+        self.conferir_a_comparacao(saida)
+
+    def test_argumento_inventado_pela_ia_nao_libera_numero(self):
+        # 2. o que a IA manda como argumento da ferramenta não entra na conta que confere os números
+        for pedido in (chamada("ensaio_da_rotacao", hoje=999), chamada("clima_do_lugar", hoje=999),
+                       chamada("ensaio_da_rotacao", safra="pior_ano", qualquer=999),
+                       chamada("verde_do_satelite", hoje=True, numero=999)):
+            estado, saida, _ = self.passo(self.confirmada(), "e aí?", fala("", pedido), fala("Faltaram 999 mm de água."),
+                                          fala("Faltaram 999 mm de água."))
+            self.assertNotIn("999", saida["resposta"], pedido)
+            self.assertEqual(saida["texto_de"], "frases_prontas")
+            self.assertNotIn("999", json.dumps(saida["consultas"]))
+        estado, saida, _ = self.passo(self.confirmada(), "e aí?", fala("", chamada("clima_do_lugar", hoje=999)), fala("Certo."))
+        self.assertEqual(saida["consultas"][0]["argumentos"], {})          # hoje só vale se for true
+        self.assertNotIn("hoje", saida["consultas"][0]["resultado"])
+        # e quem confere uma saída guardada também não olha os argumentos
+        estado, saida, _ = self.passo(self.confirmada(), "vale o sorgo?", fala("", ENSAIO), fala(BOA))
+        adulterada = dict(saida, resposta="Faltaram 999 mm.",
+                          consultas=[dict(saida["consultas"][0], argumentos={"safra": "999"})])
+        self.assertEqual(agente.conferir_saida(adulterada, HOJE), ["999"])
+
+    def test_fala_vazia_com_a_ficha_confirmada_tambem_traz_a_comparacao(self):
+        # 3. com a ficha confirmada, nenhuma resposta sai sem a comparação, nem a de uma fala vazia
+        for texto in ("", "   ", "?!", "..."):
+            estado, saida, modelo = self.passo(self.confirmada(), texto)
+            self.assertTrue(saida["ficha"]["confirmada"], repr(texto))
+            self.conferir_a_comparacao(saida)
+            self.assertEqual((saida["apoio"], modelo.pedidos), ("conta", []))
+            self.assertIn("Não entendi", saida["resposta"])
+
+    def test_o_corte_do_historico_nao_parte_numero_nem_data(self):
+        # 4. o que fica guardado no estado é cortado numa palavra inteira: "232,9" não vira "232"
+        for tamanho in range(2000, 2070):                        # o corte cai em cada ponto da frase, um por vez
+            texto = ("faltaram 232,9 mm em 14/03/2016; " * 80)[:tamanho].rsplit(" ", 1)[0]
+            cortado = agente._cortar(texto, agente.TAMANHO_DA_FALA)
+            self.assertLessEqual(len(json.dumps(cortado)), agente.TAMANHO_DA_FALA)
+            self.assertGreater(len(cortado), 1000)
+            self.assertEqual(conferencia.conferir_texto(cortado, {"falta": 232.9, "dia": "2016-03-14"}), [], cortado[-30:])
+        self.assertEqual(agente._cortar("curto", 1300), "curto")
+        self.assertLessEqual(len(json.dumps(agente._cortar("á" * 5000, 1300))), 1300)   # uma palavra só: corta mesmo assim
+        longa = ("No pior ano faltaram 232,9 mm de água com o milho e 187,5 mm com o sorgo. " * 30).strip()
+        estado, saida, _ = self.passo(self.confirmada(), "vale o sorgo?", fala("", ENSAIO), fala(longa))
+        self.assertEqual(saida["resposta"], longa)
+        guardado = estado["falas"][-1]["texto"]
+        self.assertLess(len(guardado), len(longa))
+        self.assertEqual(conferencia.conferir_texto(guardado, saida["comparacao"]), [])
+
+    def test_com_a_ficha_confirmada_a_saida_sem_comparacao_e_erro_de_dentro(self):
+        # a garantia do achado 3, por construção: o programa não consegue montar essa saída
+        with self.assertRaises(RuntimeError):
+            agente._sair(self.confirmada(), "oi", "Não entendi.", HOJE)
 
 
 if __name__ == "__main__":
