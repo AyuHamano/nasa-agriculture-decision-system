@@ -219,6 +219,9 @@
     if (!aoVivo() && !todas().length) avisar(t("modo.semConversas"));
     desenharModo(); desenharMomentos(); montarReplay(); escolherMomento("antes");
   }
-  function carregarEComecar() { porOsTextos(); comecar(); }
+  function carregarEComecar() {
+    try { porOsTextos(); comecar(); }
+    finally { document.documentElement.classList.remove("montando"); }      // a página aparece já montada (ver o index.html)
+  }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", carregarEComecar); else carregarEComecar();
 })();

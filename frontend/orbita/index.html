@@ -8,7 +8,24 @@
   <meta name="description" content="Conte o que você planta e onde: o Órbita Rural compara a sua rotação com outras, com o que os satélites da NASA viram na sua região.">
   <title>Órbita Rural</title>
   <link rel="icon" href="marca/simbolo-verde.png">
+  <!-- A página fica escondida até o app.js montar a tela, para não aparecer vazia e pular. Se algo falhar, ela aparece sozinha. -->
+  <script>document.documentElement.classList.add("montando"); setTimeout(function () { document.documentElement.classList.remove("montando"); }, 2000);</script>
   <link rel="stylesheet" href="styles.css">
+  <!-- Os dados e os programas carregam antes do corpo, para a tela aparecer já montada (sem pular ao abrir).
+       Nenhum deles mexe na página antes de ela estar lida: o app.js espera o DOMContentLoaded. -->
+  <script src="dados/respostas.js"></script>
+  <script src="dados/complementos.js"></script>
+  <script src="dados/validacao.js"></script>
+  <script src="dados/conversas.js"></script>
+  <script src="js/textos.js"></script>
+  <script src="js/textos-agronomo.js"></script>
+  <script src="js/icones.js"></script>
+  <script src="js/adaptar.js"></script>
+  <script src="js/resultado.js"></script>
+  <script src="js/comparacao.js"></script>
+  <script src="js/replay.js"></script>
+  <script src="js/conversa.js"></script>
+  <script src="app.js"></script>
 </head>
 <body>
   <a class="pular" href="#conteudo">Ir para o conteúdo</a>
@@ -73,18 +90,5 @@
     </div>
   </footer>
 
-  <script src="dados/respostas.js"></script>
-  <script src="dados/complementos.js"></script>
-  <script src="dados/validacao.js"></script>
-  <script src="dados/conversas.js"></script>
-  <script src="js/textos.js"></script>
-  <script src="js/textos-agronomo.js"></script>
-  <script src="js/icones.js"></script>
-  <script src="js/adaptar.js"></script>
-  <script src="js/resultado.js"></script>
-  <script src="js/comparacao.js"></script>
-  <script src="js/replay.js"></script>
-  <script src="js/conversa.js"></script>
-  <script src="app.js"></script>
 </body>
 </html>

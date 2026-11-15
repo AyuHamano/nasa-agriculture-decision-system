@@ -1,10 +1,11 @@
 /* Gerado com IA (Claude). */
 /* O estilo da tela do produtor, na marca da Equipe Agronautas: verde-escuro sobre fundo quase branco,
    títulos em Anton (condensada e pesada, em maiúsculas) e texto em Montserrat. As cores vêm do pitch do time.
-   As letras moram em fontes/ (licença OFL), para a tela abrir sem internet. */
+   As letras moram em fontes/ (licença OFL), para a tela abrir sem internet. Como o arquivo é local e carrega na hora,
+   o texto espera a letra certa (font-display: block) em vez de aparecer numa letra e pular para outra. */
 
 @font-face { font-family: "Anton"; src: url("fontes/anton-latin.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: block; }
-@font-face { font-family: "Montserrat"; src: url("fontes/montserrat-latin.woff2") format("woff2"); font-weight: 400 800; font-style: normal; font-display: swap; }
+@font-face { font-family: "Montserrat"; src: url("fontes/montserrat-latin.woff2") format("woff2"); font-weight: 400 800; font-style: normal; font-display: block; }
 
 :root {
   /* a marca */
@@ -24,6 +25,7 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; scroll-padding-top: 16px; }
+html.montando body { visibility: hidden; }
 body { margin: 0; background: var(--papel); color: var(--tinta); font: 500 16px/1.55 var(--texto); }
 h1, h2, h3, h4, p, dl, dd, ol, ul, figure { margin: 0; padding: 0; }
 ol, ul { list-style: none; }
