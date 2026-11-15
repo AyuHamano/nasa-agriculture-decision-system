@@ -1,0 +1,4 @@
+# Gerado com IA (Claude)
+# O que não vai ao git dentro da pasta do motor e do agente: o cache do Python que rodar os testes cria.
+__pycache__/
+*.pyc
