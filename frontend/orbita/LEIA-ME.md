@@ -1,124 +1,110 @@
-# Órbita Rural · a tela do produtor
+# Órbita Rural · o aplicativo do produtor
 
-A tela é o que o produtor vê do Órbita Rural, o projeto da **Equipe Agronautas** no NASA Space Apps Challenge 2026
-(desafio "Field Shift: Adapting Farms with NASA Data"). Nela o produtor conversa com o agente, confere a ficha dele e
-vê a rotação que planta hoje ao lado de outras, com a água, o calor e a terra coberta de cada uma. A tela **não faz
-conta**: mostra o que o motor e o agente (em `backend/orbita/`) devolvem.
+É o que o produtor vê do Órbita Rural, o projeto da **Equipe Agronautas** no NASA Space Apps Challenge 2026
+(desafio "Field Shift: Adapting Farms with NASA Data"). Ele cadastra a lavoura numa conversa curta com o assistente e
+passa a ter três telas: **Hoje** (como a lavoura está), **Ensaiar** (antes de plantar) e **Registrar** (depois de
+colher). A tela **não faz conta**: mostra o que o motor e o agente (em `backend/orbita/`) devolvem.
 
 ## Como abrir
 
-Dois cliques em `index.html`. Não precisa de servidor nem de internet: as letras, o logo e os ícones estão nesta
-pasta, e os dados estão em `dados/`.
+- **Com a API** (o jeito de uso): `index.html?api=http://127.0.0.1:8000` (ou o endereço em `API_BASE`, no
+  `js/textos.js`). Para ligar a API, de dentro de `backend/`: `python3 -m orbita.api` (a IA do assistente precisa da
+  chave no ambiente; veja o `LEIA-ME-agente.md`).
+- **Sem a API:** dois cliques em `index.html`. Não precisa de servidor nem de internet: as letras, o logo e os ícones
+  estão nesta pasta, e os números vêm dos dados guardados em `dados/`. Uma linha discreta no topo diz isso
+  ("Sem resposta do servidor: estes são os números guardados em ...").
 
 ## O que tem na tela
 
-- **Os três momentos da lavoura**, cada um com a pergunta do produtor: antes de plantar ("O que eu planto agora?"),
-  durante a safra ("Como está a minha lavoura?") e depois de colher ("O que a terra mostrou?").
-- **A conversa:** a fala do produtor e a resposta do agente. Cada resposta diz de onde saiu (da conta, dos dados da
-  NASA do lugar, ou de conhecimento geral, quando a conta não mede o assunto). Resposta comprida mostra o começo e o
-  fecho, e o miolo abre em "Ler a resposta inteira". A conversa corre com a página, no celular e no computador: não
-  há caixa que rola por dentro.
-- **A ficha:** o município, o tipo de solo, a rotação de hoje, a data do plantio e o que mais preocupa. O produtor
-  confirma ou corrige antes de a conta rodar.
-- **As rotações lado a lado:** três ou mais, com a de hoje marcada. Cada uma com a água que falta (num ano normal e no
-  pior ano), os dias de calor forte, os dias do ano sem planta viva, a prova, o que ganha, o risco e o que falta
-  saber. Onde a conta dá faixa, a tela mostra a faixa. No fim, "Converse com o agrônomo antes de decidir".
-- **A prova:** o replay da safra 2015-16, dia a dia: a chuva, a água na terra descendo, os dias de sede e de calor
-  forte, e os marcos com a frase de cada um. Tem tocar, pausar, voltar, velocidade e tela cheia (para gravar o vídeo).
-  Na velocidade normal, a safra inteira passa em cerca de 30 segundos. O ponto alto é o dia em que a água acaba (o marco
-  `agua_no_fundo` do motor; em 2015-16, 24/04/2016): é nele que ficam o destaque, as três frases grandes e a parada
-  longa. O dia em que a sede começa (o marco `agua_acabou`; 04/04/2016) vem antes, como o aviso: etiqueta clara, frase
-  menor e parada curta. No dia 24 a tela lembra quantos dias antes o aviso veio (a distância entre os dois marcos). Os
-  dois dias saem da conta do motor; numa safra em que a água não acaba, o começo da sede segue como o marco forte.
-  A frase "Neste dia a água acabou." só aparece quando o marco `agua_no_fundo` vem com `situacao: "acabou"` (sobrou
-  até 0,1 mm). Com `perto_do_fundo` (a água ficou perto do fundo, sem acabar) ou `seca_no_plantio` (a terra já chegou
-  seca ao plantio), o marco leva o nome da situação e a frase que o motor escreveu, sem as três frases grandes.
-- **A leitura do agrônomo** (a aba "Agrônomo"): como a conta foi feita, com que valores, de onde eles vêm, as
-  hipóteses e os limites. Dá para baixar a resposta completa do motor (o arquivo sai sem as antigas notas de
-  prioridade, que não existem mais no produto).
+- **A entrada: o assistente monta a ficha.** Ele pergunta onde fica a lavoura (Rio Verde, Jataí ou Silvânia), o que o
+  produtor planta (soja e depois milho, milho com capim ou sorgo), em que mês planta a soja (de setembro a dezembro,
+  no dia 15, ou "Escolher o dia") e como é a terra (arenosa, média ou argilosa). Cada pergunta tem botões; os toques
+  montam a ficha sem IA. Quem prefere escrever, escreve: o texto vai ao assistente (`POST /agente`), e o que ele
+  anotar entra na ficha. Sem a IA, a tela lê as palavras mais simples do texto (o nome da cidade, da cultura, da
+  terra, o mês) e pede o toque no que faltar. No fim o produtor confere a ficha e confirma.
+- **A lavoura fica guardada no aparelho** (no armazenamento do navegador, chave `orbita.lavoura.v1`). Ao voltar, o
+  aplicativo abre direto em "Minha lavoura hoje". O botão com o nome da cidade, no topo, mostra a ficha e tem
+  "Trocar de lavoura".
+- **Hoje · "Minha lavoura hoje"** (`POST /lavoura-hoje`): o quadro do topo com a situação (tranquilo, atenção ou
+  alerta), uma frase que diz o que pede atenção e a data do dado; e seis cartões, cada um com o número grande, a
+  situação e uma frase curta: o aviso de sede, a água na terra (com o mesmo dia do ano normal e do ano ruim), a fase
+  da cultura, o calor, o verde do satélite e a terra coberta. "Entender" abre a frase inteira do motor.
+- **Ensaiar** (`POST /recomendacao`): a resposta em uma frase, os 3 caminhos lado a lado com 3 medidas (a água que
+  falta, o calor forte na fase crítica, os dias seguidos de terra sem planta viva; o melhor número de cada linha vem
+  marcado), uma linha de risco por caminho, "Converse com o agrônomo antes de decidir", o botão "Ver a prova" (as
+  frases de prova do motor, o que falta saber e as fontes, recolhidas) e o botão "Ver um ano ruim".
+- **O ano ruim, dia a dia** (`POST /replay`; só atrás do botão do ensaio): a safra do pior ano da cidade, com a
+  chuva, a água na terra descendo, os dias de sede e de calor forte e os marcos. Tem tocar, pausar, voltar,
+  velocidade e tela cheia. O ponto alto é o dia em que a água acaba (o marco `agua_no_fundo` com `situacao:
+  "acabou"`); o dia em que a sede começa (`agua_acabou`) vem antes, como o aviso. É o `js/replay.js`, sem mudança.
+- **Registrar** (`POST /registro`): a safra que terminou (a mais recente, ou outra da lista): o que foi plantado, a
+  água que faltou, os dias de calor forte e de terra sem planta, e onde a safra ficou entre as guardadas. O produtor
+  pode escrever quanto colheu (sacas por hectare) e guardar: fica só no aparelho (`orbita.safras.v1`).
+- **O assistente à mão:** o botão "Perguntar", em qualquer tela, abre a conversa (`POST /agente`). Ele já recebe a
+  ficha da lavoura; a resposta diz de onde saiu (da conta, dos dados da NASA do lugar ou de conhecimento geral).
+- **Para o agrônomo:** o link do rodapé abre a leitura técnica (como a conta foi feita, os valores, as fontes, as
+  hipóteses e os limites), com a resposta completa do motor para baixar.
 
-## Os dois modos
+## De onde vêm os números
 
-1. **Conversas guardadas** (o padrão): a tela lê `dados/conversas.js` e toca as conversas gravadas pelo agente. A
-   próxima fala do produtor aparece como um botão. Serve para a demonstração sem servidor. São 4 conversas, todas de
-   Rio Verde (GO), o caso provado: uma do momento "antes", uma do "durante" (ela começa pelo "como está hoje", logo
-   depois da ficha, e só depois passa a pior safra dia a dia), uma do "depois" e uma de pragas e adubo, que sai com o
-   aviso de conhecimento geral.
-2. **Agente ao vivo:** abra a tela com o endereço da API no fim, por exemplo
-   `index.html?api=http://127.0.0.1:8000`. O produtor escreve o que quiser, e a tela chama `POST /agente`, guarda o
-   `estado` que volta e devolve na fala seguinte. Para ligar a API, de dentro de `backend/`:
-   `python3 -m orbita.api` (a IA do agente precisa da chave no ambiente; veja o `LEIA-ME-agente.md`).
-
-Se a API não responder, responder com erro ou estiver sem a chave da IA, a tela avisa e passa para as conversas
-guardadas. Pedido recusado pelo agente (a frase vem em `{"erro": ...}`) aparece na conversa, e ela continua ao vivo.
-
-## De onde vêm os dados
+Com a API, cada tela pede a rota dela. Se a rota não responde (sem servidor, sem internet, ou API antiga, sem as
+rotas `/replay` e `/registro`), a tela usa o dado guardado e diz isso em uma linha. O assistente, sem a API ou sem a
+chave da IA, avisa que está sem conexão; o resto funciona.
 
 | arquivo | quem grava | o que traz |
 |---|---|---|
-| `dados/conversas.js` | o agente. É a cópia, byte a byte, do `backend/orbita/conversas-guardadas/conversas.js` (o que o agente gravou com a IA de verdade e foi lido fala a fala) | as 4 conversas guardadas de Rio Verde e o replay da safra (os dias e os marcos) |
-| `dados/respostas.js` e `respostas.json` | o motor: `python3 -m orbita.exportar <esta pasta>/dados` (de dentro de `backend/`), como diz o cabeçalho do arquivo. O `gerar-dados.py` chama esse mesmo motor antes de gravar os outros dois | a resposta inteira do motor para os três tipos de solo (a leitura do agrônomo) |
-| `dados/complementos.js` e `validacao.js` | `python3 -B frontend/orbita/dados/gerar-dados.py` (da raiz do repositório) | o calendário do ano e a validação cruzada (o satélite contra a estação em terra e a colheita do IBGE) |
+| `dados/guardados.js` | `gerar-dados.py` | o painel (a resposta do `/lavoura-hoje`) e o ensaio (os campos do `/recomendacao` que a tela lê) das 3 cidades, 3 rotações e 3 terras; o registro (a safra mais recente e o pior ano) das 3 cidades e 3 rotações, em terra média |
+| `dados/guardados-replay.js` | `gerar-dados.py` | a safra dia a dia do pior ano de cada cidade e rotação, em terra média |
+| `dados/respostas.js` e `respostas.json` | o motor (`orbita.exportar`), chamado pelo `gerar-dados.py` | a resposta inteira do motor para os três tipos de terra (a leitura do agrônomo) |
+| `dados/complementos.js` e `validacao.js` | `gerar-dados.py` | o calendário do ano e a validação cruzada (a leitura do agrônomo) |
+| `dados/conversas.js` | o agente (cópia de `backend/orbita/conversas-guardadas/conversas.js`) | as 4 conversas gravadas de Rio Verde. **A página não carrega mais este arquivo**: fica de reserva |
 
-Sem o `dados/conversas.js`, a tela abre, avisa que as conversas ainda não foram gravadas e mostra só a leitura do
-agrônomo. Nenhum número é escrito à mão nesta pasta.
+Os guardados valem para a soja no dia de costume (15/10) e são do dia em que o programa rodou: a linha discreta
+diz a data e, se o plantio do produtor for outro, que o guardado é o de 15/10. Os arquivos guardados só são
+baixados quando fazem falta. Nenhum número é escrito à mão nesta pasta.
 
-**Como gerar tudo de novo** (depois de mudar o motor ou o agente), da raiz do repositório:
+**Como gerar tudo de novo** (depois de mudar o motor), da raiz do repositório:
 
-    python3 -B frontend/orbita/dados/gerar-dados.py        # respostas.js, respostas.json, complementos.js e validacao.js
-    cp backend/orbita/conversas-guardadas/conversas.js frontend/orbita/dados/conversas.js      # as conversas já gravadas
+    python3 -B frontend/orbita/dados/gerar-dados.py
 
-Para gravar as conversas de novo (antes de copiar), de dentro de `backend/`:
+As fontes: a chuva é do GPM IMERG (a chuva medida por satélite da NASA); a temperatura, do NASA POWER; o verde da
+lavoura, do satélite MODIS, da NASA; a conta da água segue o manual FAO-56; a colheita é do IBGE e a chuva medida em
+terra é da estação do INMET. O caminho de cada dado está em `data/orbita/`.
 
-    python3 -m orbita.exportar_conversas orbita/conversas-guardadas            # com OPENROUTER_API_KEY no ambiente: a IA escreve
-    python3 -m orbita.exportar_conversas orbita/conversas-guardadas --sem-ia   # sem chave: as frases prontas do motor
+## Como a tela escreve
 
-Conversa gravada com a IA precisa ser lida de novo, fala a fala, antes de ir à tela (o `LEIA-ME-agente.md` conta como).
+- **Números:** os milímetros com uma casa ("66,0 mm"); os dias, inteiros; o verde do satélite, com duas casas.
+- **Datas:** dia e mês nos cartões (21/11) e a data inteira no "Dado de" (14/11/2026); na ficha, por extenso.
+- **Frases curtas:** a frase do topo do painel, a de cada cartão e a resposta do ensaio são montadas pela tela com os
+  campos da resposta (a situação de cada item, os números, e quem ficou `melhor` em `contra_as_outras`): nenhuma
+  conta, nenhum número novo. A frase inteira do motor está em "Entender" e em "Ver a prova". A linha de risco é a
+  primeira frase do `risco` do motor.
+- **O atraso do dado** não vira aviso: aparece só a data do dado.
+- **Letras e dedos:** nenhuma letra abaixo de 13 px; botões com 44 px ou mais; nenhuma rolagem de lado.
 
-As fontes dos dados: a chuva é do GPM IMERG (a chuva medida por satélite da NASA); a temperatura, do NASA POWER (os
-dados de clima da NASA); o verde da lavoura, do
-satélite MODIS, da NASA; a conta da água segue o manual FAO-56; a colheita é do IBGE e a chuva medida em terra é da
-estação do INMET. O caminho de cada dado está em `data/orbita/`.
+## A rodada do alinhamento (2026-11-15)
 
-## Como a tela escreve números, datas e palavras
-
-- **Números:** os milímetros saem sempre com uma casa decimal, do mesmo jeito que o motor escreve nas frases
-  ("252,0 mm", "168,1 mm"), nas duas leituras e no replay (onde a temperatura do dia também sai com uma casa). Dias
-  são números inteiros. A única exceção é o total da estação do INMET na validação, que o motor já entrega
-  arredondado em milímetros inteiros. As frases que vêm prontas dos dados aparecem como vêm.
-- **Datas:** no formato do Brasil (11/11/2026); na ficha, por extenso.
-- **Palavras:** os textos fixos explicam a palavra técnica na primeira vez (rotação, mm, IA, GPM IMERG, NASA POWER) ou usam a palavra simples
-  ("assistente" em vez de "agente", "a safra dia a dia" em vez de "replay").
-- **Letras e dedos:** nenhuma letra abaixo de 13 px; botões e a barra do dia da safra com 44 px ou mais de altura.
-
-## O acerto do desenho (2026-11-15)
-
-Feito depois da conferência no navegador (celular de 390 px e computador de 1440 px):
-
-- Aba "Agrônomo": o calendário do ano, no celular, põe cada linha em cima da faixa dela, na largura toda; o nome de
-  cada trecho só aparece onde cabe inteiro (o nome completo está na legenda); tabela mais larga do que a tela rola de
-  lado com o aviso "Arraste a tabela para o lado" e entra na ordem do teclado.
-- Conversa no computador: sem caixa que rola por dentro; a coluna ficou mais larga (até 440 px).
-- Resumo do celular: o número numa linha só, a unidade embaixo; as três colunas alinhadas.
-- Replay: a barra do dia com 48 px e o trecho já visto preenchido; o marco que ainda não chegou é só um contorno; o
-  destaque, o pulso e a parada longa no dia em que a água acaba, com o aviso de quantos dias antes a sede começou.
-- Acabamento: a seleção de texto, os controles e a barra de rolagem nas cores da marca; estado de botão apertado;
-  contraste das etiquetas e das faixas do calendário acima de 4,5 para 1.
+A tela deixou de ser uma demonstração com conversas gravadas e virou o aplicativo descrito acima: a entrada no
+assistente, a lavoura guardada, "Minha lavoura hoje" como tela inicial, o ensaio enxuto, a safra de 2016 só atrás do
+botão "Ver um ano ruim", o registro, o assistente à mão e a leitura do agrônomo no rodapé. Conferido num navegador,
+em 390 px e em 1280 px, com a API ligada (as três cidades, a ficha pelos botões e por texto, uma pergunta livre) e
+sem ela (aberta como arquivo).
 
 ## Os arquivos
 
-    index.html              a página
-    styles.css              o estilo, na marca do time
-    app.js                  liga as peças: as duas leituras, os três momentos, a mesa, os dois modos
-    js/textos.js            todos os textos da tela do produtor (e o endereço da API, em API_BASE)
-    js/conversa.js          a conversa: guardadas e ao vivo, com a queda para as guardadas
-    js/comparacao.js        a ficha e as rotações lado a lado
-    js/replay.js            o replay da safra, dia a dia
+    index.html              a página: a barra, as três telas, o assistente, o ano ruim
+    app.css                 o estilo do aplicativo (a casca, os cartões, a conversa, o ensaio, o registro)
+    styles.css              as cores e as letras da marca, a safra dia a dia e a leitura do agrônomo
+    app.js                  liga as peças: a entrada, a lavoura guardada, as telas, o assistente, o agrônomo
+    js/dados.js             busca na API e, se ela não responde, nos dados guardados
+    js/telas.js             desenha "Minha lavoura hoje", "Ensaiar" e "Registrar"
+    js/replay.js            a safra dia a dia
+    js/comparacao.js        funções de escrita (números, datas) que a safra dia a dia usa
+    js/textos.js            os textos da safra dia a dia e da leitura do agrônomo (e o endereço da API, em API_BASE)
     js/icones.js            os ícones, desenhados aqui mesmo
-    js/adaptar.js           lê a resposta do motor para a leitura do agrônomo
-    js/resultado.js         a leitura do agrônomo
-    js/textos-agronomo.js   os textos da leitura do agrônomo
-    dados/                  os dados gravados pelo motor e pelo agente (tabela acima)
+    js/adaptar.js, js/resultado.js, js/textos-agronomo.js   a leitura do agrônomo (só carregam quando ela abre)
+    js/conversa.js          a conversa da tela de antes: a página não usa mais; fica de reserva
+    dados/                  os dados guardados (tabela acima) e o gerar-dados.py
     marca/                  o logo do time
     fontes/                 as letras (Anton e Montserrat), com a licença de cada uma
 
@@ -132,10 +118,9 @@ logo da NASA.
 ## Uso de IA
 
 - Esta tela foi programada com apoio de IA (Claude, da Anthropic), com as decisões e a conferência do time.
-- Na conversa, o texto do agente é escrito por IA ou montado com frases prontas; cada conversa diz qual dos dois. Todo
-  número do texto é conferido com a conta antes de aparecer; se a conferência achar número fora da conta, o texto da IA
-  não vai à tela.
-- A IA não escolhe a rotação pelo produtor: a ferramenta apoia a decisão e manda conversar com o agrônomo.
+- O assistente escreve com IA; todo número do texto dele é conferido com a conta antes de aparecer (isso é feito no
+  agente, em `backend/orbita/`). A IA não escolhe a rotação pelo produtor: a ferramenta apoia a decisão e manda
+  conversar com o agrônomo.
 
 ## Créditos e licenças
 
@@ -145,9 +130,15 @@ logo da NASA.
 - As letras Anton e Montserrat são distribuídas sob a SIL Open Font License 1.1 (`fontes/OFL-Anton.txt` e
   `fontes/OFL-Montserrat.txt`).
 
-## O que ainda não tem
+## O que ainda não tem, e o que saber
 
-- A tela é só em português.
-- A leitura do agrônomo mostra a conta guardada de Rio Verde (GO), com a rotação de hoje e a rotação com capim; a
-  rotação com sorgo aparece só na comparação do produtor.
-- O painel da cooperativa (acompanhar vários produtores) é o próximo passo; aqui ele aparece só como um aviso no fim.
+- A tela é só em português, e vale para três cidades de Goiás e três rotações, todas começando com soja.
+- O mês do plantio escolhido no botão vira o dia 15 daquele mês; para outro dia, "Escolher o dia".
+- A ficha tem 4 perguntas; o agente pede também "o que mais preocupa". Quando o produtor não disse, a tela manda
+  "água" ao agente (isso só muda a ordem e o destaque do texto dele; nenhum número muda).
+- Na primeira pergunta ao assistente, a tela manda a ficha já confirmada pelo produtor junto com o "sim", para ele
+  não ter de confirmar duas vezes; o selo da confirmação continua sendo posto pelo servidor.
+- A colheita que o produtor escreve no Registrar fica só no aparelho: não vai ao servidor nem entra em conta.
+- A leitura do agrônomo mostra a conta guardada de Rio Verde (GO), com a rotação de hoje e a rotação com capim.
+- O `styles.css` ainda traz os estilos da tela de antes (os três momentos, a conversa, a mesa), que a página não usa.
+- O painel da cooperativa (acompanhar vários produtores) é um próximo passo e não aparece na tela.

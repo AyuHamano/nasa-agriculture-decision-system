@@ -1,136 +1,287 @@
 /* Gerado com IA (Claude). */
-/* Liga as peças da tela do produtor: as duas leituras (produtor e agrônomo), os três momentos, a conversa,
-   a mesa (a ficha e a comparação), o replay e os dois modos (conversas guardadas e agente ao vivo).
-   Os textos estão em js/textos.js. A tela não faz conta: mostra o que o motor e o agente devolvem. */
+/* Liga as peças do aplicativo do produtor: a entrada (o assistente monta a ficha da lavoura, por toque ou por texto),
+   a lavoura guardada no aparelho, as três telas (Hoje, Ensaiar, Registrar), o ano ruim dia a dia, o assistente à mão
+   em qualquer tela e a leitura do agrônomo, no rodapé. A tela não faz conta: mostra o que o motor devolve (js/dados.js). */
 (function () {
   "use strict";
 
-  var C = window.ORBITA_COMPARACAO, esc = C.esc;
-  function ic(nome) { return window.ORBITA_ICONE ? window.ORBITA_ICONE(nome) : ""; }
+  var D = window.ORBITA_DADOS, T = window.ORBITA_TELAS, esc = T.esc, ic = T.ic;
   function $(id) { return document.getElementById(id); }
-  var MOMENTOS = ["antes", "durante", "depois"];
-  var app = { api: "", dados: null, momento: "antes", idDaConversa: "", corrigindo: false, avisos: [], terraDoAgronomo: "", agronomoPronto: false };
-  var conversa = null;
+  var CHAVE = "orbita.lavoura.v1", CHAVE_SAFRAS = "orbita.safras.v1";
+  var TELAS = ["hoje", "ensaiar", "registrar", "agronomo"];
+  var CAMPOS = ["cidade_id", "rotacao_id", "plantio_da_soja", "terra"];
+  var PERGUNTAS = { cidade_id: "Onde fica a sua lavoura?", rotacao_id: "O que você planta?", plantio_da_soja: "Em que mês você planta a soja?", terra: "Como é a sua terra?" };
+  var NOMES = { cidade_id: "Cidade", rotacao_id: "O que planta", plantio_da_soja: "Plantio da soja", terra: "A terra" };
+  var MOMENTO = { hoje: "durante", ensaiar: "antes", registrar: "depois" };
+  var SUGESTOES = {
+    hoje: ["Como está a água da minha lavoura?", "O que eu devo olhar esta semana?"],
+    ensaiar: ["Vale trocar o milho pelo sorgo?", "Como foi a pior safra?"],
+    registrar: ["O que a última safra mostrou?", "Como foi a pior safra?"]
+  };
+  var APOIO = { conta: "Tirado da conta da sua lavoura.", dados_do_lugar: "Tirado dos dados da NASA do lugar.", conhecimento_geral: "Conhecimento geral: a conta não mede este assunto." };
+  var SEM_ASSISTENTE = "O assistente está sem conexão agora. O painel, o ensaio e o registro seguem funcionando.";
+  var app = { lavoura: null, tela: "", vez: 0, cache: {}, safra: "", ensaio: null, registro: null, pronto: null, terraDoAgronomo: "", respostaDoAgronomo: null };
+  var en = null;                                                    // a entrada: a conversa que monta a ficha
+  var ag = { estado: null, confirmada: false, falas: [], ocupado: false };   // o assistente à mão
 
-  /* ---------- de onde vêm as conversas ---------- */
-  function apiBase() {
-    var daPagina = "";
-    try { daPagina = new URLSearchParams(window.location.search).get("api") || ""; } catch (erro) { daPagina = ""; }
-    var base = String(daPagina || API_BASE || "").replace(/\/+$/, "");
-    return /^https?:\/\//.test(base) ? base : "";
-  }
-  function aoVivo() { return !!app.api; }
-  function todas() { return app.dados && Array.isArray(app.dados.conversas) ? app.dados.conversas.filter(function (c) { return c && Array.isArray(c.passos); }) : []; }
-  function conversasDo(momento) { return todas().filter(function (c) { return c.momento === momento; }); }
-  function conversaPorId(id) { return todas().filter(function (c) { return c.id === id; })[0] || null; }
-  function conversaDoReplay() { return todas().filter(function (c) { return c.replay && Array.isArray(c.replay.dias) && c.replay.dias.length; })[0] || null; }
-  function respostasDoMotor() { var o = window.ORBITA_RESPOSTAS; return o && typeof o === "object" ? (o.respostas && typeof o.respostas === "object" ? o.respostas : o) : {}; }
+  function ler(chave) { try { return JSON.parse(window.localStorage.getItem(chave) || "null"); } catch (erro) { return null; } }
+  function gravar(chave, valor) { try { if (valor === null) window.localStorage.removeItem(chave); else window.localStorage.setItem(chave, JSON.stringify(valor)); return true; } catch (erro) { return false; } }
+  function valida(l) { return !!(l && T.CIDADES[l.cidade_id] && T.ROTACOES[l.rotacao_id] && T.TERRAS[l.terra] && /^\d{4}-(09|10|11|12)-\d{2}$/.test(l.plantio_da_soja || "")); }
+  function norm(s) { return String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\s+/g, " ").trim(); }
+  function anoDoPlantio() { var h = new Date(); return h.getMonth() < 7 ? h.getFullYear() - 1 : h.getFullYear(); }
+  function doisDigitos(n) { return (n < 10 ? "0" : "") + n; }
 
-  /* ---------- os avisos do topo e o modo ---------- */
-  function desenharAvisos() {
-    var el = $("avisoDoModo");
-    el.innerHTML = app.avisos.map(function (a) { return "<p>" + ic("alerta") + "<span>" + esc(a) + "</span></p>"; }).join("");
-    el.hidden = !app.avisos.length;
+  /* ---------- a entrada: o assistente pergunta, o produtor toca ou escreve ---------- */
+  function opcoes(campo) {
+    if (campo === "cidade_id") return Object.keys(T.CIDADES).map(function (k) { return { v: k, n: T.CIDADES[k] }; });
+    if (campo === "rotacao_id") return Object.keys(T.ROTACOES).map(function (k) { return { v: k, n: T.ROTACOES[k].nome }; });
+    if (campo === "terra") return Object.keys(T.TERRAS).map(function (k) { return { v: k, n: T.TERRAS[k].nome, d: T.TERRAS[k].dica }; });
+    var a = anoDoPlantio();
+    return [["09", "Setembro"], ["10", "Outubro"], ["11", "Novembro"], ["12", "Dezembro"]].map(function (m) { return { v: a + "-" + m[0] + "-15", n: m[1], d: "dia 15" }; });
   }
-  function avisar(texto) { if (app.avisos.indexOf(texto) < 0) app.avisos.push(texto); desenharAvisos(); }
-  function desenharModo() {
-    var el = $("modo"), vivo = aoVivo();
-    el.className = "modo " + (vivo ? "vivo" : "guardadas");
-    el.textContent = t(vivo ? "modo.aoVivo" : "modo.guardadas");
-    el.title = t(vivo ? "modo.explicaAoVivo" : "modo.explicaGuardadas");
+  // A leitura simples do texto, sem IA: serve quando o assistente está sem conexão.
+  function lerTexto(txt) {
+    var s = norm(txt), achou = {}, m;
+    if (/rio verde/.test(s)) achou.cidade_id = "rio_verde"; else if (/jatai/.test(s)) achou.cidade_id = "jatai"; else if (/silvania/.test(s)) achou.cidade_id = "silvania";
+    if (/sorgo|milho|capim|braquiaria/.test(s)) achou.rotacao_id = T.idDaRotacao(s);
+    if (/arenos|areia/.test(s)) achou.terra = "pouca"; else if (/argilos|barro/.test(s)) achou.terra = "muita"; else if (/\bmedia\b|mista/.test(s)) achou.terra = "media";
+    if ((m = /\b(\d{1,2})\/(\d{1,2})\b/.exec(s)) && Number(m[2]) >= 9 && Number(m[2]) <= 12 && Number(m[1]) >= 1 && Number(m[1]) <= 31) achou.plantio_da_soja = anoDoPlantio() + "-" + doisDigitos(Number(m[2])) + "-" + doisDigitos(Number(m[1]));
+    else if ((m = /setembro|outubro|novembro|dezembro/.exec(s))) achou.plantio_da_soja = anoDoPlantio() + "-" + { setembro: "09", outubro: "10", novembro: "11", dezembro: "12" }[m[0]] + "-15";
+    return achou;
   }
-
-  /* ---------- os três momentos ---------- */
-  function desenharMomentos() {
-    $("momentos").setAttribute("aria-label", t("momentos.rotulo"));
-    $("momentos").innerHTML = MOMENTOS.map(function (m) {
-      var semConversa = !aoVivo() && todas().length > 0 && !conversasDo(m).length, escolhido = m === app.momento;   // há conversas, mas não deste momento
-      return '<button class="momento' + (semConversa ? " adiante" : "") + '" role="tab" id="momento-' + m + '" aria-controls="painelDoMomento" data-momento="' + m + '" aria-selected="' + escolhido + '" tabindex="' + (escolhido ? "0" : "-1") + '">' +
-        '<span class="quando">' + esc(t("momentos." + m + ".quando")) + '</span><strong class="pergunta">' + esc(t("momentos." + m + ".pergunta")) + "</strong>" +
-        (semConversa ? '<span class="estado">' + esc(t("momentos.proximo")) + "</span>" : "") + "</button>";
+  function falar(de, texto) { en.falas.push({ de: de, texto: texto }); }
+  function faltando() { return CAMPOS.filter(function (c) { return !en.l[c]; })[0] || ""; }
+  function perguntarOProximo() {
+    en.campo = faltando(); en.outroDia = false;
+    if (en.campo) falar("assistente", PERGUNTAS[en.campo]); else { en.campo = "ficha"; falar("assistente", "Anotei a sua lavoura. Está certo?"); }
+    desenharEntrada(true);
+  }
+  function escolher(campo, valor, nome) { en.l[campo] = valor; falar("produtor", nome); perguntarOProximo(); }
+  function anotar(achou, respostaDaIA) {
+    var novos = CAMPOS.filter(function (c) { return achou[c] && achou[c] !== en.l[c]; });
+    novos.forEach(function (c) { en.l[c] = achou[c]; });
+    if (novos.length) falar("assistente", "Anotei: " + novos.map(function (c) { return T.valorDaFicha(c, en.l[c]); }).join(", ") + ".");
+    else falar("assistente", respostaDaIA || "Não entendi. Toque numa das opções abaixo." + (D.ia ? "" : " O assistente está sem conexão agora."));
+    en.campo = faltando(); en.outroDia = false;
+    if (!en.campo) { en.campo = "ficha"; if (novos.length) falar("assistente", "Está certo?"); } else if (novos.length) falar("assistente", PERGUNTAS[en.campo]);
+    desenharEntrada(true);
+  }
+  function escritaNaEntrada(txt) {
+    txt = String(txt || "").trim(); if (!txt || en.ocupado) return;
+    falar("produtor", txt);
+    var exata = en.campo && en.campo !== "ficha" ? opcoes(en.campo).filter(function (o) { return norm(o.n) === norm(txt); })[0] : null;
+    if (exata) { en.l[en.campo] = exata.v; perguntarOProximo(); return; }
+    en.ocupado = true; desenharEntrada(true);
+    app.pronto.then(function () {
+      if (!D.api || !D.ia) throw new Error("sem_ia");
+      return D.post("/agente", { estado: en.estado, texto: txt }, 120000);
+    }).then(function (s) {
+      var f = s.ficha || {}, antes = en.fichaDaIA || {}, achou = {};
+      function mudou(c) { return f[c] && JSON.stringify(f[c]) !== JSON.stringify(antes[c]); }      // só o que ele disse agora: o toque de antes não é desfeito
+      if (mudou("cidade_id") && T.CIDADES[f.cidade_id]) achou.cidade_id = f.cidade_id;
+      if (mudou("rotacao_atual") && Array.isArray(f.rotacao_atual)) achou.rotacao_id = T.idDaRotacao(f.rotacao_atual);
+      if (mudou("terra") && T.TERRAS[f.terra]) achou.terra = f.terra;
+      if (mudou("plantio_da_soja") && /^\d{4}-(09|10|11|12)-\d{2}$/.test(f.plantio_da_soja)) achou.plantio_da_soja = f.plantio_da_soja;
+      if (f.preocupacao) en.l.preocupacao = f.preocupacao;
+      en.estado = s.estado || en.estado; en.fichaDaIA = f; en.ocupado = false; anotar(achou, s.resposta || "");
+    }, function () { en.ocupado = false; anotar(lerTexto(txt), ""); });
+  }
+  function opcoesHtml(campo) {
+    var h = opcoes(campo).map(function (o) {
+      return '<button type="button" class="o-opcao" data-acao="opcao" data-campo="' + campo + '" data-valor="' + esc(o.v) + '" data-nome="' + esc(o.n) + '">' + esc(o.n) + (o.d ? "<small>" + esc(o.d) + "</small>" : "") + "</button>";
     }).join("");
-  }
-  function marcarMomento() {
-    Array.prototype.forEach.call(document.querySelectorAll(".momento"), function (b) {
-      var escolhido = b.getAttribute("data-momento") === app.momento;
-      b.setAttribute("aria-selected", escolhido); b.tabIndex = escolhido ? 0 : -1;
-    });
-    $("painelDoMomento").setAttribute("aria-labelledby", "momento-" + app.momento);
-  }
-  function desenharOutras() {
-    var el = $("outras"), lista = aoVivo() ? [] : conversasDo(app.momento), atual = conversaPorId(app.idDaConversa), html = "";
-    if (lista.length > 1) {
-      html += '<div class="fichas" role="group" aria-label="' + esc(t("conversa.escolha")) + '">' + lista.map(function (c) {
-        return '<button class="ficha-de-conversa" data-acao="abrir-conversa" data-id="' + esc(c.id) + '" aria-pressed="' + (c.id === app.idDaConversa) + '">' + esc(c.titulo || c.id) + "</button>";
-      }).join("") + "</div>";
+    if (campo === "plantio_da_soja") {
+      var a = anoDoPlantio();
+      h += en.outroDia ? '<span class="o-dia"><input type="date" id="diaDoPlantio" min="' + a + '-09-01" max="' + a + '-12-31" value="' + a + '-10-15" aria-label="O dia do plantio da soja"><button type="button" class="o-opcao cheia" data-acao="usar-dia">Usar este dia</button></span>'
+        : '<button type="button" class="o-opcao" data-acao="outro-dia">Escolher o dia</button>';
     }
-    var ultima = conversa.ultimaSaida();      // ao vivo, cada resposta diz de quem é o texto; nas guardadas, a conversa diz
-    var de = aoVivo() ? (ultima && ultima.texto_de) || "" : atual ? atual.texto_de : "";
-    if (de && t("conversa.textoDe." + de) !== "conversa.textoDe." + de) html += '<p class="texto-de">' + esc(t("conversa.textoDe." + de)) + "</p>";
-    el.innerHTML = html; el.hidden = !html;
+    return '<div class="o-opcoes" role="group" aria-label="' + esc(PERGUNTAS[campo]) + '">' + h + "</div>" + (campo === "cidade_id" ? '<p class="o-legenda">Por enquanto, três cidades de Goiás.</p>' : "");
   }
-  function abrirConversa(c) {
-    app.idDaConversa = c ? c.id : ""; app.corrigindo = false;
-    montarReplay(c && c.replay ? c.replay : null);      // o replay da conversa aberta, ou o guardado; nunca o que sobrou de outra conversa
-    conversa.abrirGuardada(c, app.momento);
-    if (!c) $("compositor").innerHTML = '<p class="proximo-passo">' + esc(t(todas().length ? "momentos.proximoTexto" : "modo.semConversas")) + "</p>";
+  function valorNaFicha(l, c) { return c === "cidade_id" ? T.CIDADES[l[c]] : c === "rotacao_id" ? T.ROTACOES[l[c]].nome : c === "terra" ? T.TERRAS[l[c]].nome : T.dataPorExtenso(l[c]); }
+  function fichaHtml(l, trocavel) {
+    return "<dl>" + CAMPOS.map(function (c) {
+      return '<div class="linha"><div><dt>' + NOMES[c] + "</dt><dd>" + esc(valorNaFicha(l, c)) + "</dd></div>" + (trocavel ? '<button type="button" class="o-trocar" data-acao="trocar-campo" data-campo="' + c + '">Trocar</button>' : "") + "</div>";
+    }).join("") + "</dl>";
   }
-  function escolherMomento(m) {
-    app.momento = m; app.corrigindo = false; marcarMomento();
-    if (aoVivo()) { app.idDaConversa = ""; montarReplay(null); conversa.abrirAoVivo(app.api, m); }
-    else abrirConversa(conversasDo(m)[0] || null);
+  function desenharEntrada(descer) {
+    var falas = en.falas.map(function (f) { return '<li class="o-fala ' + f.de + '">' + esc(f.texto) + "</li>"; }).join("") + (en.ocupado ? '<li class="o-fala assistente o-pensando" aria-label="O assistente está escrevendo"><i></i><i></i><i></i></li>' : "");
+    var respostas = en.ocupado ? "" : en.campo === "ficha" ? '<div class="o-ficha">' + fichaHtml(en.l, true) + '<button type="button" class="o-bt" data-acao="confirmar-lavoura">' + ic("certo") + "Está certo, ver minha lavoura</button></div>" : en.campo ? opcoesHtml(en.campo) : "";
+    $("conteudo").innerHTML = '<div class="o-entrada"><h1 class="so-leitor">Cadastre a sua lavoura</h1><ol class="o-chat" aria-live="polite">' + falas + '</ol><div class="o-respostas">' + respostas + "</div>" +
+      '<form class="o-compor" id="formDaEntrada"><input type="text" id="campoDaEntrada" autocomplete="off" enterkeyhint="send" placeholder="Ou escreva aqui" aria-label="Escreva para o assistente"><button type="submit" aria-label="Enviar">' + ic("seta") + "</button></form></div>";
+    if (descer) window.scrollTo(0, document.documentElement.scrollHeight);
+  }
+  function abrirEntrada() {
+    en = { l: {}, falas: [], campo: "", ocupado: false, estado: null, fichaDaIA: null, outroDia: false };
+    app.tela = ""; app.vez += 1; fecharTudo();
+    document.body.className = "na-entrada";
+    $("nave").hidden = true; $("botaoLavoura").hidden = true; $("perguntar").hidden = true; $("reserva").hidden = true;
+    falar("assistente", "Olá! Sou o assistente do Órbita Rural. Acompanho a sua lavoura com os dados dos satélites da NASA.");
+    en.campo = faltando(); falar("assistente", PERGUNTAS[en.campo]);
+    desenharEntrada(false); window.scrollTo(0, 0);
+  }
+  function confirmarLavoura() {
+    if (faltando()) return;
+    app.lavoura = { cidade_id: en.l.cidade_id, rotacao_id: en.l.rotacao_id, terra: en.l.terra, plantio_da_soja: en.l.plantio_da_soja };
+    if (en.l.preocupacao) app.lavoura.preocupacao = en.l.preocupacao;
+    gravar(CHAVE, app.lavoura); app.cache = {}; app.safra = ""; ag = { estado: null, confirmada: false, falas: [], ocupado: false };
+    abrirApp("hoje");
   }
 
-  /* ---------- a mesa: a ficha e a comparação ---------- */
-  function desenharMesa() {
-    var s = conversa.ultimaSaida(), vivo = conversa.estado.modo === "ao_vivo", html;
-    if (!s || !s.ficha) html = C.ficha(null);
-    else html = C.ficha(s.ficha, { podeAgir: vivo || conversa.proximaGuardada() !== null, aoVivo: vivo, corrigindo: app.corrigindo });
-    if (s && Array.isArray(s.comparacao) && s.comparacao.length && !(s.ficha && s.ficha.confirmada === false)) {
-      html += C.comparacao(s.comparacao, s.ficha ? s.ficha.preocupacao : "", s.aviso);
+  /* ---------- o aplicativo: as três telas ---------- */
+  function busca(tipo, safra) {
+    var k = tipo + "|" + (safra || "");
+    if (!app.cache[k]) app.cache[k] = D.buscar(tipo, app.lavoura, safra).then(function (r) { if (r.reserva) delete app.cache[k]; return r; }, function (e) { delete app.cache[k]; throw e; });
+    return app.cache[k];
+  }
+  function mostrarReserva(r) {
+    var el = $("reserva");
+    if (!r || !r.reserva) { el.hidden = true; return; }
+    el.textContent = "Sem resposta do servidor: estes são os números guardados" + (r.gerado_em ? " em " + T.dataCurta(r.gerado_em) : "") + (/-10-15$/.test(app.lavoura.plantio_da_soja || "") ? "" : ", para a soja plantada em 15/10") + ".";
+    el.hidden = false;
+  }
+  function marcarNave() {
+    Array.prototype.forEach.call($("nave").querySelectorAll("a"), function (a) { if (a.getAttribute("data-tela") === app.tela) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
+    document.body.classList.toggle("lendo-agronomo", app.tela === "agronomo");
+  }
+  function falhou(vez) {
+    return function () {
+      if (vez !== app.vez) return;
+      $("conteudo").innerHTML = '<div class="o-tela estreita"><p class="o-nota">Não deu para buscar os dados agora. Confira a internet e tente de novo.</p><button type="button" class="o-bt claro" data-acao="tentar">Tentar de novo</button></div>';
+    };
+  }
+  function colheitaGuardada(safra) { var l = app.lavoura; return (ler(CHAVE_SAFRAS) || {})[[l.cidade_id, l.rotacao_id, safra].join("|")] || null; }
+  function desenharRegistro(recado) {
+    var x = app.registro; if (!x) return;
+    $("conteudo").innerHTML = T.registro(x.r.dados, app.lavoura, x.safras, x.safra, colheitaGuardada(x.safra), recado);
+  }
+  function mostrar(tela) {
+    var vez = ++app.vez, main = $("conteudo"), l = app.lavoura;
+    app.tela = tela; marcarNave(); fecharTudo();
+    if (tela === "agronomo") { abrirAgronomo(vez); return; }
+    main.innerHTML = T.esperando(); $("reserva").hidden = true; window.scrollTo(0, 0);
+    if (tela === "hoje") busca("painel").then(function (r) { if (vez !== app.vez) return; main.innerHTML = T.painel(r.dados, l); mostrarReserva(r); }, falhou(vez));
+    else if (tela === "ensaiar") busca("ensaio").then(function (r) { if (vez !== app.vez) return; app.ensaio = r.dados; main.innerHTML = T.ensaio(r.dados, l); mostrarReserva(r); }, falhou(vez));
+    else busca("ensaio").then(function (e) {
+      var d = e.dados || {}, safras = Object.keys((d.regra_dos_anos || {}).rendimento_por_safra_kg_ha || {}), ultima = (d.safra_2025_26 || {}).safra;
+      if (ultima && safras.indexOf(ultima) < 0) safras.push(ultima);
+      var safra = safras.indexOf(app.safra) >= 0 ? app.safra : (ultima || safras[safras.length - 1] || "");
+      return busca("registro", safra).then(function (r) {
+        if (r.reserva && r.safras) safras = r.safras.slice();      // sem a API, só as safras guardadas
+        return { r: r, safras: safras.sort().reverse(), safra: (r.dados && r.dados.safra) || safra };
+      });
+    }).then(function (x) { if (vez !== app.vez) return; app.safra = x.safra; app.registro = x; desenharRegistro(""); mostrarReserva(x.r); }, falhou(vez));
+  }
+  function rota() {
+    if (!app.lavoura) return;
+    var h = window.location.hash.replace(/^#/, "");
+    mostrar(TELAS.indexOf(h) >= 0 ? h : "hoje");
+  }
+  function irPara(tela) { if (window.location.hash.replace(/^#/, "") === tela) mostrar(tela); else window.location.hash = tela; }
+  function abrirApp(tela) {
+    document.body.className = "no-app";
+    $("nave").hidden = false; $("botaoLavoura").hidden = false; $("perguntar").hidden = false;
+    $("botaoLavoura").innerHTML = ic("pino") + "<span>" + esc(T.CIDADES[app.lavoura.cidade_id]) + "</span>";
+    if (tela) irPara(tela); else rota();
+  }
+  function guardarColheita(form) {
+    var x = app.registro, l = app.lavoura, valores = {}, algum = false;
+    Array.prototype.forEach.call(form.querySelectorAll("input[name]"), function (c) { var n = Number(String(c.value).replace(",", ".")); if (c.value !== "" && isFinite(n) && n > 0) { valores[c.name] = n; algum = true; } });
+    if (!algum) { form.querySelector(".o-recado").textContent = "Escreva quanto colheu, em sacas por hectare."; return; }
+    var h = new Date(), todas = ler(CHAVE_SAFRAS) || {};
+    valores.em = h.getFullYear() + "-" + doisDigitos(h.getMonth() + 1) + "-" + doisDigitos(h.getDate());
+    todas[[l.cidade_id, l.rotacao_id, x.safra].join("|")] = valores;
+    desenharRegistro(gravar(CHAVE_SAFRAS, todas) ? "Safra " + x.safra + " guardada neste aparelho." : "Este aparelho não deixou guardar a safra.");
+  }
+
+  /* ---------- o ano ruim, dia a dia (atrás do botão do ensaio) ---------- */
+  function abrirAnoRuim() {
+    var safra = ((app.ensaio || {}).regra_dos_anos || {}).pior_ano || "2015-16", vez = app.vez, el = $("prova");
+    $("folha").hidden = false; document.body.classList.add("com-folha"); $("folhaNota").textContent = "";
+    el.innerHTML = '<p class="o-espera">Buscando a safra…</p>'; $("folha").scrollTop = 0;
+    busca("replay", safra).then(function (r) {
+      if (vez !== app.vez || $("folha").hidden) return;
+      window.ORBITA_REPLAY.montar(el, r.dados, T.CIDADES[app.lavoura.cidade_id]);
+      $("folhaNota").textContent = r.reserva ? "Sem resposta do servidor: esta é a safra guardada, em terra média." : "";
+    }, function () { el.innerHTML = '<p class="o-espera">Não deu para buscar a safra agora.</p>'; });
+    $("fecharFolha").focus();
+  }
+  function fecharFolha() { if ($("folha").hidden) return; window.ORBITA_REPLAY.parar(); $("folha").hidden = true; $("prova").innerHTML = ""; document.body.classList.remove("com-folha"); }
+
+  /* ---------- a lavoura guardada ---------- */
+  function abrirLavoura() {
+    $("janelaCorpo").innerHTML = fichaHtml(app.lavoura, false) + '<p class="o-legenda">A lavoura fica guardada só neste aparelho.</p>';
+    $("janela").hidden = false; $("fecharJanela").focus();
+  }
+  function trocarDeLavoura() {
+    gravar(CHAVE, null); app.lavoura = null; app.cache = {}; app.safra = ""; app.ensaio = null; app.registro = null;
+    ag = { estado: null, confirmada: false, falas: [], ocupado: false };
+    try { window.history.replaceState(null, "", window.location.pathname + window.location.search); } catch (erro) { /* aberta como arquivo */ }
+    abrirEntrada();
+  }
+  function fecharTudo() { fecharFolha(); $("janela").hidden = true; $("gaveta").hidden = true; document.body.classList.remove("com-folha"); }
+
+  /* ---------- o assistente à mão ---------- */
+  function estadoDaFicha(pergunta) {
+    var l = app.lavoura;      // a ficha que o produtor confirmou na entrada; o "sim" dela vai no texto, e o servidor põe o selo
+    return { v: 1, ficha: { cidade_id: l.cidade_id, rotacao_atual: D.culturas[l.rotacao_id], terra: l.terra, plantio_da_soja: l.plantio_da_soja || null, preocupacao: l.preocupacao || "agua", confirmada: false },
+             selo: null, pergunta: pergunta, momento: MOMENTO[app.tela] || "durante", falas: [] };
+  }
+  function desenharGaveta() {
+    var falas = ag.falas.length ? ag.falas : [{ de: "assistente", texto: "Pergunte o que quiser sobre a sua lavoura. Eu respondo com a conta e com os dados da NASA do lugar." }];
+    $("chatDoAssistente").innerHTML = falas.map(function (f) { return '<li class="o-fala ' + f.de + '">' + esc(f.texto) + (f.apoio ? '<small class="o-apoio">' + esc(f.apoio) + "</small>" : "") + "</li>"; }).join("") +
+      (ag.ocupado ? '<li class="o-fala assistente o-pensando" aria-label="O assistente está escrevendo"><i></i><i></i><i></i></li>' : "");
+    $("sugestoes").innerHTML = ag.falas.length ? "" : (SUGESTOES[app.tela] || SUGESTOES.hoje).map(function (s) { return '<button type="button" class="o-opcao" data-acao="sugestao" data-texto="' + esc(s) + '">' + esc(s) + "</button>"; }).join("");
+    var rolo = $("roloDoAssistente"); rolo.scrollTop = rolo.scrollHeight;
+  }
+  function abrirGaveta() { $("gaveta").hidden = false; document.body.classList.add("com-folha"); desenharGaveta(); $("fecharGaveta").focus(); }
+  function fecharGaveta() { $("gaveta").hidden = true; document.body.classList.remove("com-folha"); $("perguntar").focus(); }
+  function perguntar(texto) {
+    texto = String(texto || "").trim(); if (!texto || ag.ocupado) return;
+    ag.falas.push({ de: "produtor", texto: texto }); ag.ocupado = true; desenharGaveta();
+    function mandar(deNovo) {
+      var direto = !!(ag.estado && ag.confirmada) && !deNovo;
+      return D.post("/agente", direto ? { estado: ag.estado, texto: texto } : { estado: estadoDaFicha(texto), texto: "sim" }, 120000).then(function (s) {
+        var confirmada = !!(s.ficha && s.ficha.confirmada);
+        if (!confirmada && direto) return mandar(true);      // o servidor religou e o selo de antes não vale: confirma de novo
+        ag.estado = s.estado || null; ag.confirmada = confirmada; return s;
+      });
     }
-    $("mesa").innerHTML = html;
-    $("mesa").classList.toggle("com-comparacao", html.indexOf('id="comparacao"') >= 0);
+    app.pronto.then(function () { if (!D.api || !D.ia) throw new Error("sem_ia"); return mandar(false); }).then(function (s) {
+      ag.falas.push({ de: "assistente", texto: s.resposta || "", apoio: APOIO[s.apoio] || "" });
+    }, function (e) {
+      ag.falas.push({ de: "assistente", texto: e && e.message === "sem_ia" ? SEM_ASSISTENTE : e && e.codigo === 400 && e.frase ? e.frase : "O assistente não respondeu agora. Tente de novo daqui a pouco. O painel, o ensaio e o registro seguem funcionando." });
+    }).then(function () { ag.ocupado = false; desenharGaveta(); });
   }
 
-  /* ---------- o replay ---------- */
-  function montarReplay(replay) {
-    var c = conversaDoReplay(), el = $("prova");
-    replay = replay || (c ? c.replay : null);
-    if (!replay || !Array.isArray(replay.dias) || !replay.dias.length) { el.hidden = true; $("paraAProva").hidden = true; return; }
-    // O mesmo replay pode chegar de novo dentro de uma resposta: se é o que já está na tela, fica como está (não volta ao começo).
-    var na = app.replayNaTela;
-    if (na && (na === replay || (na.safra === replay.safra && na.cidade_id === replay.cidade_id && na.terra === replay.terra && na.dias.length === replay.dias.length &&
-        (na.rotacao || {}).id === (replay.rotacao || {}).id))) return;
-    app.replayNaTela = replay; el.hidden = false;
-    $("paraAProva").hidden = false;
-    $("paraAProva").firstElementChild.innerHTML = esc(t("momentos.prova", { safra: replay.safra || "" })) + ic("seta");
-    var cidade = t("ficha.cidades." + replay.cidade_id);
-    window.ORBITA_REPLAY.montar(el, replay, cidade === "ficha.cidades." + replay.cidade_id ? "" : cidade);
-  }
-
-  /* ---------- a leitura do agrônomo ---------- */
+  /* ---------- a leitura do agrônomo (o link do rodapé) ---------- */
+  function respostasDoMotor() { var o = window.ORBITA_RESPOSTAS; return o && typeof o === "object" ? (o.respostas && typeof o.respostas === "object" ? o.respostas : o) : {}; }
   function desenharAgronomo() {
-    var el = $("leituraAgronomo"), R = respostasDoMotor(), terras = ["pouca", "media", "muita"].filter(function (k) { return R[k]; });
+    var el = $("leituraAgronomo"); if (!el) return;
+    var R = respostasDoMotor(), terras = ["pouca", "media", "muita"].filter(function (k) { return R[k]; });
     var topo = '<header class="agro-topo"><h1>' + esc(t("agronomo.titulo")) + "</h1><p>" + esc(t("agronomo.texto")) + "</p>";
     if (!terras.length || !window.ORBITA_ADAPTAR || !window.ORBITA_RESULTADO) { el.innerHTML = topo + '<p class="nota">' + esc(t("agronomo.sem")) + "</p></header>"; return; }
-    var s = conversa.ultimaSaida(), daFicha = s && s.ficha ? s.ficha.terra : "";
+    var daFicha = app.lavoura ? app.lavoura.terra : "";
     var terra = terras.indexOf(app.terraDoAgronomo) >= 0 ? app.terraDoAgronomo : terras.indexOf(daFicha) >= 0 ? daFicha : terras.indexOf("media") >= 0 ? "media" : terras[0];
-    app.terraDoAgronomo = terra;
+    app.terraDoAgronomo = terra; app.respostaDoAgronomo = R[terra];
     var v = window.ORBITA_ADAPTAR(R[terra], { complementos: window.ORBITA_COMPLEMENTOS, guardada: R[terra] });
-    app.respostaDoAgronomo = R[terra];
     el.innerHTML = topo + '<p class="nota">' + esc(t("agronomo.nota")) + '</p><div class="agro-acoes"><div class="segmento" role="group" aria-label="' + esc(t("agronomo.terra")) + '"><span>' + esc(t("agronomo.terra")) + "</span>" +
       terras.map(function (k) { return '<button data-acao="terra-do-agronomo" data-terra="' + k + '" aria-pressed="' + (k === terra) + '">' + esc(String(t("ficha.terras." + k)).replace(/\s*\(.*\)\s*$/, "")) + "</button>"; }).join("") +
-      '</div><button class="botao" data-acao="voltar-produtor">' + esc(t("agronomo.voltar")) + "</button></div></header>" + window.ORBITA_RESULTADO.agronomo(v, window.ORBITA_VALIDACAO);
+      '</div><button class="botao" data-acao="voltar-produtor">Voltar para a minha lavoura</button></div></header>' + window.ORBITA_RESULTADO.agronomo(v, window.ORBITA_VALIDACAO);
     window.ORBITA_RESULTADO.ajustar(el);
+  }
+  function abrirAgronomo(vez) {
+    var main = $("conteudo"); main.innerHTML = T.esperando("Abrindo as contas…"); $("reserva").hidden = true; window.scrollTo(0, 0);
+    D.emOrdem(["dados/respostas.js", "dados/complementos.js", "dados/validacao.js", "js/textos-agronomo.js", "js/adaptar.js", "js/resultado.js"]).then(function () {
+      if (vez !== app.vez) return;
+      main.innerHTML = '<section id="leituraAgronomo"></section>'; desenharAgronomo();
+    }, function () { if (vez === app.vez) main.innerHTML = '<div class="o-tela estreita"><p class="o-nota">Não deu para abrir as contas agora.</p></div>'; });
   }
   var relogioDoAgronomo = 0;
   window.addEventListener("resize", function () {
     clearTimeout(relogioDoAgronomo);
-    relogioDoAgronomo = setTimeout(function () { var el = $("leituraAgronomo"); if (el && !el.hidden && app.respostaDoAgronomo) window.ORBITA_RESULTADO.ajustar(el); }, 150);
+    relogioDoAgronomo = setTimeout(function () { var el = $("leituraAgronomo"); if (el && app.respostaDoAgronomo && window.ORBITA_RESULTADO) window.ORBITA_RESULTADO.ajustar(el); }, 150);
   });
-  // As notas de prioridade (3, 3, 3, 3) saíram do produto: o arquivo que se baixa não as leva, em nenhum nível.
-  function semPrioridades(o) {
+  function semPrioridades(o) {      // as notas de prioridade saíram do produto: o arquivo que se baixa não as leva
     if (Array.isArray(o)) return o.map(semPrioridades);
     if (o && typeof o === "object") { var s = {}; Object.keys(o).forEach(function (k) { if (k !== "prioridades") s[k] = semPrioridades(o[k]); }); return s; }
     return o;
@@ -147,93 +298,47 @@
     Array.prototype.forEach.call(document.querySelectorAll("#parametrosBox tbody tr"), function (tr) { tr.hidden = so && tr.getAttribute("data-etiqueta") === "publicado"; });
   }
 
-  /* ---------- as duas leituras ---------- */
-  function abrirLeitura(qual, focar) {
-    var agro = qual === "agronomo";
-    $("abaProdutor").setAttribute("aria-selected", !agro); $("abaProdutor").tabIndex = agro ? -1 : 0;
-    $("abaAgronomo").setAttribute("aria-selected", agro); $("abaAgronomo").tabIndex = agro ? 0 : -1;
-    $("leituraProdutor").hidden = agro; $("leituraAgronomo").hidden = !agro;
-    document.body.classList.toggle("lendo-agronomo", agro);
-    if (agro) { window.ORBITA_REPLAY.parar(); desenharAgronomo(); }
-    if (focar) { window.scrollTo(0, 0); $(agro ? "abaAgronomo" : "abaProdutor").focus(); }
-  }
-  function irPara(id) {
-    var el = $(id); if (!el) return;
-    var calmo = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    el.scrollIntoView({ block: "start", behavior: calmo ? "auto" : "smooth" });
-    if (!el.hasAttribute("tabindex")) el.setAttribute("tabindex", "-1");
-    el.focus({ preventScroll: true });
-  }
-
-  /* ---------- os cliques ---------- */
+  /* ---------- os toques ---------- */
   var ACOES = {
-    "dizer-proxima": function () { conversa.dizer(); },
-    "recomecar": function () { abrirConversa(conversaPorId(app.idDaConversa)); },
-    "abrir-conversa": function (b) { abrirConversa(conversaPorId(b.getAttribute("data-id"))); },
-    "usar-sugestao": function (b) { var campo = $("campoDaFala"); if (campo) { campo.value = b.getAttribute("data-texto") || ""; campo.focus(); } },
-    "confirmar-ficha": function () { conversa.dizer(t("ficha.confirmarFala")); },
-    "corrigir-ficha": function () { app.corrigindo = true; desenharMesa(); var f = $("correcao"); if (f) f.querySelector("select, input").focus(); },
-    "cancelar-correcao": function () { app.corrigindo = false; desenharMesa(); },
-    "abrir-agronomo": function () { abrirLeitura("agronomo", true); },
-    "voltar-produtor": function () { abrirLeitura("produtor", true); },
+    "opcao": function (b) { escolher(b.getAttribute("data-campo"), b.getAttribute("data-valor"), b.getAttribute("data-nome")); },
+    "outro-dia": function () { en.outroDia = true; desenharEntrada(true); var c = $("diaDoPlantio"); if (c) c.focus(); },
+    "usar-dia": function () { var c = $("diaDoPlantio"), v = c ? c.value : ""; if (/^\d{4}-(09|10|11|12)-\d{2}$/.test(v)) escolher("plantio_da_soja", v, T.dataPorExtenso(v)); },
+    "trocar-campo": function (b) { var c = b.getAttribute("data-campo"); delete en.l[c]; en.campo = c; en.outroDia = false; falar("assistente", PERGUNTAS[c]); desenharEntrada(true); },
+    "confirmar-lavoura": confirmarLavoura,
+    "ano-ruim": abrirAnoRuim, "fechar-folha": fecharFolha,
+    "abrir-lavoura": abrirLavoura, "fechar-janela": function () { $("janela").hidden = true; $("botaoLavoura").focus(); }, "trocar-lavoura": trocarDeLavoura,
+    "perguntar": abrirGaveta, "fechar-gaveta": fecharGaveta, "sugestao": function (b) { perguntar(b.getAttribute("data-texto")); },
+    "tentar": function () { mostrar(app.tela || "hoje"); },
     "terra-do-agronomo": function (b) { app.terraDoAgronomo = b.getAttribute("data-terra"); desenharAgronomo(); },
-    "baixar": baixarResposta,
-    "ir-comparacao": function () { irPara("comparacao"); },
-    "ir-ficha": function () { irPara("ficha"); },
-    "ir-replay": function () { irPara("prova"); }
+    "baixar": baixarResposta, "voltar-produtor": function () { irPara("hoje"); }
   };
   document.addEventListener("click", function (ev) {
     var alvo = ev.target instanceof Element ? ev.target : null; if (!alvo) return;
-    var momento = alvo.closest(".momento"); if (momento) { escolherMomento(momento.getAttribute("data-momento")); return; }
-    var leitura = alvo.closest("[data-leitura]"); if (leitura) { abrirLeitura(leitura.getAttribute("data-leitura")); return; }
+    if (alvo.id === "gaveta") { fecharGaveta(); return; }
+    if (alvo.id === "janela") { $("janela").hidden = true; return; }
     var filtro = alvo.closest("[data-filtro]"); if (filtro) { filtrarParametros(filtro); return; }
     var b = alvo.closest("[data-acao]"); if (b && ACOES[b.getAttribute("data-acao")]) { ev.preventDefault(); ACOES[b.getAttribute("data-acao")](b); }
   });
   document.addEventListener("submit", function (ev) {
-    var f = ev.target;
-    if (f.id === "formDaFala") { ev.preventDefault(); var campo = $("campoDaFala"); if (campo && campo.value.trim()) conversa.dizer(campo.value); }
-    else if (f.id === "correcao") { ev.preventDefault(); app.corrigindo = false; conversa.dizer(C.falaDaCorrecao(f)); }
+    var f = ev.target, campo; ev.preventDefault();
+    if (f.id === "formDaEntrada") { campo = $("campoDaEntrada"); escritaNaEntrada(campo.value); }
+    else if (f.id === "formDoAssistente") { campo = $("campoDoAssistente"); var txt = campo.value; campo.value = ""; perguntar(txt); }
+    else if (f.id === "formDaColheita") guardarColheita(f);
   });
+  document.addEventListener("change", function (ev) { if (ev.target && ev.target.id === "safraDoRegistro") { app.safra = ev.target.value; mostrar("registrar"); } });
   document.addEventListener("keydown", function (ev) {
-    var alvo = ev.target instanceof Element ? ev.target : null; if (!alvo) return;
-    if (alvo.id === "campoDaFala" && ev.key === "Enter" && !ev.shiftKey && !ev.isComposing) { ev.preventDefault(); if (alvo.value.trim()) conversa.dizer(alvo.value); return; }
-    // As setas andam entre as abas (as duas leituras e os três momentos).
-    if ((ev.key === "ArrowRight" || ev.key === "ArrowLeft") && alvo.getAttribute("role") === "tab") {
-      var abas = Array.prototype.slice.call(alvo.parentNode.querySelectorAll('[role="tab"]')), i = abas.indexOf(alvo);
-      var outra = abas[(i + (ev.key === "ArrowRight" ? 1 : abas.length - 1)) % abas.length];
-      ev.preventDefault(); outra.focus(); outra.click();
-    }
+    if (ev.key !== "Escape") return;
+    if (!$("gaveta").hidden) fecharGaveta(); else if (!$("janela").hidden) $("janela").hidden = true; else fecharFolha();
   });
+  window.addEventListener("hashchange", rota);
 
   /* ---------- o começo ---------- */
-  function porOsTextos() {
-    Array.prototype.forEach.call(document.querySelectorAll("[data-t]"), function (el) { el.textContent = t(el.getAttribute("data-t")); });
-    $("abaProdutor").textContent = t("leituras.produtor"); $("abaAgronomo").textContent = t("leituras.agronomo");
-    $("leituras").setAttribute("aria-label", t("leituras.rotulo"));
-  }
   function comecar() {
-    app.dados = window.ORBITA_CONVERSAS && Array.isArray(window.ORBITA_CONVERSAS.conversas) ? window.ORBITA_CONVERSAS : null;
-    app.api = apiBase();
-    conversa = window.ORBITA_CONVERSA.criar($("falas"), $("compositor"), {
-      aoResponder: function (saida) {
-        app.corrigindo = false;
-        $("anuncio").textContent = t("conversa.agente") + ": " + String(saida.resposta || "");      // para o leitor de tela, só a resposta nova
-        if (saida.replay) montarReplay(saida.replay);      // ao vivo, o agente pode mandar o replay junto da resposta
-        if (aoVivo() && MOMENTOS.indexOf(saida.momento) >= 0 && saida.momento !== app.momento) { app.momento = saida.momento; marcarMomento(); }
-      },
-      aoCair: function (motivo) {
-        app.api = "";
-        avisar(t("modo.caiu", { motivo: t("modo." + motivo) }));
-        desenharModo(); desenharMomentos(); escolherMomento(app.momento);
-      },
-      aoMudar: function () { desenharMesa(); desenharOutras(); }
-    });
-    if (!aoVivo() && !todas().length) avisar(t("modo.semConversas"));
-    desenharModo(); desenharMomentos(); montarReplay(); escolherMomento("antes");
+    try {
+      app.pronto = D.saude();
+      app.lavoura = ler(CHAVE); if (!valida(app.lavoura)) app.lavoura = null;
+      if (app.lavoura) abrirApp(""); else abrirEntrada();
+    } finally { document.documentElement.classList.remove("montando"); }
   }
-  function carregarEComecar() {
-    try { porOsTextos(); comecar(); }
-    finally { document.documentElement.classList.remove("montando"); }      // a página aparece já montada (ver o index.html)
-  }
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", carregarEComecar); else carregarEComecar();
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", comecar); else comecar();
 })();
