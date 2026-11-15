@@ -146,5 +146,60 @@ class OTetoIgualDaFaixaECoincidencia(unittest.TestCase):
         self.assertEqual((agua["falta_no_ano_normal_mm"]["ate"], agua["falta_no_pior_ano_mm"]["ate"]), (266.8, 266.8))
 
 
+class OMarcoDaAguaNoFundo(unittest.TestCase):
+    """O marco "agua_acabou" é o começo da sede (a água fácil de tirar acabou), não o dia em que a água acabou de
+    fato. O replay ganha o marco "agua_no_fundo": o primeiro dia em que a água na terra chega ao menor valor do
+    ciclo da cultura, só quando nesse dia a planta não conseguiu beber nada."""
+    DE_ANTES = [("2015-10-15", "plantio", "soja", False), ("2015-10-18", "agua_acabou", "soja", False),
+                ("2016-02-06", "colheita", "soja", False), ("2016-02-10", "plantio", "milho", False),
+                ("2016-04-04", "agua_acabou", "milho", True), ("2016-04-08", "calor_forte", "milho", False),
+                ("2016-06-13", "colheita", "milho", False)]
+
+    @classmethod
+    def setUpClass(cls):
+        cls.replay = motor.replay_da_safra(RIO_VERDE, "2015-16")
+
+    def test_os_marcos_de_antes_ficam_exatamente_como_estavam(self):
+        antes = [m for m in self.replay["marcos"] if m["tipo"] != "agua_no_fundo"]
+        self.assertEqual([(m["data"], m["tipo"], m["cultura"], m["principal"]) for m in antes], self.DE_ANTES)
+        self.assertIn({"data": "2016-04-04", "tipo": "agua_acabou", "cultura": "milho", "dias_seguidos": 60,
+                       "agua_na_terra_mm": 17.2, "principal": True,
+                       "frase": "Neste dia a água fácil de tirar da terra acabou para o milho de 2ª safra: começaram "
+                                "60 dias seguidos de sede."}, antes)
+
+    def test_o_marco_novo_sai_no_dia_em_que_a_agua_chega_ao_fundo(self):
+        marcos = self.replay["marcos"]
+        novos = [m for m in marcos if m["tipo"] == "agua_no_fundo"]
+        self.assertEqual(novos, [{
+            "data": "2016-04-24", "tipo": "agua_no_fundo", "cultura": "milho", "agua_na_terra_mm": 0.1,
+            "frase": "Neste dia a água da terra chegou ao fundo para o milho de 2ª safra: ficou em 0,1 mm, o menor "
+                     "valor do ciclo, e a planta não conseguiu beber nada.", "principal": False}])
+        self.assertEqual(list(novos[0]), ["data", "tipo", "cultura", "agua_na_terra_mm", "frase", "principal"])
+        self.assertEqual([m["data"] for m in marcos], sorted(m["data"] for m in marcos))     # em ordem de data
+        self.assertEqual(sum(1 for m in marcos if m["principal"]), 1)
+        self.assertEqual(conferencia.conferir_texto(novos[0]["frase"], self.replay), [])
+        self.assertEqual(motor.registro_da_safra(RIO_VERDE, "2015-16")["marcos"], marcos)
+
+    def test_em_qualquer_cidade_e_safra_o_marco_so_sai_quando_a_agua_acabou_de_fato(self):
+        vistos = 0
+        for cidade in motor.CIDADES:
+            for safra in balanco.SAFRAS_DO_ESTUDO + (motor.SAFRA_A_PARTE,):
+                replay = motor.replay_da_safra(dict(RIO_VERDE, cidade_id=cidade), safra)
+                fundo = {m["cultura"]: m for m in replay["marcos"] if m["tipo"] == "agua_no_fundo"}
+                for cultura in ("soja", "milho"):
+                    dias = [d for d in replay["dias"] if d["cultura"] == cultura]
+                    menor = min(d["agua_na_terra_mm"] for d in dias)
+                    primeiro = next(d for d in dias if d["agua_na_terra_mm"] == menor)
+                    acabou = primeiro["bebido_mm"] == 0.0 and primeiro["pedido_mm"] > 0
+                    self.assertEqual(cultura in fundo, acabou and replay["resumo"][cultura]["ciclo_completo"],
+                                     (cidade, safra, cultura))
+                    if cultura in fundo:
+                        vistos += 1
+                        self.assertEqual((fundo[cultura]["data"], fundo[cultura]["agua_na_terra_mm"]),
+                                         (primeiro["data"], menor), (cidade, safra, cultura))
+                        self.assertFalse(fundo[cultura]["principal"])
+        self.assertGreater(vistos, 0)
+
+
 if __name__ == "__main__":
     unittest.main()

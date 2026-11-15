@@ -76,8 +76,15 @@ rotação que o produtor faz hoje (qualquer uma do cardápio) aparece em `rotaca
 `motor.replay_da_safra(entrada, "2015-16")` devolve `dias` (um por dia, de 1 de setembro a 31 de agosto) e `marcos`.
 - Cada dia: `data`, `cultura`, `chuva_mm`, `agua_na_terra_mm`, `pedido_mm`, `bebido_mm`, `falta_mm`, `com_sede`,
   `tmax_c`, `calor_forte`.
-- Cada marco: `data`, `tipo` (`plantio`, `agua_acabou`, `calor_forte` ou `colheita`), `cultura`, `frase` e `principal`
-  (um só marco é o principal: o começo da maior sequência de dias de sede). As datas dos marcos saem da conta.
+- Cada marco: `data`, `tipo` (`plantio`, `agua_acabou`, `agua_no_fundo`, `calor_forte` ou `colheita`), `cultura`,
+  `frase` e `principal` (um só marco é o principal: o começo da maior sequência de dias de sede). As datas dos marcos
+  saem da conta.
+- `agua_acabou` é o começo da sede: o dia em que a água fácil de tirar acabou (em Rio Verde, 2015-16, o milho em
+  2016-04-04, com 17,2 mm na terra). Não é o dia em que a água acabou de fato.
+- `agua_no_fundo` (acerto de 2026-11-15) é esse dia: o primeiro em que a água na terra chega ao menor valor do ciclo
+  da cultura, só quando nesse dia a planta pediu água e não conseguiu beber nada (no mesmo caso, 2016-04-24, com
+  0,1 mm). Campos: `data`, `tipo`, `cultura`, `agua_na_terra_mm`, `frase` e `principal` (sempre `false`). Se a água
+  não acabou de fato, ou se o ciclo não fechou nos dados guardados, não há esse marco. Os números são os de `dias`.
 
 ### O registro: as mesmas regras da comparação (acerto de 2026-11-15)
 `motor.registro_da_safra(entrada, "2015-16")` conta a safra depois da colheita. Dois números dele discordavam da

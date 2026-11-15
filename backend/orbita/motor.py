@@ -704,7 +704,11 @@ def replay_da_safra(entrada, safra="2015-16", par=None):
 
     Cada dia: a data, o que está na terra, a chuva, a água na terra, o que a planta pediu, bebeu e o que faltou, se
     passou sede, a temperatura máxima e se foi dia de calor forte. Cada marco: a data, o tipo (plantio, agua_acabou,
-    calor_forte ou colheita) e uma frase pronta. As datas dos marcos saem da conta.
+    agua_no_fundo, calor_forte ou colheita) e uma frase pronta. As datas dos marcos saem da conta.
+
+    "agua_acabou" é o começo da maior sequência de sede (a água fácil de tirar acabou). "agua_no_fundo" é o dia em
+    que a água acabou de fato: o primeiro dia em que a água na terra chega ao menor valor do ciclo da cultura, só
+    quando nesse dia a planta não conseguiu beber nada (e só com o ciclo completo nos dados guardados).
     """
     entrada = validar_entrada(entrada)
     conferir_safra(safra)
@@ -752,6 +756,15 @@ def replay_da_safra(entrada, safra="2015-16", par=None):
                            "agua_na_terra_mm": dia["agua_na_terra_mm"],
                            "frase": f"Neste dia a água fácil de tirar da terra acabou para {nome}: começaram "
                                     f"{tamanho} dias seguidos de sede."})
+        # A água no fundo: o primeiro dia em que a água na terra chega ao menor valor do ciclo, só quando nesse dia
+        # a planta pediu água e não conseguiu beber nada (se a água não acabou de fato, não há marco). Os números
+        # são os dos dias do replay (os que a tela mostra). Com o ciclo pela metade, o menor valor ainda não se sabe.
+        menor = min(linhas[i]["agua_na_terra_mm"] for i in indices)
+        fundo = next(linhas[i] for i in indices if linhas[i]["agua_na_terra_mm"] == menor)
+        if resumo[tipo]["ciclo_completo"] and fundo["bebido_mm"] == 0.0 and fundo["pedido_mm"] > 0:
+            marcos.append({"data": fundo["data"], "tipo": "agua_no_fundo", "cultura": tipo, "agua_na_terra_mm": menor,
+                           "frase": f"Neste dia a água da terra chegou ao fundo para {nome}: ficou em {_n(menor)} mm, "
+                                    "o menor valor do ciclo, e a planta não conseguiu beber nada."})
         if quentes:
             dia = linhas[quentes[0]]
             marcos.append({"data": dia["data"], "tipo": "calor_forte", "cultura": tipo, "tmax_c": dia["tmax_c"],
@@ -771,7 +784,8 @@ def replay_da_safra(entrada, safra="2015-16", par=None):
     principal = max((m for m in marcos if m["tipo"] == "agua_acabou"), key=lambda m: m["dias_seguidos"], default=None)
     for marco in marcos:
         marco["principal"] = marco is principal
-    marcos.sort(key=lambda m: (m["data"], ("plantio", "agua_acabou", "calor_forte", "colheita").index(m["tipo"])))
+    marcos.sort(key=lambda m: (m["data"], ("plantio", "agua_acabou", "agua_no_fundo", "calor_forte",
+                                           "colheita").index(m["tipo"])))
     resumo["total"] = {"falta_mm": r1(sum(r.pedido - r.bebido for r in da_safra if r.tipo in rotacoes.CULTURAS)),
                        "dias_de_sede": sum(1 for r in da_safra if r.tipo in rotacoes.CULTURAS and r.ks < 1.0),
                        "dias_de_calor_forte": sum(1 for linha in linhas if linha["calor_forte"]),

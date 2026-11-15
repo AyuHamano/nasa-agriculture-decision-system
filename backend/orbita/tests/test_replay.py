@@ -11,7 +11,7 @@ RESPOSTA = motor.responder(ENTRADA)
 REPLAY = motor.replay_da_safra(ENTRADA, "2015-16")
 CAMPOS_DO_DIA = {"data", "cultura", "chuva_mm", "agua_na_terra_mm", "pedido_mm", "bebido_mm", "falta_mm", "com_sede",
                  "tmax_c", "calor_forte"}
-TIPOS_DE_MARCO = {"plantio", "agua_acabou", "calor_forte", "colheita"}
+TIPOS_DE_MARCO = {"plantio", "agua_acabou", "agua_no_fundo", "calor_forte", "colheita"}   # agua_no_fundo: 2026-11-15
 
 
 class ClimaDoLugar(unittest.TestCase):
