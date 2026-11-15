@@ -128,6 +128,7 @@ var TEXTOS = {
       textoSemLugar: "A safra refeita dia a dia, com a chuva que o satélite da NASA mediu.",
       rotacao: "Na terra: {nome}.",
       pulso: ["Neste dia a água acabou.", "O produtor não sabia.", "O satélite sabia."],
+      pulsoSede: ["Neste dia a sede começou."],
       culturas: { soja: "soja", milho: "milho safrinha", sorgo: "sorgo", braquiaria: "braquiária (capim)", milho_com_capim: "milho com capim", sem_planta: "sem planta" },
       semPlanta: "Terra sem planta viva",
       tocar: "Tocar", pausar: "Pausar", voltar: "Voltar ao começo", cheia: "Tela cheia", sair: "Sair da tela cheia",
@@ -137,7 +138,7 @@ var TEXTOS = {
       agua: "Água na terra", chuva: "Chuva do dia", falta: "Água que faltou no dia", tmax: "Temperatura máxima",
       comSede: "Lavoura com sede", calorForte: "Calor forte",
       legenda: { chuva: "Chuva de cada dia", agua: "Água guardada na terra", sede: "Dias de sede", calor: "Dias de calor forte" },
-      marcos: { plantio: "Plantio", agua_acabou: "A água acabou", sede: "Começa a sede", calor_forte: "Calor forte", colheita: "Colheita" },
+      marcos: { plantio: "Plantio", agua_acabou: "Começa a sede", agua_no_fundo: "A água acabou", calor_forte: "Calor forte", colheita: "Colheita" },
       comeco: "Toque para ver os dias passando.",
       sem: "O replay da safra aparece aqui quando a conversa guardada da safra 2015-16 for gravada."
     },

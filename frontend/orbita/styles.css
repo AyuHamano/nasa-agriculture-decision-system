@@ -312,7 +312,7 @@ a { color: var(--agua); font-weight: 700; }
 .rp-marco b { position: absolute; top: 0; left: 5px; font-size: .76rem; font-weight: 700; line-height: 1; white-space: nowrap; background: #fff; color: var(--tinta); padding: 4px 8px; border-radius: 999px; opacity: 0; pointer-events: auto; cursor: pointer; }
 .rp-marco.passou b { opacity: 1; }
 .rp-marco.a-esquerda b { left: auto; right: 5px; }
-.rp-marco.m-agua_acabou b { background: #E4593C; color: #fff; }
+.rp-marco.m-agua_acabou b, .rp-marco.m-agua_no_fundo b { background: #E4593C; color: #fff; }
 .rp-marco.m-calor_forte b { background: #F3A441; }
 .rp-culturas { position: relative; height: 24px; font-size: .8rem; font-weight: 700; color: #DCECDB; }
 .rp-culturas span { position: absolute; top: 2px; padding-left: 5px; border-left: 1.5px solid rgba(255, 255, 255, .45); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }

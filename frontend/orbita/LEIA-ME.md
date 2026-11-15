@@ -24,7 +24,8 @@ pasta, e os dados estão em `dados/`.
   saber. Onde a conta dá faixa, a tela mostra a faixa. No fim, "Converse com o agrônomo antes de decidir".
 - **A prova:** o replay da safra 2015-16, dia a dia: a chuva, a água na terra descendo, os dias de sede e de calor
   forte, e os marcos com a frase de cada um. Tem tocar, pausar, voltar, velocidade e tela cheia (para gravar o vídeo).
-  Na velocidade normal, a safra inteira passa em cerca de 30 segundos, com uma parada no dia em que a água acaba.
+  Na velocidade normal, a safra inteira passa em cerca de 30 segundos, com uma parada no dia em que a sede começa e outra no dia em que a água acaba
+  (os dois dias saem da conta do motor: os marcos `agua_acabou`, o começo da sede, e `agua_no_fundo`, a água no fundo).
 - **A leitura do agrônomo** (a aba "Agrônomo"): como a conta foi feita, com que valores, de onde eles vêm, as
   hipóteses e os limites. Dá para baixar a resposta completa do motor.
 
