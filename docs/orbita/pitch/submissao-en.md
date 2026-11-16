@@ -93,6 +93,14 @@ daily root-zone water balance). Crop calendars come from Brazil's agricultural c
 
 The code and the data are public in the repository.
 
+## What sets it apart
+- **Before planting.** What exists today gives the farmer a planting date. Órbita Rural gives the rotation rehearsed on
+  10 real seasons.
+- **During the season.** What exists today shows a greenness map. Órbita Rural sends the warning: water stress in 7 days
+  (the Rio Verde example above, with data as of November 14, 2026).
+- **For the farmer.** With what exists today, each tool covers one part. Órbita Rural puts the whole cycle in one place,
+  for free.
+
 ## Use of artificial intelligence
 - **In the product.** A large language model (Claude Haiku 5.5, by Anthropic, called through OpenRouter) holds the
   conversation with the farmer and explains the results. It does not calculate or choose anything: the numbers come from
@@ -113,6 +121,9 @@ Free for the farmer; the cooperative pays, per farmer supported.
 NASA doesn't fly without mission control. Farms no longer have to.
 
 Órbita Rural uses public NASA data. It is not a NASA product and is not endorsed by NASA.
+
+## What's next
+More cities, more crops, and a trial with a cooperative in Goiás this season.
 
 ## Links
 - Repository: [a preencher]

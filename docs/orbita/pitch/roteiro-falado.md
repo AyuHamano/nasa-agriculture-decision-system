@@ -2,7 +2,7 @@
 
 > Gerado com IA (Claude) em 2026-11-15. A fala de cada slide é a do roteiro de 3 minutos aprovado pelo time em 2026-11-15.
 > A prova de cada número está em `../VALIDACAO.md`; os números da conta saem do motor (`backend/orbita/`). Um slide por bloco; a linha em branco é pausa; frase
-> curta se diz devagar. São 416 palavras e 3:01 no total. **O tempo é pela contagem de palavras** (150 por minuto, mais
+> curta se diz devagar. São 413 palavras e 3:00 no total. **O tempo é pela contagem de palavras** (150 por minuto, mais
 > 2,5 segundos em cada uma das 6 trocas de slide): falta cronometrar em voz alta.
 
 ## O texto, slide a slide
@@ -15,39 +15,39 @@ Agora o céu olha de volta.
 
 Nenhuma missão da NASA decola sem ensaio. Toda safra decola.
 
-### Slide 2 · a dor (0:15 a 0:35; 51 palavras)
+### Slide 2 · o desafio e a dor (0:15 a 0:34; 47 palavras)
 
-Em Goiás, 80 produtores validaram as dores do campo listadas pelo IFAG. Nos grãos, a primeira é planejar com o clima e a economia mudando. E pesam a água que falta na fase crítica, o calor extremo e o solo que perde vida.
+O nosso desafio é o Field Shift: adaptar a lavoura com os dados da NASA.
 
-Hoje o produtor escolhe a rotação no escuro.
+Em Goiás, 80 produtores validaram as dores listadas pelo IFAG: o clima que muda, a água que falta, o calor extremo, o solo que perde vida.
 
-### Slide 3 · a solução: o controle de missão da lavoura (0:38 a 1:05; 68 palavras)
+Os dados existem. Falta virarem decisão.
+
+### Slide 3 · a solução: o controle de missão da lavoura (0:36 a 0:57; 52 palavras)
 
 A NASA não voa sem ensaio, sem controle de missão e sem relatório da missão. O produtor planta sem nenhum dos três.
 
-O Órbita Rural dá os três à lavoura.
+O Órbita Rural dá os três à lavoura, com dados abertos da NASA: a chuva do satélite GPM, a temperatura do NASA POWER e o verde da lavoura, do MODIS.
 
-Antes de plantar, o ensaio: a rotação dele e outras duas, contra dez safras de clima de verdade. Durante a safra, o controle de missão: a lavoura dele, hoje, na tela. Depois de colher, o relatório da missão.
+### Slide 4 · a demonstração do ensaio (1:00 a 1:27; 68 palavras)
 
-### Slide 4 · a demonstração do ensaio (1:08 a 1:32; 62 palavras)
+Um produtor de Rio Verde plantou a soja tarde, em dez de novembro. Milho ou sorgo?
 
-Um produtor de Rio Verde plantou a soja tarde, em dez de novembro. E pergunta: milho ou sorgo?
+No ano ruim, com milho faltam 253 milímetros de água; com sorgo, 220. O milho pega nove dias de calor forte na fase crítica; o sorgo, nenhum. Com capim junto, a terra fica 30 dias sem planta viva, e não 122.
 
-No ano ruim, com milho faltam 253 milímetros de água. Com sorgo, 220. O milho pega nove dias de calor forte na fase crítica. O sorgo, nenhum. Com capim junto, a terra fica 30 dias sem planta viva, e não 122.
+A tela mostra o risco de cada caminho. Ele escolhe sabendo.
 
-Ele escolhe sabendo.
+### Slide 5 · a demonstração do controle de missão (1:29 a 2:00; 77 palavras)
 
-### Slide 5 · a demonstração do controle de missão (1:35 a 2:07; 81 palavras)
+Ele abre o aplicativo e vê a lavoura hoje: a fase, a água na terra, o calor, o verde visto do satélite, a terra coberta. E o aviso: sem chuva, a lavoura entra em sede em sete dias. Ele tem uma semana para agir.
 
-Durante a safra, ele abre o aplicativo e vê a lavoura hoje: a fase da cultura, a água na terra, o calor, o verde visto do satélite, a terra coberta. E o aviso: se não chover, a lavoura entra em sede em sete dias.
-
-Rio Verde, safra de 2016. Quatro de abril: começa a sede. Vinte e quatro de abril. Neste dia a água acabou.
+Rio Verde, 2016. Quatro de abril: começa a sede. Vinte e quatro de abril: a água acabou.
 
 O produtor não sabia. O satélite sabia.
 
 O controle de missão teria avisado vinte dias antes.
 
-### Slide 6 · a prova: o tira-teima com o passado (2:10 a 2:32; 55 palavras)
+### Slide 6 · a prova e o diferencial (2:03 a 2:31; 72 palavras)
 
 Dá para confiar?
 
@@ -55,15 +55,19 @@ Fizemos o tira-teima com o passado: dez safras, nos vinte municípios que mais p
 
 Onde o sistema apontou mais falta de água, a colheita do IBGE foi menor. Nos vinte.
 
-E a chuva do satélite ficou mais perto da chuva medida no chão em 21 de 27 estações.
+E a chuva do satélite ficou mais perto da medida no chão em 21 de 27 estações.
 
-### Slide 7 · o fecho (2:34 a 3:01; 68 palavras)
+O zoneamento oficial diz quando plantar.
+
+O Órbita Rural ensaia a rotação e avisa a sede, de graça.
+
+### Slide 7 · o próximo passo e o fecho (2:34 a 3:00; 66 palavras)
+
+O próximo passo: mais cidades, mais culturas e o teste com uma cooperativa de Goiás nesta safra.
 
 Há dez mil anos o agricultor olha para o céu esperando uma resposta.
 
-Agora ela chega no celular dele: o ensaio antes de plantar, a lavoura acompanhada durante a safra, o aprendizado depois da colheita.
-
-Para o produtor, de graça; quem paga é a cooperativa.
+Agora ela chega no celular dele, de graça; quem paga é a cooperativa.
 
 A NASA não voa sem controle de missão. A lavoura também não precisa mais.
 

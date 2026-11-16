@@ -11,17 +11,18 @@ antes de plantar, o controle de missão durante a safra e o relatório da missã
 | `slides-pt.pptx` | os mesmos 7 slides em português, no formato que dá para editar |
 | `slides-en.pdf` | os 7 slides em inglês, para a submissão |
 | `slides-en.pptx` | os mesmos 7 slides em inglês, no formato que dá para editar |
-| `roteiro-falado.md` | a fala de cada slide, em português (3 minutos pela contagem de palavras), com as respostas curtas para as perguntas dos jurados |
+| `roteiro-falado.md` | a fala de cada slide, em português (413 palavras, 3:00 pela contagem de palavras), com as respostas curtas para as perguntas dos jurados |
 | `submissao-en.md` | o texto da página do projeto, em inglês |
 | `video-30s.mp4` | o vídeo de 30 segundos, com a legenda em inglês |
 
 **Os 7 slides:** a abertura; a dor; a solução (o controle de missão da lavoura); a demonstração do ensaio; a
-demonstração do controle de missão ("Minha lavoura hoje" e a safra de 2016); a prova, em Goiás; o fecho.
+demonstração do controle de missão ("Minha lavoura hoje" e a safra de 2016); o diferencial (o comparativo "o que existe
+hoje" contra "Órbita Rural", com a prova, em Goiás, numa linha); o próximo passo e o fecho, com a linha da equipe.
 
 **A demonstração da submissão.** O concurso aceita um dos dois como demonstração do projeto: os slides em inglês
 (`slides-en.pdf`) ou o vídeo (`video-30s.mp4`). O time escolhe qual vai.
 
-**O que está a preencher.** Na capa dos slides, os nomes dos integrantes (o espaço entre colchetes). No `submissao-en.md`, os endereços do repositório, da demonstração e do aplicativo, e os
+**O que está a preencher.** Na capa e no último slide, os nomes dos integrantes (o espaço entre colchetes). No `submissao-en.md`, os endereços do repositório, da demonstração e do aplicativo, e os
 nomes dos integrantes (marcados com `[a preencher]`); a nota do começo daquele arquivo sai antes de colar o texto na
 página do projeto.
 
